@@ -1,2 +1,3 @@
 # azdev
-Knack-based devtools for AzureCLI
+
+Tool to aid in developing for Azure CLI command modules and extensions.
