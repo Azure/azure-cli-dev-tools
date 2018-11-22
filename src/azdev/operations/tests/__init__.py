@@ -74,7 +74,7 @@ def run_tests(cmd, tests, xml_path=None, ci_mode=False, discover=False, in_serie
             continue
 
     # Tests have been collected. Now run them.
-    if  not tests:
+    if not test_paths:
         raise CLIError('No tests selected to run.')
 
     runner = get_test_runner(parallel=not in_series, log_path=xml_path)

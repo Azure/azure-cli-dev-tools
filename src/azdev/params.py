@@ -10,6 +10,7 @@ import os
 from knack.arguments import ArgumentsContext
 
 from azdev.utilities import ENV_VAR_TEST_MODULES
+from azdev.completer import get_test_completion
 
 
 class Flag(object):
@@ -35,7 +36,7 @@ def load_arguments(self, command):
         c.argument('xml_path', options_list='--xml-path', help='Path and filename at which to store the results in XML format. If omitted, the file will be saved as `test_results.xml` in your `.azdev` directory.')
         c.argument('in_series', options_list='--series', action='store_true', help='Disable test parallelization.')
         c.argument('run_live', options_list='--live', action='store_true', help='Run all tests live.')
-        c.positional('tests', nargs='*', help='Space separated list of tests to run. Can specify test filenames, class name or individual method names.')
+        c.positional('tests', nargs='*', help='Space separated list of tests to run. Can specify test filenames, class name or individual method names.', completer=get_test_completion)
         c.argument('profile', options_list='--profile', help='Run automation against a specific profile. If omit, the tests will run against current profile.')
         c.argument('pytest_args', nargs=argparse.REMAINDER, options_list=['--pytest-args', '-a'], help='Denotes the remaining args will be passed to pytest.')
 
