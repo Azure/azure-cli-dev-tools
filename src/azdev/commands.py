@@ -19,6 +19,7 @@ def load_command_table(self, args):
 
     with CommandGroup(self, '', operation_group('setup')) as g:
         g.command('setup', 'setup')
+        g.command('configure', 'configure')
 
     # TODO: enhance with tox support
     with CommandGroup(self, '', operation_group('tests')) as g:

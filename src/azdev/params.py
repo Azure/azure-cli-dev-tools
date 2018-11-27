@@ -36,9 +36,10 @@ def load_arguments(self, command):
         c.argument('xml_path', options_list='--xml-path', help='Path and filename at which to store the results in XML format. If omitted, the file will be saved as `test_results.xml` in your `.azdev` directory.')
         c.argument('in_series', options_list='--series', action='store_true', help='Disable test parallelization.')
         c.argument('run_live', options_list='--live', action='store_true', help='Run all tests live.')
-        c.positional('tests', nargs='*', help='Space separated list of tests to run. Can specify test filenames, class name or individual method names.', completer=get_test_completion)
+        c.positional('tests', nargs='*', help='Space-separated list of tests to run. Can specify test filenames, class name or individual method names.', completer=get_test_completion)
         c.argument('profile', options_list='--profile', help='Run automation against a specific profile. If omit, the tests will run against current profile.')
         c.argument('pytest_args', nargs=argparse.REMAINDER, options_list=['--pytest-args', '-a'], help='Denotes the remaining args will be passed to pytest.')
+        c.argument('last_failed', options_list='--lf', action='store_true', help='Re-run the last tests that failed.')
 
     with ArgumentsContext(self, 'coverage') as c:
         c.argument('prefix', type=str, help='Filter analysis by command prefix.')
@@ -46,7 +47,7 @@ def load_arguments(self, command):
         c.argument('untested_params', nargs='+', help='Space-separated list of param dest values to search for (OR logic)')
 
     with ArgumentsContext(self, 'style') as c:
-        c.argument('modules', options_list='--modules', nargs='+', help='Space-separated list of modules. Accept short names, except azure-cli, azure-cli-core, and azure-cli-nspkg.')
+        c.positional('modules', nargs='*', help='Space-separated list of modules or extensions to check.')
         c.argument('pylint', action='store_true', help='Run pylint.')
         c.argument('pep8', action='store_true', help='Run flake8 to check PEP8.')
 

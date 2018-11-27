@@ -31,7 +31,7 @@ DEFAULT_RESULT_PATH = os.path.join(get_azdev_config_dir(), DEFAULT_RESULT_FILE)
 
 
 def run_tests(cmd, tests, xml_path=None, ci_mode=False, discover=False, in_series=False,
-              run_live=False, profile=None, pytest_args=None):
+              run_live=False, profile=None, last_failed=False, pytest_args=None):
 
     from .pytest_runner import get_test_runner
 
@@ -63,11 +63,27 @@ def run_tests(cmd, tests, xml_path=None, ci_mode=False, discover=False, in_serie
         core_names = [name for name, _ in get_core_module_paths()]
         tests = module_names + core_names
 
+    def _find_test(index, name):
+        name_comps = name.split('.')
+        num_comps = len(name_comps)
+        key_error = KeyError()
+        for i in range(num_comps):
+            check_name = '.'.join(name_comps[(-1 - i):])
+            try:
+                match = index[check_name]
+                if check_name != name:
+                    logger.info("Test found using just '{}'. The rest of the name was ignored.\n".format(check_name))
+                return match
+            except KeyError as ex:
+                key_error = ex
+                continue
+        raise key_error
+
     # lookup test paths from index
     test_paths = []
-    for t in tests:   
+    for t in tests:
         try:
-            test_path = os.path.normpath(test_index[t])
+            test_path = os.path.normpath(_find_test(test_index, t))
             test_paths.append(test_path)
         except KeyError:
             logger.warning("'{}' not found. If newly added, re-run with --discover".format(t))
@@ -77,7 +93,7 @@ def run_tests(cmd, tests, xml_path=None, ci_mode=False, discover=False, in_serie
     if not test_paths:
         raise CLIError('No tests selected to run.')
 
-    runner = get_test_runner(parallel=not in_series, log_path=xml_path)
+    runner = get_test_runner(parallel=not in_series, log_path=xml_path, last_failed=last_failed)
     exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
     _summarize_test_results(xml_path)
 

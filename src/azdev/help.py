@@ -13,7 +13,12 @@ helps[''] = """
 
 
 helps['setup'] = """
-    short-summary: Set up the CLI for development.
+    short-summary: Set up your environment for development of Azure CLI command modules and/or extensions.
+"""
+
+
+helps['configure'] = """
+    short-summary: Configure `azdev` for development.
 """
 
 
@@ -92,7 +97,7 @@ helps['test'] = """
           text: azdev test {mod1} {mod2}
 
         - name: Re-run the tests that failed the previous run.
-          text: azdev test -a --lf
+          text: azdev test --lf
 
         - name: Run tests for a module but run the tests that failed last time first.
           text: azdev test {mod} -a --ff

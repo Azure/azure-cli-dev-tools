@@ -4,7 +4,18 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-from azure.cli.core.decorators import Completer
+# TODO: import from Knack once it is moved
+# pylint: disable=too-few-public-methods
+class Completer(object):
+
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, **kwargs):
+        namespace = kwargs['parsed_args']
+        prefix = kwargs['prefix']
+        cmd = namespace._cmd  # pylint: disable=protected-access
+        return self.func(cmd, prefix, namespace)
 
 
 @Completer

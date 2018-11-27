@@ -8,10 +8,6 @@ import sys
 import time
 import yaml
 
-from azure.cli.core import MainCommandsLoader
-from azure.cli.core.commands.arm import (
-    register_ids_argument, register_global_subscription_argument)
-
 from knack.arguments import ignore_type, ArgumentsContext
 from knack import events
 from knack.help_files import helps

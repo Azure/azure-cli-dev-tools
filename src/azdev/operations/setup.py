@@ -70,7 +70,7 @@ def _install_modules(cli_path):
     total_mods = len(all_modules)
     for name, path in all_modules:
         try:
-            pip_cmd("install -q -e {}".format(path), "Installing module `azure-cli-{}` ({}/{})...".format(name, mod_num, total_mods))
+            pip_cmd("install -q -e {}".format(path), "Installing module `{}` ({}/{})...".format(name, mod_num, total_mods))
             mod_num += 1
         except CalledProcessError as err:
             # exit code is not zero
@@ -217,9 +217,16 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
     else:
         _cli_and_extension_install(cli_path, ext_path)
 
+    # TODO: Final step, re-install azdev in the virtual environment
+    # in order to have all needed packages.
+
     end = time.time()
     elapsed_min = int((end - start) / 60)
     elapsed_sec = int(end - start) % 60
     display('\nElapsed time: {} min {} sec'.format(elapsed_min, elapsed_sec))
 
     heading('Finished dev setup!')
+
+
+def configure(cmd):
+    raise CLIError('TODO: Implement!')

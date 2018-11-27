@@ -41,6 +41,10 @@ setup(
     python_requires='>=2.7,!=3.4,!=3.3,!=3.2,!=3.1,!=3.0,<=3.8',
     packages=[
         'azdev',
+        'azdev.operations',
+        'azdev.operations.linter',
+        'azdev.operations.tests',
+        'azdev.utilities',
     ],
     install_requires=[
         'docutils',
