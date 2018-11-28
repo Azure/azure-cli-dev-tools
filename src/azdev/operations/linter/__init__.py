@@ -33,11 +33,13 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
     # needed to remove helps from azdev
     azdev_helps = helps.copy()
     exclusions = {}
-    selected_modules = get_path_table(filter=modules)
-    selected_mod_names = [name for name, _ in selected_modules]
+    path_table = get_path_table(filter=modules)
+
+    selected_mod_names = path_table['mod'].keys() + path_table['core'].keys() + path_table['ext'].keys()
+    selected_mod_paths = path_table['mod'].values() + path_table['core'].values() + path_table['ext'].values()
 
     # collect all rule exclusions
-    for _, path in selected_modules:
+    for path in selected_mod_paths:
         exclusion_path = os.path.join(path, 'linter_exclusions.yml')
         if os.path.isfile(exclusion_path):
             mod_exclusions = yaml.load(open(exclusion_path))
@@ -68,6 +70,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
         help_entry = yaml.load(help_yaml)
         help_file_entries[entry_name] = help_entry
 
+    # TODO: Not working for extensions!
     # trim command table and help to just selected_modules
     command_loader, help_file_entries = filter_modules(
         command_loader, help_file_entries, modules=selected_mod_names)

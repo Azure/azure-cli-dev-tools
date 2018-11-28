@@ -51,13 +51,17 @@ def load_arguments(self, command):
         c.argument('pylint', action='store_true', help='Run pylint.')
         c.argument('pep8', action='store_true', help='Run flake8 to check PEP8.')
 
+    for scope in ['history', 'version']:
+        with ArgumentsContext(self, 'verify {}'.format(scope)) as c:
+            c.positional('modules', nargs='*', help='Space-separated list of modules to check.')
+
     with ArgumentsContext(self, 'verify versions') as c:
         c.argument('base_repo', help='Path to directory containeing the CLI repo with the base versions to compare against.')
         c.argument('base_tag', help='The Git tag name that represents the base repo.')
 
     with ArgumentsContext(self, 'linter') as c:
+        c.positional('modules', nargs='*', help='Space-separated list of modules or extensions to check.')
         c.argument('rules', options_list=['--rules', '-r'], nargs='+', help='Space-separated list of rules to run. Omit to run all rules.')
-        c.argument('extensions', options_list=['--extensions', '-e'], nargs='+', help='Space-separated list of extensions to check.')
         c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries'], help='Space-separated list of rule types to run. Omit to run all.')
 
     for scope in ['extension add', 'extension remove']:

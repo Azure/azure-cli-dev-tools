@@ -66,7 +66,7 @@ def _map_help_files_not_found(cli_repo, help_files_in_map):
 def _help_files_not_in_map(cli_repo, help_files_in_map):
     found_files = []
     not_in_map = []
-    for name, path in get_path_table()['mod']:
+    for name, path in get_path_table()['mod'].items():
         name.replace(COMMAND_MODULE_PREFIX, '')
         help_file = os.path.join(path, 'azure', 'cli', 'command_modules', name, HELP_FILE_NAME)
         if os.path.isfile(help_file):
