@@ -24,7 +24,7 @@ def load_arguments(self, command):
         c.argument('ci_mode', options_list='--ci', action='store_true', help='Run in CI mode.')
         c.argument('private', action='store_true', help='Target the private repo.')
 
-    with ArgumentsContext(self, 'setup') as c:
+    with ArgumentsContext(self, '') as c:
         c.argument('cli_path', options_list=['--cli', '-c'], nargs='?', const=Flag, help='Path to an existing Azure CLI repo or the location where it will be cloned. No value to search for existing repo.')
         c.argument('ext_path', options_list=['--ext', '-e'], nargs='?', const=Flag, help='Path to an existing Azure CLI extensions repo or the location where it will be cloned. No value to search for existing repo.')
         c.argument('yes', action='store_true', options_list=['--yes', '-y'], help='Accept all prompts.')
@@ -59,3 +59,7 @@ def load_arguments(self, command):
         c.argument('rules', options_list=['--rules', '-r'], nargs='+', help='Space-separated list of rules to run. Omit to run all rules.')
         c.argument('extensions', options_list=['--extensions', '-e'], nargs='+', help='Space-separated list of extensions to check.')
         c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries'], help='Space-separated list of rule types to run. Omit to run all.')
+
+    for scope in ['extension add', 'extension remove']:
+        with ArgumentsContext(self, scope) as c:
+            c.positional('extensions', metavar='NAME', nargs='+', help='Space-separated list of extension names.')

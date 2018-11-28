@@ -17,8 +17,7 @@ logger = get_logger(__name__)
 
 
 from azdev.utilities import (
-    display, heading, subheading, py_cmd, get_core_module_paths, get_command_module_paths, get_extension_paths,
-    filter_module_paths)
+    display, heading, subheading, py_cmd, get_path_table)
 
 
 def check_style(cmd, modules=None, pylint=False, pep8=False):
@@ -28,11 +27,9 @@ def check_style(cmd, modules=None, pylint=False, pep8=False):
 
     heading('Style Check')
 
-    all_modules = get_command_module_paths() + get_core_module_paths() + get_extension_paths()
+    selected_modules = get_path_table(filter=modules)
     pep8_result = None
     pylint_result = None
-
-    selected_modules = filter_module_paths(all_modules, modules)
 
     if not selected_modules:
         raise CLIError('No modules selected.')
@@ -66,11 +63,11 @@ def check_style(cmd, modules=None, pylint=False, pep8=False):
 
     # print error messages last
     if pep8_result and pep8_result.error:
-        logger.error(pep8_result.error.output)
-        logger.error('Flake8: FAILED')
+        logger.error(pep8_result.error.output.decode('utf-8'))
+        logger.error('Flake8: FAILED\n')
     if pylint_result and pylint_result.error:
-        logger.error(pylint_result.error.output)
-        logger.error('Pylint: FAILED')
+        logger.error(pylint_result.error.output.decode('utf-8'))
+        logger.error('Pylint: FAILED\n')
 
     sys.exit(exit_code_sum)
 
@@ -85,7 +82,7 @@ def _run_pylint(cli_path, ext_path, modules):
         os.path.join(cli_path, 'pylintrc'),
         multiprocessing.cpu_count())
 
-    return py_cmd(command, message='Running pylint...', show_stderr=True)
+    return py_cmd(command, message='Running pylint...')
 
 
 def _run_pep8(cli_path, ext_path, modules):
@@ -95,4 +92,4 @@ def _run_pep8(cli_path, ext_path, modules):
         os.path.join(cli_path, '.flake8'),
         ' '.join(path for _, path in modules))
 
-    return py_cmd(command, message='Running flake8...', show_stderr=True)
+    return py_cmd(command, message='Running flake8...')

@@ -47,6 +47,11 @@ def load_command_table(self, args):
     with CommandGroup(self, 'sdk', operation_group('python_sdk')) as g:
         g.command('draft', 'install_draft_sdk')
 
+    with CommandGroup(self, 'extension', operation_group('extensions')) as g:
+        g.command('add', 'add_extension')
+        g.command('remove', 'remove_extension')
+        g.command('list', 'list_extensions')
+
     # TODO: implement
     # with CommandGroup(self, operation_group('help')) as g:
     #     g.command('generate', 'generate_help_xml')

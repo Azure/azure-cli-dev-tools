@@ -21,7 +21,7 @@ from azdev.utilities import (
     ENV_VAR_TEST_MODULES, ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
-    get_core_module_paths, get_command_module_paths, get_extension_paths)
+    get_path_table)
 
 logger = get_logger(__name__)
 
@@ -59,9 +59,8 @@ def run_tests(cmd, tests, xml_path=None, ci_mode=False, discover=False, in_serie
     if ci_mode:
         # CI Mode runs specific modules
         # TODO: linter was included, but now this will be in azdev...
-        module_names = [name for name, _ in get_command_module_paths()]
-        core_names = [name for name, _ in get_core_module_paths()]
-        tests = module_names + core_names
+        path_table = get_path_table()
+        tests = path_table['core'].keys() + path_table['mod'].keys()
 
     def _find_test(index, name):
         name_comps = name.split('.')
@@ -178,28 +177,30 @@ def _discover_tests(profile):
     profile_split = profile.split('-')
     profile_namespace = '_'.join([profile_split[-1]] + profile_split[:-1])
 
-    core_modules = get_core_module_paths()
-    command_modules = get_command_module_paths(include_prefix=False)
-    extensions = get_extension_paths()
-
     heading('Discovering Tests')
+
+    path_table = get_path_table()
+    core_modules = path_table['core'].items()
+    command_modules = path_table['mod'].items()
+    extensions = path_table['ext'].items()
 
     module_data = {}
 
     logger.info('\nCore Modules: %s', ', '.join([name for name, _ in core_modules]))
     for mod_name, mod_path in core_modules:
         filepath = mod_path
-        for comp in os.path.basename(mod_path).split('-'):
+        for comp in mod_name.split('-'):
             filepath = os.path.join(filepath, comp)
         mod_data = {
             'filepath': os.path.join(filepath, 'tests'),
-            'base_path': 'azure.cli.{}.tests'.format(mod_name),
+            'base_path': '{}.tests'.format(mod_name).replace('-', '.'),
             'files': {}
         }
         module_data[mod_name] = _discover_module_tests(mod_name, mod_data)
 
     logger.info('\nCommand Modules: %s', ', '.join([name for name, _ in command_modules]))
     for mod_name, mod_path in command_modules:
+        mod_name = mod_name.replace(COMMAND_MODULE_PREFIX, '')
         mod_data = {
             'filepath': os.path.join(mod_path, 'azure', 'cli', 'command_modules', mod_name, 'tests', profile_namespace),
             'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(mod_name, profile_namespace),

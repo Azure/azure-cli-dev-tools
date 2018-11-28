@@ -14,8 +14,12 @@ helps[''] = """
 
 helps['setup'] = """
     short-summary: Set up your environment for development of Azure CLI command modules and/or extensions.
+    long-summary: Find or clones the relevant repositories and installs the necessary modules.
 """
 
+helps['configure'] = """
+    short-summary: Configure azdev for use without installing anything.
+"""
 
 helps['configure'] = """
     short-summary: Configure `azdev` for development.
@@ -126,4 +130,26 @@ helps['sdk'] = """
 
 helps['sdk draft'] = """
     short-summary: Install draft packages from the Python SDK repo.
+"""
+
+
+helps['extension'] = """
+    short-summary: Control which CLI extensions are visible in the development environment.
+"""
+
+
+helps['extension add'] = """
+    short-summary: Make an extension visible to the development environment.
+    long-summary: The source code for the extension must already be on your machine.
+"""
+
+
+helps['extension remove'] = """
+    short-summary: Make an extension no longer visible to the development environment.
+    long-summary: This does not remove the extensions source code from your machine.
+"""
+
+
+helps['extension list'] = """
+    short-summary: List what extensions are currently visible to your development environment.
 """

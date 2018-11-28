@@ -52,12 +52,14 @@ setup(
         'future',
         'gitpython',
         'knack~=0.5.1',
-        'pylint>=1.9.2',
+        'pylint==1.9.2',
         'pytest',
         'pytest-xdist',
         'tox',
         'virtualenv'
     ],
+    package_data={'azdev.config': ['*.*']},
+    include_package_data=True,
     entry_points={
         'console_scripts': ['azdev=azdev:launch']
     }

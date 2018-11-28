@@ -14,7 +14,7 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     display, heading, subheading,
-    get_cli_repo_path, get_command_module_paths,
+    get_cli_repo_path, get_path_table,
     COMMAND_MODULE_PREFIX
 )
 
@@ -66,7 +66,7 @@ def _map_help_files_not_found(cli_repo, help_files_in_map):
 def _help_files_not_in_map(cli_repo, help_files_in_map):
     found_files = []
     not_in_map = []
-    for name, path in get_command_module_paths():
+    for name, path in get_path_table()['mod']:
         name.replace(COMMAND_MODULE_PREFIX, '')
         help_file = os.path.join(path, 'azure', 'cli', 'command_modules', name, HELP_FILE_NAME)
         if os.path.isfile(help_file):

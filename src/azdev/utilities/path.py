@@ -6,7 +6,7 @@
 from importlib import import_module
 import os
 import pkgutil
-import glob
+from glob import glob
 import sys
 
 from knack.util import CLIError
@@ -73,54 +73,80 @@ def make_dirs(path):
             raise
 
 
-def get_command_module_paths(include_prefix=False):
-    """ Returns a list of command module names and paths.
+def get_path_table(filter=None):
+    """ Gets a table which contains the long and short names of different modules and extensions and the path to them. The structure looks like:
 
-    :param include_prefix: (bool) preserve the 'azure-cli-' prefix in module names.
-    :returns: [(str, str)] List of (name, path) tuples.
+    {
+        'core': {
+            NAME: PATH,
+            ...
+        },
+        'mod': {
+            NAME: PATH,
+            ...
+        },
+        'ext': {
+            NAME: PATH,
+            ...
+        }
+    }
     """
+
+    # determine whether the call will filter or return all
+    if isinstance(filter, str):
+        filter = [filter]
+    get_all = not filter
+
+    table = {}
     cli_path = get_cli_repo_path()
-    glob_pattern = os.path.normcase(os.path.join('src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py'))
-    paths = []
-    for path in glob.glob(os.path.join(cli_path, glob_pattern)):
-        folder = os.path.dirname(path)
-        name = os.path.basename(folder)
-        if not include_prefix:
-            name = name[len(COMMAND_MODULE_PREFIX):]
-        paths.append((name, folder))
-    return paths
-
-
-def get_core_module_paths(include_prefix=False):
-    """ Returns a list of core module names and paths.
-
-    :param include_prefix: (bool) preserve the 'azure-cli-' prefix in module names.
-    :returns: [(str, str)] List of (name, path) tuples.
-    """
-    cli_path = get_cli_repo_path()
-    paths = []
-    for path in glob.glob(cli_path + os.path.normcase('/src/*/setup.py')):
-        name = os.path.basename(os.path.dirname(path))
-        if not include_prefix:
-            name = name[len(COMMAND_MODULE_PREFIX):] or '__main__'
-        folder = os.path.join(os.path.dirname(path))
-        paths.append((name, folder))
-    return paths
-
-
-def get_extension_paths():
-    """ Returns a list of extension names and paths.
-
-    :returns: [(str, str)] List of (name, path) tuples.
-    """
     ext_path = get_ext_repo_path()
-    glob_pattern = os.path.normcase(os.path.join('src', '*', '*.egg-info'))
-    paths = []
-    for path in glob.glob(os.path.join(ext_path, glob_pattern)):
-        folder = os.path.dirname(path)
-        name = os.path.basename(folder)
-        paths.append((name, folder))
-    return paths
+    module_pattern = os.path.normcase(os.path.join(cli_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py'))
+    core_pattern = os.path.normcase(os.path.join(cli_path, 'src', '*', 'setup.py'))
+    ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', '*.egg-info'))
+
+    def _update_table(pattern, key):
+        if key not in table:
+            table[key] = {}
+        folder = None
+        long_name = None
+        short_name = None
+        for path in glob(pattern):
+            folder = os.path.dirname(path)
+            long_name = os.path.basename(folder)
+            # determine short-names
+            if key == 'ext':
+                for item in os.listdir(folder):
+                    if item.startswith(EXTENSION_PREFIX):
+                        short_name = item
+                        break
+            else:
+                short_name = long_name[len(COMMAND_MODULE_PREFIX):] or '__main__'
+
+            if get_all:
+                table[key][long_name] = folder
+                continue
+            elif not filter:
+                # nothing left to filter
+                return
+            else:
+                # check and update filter
+                if short_name in filter:
+                    filter.remove(short_name)
+                    table[key][short_name] = folder
+                if long_name in filter:
+                    # long name takes precedence to ensure path doesn't appear twice
+                    filter.remove(long_name)
+                    table[key].pop(short_name)
+                    table[key][long_name] = folder
+
+    _update_table(module_pattern, 'mod')
+    _update_table(core_pattern, 'core')
+    _update_table(ext_pattern, 'ext')
+
+    if filter:
+        raise CLIError('unrecognized names: {}'.format(' '.join(filter)))
+
+    return table
 
 
 def filter_module_paths(paths, filter):

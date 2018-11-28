@@ -14,8 +14,7 @@ from knack.help_files import helps
 from knack.log import get_logger
 
 from azdev.utilities import (
-    heading, subheading, display,
-    get_command_module_paths, get_extension_paths, filter_module_paths)
+    heading, subheading, display, get_path_table)
 
 from .linter import LinterManager
 from .util import filter_modules
@@ -34,8 +33,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
     # needed to remove helps from azdev
     azdev_helps = helps.copy()
     exclusions = {}
-    all_modules = get_command_module_paths() + get_extension_paths()
-    selected_modules = filter_module_paths(all_modules, modules)
+    selected_modules = get_path_table(filter=modules)
     selected_mod_names = [name for name, _ in selected_modules]
 
     # collect all rule exclusions

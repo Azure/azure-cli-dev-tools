@@ -11,7 +11,6 @@ import sys
 
 from knack.log import get_logger
 
-from azdev.utilities import get_command_module_paths
 
 logger = get_logger(__name__)
 

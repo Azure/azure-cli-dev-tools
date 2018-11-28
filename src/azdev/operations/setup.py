@@ -15,7 +15,7 @@ from knack.util import CLIError
 
 from azdev.params import Flag
 from azdev.utilities import (
-    display, heading, cmd, py_cmd, pip_cmd, find_file, get_command_module_paths, IS_WINDOWS)
+    display, heading, subheading, cmd, py_cmd, pip_cmd, find_file, IS_WINDOWS, get_path_table)
 
 logger = get_logger(__name__)
 
@@ -63,7 +63,7 @@ def _check_repo(path):
 
 def _install_modules(cli_path):
 
-    all_modules = list(get_command_module_paths(cli_path))
+    all_modules = list(get_path_table()['mod'].items())
 
     failures = []
     mod_num = 1
@@ -145,10 +145,8 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
     if not (cli_path or ext_path):
         raise CLIError("usage error: must specify at least one of --cli or --ext")
 
-    cli_path, cli_exists = _get_path(cli_path, "azure-cli.pyproj", "azure-cli")
-    ext_path, ext_exists = _get_path(
-        ext_path, "azure-cli-extensions.pyproj", "azure-cli-extensions"
-    )
+    cli_path, cli_exists = _get_path(cli_path, 'azure-cli.pyproj', 'azure-cli')
+    ext_path, ext_exists = _get_path(ext_path, 'azure-cli-extensions.pyproj', 'azure-cli-extensions')
 
     cli_clone = False
     ext_clone = False
@@ -204,7 +202,7 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
         from azdev.utilities import get_azure_config
         config.set_value('ext', 'repo_path', ext_path)
         az_config = get_azure_config()
-        az_config.set_value('extension', 'dir', '{}/src'.format(ext_path))
+        az_config.set_value('extension', 'dir', os.path.join(ext_path, 'src'))
 
     if cli_path:
         config.set_value('cli', 'repo_path', cli_path)
@@ -228,5 +226,30 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
     heading('Finished dev setup!')
 
 
-def configure(cmd):
-    raise CLIError('TODO: Implement!')
+def configure(cmd, cli_path=None, ext_path=None):
+
+    heading('Azdev Configure')
+
+    cli_path, cli_exists = _get_path(cli_path or Flag, 'azure-cli.pyproj', 'azure-cli')
+    ext_path, ext_exists = _get_path(ext_path or Flag, 'azure-cli-extensions.pyproj', 'azure-cli-extensions')
+
+    if cli_path and cli_exists:
+        _check_repo(cli_path)
+        display("Azure CLI repo found at: {}".format(cli_path))
+
+    if ext_path and ext_exists:
+        _check_repo(ext_path)
+        display("Azure CLI extensions repo found at: {}".format(ext_path))
+
+    # save data to config files
+    config = cmd.cli_ctx.config
+    if ext_path:
+        from azdev.utilities import get_azure_config
+        config.set_value('ext', 'repo_path', ext_path)
+        az_config = get_azure_config()
+        az_config.set_value('extension', 'dir', os.path.join(ext_path, 'src'))
+
+    if cli_path:
+        config.set_value('cli', 'repo_path', cli_path)
+
+    subheading('Azdev configured!')

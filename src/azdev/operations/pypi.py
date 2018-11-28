@@ -14,9 +14,7 @@ except ImportError:
 
 
 from azdev.utilities import (
-    display, heading, subheading, cmd, py_cmd, get_core_module_paths, get_command_module_paths,
-    get_cli_repo_path, filter_module_paths
-)
+    display, heading, subheading, cmd, py_cmd, get_cli_repo_path, get_path_table)
 
 from knack.log import get_logger
 
@@ -29,8 +27,7 @@ SETUP_PY_NAME = 'setup.py'
 
 # region verify History Headings
 def check_history(modules=None):
-    all_modules = get_core_module_paths() + get_command_module_paths()
-    selected_modules = filter_module_paths(all_modules, modules)
+    selected_modules = get_path_table(filter=modules)
 
     heading('Verify History')
 
@@ -116,8 +113,7 @@ def _check_readme_render(mod_path):
 
 # region verify PyPI versions
 def check_versions(modules=None, base_repo=None, base_tag=None):
-    all_modules = get_core_module_paths() + get_command_module_paths()
-    selected_modules = filter_module_paths(all_modules, modules)
+    selected_modules = get_path_path(filter=modules)
     base_repo = base_repo or get_cli_repo_path()
 
     heading('Verify PyPI Verions')
