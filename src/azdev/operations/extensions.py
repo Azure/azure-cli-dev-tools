@@ -42,35 +42,38 @@ def add_extension(extensions):
 
 def remove_extension(extensions):
     ext_path = get_ext_repo_path()
-    installed_ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', '*.egg-info'))
-    installed_extensions = glob(installed_ext_pattern)
-
+    installed_paths = []
+    installed_paths.extend(glob(os.path.normcase(os.path.join(ext_path, 'src', '*', '*.*-info'))))
     paths_to_remove = []
-    for path in installed_extensions:
+    for path in installed_paths:
         target_path = None
         folder = os.path.dirname(path)
         long_name = os.path.basename(folder)
         if long_name in extensions:
-            paths_to_remove.append(path)
+            paths_to_remove.append(folder)
             extensions.remove(long_name)
     # raise error if any extension not installed
     if extensions:
         raise CLIError('extension(s) not installed: {}'.format(' '.join(extensions)))
 
     for path in paths_to_remove:
-        # delete the egg-info folder to make the extension invisible to the CLI and azdev
-        display("Removing '{}'...".format(path))
-        shutil.rmtree(path)
+        for d in os.listdir(path):
+            # delete the egg-info and dist-info folders to make the extension invisible to the CLI and azdev
+            if d.endswith('egg-info') or d.endswith('dist-info'):
+                path_to_remove = os.path.join(path, d)
+                display("Removing '{}'...".format(path_to_remove))
+                shutil.rmtree(path_to_remove)
 
 
 def list_extensions():
     ext_path = get_ext_repo_path()
     all_ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', 'setup.py'))
-    installed_ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', '*.egg-info'))
+    installed_paths = []
+    installed_paths.extend(glob(os.path.normcase(os.path.join(ext_path, 'src', '*', '*.*-info'))))
 
     results = []
     installed = []
-    for path in glob(installed_ext_pattern):
+    for path in installed_paths:
         folder = os.path.dirname(path)
         long_name = os.path.basename(folder)
         results.append({'name': '{} (INSTALLED)'.format(long_name), 'path': folder})

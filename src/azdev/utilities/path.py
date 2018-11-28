@@ -102,7 +102,7 @@ def get_path_table(filter=None):
     ext_path = get_ext_repo_path()
     module_pattern = os.path.normcase(os.path.join(cli_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py'))
     core_pattern = os.path.normcase(os.path.join(cli_path, 'src', '*', 'setup.py'))
-    ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', '*.egg-info'))
+    ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', '*.*-info'))
 
     def _update_table(pattern, key):
         if key not in table:

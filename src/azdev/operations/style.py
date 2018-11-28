@@ -34,7 +34,8 @@ def check_style(cmd, modules=None, pylint=False, pep8=False):
     if not selected_modules:
         raise CLIError('No modules selected.')
 
-    display('Modules: {}\n'.format(', '.join(name for name, _ in selected_modules)))
+    mod_names = selected_modules['mod'].keys() + selected_modules['core'].keys() + selected_modules['ext'].keys()
+    display('Modules: {}\n'.format(', '.join(mod_names)))
 
     # if neither flag provided, same as if both were provided
     if not any([pylint, pep8]):
@@ -75,10 +76,9 @@ def check_style(cmd, modules=None, pylint=False, pep8=False):
 def _run_pylint(cli_path, ext_path, modules):
 
     # TODO: Update to use ext_path as well
-    modules_list = ' '.join(
-        [os.path.join(path, 'azure') for name, path in modules if not name.endswith('-nspkg')])
+    mod_paths = modules['core'].values() + modules['mod'].values() + modules['ext'].values()
     command = 'pylint {} --rcfile={} -j {}'.format(
-        modules_list,
+        mod_paths,
         os.path.join(cli_path, 'pylintrc'),
         multiprocessing.cpu_count())
 
@@ -88,8 +88,9 @@ def _run_pylint(cli_path, ext_path, modules):
 def _run_pep8(cli_path, ext_path, modules):
 
     # TODO: Update to use ext_path as well
+    mod_paths = modules['core'].values() + modules['mod'].values() + modules['ext'].values()
     command = 'flake8 --statistics --append-config={} {}'.format(
         os.path.join(cli_path, '.flake8'),
-        ' '.join(path for _, path in modules))
+        ' '.join(mod_paths))
 
     return py_cmd(command, message='Running flake8...')
