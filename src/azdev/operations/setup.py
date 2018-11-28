@@ -6,6 +6,7 @@
 
 import os
 from subprocess import CalledProcessError
+from shutil import copytree, rmtree
 import sys
 import time
 
@@ -15,7 +16,8 @@ from knack.util import CLIError
 
 from azdev.params import Flag
 from azdev.utilities import (
-    display, heading, subheading, cmd, py_cmd, pip_cmd, find_file, IS_WINDOWS, get_path_table)
+    display, heading, subheading, cmd, py_cmd, pip_cmd, find_file, IS_WINDOWS, get_path_table,
+    get_azdev_config_dir)
 
 logger = get_logger(__name__)
 
@@ -136,6 +138,22 @@ def _get_venv_activate_command(venv):
     return os.path.join(venv, "Scripts" if IS_WINDOWS else "bin", "activate")
 
 
+def _copy_config_files():
+    from glob import glob
+    from importlib import import_module
+
+    config_mod = import_module('azdev.config')
+    config_dir_path = config_mod.__dict__['__path__'][0]
+    dest_path = os.path.join(get_azdev_config_dir(), 'config_files')
+    if os.path.exists(dest_path):
+        rmtree(dest_path)
+    copytree(config_dir_path, dest_path)
+    # remove the python __init__ files
+    pattern = os.path.join(dest_path, '*.py*')
+    for path in glob(pattern):
+        os.remove(path)
+
+
 def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
 
     start = time.time()
@@ -218,6 +236,8 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
     # TODO: Final step, re-install azdev in the virtual environment
     # in order to have all needed packages.
 
+    _copy_config_files()
+
     end = time.time()
     elapsed_min = int((end - start) / 60)
     elapsed_sec = int(end - start) % 60
@@ -251,5 +271,7 @@ def configure(cmd, cli_path=None, ext_path=None):
 
     if cli_path:
         config.set_value('cli', 'repo_path', cli_path)
+
+    _copy_config_files()
 
     subheading('Azdev configured!')

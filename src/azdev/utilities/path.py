@@ -3,7 +3,6 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
-from importlib import import_module
 import os
 import pkgutil
 from glob import glob
@@ -136,7 +135,7 @@ def get_path_table(filter=None):
                 if long_name in filter:
                     # long name takes precedence to ensure path doesn't appear twice
                     filter.remove(long_name)
-                    table[key].pop(short_name)
+                    table[key].pop(short_name, None)
                     table[key][long_name] = folder
 
     _update_table(module_pattern, 'mod')
