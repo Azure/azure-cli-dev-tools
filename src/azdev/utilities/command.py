@@ -5,7 +5,6 @@
 # -----------------------------------------------------------------------------
 
 import os
-import shlex
 import subprocess
 import sys
 
@@ -27,7 +26,7 @@ def call(command, **kwargs):
     :returns: (int) process exit code.
     """
     return subprocess.call(
-        shlex.split(command),
+        command.split(),
         shell=IS_WINDOWS,
         **kwargs)
 
@@ -50,7 +49,7 @@ def cmd(command, message=False, show_stderr=True, **kwargs):
 
     try:
         output = subprocess.check_output(
-            shlex.split(command),
+            command.split(),
             stderr=subprocess.STDOUT if show_stderr else None,
             shell=IS_WINDOWS,
             **kwargs).decode('utf-8').strip()

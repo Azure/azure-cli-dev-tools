@@ -21,7 +21,7 @@ from azdev.utilities import (
     ENV_VAR_TEST_MODULES, ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
-    get_core_module_paths, get_command_module_paths, get_extension_paths)
+    get_path_table)
 
 logger = get_logger(__name__)
 
@@ -31,7 +31,7 @@ DEFAULT_RESULT_PATH = os.path.join(get_azdev_config_dir(), DEFAULT_RESULT_FILE)
 
 
 def run_tests(cmd, tests, xml_path=None, ci_mode=False, discover=False, in_series=False,
-              run_live=False, profile=None, pytest_args=None):
+              run_live=False, profile=None, last_failed=False, pytest_args=None):
 
     from .pytest_runner import get_test_runner
 
@@ -59,25 +59,40 @@ def run_tests(cmd, tests, xml_path=None, ci_mode=False, discover=False, in_serie
     if ci_mode:
         # CI Mode runs specific modules
         # TODO: linter was included, but now this will be in azdev...
-        module_names = [name for name, _ in get_command_module_paths()]
-        core_names = [name for name, _ in get_core_module_paths()]
-        tests = module_names + core_names
+        path_table = get_path_table()
+        tests = path_table['core'].keys() + path_table['mod'].keys()
+
+    def _find_test(index, name):
+        name_comps = name.split('.')
+        num_comps = len(name_comps)
+        key_error = KeyError()
+        for i in range(num_comps):
+            check_name = '.'.join(name_comps[(-1 - i):])
+            try:
+                match = index[check_name]
+                if check_name != name:
+                    logger.info("Test found using just '{}'. The rest of the name was ignored.\n".format(check_name))
+                return match
+            except KeyError as ex:
+                key_error = ex
+                continue
+        raise key_error
 
     # lookup test paths from index
     test_paths = []
-    for t in tests:   
+    for t in tests:
         try:
-            test_path = os.path.normpath(test_index[t])
+            test_path = os.path.normpath(_find_test(test_index, t))
             test_paths.append(test_path)
         except KeyError:
             logger.warning("'{}' not found. If newly added, re-run with --discover".format(t))
             continue
 
     # Tests have been collected. Now run them.
-    if  not tests:
+    if not test_paths:
         raise CLIError('No tests selected to run.')
 
-    runner = get_test_runner(parallel=not in_series, log_path=xml_path)
+    runner = get_test_runner(parallel=not in_series, log_path=xml_path, last_failed=last_failed)
     exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
     _summarize_test_results(xml_path)
 
@@ -162,28 +177,30 @@ def _discover_tests(profile):
     profile_split = profile.split('-')
     profile_namespace = '_'.join([profile_split[-1]] + profile_split[:-1])
 
-    core_modules = get_core_module_paths()
-    command_modules = get_command_module_paths(include_prefix=False)
-    extensions = get_extension_paths()
-
     heading('Discovering Tests')
+
+    path_table = get_path_table()
+    core_modules = path_table['core'].items()
+    command_modules = path_table['mod'].items()
+    extensions = path_table['ext'].items()
 
     module_data = {}
 
     logger.info('\nCore Modules: %s', ', '.join([name for name, _ in core_modules]))
     for mod_name, mod_path in core_modules:
         filepath = mod_path
-        for comp in os.path.basename(mod_path).split('-'):
+        for comp in mod_name.split('-'):
             filepath = os.path.join(filepath, comp)
         mod_data = {
             'filepath': os.path.join(filepath, 'tests'),
-            'base_path': 'azure.cli.{}.tests'.format(mod_name),
+            'base_path': '{}.tests'.format(mod_name).replace('-', '.'),
             'files': {}
         }
         module_data[mod_name] = _discover_module_tests(mod_name, mod_data)
 
     logger.info('\nCommand Modules: %s', ', '.join([name for name, _ in command_modules]))
     for mod_name, mod_path in command_modules:
+        mod_name = mod_name.replace(COMMAND_MODULE_PREFIX, '')
         mod_data = {
             'filepath': os.path.join(mod_path, 'azure', 'cli', 'command_modules', mod_name, 'tests', profile_namespace),
             'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(mod_name, profile_namespace),

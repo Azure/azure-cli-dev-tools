@@ -6,19 +6,20 @@
 
 # import automation.utilities.path as automation_path
 
+from glob import glob
 import multiprocessing
 import os
 import sys
 
 from knack.log import get_logger
-from knack.util import CLIError
+from knack.util import CLIError, CommandResultItem
 
 logger = get_logger(__name__)
 
 
 from azdev.utilities import (
-    display, heading, subheading, py_cmd, get_core_module_paths, get_command_module_paths, get_extension_paths,
-    filter_module_paths)
+    display, heading, subheading, py_cmd, get_path_table, EXTENSION_PREFIX,
+    get_azdev_config_dir)
 
 
 def check_style(cmd, modules=None, pylint=False, pep8=False):
@@ -28,16 +29,19 @@ def check_style(cmd, modules=None, pylint=False, pep8=False):
 
     heading('Style Check')
 
-    all_modules = get_command_module_paths() + get_core_module_paths() + get_extension_paths()
+    selected_modules = get_path_table(filter=modules)
     pep8_result = None
     pylint_result = None
-
-    selected_modules = filter_module_paths(all_modules, modules)
 
     if not selected_modules:
         raise CLIError('No modules selected.')
 
-    display('Modules: {}\n'.format(', '.join(name for name, _ in selected_modules)))
+    mod_names = selected_modules['mod'].keys() + selected_modules['core'].keys()
+    ext_names = selected_modules['ext'].keys()
+    if mod_names:
+        display('Modules: {}\n'.format(', '.join(mod_names)))
+    if ext_names:
+        display('Extensions: {}\n'.format(', '.join(ext_names)))
 
     # if neither flag provided, same as if both were provided
     if not any([pylint, pep8]):
@@ -66,33 +70,77 @@ def check_style(cmd, modules=None, pylint=False, pep8=False):
 
     # print error messages last
     if pep8_result and pep8_result.error:
-        logger.error(pep8_result.error.output)
-        logger.error('Flake8: FAILED')
+        logger.error(pep8_result.error.output.decode('utf-8'))
+        logger.error('Flake8: FAILED\n')
     if pylint_result and pylint_result.error:
-        logger.error(pylint_result.error.output)
-        logger.error('Pylint: FAILED')
+        logger.error(pylint_result.error.output.decode('utf-8'))
+        logger.error('Pylint: FAILED\n')
 
     sys.exit(exit_code_sum)
 
 
+def _combine_command_result(cli_result, ext_result):
+    final_result = CommandResultItem(None)
+    def apply(item):
+        if item:
+            final_result.exit_code += item.exit_code
+            if item.error:
+                if final_result.error:
+                    final_result.error.message += item.error.message
+                else:
+                    final_result.error = item.error
+            if item.result:
+                if final_result.result:
+                    final_result.result += item.result
+                else:
+                    final_result.result = item.result
+    apply(cli_result)
+    apply(ext_result)
+    return final_result
+
 def _run_pylint(cli_path, ext_path, modules):
 
-    # TODO: Update to use ext_path as well
-    modules_list = ' '.join(
-        [os.path.join(path, 'azure') for name, path in modules if not name.endswith('-nspkg')])
-    command = 'pylint {} --rcfile={} -j {}'.format(
-        modules_list,
-        os.path.join(cli_path, 'pylintrc'),
-        multiprocessing.cpu_count())
+    cli_paths = []
+    for path in modules['core'].values() + modules['mod'].values():
+        cli_paths.append(os.path.join(path, 'azure'))
 
-    return py_cmd(command, message='Running pylint...', show_stderr=True)
+    ext_paths = []
+    for path in modules['ext'].values():
+        glob_pattern = os.path.normcase(os.path.join('{}*'.format(EXTENSION_PREFIX)))
+        ext_paths.append(glob(os.path.join(path, glob_pattern))[0])
+    
+    def run(paths, rcfile, desc):
+        if not paths:
+            return None
+        config_path = os.path.join(get_azdev_config_dir(), 'config_files', rcfile)
+        logger.info('Using rcfile file: %s', config_path)
+        logger.info('Running on %s: %s', desc, ' '.join(paths))
+        command = 'pylint {} --rcfile={} -j {}'.format(' '.join(paths),
+            config_path,
+            multiprocessing.cpu_count())
+        return py_cmd(command, message='Running pylint on {}...'.format(desc))
+
+    cli_result = run(cli_paths, 'cli_pylintrc', 'modules')
+    ext_result = run(ext_paths, 'ext_pylintrc', 'extensions')
+    return _combine_command_result(cli_result, ext_result)
 
 
 def _run_pep8(cli_path, ext_path, modules):
 
-    # TODO: Update to use ext_path as well
-    command = 'flake8 --statistics --append-config={} {}'.format(
-        os.path.join(cli_path, '.flake8'),
-        ' '.join(path for _, path in modules))
+    cli_paths = modules['core'].values() + modules['mod'].values()
+    ext_paths = modules['ext'].values()
 
-    return py_cmd(command, message='Running flake8...', show_stderr=True)
+    def run(paths, config_file, desc):
+        if not paths:
+            return
+        config_path = os.path.join(get_azdev_config_dir(), 'config_files', config_file)
+        logger.info('Using config file: %s', config_path)
+        logger.info('Running on %s: %s', desc, ' '.join(paths))
+        command = 'flake8 --statistics --append-config={} {}'.format(
+            config_path,
+            ' '.join(paths))
+        return py_cmd(command, message='Running flake8 on {}...'.format(desc))
+
+    cli_result = run(cli_paths, 'cli.flake8', 'modules')
+    ext_result = run(ext_paths, 'ext.flake8', 'extensions')
+    return _combine_command_result(cli_result, ext_result)

@@ -34,10 +34,7 @@ from .path import (
     get_azdev_repo_path,
     get_cli_repo_path,
     get_ext_repo_path,
-    get_extension_paths,
-    get_command_module_paths,
-    get_core_module_paths,
-    filter_module_paths
+    get_path_table
 )
 
 
@@ -64,8 +61,5 @@ __all__ = [
     'get_azdev_repo_path',
     'get_cli_repo_path',
     'get_ext_repo_path',
-    'get_extension_paths',
-    'get_command_module_paths',
-    'get_core_module_paths',
-    'filter_module_paths'
+    'get_path_table'
 ]

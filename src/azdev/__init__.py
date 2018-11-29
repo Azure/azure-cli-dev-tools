@@ -17,6 +17,7 @@ __VERSION__ = "0.1.0"
 
 
 class AzDevCli(CLI):
+
     def get_cli_version(self):
         return __VERSION__
 
