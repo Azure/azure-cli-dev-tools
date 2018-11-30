@@ -20,14 +20,14 @@ from azdev.utilities import (
     cmd, py_cmd, pip_cmd, find_file, IS_WINDOWS,
     ENV_VAR_TEST_MODULES, ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
-    make_dirs, get_azdev_config_dir,
+    make_dirs, get_env_config_dir,
     get_path_table)
 
 logger = get_logger(__name__)
 
 
 DEFAULT_RESULT_FILE = 'test_results.xml'
-DEFAULT_RESULT_PATH = os.path.join(get_azdev_config_dir(), DEFAULT_RESULT_FILE)
+DEFAULT_RESULT_PATH = os.path.join(get_env_config_dir(), DEFAULT_RESULT_FILE)
 
 
 def run_tests(cmd, tests, xml_path=None, ci_mode=False, discover=False, in_series=False,
@@ -266,7 +266,8 @@ def _discover_tests(profile):
 
 
 def _get_test_index(cmd, profile, discover):
-    test_index_dir = os.path.join(cmd.cli_ctx.config.config_dir, 'test_index')
+    config_dir = get_env_config_dir()
+    test_index_dir = os.path.join(config_dir, 'test_index')
     make_dirs(test_index_dir)
     test_index_path = os.path.join(test_index_dir, '{}.json'.format(profile))
     test_index = {}

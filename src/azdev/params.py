@@ -64,6 +64,12 @@ def load_arguments(self, command):
         c.argument('rules', options_list=['--rules', '-r'], nargs='+', help='Space-separated list of rules to run. Omit to run all rules.')
         c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries'], help='Space-separated list of rule types to run. Omit to run all.')
 
+    with ArgumentsContext(self, 'perf') as c:
+        c.argument('runs', type=int, help='Number of runs to average performance over.')
+
     for scope in ['extension add', 'extension remove']:
         with ArgumentsContext(self, scope) as c:
             c.positional('extensions', metavar='NAME', nargs='+', help='Space-separated list of extension names.')
+
+    with ArgumentsContext(self, 'extension update-index') as c:
+        c.positional('extension', metavar='URL', help='URL to an extension WHL file.')

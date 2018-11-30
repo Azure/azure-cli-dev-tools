@@ -19,7 +19,6 @@ from azdev.utilities import (
 logger = get_logger(__name__)
 
 TOTAL = 'ALL'
-NUM_RUNS = 3
 DEFAULT_THRESHOLD = 10
 
 # TODO: Treat everything as bubble instead of specific modules
@@ -33,14 +32,14 @@ THRESHOLDS = {
 }
 
 
-def check_load_time():
+def check_load_time(runs=3):
     heading('Module Load Performance')
 
     regex = r"[^']*'([^']*)'[\D]*([\d\.]*)"
 
     results = {TOTAL: []}
     # Time the module loading X times
-    for i in range(0, NUM_RUNS + 1):
+    for i in range(0, runs + 1):
         lines = cmd('az -h --debug', show_stderr=True).result
         if i == 0:
             # Ignore the first run since it can be longer due to *.pyc file compilation

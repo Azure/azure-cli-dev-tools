@@ -45,6 +45,7 @@ setup(
         'azdev.operations',
         'azdev.operations.linter',
         'azdev.operations.tests',
+        'azdev.operations.extensions',
         'azdev.utilities',
     ],
     install_requires=[

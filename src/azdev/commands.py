@@ -51,6 +51,7 @@ def load_command_table(self, args):
         g.command('add', 'add_extension')
         g.command('remove', 'remove_extension')
         g.command('list', 'list_extensions')
+        g.command('update-index', 'update_extension_index')
 
     # TODO: implement
     # with CommandGroup(self, operation_group('help')) as g:

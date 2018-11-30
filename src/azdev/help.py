@@ -153,3 +153,7 @@ helps['extension remove'] = """
 helps['extension list'] = """
     short-summary: List what extensions are currently visible to your development environment.
 """
+
+helps['extension update-index'] = """
+    short-summary: Update the extensions index.json from a built WHL file.
+"""
