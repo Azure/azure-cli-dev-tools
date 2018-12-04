@@ -17,12 +17,9 @@ helps['setup'] = """
     long-summary: Find or clones the relevant repositories and installs the necessary modules.
 """
 
-helps['configure'] = """
-    short-summary: Configure azdev for use without installing anything.
-"""
 
 helps['configure'] = """
-    short-summary: Configure `azdev` for development.
+    short-summary: Configure azdev for use without installing anything.
 """
 
 

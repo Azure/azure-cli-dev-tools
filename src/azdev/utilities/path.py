@@ -30,9 +30,9 @@ def get_cli_repo_path():
 
     :returns: Path (str) to Azure CLI repo.
     """
-    from .config import get_azdev_config
+    from .config import get_env_config
     try:
-        return get_azdev_config().get('cli', 'repo_path', None)
+        return get_env_config().get('cli', 'repo_path', None)
     except Exception:
         CLIError('Unable to retrieve CLI repo path from config. Please run `azdev setup`.')
 
@@ -42,9 +42,9 @@ def get_ext_repo_path():
 
     :returns: Path (str) to Azure CLI extensions repo.
     """
-    from .config import get_azdev_config
+    from .config import get_env_config
     try:
-        return get_azdev_config().get('ext', 'repo_path')
+        return get_env_config().get('ext', 'repo_path')
     except Exception:
         CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup`.')
 
@@ -72,7 +72,7 @@ def make_dirs(path):
             raise
 
 
-def get_path_table(filter=None):
+def get_path_table(include_only=None):
     """ Gets a table which contains the long and short names of different modules and extensions and the path to them. The structure looks like:
 
     {
@@ -92,9 +92,9 @@ def get_path_table(filter=None):
     """
 
     # determine whether the call will filter or return all
-    if isinstance(filter, str):
-        filter = [filter]
-    get_all = not filter
+    if isinstance(include_only, str):
+        include_only = [include_only]
+    get_all = not include_only
 
     table = {}
     cli_path = get_cli_repo_path()
@@ -124,17 +124,17 @@ def get_path_table(filter=None):
             if get_all:
                 table[key][long_name] = folder
                 continue
-            elif not filter:
+            elif not include_only:
                 # nothing left to filter
                 return
             else:
                 # check and update filter
-                if short_name in filter:
-                    filter.remove(short_name)
+                if short_name in include_only:
+                    include_only.remove(short_name)
                     table[key][short_name] = folder
-                if long_name in filter:
+                if long_name in include_only:
                     # long name takes precedence to ensure path doesn't appear twice
-                    filter.remove(long_name)
+                    include_only.remove(long_name)
                     table[key].pop(short_name, None)
                     table[key][long_name] = folder
 
@@ -142,29 +142,7 @@ def get_path_table(filter=None):
     _update_table(core_pattern, 'core')
     _update_table(ext_pattern, 'ext')
 
-    if filter:
-        raise CLIError('unrecognized names: {}'.format(' '.join(filter)))
+    if include_only:
+        raise CLIError('unrecognized names: {}'.format(' '.join(include_only)))
 
     return table
-
-
-def filter_module_paths(paths, filter):
-    """ Filter command module and extension paths.
-
-    :param paths: [(str, str)] List of (name, path) tuples.
-    :param filter: [str] List of command module or extension names to return, or None to return all.
-    """
-    if not filter:
-        return paths
-
-    if isinstance(filter, str):
-        filter = [filter]
-
-    filtered = []
-    for name, path in paths:
-        if name in filter:
-            filtered.append((name, path))
-            filter.remove(name)
-    if filter:
-        raise CLIError('unrecognized names: {}'.format(' '.join(filter)))
-    return filtered

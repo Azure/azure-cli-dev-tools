@@ -7,7 +7,9 @@ from .config import (
     get_azure_config,
     get_azure_config_dir,
     get_azdev_config,
-    get_azdev_config_dir
+    get_azdev_config_dir,
+    get_env_config,
+    get_env_config_dir
 )
 from .command import (
     call,
@@ -53,6 +55,8 @@ __all__ = [
     'get_azure_config',
     'get_azdev_config_dir',
     'get_azdev_config',
+    'get_env_config',
+    'get_env_config_dir',
     'ENV_VAR_TEST_MODULES',
     'ENV_VAR_TEST_LIVE',
     'IS_WINDOWS',
