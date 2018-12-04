@@ -73,3 +73,10 @@ def load_arguments(self, command):
 
     with ArgumentsContext(self, 'extension update-index') as c:
         c.positional('extension', metavar='URL', help='URL to an extension WHL file.')
+
+    with ArgumentsContext(self, 'group delete') as c:
+        c.argument('product', help='Value for tag `product` to mark for deletion.', arg_group='Tag')
+        c.argument('older_than', type=int, help='Minimum age (in hours) for tag `date` to mark for deletion.', arg_group='Tag')
+        c.argument('cause', help='Value for tag `cause` to mark for deletion.', arg_group='Tag')
+        c.argument('yes', options_list=['--yes', '-y'], help='Do not prompt.')
+        c.argument('prefixes', options_list=['--prefixes', '-p'], nargs='+', help='Space-separated list of prefixes to filter by.')

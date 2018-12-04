@@ -53,6 +53,9 @@ def load_command_table(self, args):
         g.command('list', 'list_extensions')
         g.command('update-index', 'update_extension_index')
 
+    with CommandGroup(self, 'group', operation_group('resource')) as g:
+        g.command('delete', 'delete_groups')
+
     # TODO: implement
     # with CommandGroup(self, operation_group('help')) as g:
     #     g.command('generate', 'generate_help_xml')

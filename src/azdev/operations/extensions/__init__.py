@@ -112,7 +112,7 @@ def update_extension_index(extension):
     # Extract the extension name
     try:
         extension_name = re.findall(NAME_REGEX, extension)[0]
-        extension_name = extension_name.replace('_', '-')
+        extension_name = extension_name.replace('_', '-')az
     except IndexError:
         raise ValueError('unable to parse extension name')
 
