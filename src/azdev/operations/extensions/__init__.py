@@ -4,11 +4,10 @@
 # --------------------------------------------------------------------------------------------
 
 from collections import OrderedDict
-from glob import glob
 import os
 import shutil
 
-from azdev.utilities import pip_cmd, display, get_ext_repo_path
+from azdev.utilities import pip_cmd, display, get_ext_repo_path, find_files
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -18,8 +17,7 @@ logger = get_logger(__name__)
 
 def add_extension(extensions):
     ext_path = get_ext_repo_path()
-    all_ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', 'setup.py'))
-    all_extensions = glob(all_ext_pattern)
+    all_extensions = find_files(ext_path, 'setup.py')
 
     paths_to_add = []
     for path in all_extensions:
@@ -41,8 +39,7 @@ def add_extension(extensions):
 
 def remove_extension(extensions):
     ext_path = get_ext_repo_path()
-    installed_paths = []
-    installed_paths.extend(glob(os.path.normcase(os.path.join(ext_path, 'src', '*', '*.*-info'))))
+    installed_paths = find_files(ext_path, '*.*-info')
     paths_to_remove = []
     for path in installed_paths:
         target_path = None
@@ -66,9 +63,7 @@ def remove_extension(extensions):
 
 def list_extensions():
     ext_path = get_ext_repo_path()
-    all_ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', 'setup.py'))
-    installed_paths = []
-    installed_paths.extend(glob(os.path.normcase(os.path.join(ext_path, 'src', '*', '*.*-info'))))
+    installed_paths = find_files(ext_path, '*.*-info')
 
     results = []
     installed = []
@@ -78,7 +73,7 @@ def list_extensions():
         results.append({'name': '{} (INSTALLED)'.format(long_name), 'path': folder})
         installed.append(long_name)
 
-    for path in glob(all_ext_pattern):
+    for path in find_files(ext_path, 'setup.py'):
         folder = os.path.dirname(path)
         long_name = os.path.basename(folder)
         if long_name not in installed:

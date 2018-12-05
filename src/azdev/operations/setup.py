@@ -220,7 +220,7 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
         from azdev.utilities import get_azure_config
         config.set_value('ext', 'repo_path', ext_path)
         az_config = get_azure_config()
-        az_config.set_value('extension', 'dir', os.path.join(ext_path))
+        az_config.set_value('extension', 'dev_sources', os.path.join(ext_path))
 
     if cli_path:
         config.set_value('cli', 'repo_path', cli_path)
@@ -267,7 +267,7 @@ def configure(cmd, cli_path=None, ext_path=None):
         from azdev.utilities import get_azure_config
         config.set_value('ext', 'repo_path', ext_path)
         az_config = get_azure_config()
-        az_config.set_value('extension', 'dir', os.path.join(ext_path))
+        az_config.set_value('extension', 'dev_sources', os.path.join(ext_path))
 
     if cli_path:
         config.set_value('cli', 'repo_path', cli_path)

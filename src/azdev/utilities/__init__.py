@@ -32,6 +32,7 @@ from .display import (
 )
 from .path import (
     find_file,
+    find_files,
     make_dirs,
     get_azdev_repo_path,
     get_cli_repo_path,
@@ -61,6 +62,7 @@ __all__ = [
     'ENV_VAR_TEST_LIVE',
     'IS_WINDOWS',
     'find_file',
+    'find_files',
     'make_dirs',
     'get_azdev_repo_path',
     'get_cli_repo_path',

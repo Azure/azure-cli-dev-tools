@@ -60,6 +60,18 @@ def find_file(file_name):
     return None
 
 
+def find_files(root_path, file_pattern):
+    """ Returns the paths to all files that match a given pattern.
+
+    :returns: Paths ([str]) to files matching the given pattern.
+    """
+    paths = []
+    for path, dirs, files in os.walk(root_path):
+        pattern = os.path.join(path, file_pattern)
+        paths.extend(glob(pattern))
+    return paths
+
+
 def make_dirs(path):
     """ Create directories recursively. """
     import errno
@@ -99,17 +111,17 @@ def get_path_table(include_only=None):
     table = {}
     cli_path = get_cli_repo_path()
     ext_path = get_ext_repo_path()
-    module_pattern = os.path.normcase(os.path.join(cli_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py'))
-    core_pattern = os.path.normcase(os.path.join(cli_path, 'src', '*', 'setup.py'))
-    ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', '*.*-info'))
+    modules_paths = glob(os.path.normcase(os.path.join(cli_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py')))
+    core_paths = glob(os.path.normcase(os.path.join(cli_path, 'src', '*', 'setup.py')))
+    ext_paths = find_files(ext_path, '*.*-info')
 
-    def _update_table(pattern, key):
+    def _update_table(paths, key):
         if key not in table:
             table[key] = {}
         folder = None
         long_name = None
         short_name = None
-        for path in glob(pattern):
+        for path in paths:
             folder = os.path.dirname(path)
             long_name = os.path.basename(folder)
             # determine short-names
@@ -138,9 +150,9 @@ def get_path_table(include_only=None):
                     table[key].pop(short_name, None)
                     table[key][long_name] = folder
 
-    _update_table(module_pattern, 'mod')
-    _update_table(core_pattern, 'core')
-    _update_table(ext_pattern, 'ext')
+    _update_table(modules_paths, 'mod')
+    _update_table(core_paths, 'core')
+    _update_table(ext_paths, 'ext')
 
     if include_only:
         raise CLIError('unrecognized names: {}'.format(' '.join(include_only)))
