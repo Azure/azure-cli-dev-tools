@@ -17,12 +17,9 @@ helps['setup'] = """
     long-summary: Find or clones the relevant repositories and installs the necessary modules.
 """
 
-helps['configure'] = """
-    short-summary: Configure azdev for use without installing anything.
-"""
 
 helps['configure'] = """
-    short-summary: Configure `azdev` for development.
+    short-summary: Configure azdev for use without installing anything.
 """
 
 
@@ -152,4 +149,16 @@ helps['extension remove'] = """
 
 helps['extension list'] = """
     short-summary: List what extensions are currently visible to your development environment.
+"""
+
+helps['extension update-index'] = """
+    short-summary: Update the extensions index.json from a built WHL file.
+"""
+
+helps['group delete'] = """
+    short-summary: Delete several resource groups with filters. Useful for cleaning up test resources.
+    long-summary: >
+        Can filter either by key tags used by the CLI infrastructure, or by name prefix. If name prefix
+        is used, the tag filters will be ignored. This command doesn't guarantee the resource group will
+        be deleted.
 """

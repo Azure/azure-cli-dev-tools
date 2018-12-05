@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 
 from azdev.utilities import (
     display, heading, subheading, py_cmd, get_path_table, EXTENSION_PREFIX,
-    get_azdev_config_dir)
+    get_env_config_dir)
 
 
 def check_style(cmd, modules=None, pylint=False, pep8=False):
@@ -112,7 +112,7 @@ def _run_pylint(cli_path, ext_path, modules):
     def run(paths, rcfile, desc):
         if not paths:
             return None
-        config_path = os.path.join(get_azdev_config_dir(), 'config_files', rcfile)
+        config_path = os.path.join(get_env_config_dir(), 'config_files', rcfile)
         logger.info('Using rcfile file: %s', config_path)
         logger.info('Running on %s: %s', desc, ' '.join(paths))
         command = 'pylint {} --rcfile={} -j {}'.format(' '.join(paths),
@@ -133,7 +133,7 @@ def _run_pep8(cli_path, ext_path, modules):
     def run(paths, config_file, desc):
         if not paths:
             return
-        config_path = os.path.join(get_azdev_config_dir(), 'config_files', config_file)
+        config_path = os.path.join(get_env_config_dir(), 'config_files', config_file)
         logger.info('Using config file: %s', config_path)
         logger.info('Running on %s: %s', desc, ' '.join(paths))
         command = 'flake8 --statistics --append-config={} {}'.format(

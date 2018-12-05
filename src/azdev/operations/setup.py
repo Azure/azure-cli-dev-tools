@@ -17,7 +17,7 @@ from knack.util import CLIError
 from azdev.params import Flag
 from azdev.utilities import (
     display, heading, subheading, cmd, py_cmd, pip_cmd, find_file, IS_WINDOWS, get_path_table,
-    get_azdev_config_dir)
+    get_env_config_dir, get_env_config)
 
 logger = get_logger(__name__)
 
@@ -144,7 +144,7 @@ def _copy_config_files():
 
     config_mod = import_module('azdev.config')
     config_dir_path = config_mod.__dict__['__path__'][0]
-    dest_path = os.path.join(get_azdev_config_dir(), 'config_files')
+    dest_path = os.path.join(get_env_config_dir(), 'config_files')
     if os.path.exists(dest_path):
         rmtree(dest_path)
     copytree(config_dir_path, dest_path)
@@ -213,14 +213,14 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
                 _get_venv_activate_command(venv)
             )
         )
+    config = get_env_config()
 
     # save data to config files
-    config = cmd.cli_ctx.config
     if ext_path:
         from azdev.utilities import get_azure_config
         config.set_value('ext', 'repo_path', ext_path)
         az_config = get_azure_config()
-        az_config.set_value('extension', 'dir', os.path.join(ext_path, 'src'))
+        az_config.set_value('extension', 'dir', os.path.join(ext_path))
 
     if cli_path:
         config.set_value('cli', 'repo_path', cli_path)
@@ -262,12 +262,12 @@ def configure(cmd, cli_path=None, ext_path=None):
         display("Azure CLI extensions repo found at: {}".format(ext_path))
 
     # save data to config files
-    config = cmd.cli_ctx.config
+    config = get_env_config()
     if ext_path:
         from azdev.utilities import get_azure_config
         config.set_value('ext', 'repo_path', ext_path)
         az_config = get_azure_config()
-        az_config.set_value('extension', 'dir', os.path.join(ext_path, 'src'))
+        az_config.set_value('extension', 'dir', os.path.join(ext_path))
 
     if cli_path:
         config.set_value('cli', 'repo_path', cli_path)
