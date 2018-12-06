@@ -29,7 +29,7 @@ SETUP_PY_NAME = 'setup.py'
 # region verify History Headings
 def check_history(modules=None):
     # TODO: Does not work with extensions
-    path_table = get_path_table(filter=modules)
+    path_table = get_path_table(include_only=modules)
     selected_modules = list(path_table['core'].items()) + list(path_table['mod'].items())
 
     heading('Verify History')
@@ -116,7 +116,7 @@ def _check_readme_render(mod_path):
 
 # region verify PyPI versions
 def check_versions(modules=None, base_repo=None, base_tag=None):
-    path_table = get_path_table(filter=modules)
+    path_table = get_path_table(include_only=modules)
     selected_modules = list(path_table['core'].items()) + list(path_table['mod'].items())
     base_repo = base_repo or get_cli_repo_path()
 

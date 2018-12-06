@@ -49,7 +49,7 @@ def _filter_mods(command_loader, help_file_entries, modules=None, exclude=False)
     command_loader.command_group_table = command_group_table
     help_file_entries = help_file_entries.copy()
 
-    for command_name in command_loader.command_table.keys():
+    for command_name in list(command_loader.command_table.keys()):
         try:
             source_name, is_extension = _get_command_source(command_name, command_loader.command_table)
         except LinterError as ex:
