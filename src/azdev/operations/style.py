@@ -19,25 +19,25 @@ logger = get_logger(__name__)
 
 from azdev.utilities import (
     display, heading, subheading, py_cmd, get_path_table, EXTENSION_PREFIX,
-    get_env_config_dir)
+    get_env_config_dir, get_cli_repo_path, get_ext_repo_path)
 
 
 def check_style(cmd, modules=None, pylint=False, pep8=False):
 
-    cli_path = cmd.cli_ctx.config.get('cli', 'repo_path')
-    ext_path = cmd.cli_ctx.config.get('ext', 'repo_path')
+    cli_path = get_cli_repo_path()
+    ext_path = get_ext_repo_path()
 
     heading('Style Check')
 
-    selected_modules = get_path_table(filter=modules)
+    selected_modules = get_path_table(include_only=modules)
     pep8_result = None
     pylint_result = None
 
     if not selected_modules:
         raise CLIError('No modules selected.')
 
-    mod_names = selected_modules['mod'].keys() + selected_modules['core'].keys()
-    ext_names = selected_modules['ext'].keys()
+    mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys())
+    ext_names = list(selected_modules['ext'].keys())
     if mod_names:
         display('Modules: {}\n'.format(', '.join(mod_names)))
     if ext_names:
@@ -101,11 +101,11 @@ def _combine_command_result(cli_result, ext_result):
 def _run_pylint(cli_path, ext_path, modules):
 
     cli_paths = []
-    for path in modules['core'].values() + modules['mod'].values():
+    for path in list(modules['core'].values()) + list(modules['mod'].values()):
         cli_paths.append(os.path.join(path, 'azure'))
 
     ext_paths = []
-    for path in modules['ext'].values():
+    for path in list(modules['ext'].values()):
         glob_pattern = os.path.normcase(os.path.join('{}*'.format(EXTENSION_PREFIX)))
         ext_paths.append(glob(os.path.join(path, glob_pattern))[0])
     
@@ -127,8 +127,8 @@ def _run_pylint(cli_path, ext_path, modules):
 
 def _run_pep8(cli_path, ext_path, modules):
 
-    cli_paths = modules['core'].values() + modules['mod'].values()
-    ext_paths = modules['ext'].values()
+    cli_paths = list(modules['core'].values()) + list(modules['mod'].values())
+    ext_paths = list(modules['ext'].values())
 
     def run(paths, config_file, desc):
         if not paths:

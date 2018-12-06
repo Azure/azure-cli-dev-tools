@@ -33,10 +33,10 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
     # needed to remove helps from azdev
     azdev_helps = helps.copy()
     exclusions = {}
-    path_table = get_path_table(filter=modules)
+    path_table = get_path_table(include_only=modules)
 
-    selected_mod_names = path_table['mod'].keys() + path_table['core'].keys() + path_table['ext'].keys()
-    selected_mod_paths = path_table['mod'].values() + path_table['core'].values() + path_table['ext'].values()
+    selected_mod_names = list(path_table['mod'].keys()) + list(path_table['core'].keys()) + list(path_table['ext'].keys())
+    selected_mod_paths = list(path_table['mod'].values()) + list(path_table['core'].values()) + list(path_table['ext'].values())
 
     # collect all rule exclusions
     for path in selected_mod_paths:
