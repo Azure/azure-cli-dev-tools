@@ -21,17 +21,18 @@ from azdev.utilities import (
     ENV_VAR_TEST_MODULES, ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_env_config_dir,
-    get_path_table)
+    get_path_table, require_virtual_env)
 
 logger = get_logger(__name__)
 
 
-DEFAULT_RESULT_FILE = 'test_results.xml'
-DEFAULT_RESULT_PATH = os.path.join(get_env_config_dir(), DEFAULT_RESULT_FILE)
-
-
 def run_tests(cmd, tests, xml_path=None, ci_mode=False, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None):
+
+    require_virtual_env()
+
+    DEFAULT_RESULT_FILE = 'test_results.xml'
+    DEFAULT_RESULT_PATH = os.path.join(get_env_config_dir(), DEFAULT_RESULT_FILE)
 
     from .pytest_runner import get_test_runner
 
