@@ -15,9 +15,10 @@ except ImportError:
 
 from azdev.utilities import (
     display, heading, subheading, cmd, py_cmd, get_cli_repo_path, get_path_table,
-    call)
+    pip_cmd, call)
 
 from knack.log import get_logger
+from knack.util import CLIError
 
 logger = get_logger(__name__)
 
@@ -228,3 +229,99 @@ def _version_in_base_repo(base_repo, mod_path, package_name, mod_version):
         logger.warning(str(ex))
     return False
 # endregion
+
+def _diff_files(filename, dir1, dir2):
+    import difflib
+    file1 = os.path.join(dir1, filename)
+    file2 = os.path.join(dir2, filename)
+    identical = True
+    with open(file1, 'r') as f1, open(file2, 'r') as f2:
+        for diff in difflib.context_diff(f1.readlines(), f2.readlines()):
+            logger.warning(diff)
+            identical = False
+    return identical
+
+def _compare_common_files(common_files, dir1, dir2):
+    import hashlib
+    identical = True
+    for filename in common_files:
+        if not _diff_files(filename, dir1, dir2):
+            identical = False
+    return identical
+
+def _compare_folders(dir1, dir2):
+    import filecmp
+    dirs_cmp = filecmp.dircmp(dir1, dir2)
+    if len(dirs_cmp.left_only) > 0 or len(dirs_cmp.right_only) > 0 or len(dirs_cmp.funny_files) > 0:
+        if len(dirs_cmp.left_only) == 1 and '__init__.py' in dirs_cmp.left_only:
+            pass
+        else:
+            return False
+    if not _compare_common_files(dirs_cmp.common_files, dir1, dir2):
+        return False
+    for common_dir in dirs_cmp.common_dirs:
+        new_dir1 = os.path.join(dir1, common_dir)
+        new_dir2 = os.path.join(dir2, common_dir)
+        if not _compare_folders(new_dir1, new_dir2):
+            return False
+    return True
+
+
+def verify_versions(mod):
+    import re
+    import tempfile
+    import shutil
+    import zipfile
+
+    path_table = get_path_table()
+    original_cwd = os.getcwd()
+
+    temp_dir = tempfile.mkdtemp()
+    #temp_dir = os.path.normpath('e:\\test')
+    build_dir = os.path.join(temp_dir, 'local')
+    pypi_dir = os.path.join(temp_dir, 'public')
+
+    version_pattern = re.compile(r'.*azure_cli[^-]*-(\d*.\d*.\d*).*')
+
+    downloaded_path = None
+    downloaded_version = None
+    build_path = None
+    build_version = None
+
+    # download the public PyPI package and extract the version
+    result = pip_cmd('download {} --no-deps -d {}'.format(mod, temp_dir)).result
+    for line in result.splitlines():
+        if line.endswith('.whl') and 'cached' not in line:
+            downloaded_path = line.replace('Saved ', '').strip()
+            downloaded_version = version_pattern.match(downloaded_path).group(1)
+            break
+
+    # build from source and extract the version
+    setup_path = os.path.normpath(path_table['mod'][mod].strip())
+    os.chdir(setup_path)
+    py_cmd('setup.py bdist_wheel -d {}'.format(build_dir))
+    if len(os.listdir(build_dir)) != 1:
+        raise CLIError('Unexpectedly found multiple build files found in {}.'.format(build_dir))
+    build_path = os.path.join(build_dir, os.listdir(build_dir)[0])
+    build_version = version_pattern.match(build_path).group(1)
+
+    if build_version != downloaded_version:
+        # TODO: Make this more robust? What if local version < public?
+        display('MOD: {} ... OK!'.format(mod))
+    else:
+        display('MOD: {} Public: {} Local: {} ... comparing...'.format(mod, downloaded_version, build_version))
+
+        # slight difference in dist-info dirs, so we must extract the azure folders and compare them
+        with zipfile.ZipFile(downloaded_path, 'r') as z:
+            z.extractall(pypi_dir)
+
+        with zipfile.ZipFile(build_path, 'r') as z:
+            z.extractall(build_dir)
+
+        if _compare_folders(os.path.join(pypi_dir, 'azure'), os.path.join(build_dir, 'azure')):
+            display('MOD: {} ... OK!'.format(mod))
+        else:
+            logger.warning('MOD: {} has the same version as PyPI but is different! Bump the version!'.format(mod))
+
+    shutil.rmtree(temp_dir)
+    os.chdir(original_cwd)
