@@ -116,180 +116,170 @@ def _check_readme_render(mod_path):
 
 
 # region verify PyPI versions
-def check_versions(modules=None, base_repo=None, base_tag=None):
-    path_table = get_path_table(include_only=modules)
-    selected_modules = list(path_table['core'].items()) + list(path_table['mod'].items())
-    base_repo = base_repo or get_cli_repo_path()
+# def check_versions(modules=None, base_repo=None, base_tag=None):
+#     path_table = get_path_table(include_only=modules)
+#     selected_modules = list(path_table['core'].items()) + list(path_table['mod'].items())
+#     base_repo = base_repo or get_cli_repo_path()
 
-    heading('Verify PyPI Verions')
+#     heading('Verify PyPI Verions')
 
-    module_names = sorted([name for name, _ in selected_modules])
-    display('Verifying PyPI versions for modules: {}'.format(' '.join(module_names)))
+#     module_names = sorted([name for name, _ in selected_modules])
+#     display('Verifying PyPI versions for modules: {}'.format(' '.join(module_names)))
 
-    failed_mods = []
-    for name, path in selected_modules:
-        errors = _check_package_version(name, path, base_repo=base_repo, base_tag=base_tag)
-        if errors:
-            failed_mods.append(name)
-            subheading('{} errors'.format(name))
-            for error in errors:
-                logger.error('%s\n', error)
-    subheading('Results')
-    if failed_mods:
-        display('The following modules have invalid versions:')
-        logger.error('\n'.join(failed_mods))
-        logger.warning('See above for the full warning/errors')
-        sys.exit(1)
-    display('OK')
-
-
-def check_versions_on_pypi(package_name, versions=None):
-    """ Query PyPI for package versions.
-
-    :param package_name: Name of the package on PyPI.
-    :module_version: The version(s) to query. Omit to return all versions.
-    :return [str] sorted list of version strings that match.
-    """
-    if isinstance(versions, str):
-        versions = [versions]
-
-    client = xmlrpclib.ServerProxy('https://pypi.python.org/pypi')
-    available_versions = sorted(client.package_releases(package_name, True))
-    if not versions:
-        return available_versions
-    return [v for v in available_versions if v in versions]
+#     failed_mods = []
+#     for name, path in selected_modules:
+#         errors = _check_package_version(name, path, base_repo=base_repo, base_tag=base_tag)
+#         if errors:
+#             failed_mods.append(name)
+#             subheading('{} errors'.format(name))
+#             for error in errors:
+#                 logger.error('%s\n', error)
+#     subheading('Results')
+#     if failed_mods:
+#         display('The following modules have invalid versions:')
+#         logger.error('\n'.join(failed_mods))
+#         logger.warning('See above for the full warning/errors')
+#         sys.exit(1)
+#     display('OK')
 
 
-def _get_mod_version(mod_path):
-    return cmd('python setup.py --version', cwd=mod_path).result
+# def check_versions_on_pypi(package_name, versions=None):
+#     """ Query PyPI for package versions.
+
+#     :param package_name: Name of the package on PyPI.
+#     :module_version: The version(s) to query. Omit to return all versions.
+#     :return [str] sorted list of version strings that match.
+#     """
+#     if isinstance(versions, str):
+#         versions = [versions]
+
+#     client = xmlrpclib.ServerProxy('https://pypi.python.org/pypi')
+#     available_versions = sorted(client.package_releases(package_name, True))
+#     if not versions:
+#         return available_versions
+#     return [v for v in available_versions if v in versions]
 
 
-def _check_package_version(mod_name, mod_path, base_repo=None, base_tag=None):
-    mod_version = _get_mod_version(mod_path)
-    package_name = 'azure-cli-{}'.format(mod_name)
-    errors = []
-    errors.append(_is_unreleased_version(package_name, mod_version))
-    #errors.append(_is_latest_version(package_name, mod_version))
-    errors.append(_contains_no_plus_dev(mod_version))
-    errors.append(_changes_require_version_bump(package_name, mod_version, mod_path, base_repo=base_repo, base_tag=base_tag))
-
-    # filter out "None" results
-    errors = [e for e in errors if e]
-    return errors
+# def _get_mod_version(mod_path):
+#     return cmd('python setup.py --version', cwd=mod_path).result
 
 
-def _is_unreleased_version(package_name, mod_version):
-    if check_versions_on_pypi(package_name, mod_version):
-        return '{} {} is already available on PyPI! Update the version.'.format(package_name, mod_version)
+# def _check_package_version(mod_name, mod_path, base_repo=None, base_tag=None):
+#     mod_version = _get_mod_version(mod_path)
+#     package_name = 'azure-cli-{}'.format(mod_name)
+#     errors = []
+#     errors.append(_is_unreleased_version(package_name, mod_version))
+#     #errors.append(_is_latest_version(package_name, mod_version))
+#     errors.append(_contains_no_plus_dev(mod_version))
+#     errors.append(_changes_require_version_bump(package_name, mod_version, mod_path, base_repo=base_repo, base_tag=base_tag))
+
+#     # filter out "None" results
+#     errors = [e for e in errors if e]
+#     return errors
 
 
-def _is_latest_version(package_name, mod_version):
-    latest = check_versions_on_pypi(package_name)[-1]
-    if mod_version != latest:
-        return '{} {} is not the latest version on PyPI! Use version {}.'.format(package_name, mod_version, latest)
+# def _is_unreleased_version(package_name, mod_version):
+#     if check_versions_on_pypi(package_name, mod_version):
+#         return '{} {} is already available on PyPI! Update the version.'.format(package_name, mod_version)
 
 
-def _contains_no_plus_dev(mod_version):
-    if '+dev' in mod_version:
-        return "Version contains the invalid '+dev'. Actual version {}".format(mod_version)
+# def _is_latest_version(package_name, mod_version):
+#     latest = check_versions_on_pypi(package_name)[-1]
+#     if mod_version != latest:
+#         return '{} {} is not the latest version on PyPI! Use version {}.'.format(package_name, mod_version, latest)
 
 
-def _changes_require_version_bump(package_name, mod_version, mod_path, base_repo=None, base_tag=None):
-    revision_range = os.environ.get('TRAVIS_COMMIT_RANGE', None)
-    if not revision_range:
-        # TODO: Shoud not depend on CI! Must be able to run locally.
-        # TRAVIS_COMMIT_RANGE looks like <ID>...<ID>
-        # 
-        pass
-    error = None
-    if revision_range:
-        changes = cmd('git diff {} -- {} :(exclude)*/tests/*'.format(revision_range, mod_path)).result
-        if changes:
-            if check_versions_on_pypi(package_name, mod_version):
-                error = 'There are changes to {} and the current version {} is already available on PyPI! Bump the version.'.format(package_name, mod_version)
-            elif base_repo and _version_in_base_repo(base_repo, mod_path, package_name, mod_version):
-                error = 'There are changes to {} and the current version {} is already used at tag {}. Bump the version.'.format(package_name, mod_version, base_tag)
-            error += '\nChanges are as follows:'
-            error += changes
-    return error
+# def _contains_no_plus_dev(mod_version):
+#     if '+dev' in mod_version:
+#         return "Version contains the invalid '+dev'. Actual version {}".format(mod_version)
 
 
-def _version_in_base_repo(base_repo, mod_path, package_name, mod_version):
-    cli_path = get_cli_repo_path()
-    base_repo_mod_path = mod_path.replace(cli_path, base_repo)
-    try:
-        if mod_version == _get_mod_version(base_repo_mod_path):
-            logger.error('Version %s of %s is already used in the base repo.', mod_version, package_name)
-            return True
-    except FileNotFoundError:
-        logger.warning('Module %s not in base repo. Skipping...', package_name)
-    except Exception as ex:
-        # warning if unable to get module from base version (e.g. mod didn't exist there)
-        logger.warning('Warning: Unable to get module version from base repo... skipping...')
-        logger.warning(str(ex))
-    return False
+# def _changes_require_version_bump(package_name, mod_version, mod_path, base_repo=None, base_tag=None):
+#     revision_range = os.environ.get('TRAVIS_COMMIT_RANGE', None)
+#     if not revision_range:
+#         # TODO: Shoud not depend on CI! Must be able to run locally.
+#         # TRAVIS_COMMIT_RANGE looks like <ID>...<ID>
+#         # 
+#         pass
+#     error = None
+#     if revision_range:
+#         changes = cmd('git diff {} -- {} :(exclude)*/tests/*'.format(revision_range, mod_path)).result
+#         if changes:
+#             if check_versions_on_pypi(package_name, mod_version):
+#                 error = 'There are changes to {} and the current version {} is already available on PyPI! Bump the version.'.format(package_name, mod_version)
+#             elif base_repo and _version_in_base_repo(base_repo, mod_path, package_name, mod_version):
+#                 error = 'There are changes to {} and the current version {} is already used at tag {}. Bump the version.'.format(package_name, mod_version, base_tag)
+#             error += '\nChanges are as follows:'
+#             error += changes
+#     return error
+
+
+# def _version_in_base_repo(base_repo, mod_path, package_name, mod_version):
+#     cli_path = get_cli_repo_path()
+#     base_repo_mod_path = mod_path.replace(cli_path, base_repo)
+#     try:
+#         if mod_version == _get_mod_version(base_repo_mod_path):
+#             logger.error('Version %s of %s is already used in the base repo.', mod_version, package_name)
+#             return True
+#     except FileNotFoundError:
+#         logger.warning('Module %s not in base repo. Skipping...', package_name)
+#     except Exception as ex:
+#         # warning if unable to get module from base version (e.g. mod didn't exist there)
+#         logger.warning('Warning: Unable to get module version from base repo... skipping...')
+#         logger.warning(str(ex))
+#     return False
 # endregion
 
-def _diff_files(filename, dir1, dir2):
-    import difflib
-    file1 = os.path.join(dir1, filename)
-    file2 = os.path.join(dir2, filename)
-    identical = True
-    with open(file1, 'r') as f1, open(file2, 'r') as f2:
-        for diff in difflib.context_diff(f1.readlines(), f2.readlines()):
-            logger.warning(diff)
-            identical = False
-    return identical
 
-def _compare_common_files(common_files, dir1, dir2):
-    import hashlib
-    identical = True
-    for filename in common_files:
-        if not _diff_files(filename, dir1, dir2):
-            identical = False
-    return identical
-
-def _compare_folders(dir1, dir2):
-    import filecmp
-    dirs_cmp = filecmp.dircmp(dir1, dir2)
-    if len(dirs_cmp.left_only) > 0 or len(dirs_cmp.right_only) > 0 or len(dirs_cmp.funny_files) > 0:
-        if len(dirs_cmp.left_only) == 1 and '__init__.py' in dirs_cmp.left_only:
-            pass
-        else:
-            return False
-    if not _compare_common_files(dirs_cmp.common_files, dir1, dir2):
-        return False
-    for common_dir in dirs_cmp.common_dirs:
-        new_dir1 = os.path.join(dir1, common_dir)
-        new_dir2 = os.path.join(dir2, common_dir)
-        if not _compare_folders(new_dir1, new_dir2):
-            return False
-    return True
-
-
-def verify_versions(mod):
-    import re
+# region verify PyPI versions
+def verify_versions(modules=None):
     import tempfile
     import shutil
-    import zipfile
 
-    path_table = get_path_table()
+    heading('Verify Package Versions')
+
     original_cwd = os.getcwd()
+    path_table = get_path_table(include_only=modules)
+    modules = list(path_table['core'].items()) + list(path_table['mod'].items())
+
+    display('MODULES: {}'.format(', '.join([x[0] for x in modules])))
 
     temp_dir = tempfile.mkdtemp()
-    #temp_dir = os.path.normpath('e:\\test')
-    build_dir = os.path.join(temp_dir, 'local')
-    pypi_dir = os.path.join(temp_dir, 'public')
+
+    results = {}
+    for mod, mod_path in modules:
+        if mod == 'azure-cli-testsdk':
+            continue
+        results.update(_check_module(temp_dir, mod, mod_path))
+
+    shutil.rmtree(temp_dir)
+    os.chdir(original_cwd)
+
+    failed_mods = {k: v for k, v in results.items() if v['status'] != 'OK'}
+    subheading('RESULTS')
+    if failed_mods:
+        logger.error('The following modules need their versions bumped. Scroll up for details: %s', ', '.join(failed_mods.keys()))
+    else:
+        display('OK!')
+
+
+def _check_module(root_dir, mod, mod_path):
+    import re
+    import zipfile
 
     version_pattern = re.compile(r'.*azure_cli[^-]*-(\d*.\d*.\d*).*')
 
+    results = {}
     downloaded_path = None
     downloaded_version = None
     build_path = None
     build_version = None
 
+    build_dir = os.path.join(root_dir, mod, 'local')
+    pypi_dir = os.path.join(root_dir, mod, 'public')
+
     # download the public PyPI package and extract the version
-    result = pip_cmd('download {} --no-deps -d {}'.format(mod, temp_dir)).result
+    result = pip_cmd('download {} --no-deps -d {}'.format(mod, root_dir)).result
     for line in result.splitlines():
         if line.endswith('.whl') and 'cached' not in line:
             downloaded_path = line.replace('Saved ', '').strip()
@@ -297,7 +287,7 @@ def verify_versions(mod):
             break
 
     # build from source and extract the version
-    setup_path = os.path.normpath(path_table['mod'][mod].strip())
+    setup_path = os.path.normpath(mod_path.strip())
     os.chdir(setup_path)
     py_cmd('setup.py bdist_wheel -d {}'.format(build_dir))
     if len(os.listdir(build_dir)) != 1:
@@ -307,10 +297,12 @@ def verify_versions(mod):
 
     if build_version != downloaded_version:
         # TODO: Make this more robust? What if local version < public?
-        display('MOD: {} ... OK!'.format(mod))
+        results[mod] = {
+            'local_version': build_version,
+            'public_version': downloaded_version,
+            'status': 'OK'
+        }
     else:
-        display('MOD: {} Public: {} Local: {} ... comparing...'.format(mod, downloaded_version, build_version))
-
         # slight difference in dist-info dirs, so we must extract the azure folders and compare them
         with zipfile.ZipFile(downloaded_path, 'r') as z:
             z.extractall(pypi_dir)
@@ -318,10 +310,97 @@ def verify_versions(mod):
         with zipfile.ZipFile(build_path, 'r') as z:
             z.extractall(build_dir)
 
-        if _compare_folders(os.path.join(pypi_dir, 'azure'), os.path.join(build_dir, 'azure')):
-            display('MOD: {} ... OK!'.format(mod))
-        else:
-            logger.warning('MOD: {} has the same version as PyPI but is different! Bump the version!'.format(mod))
+        errors = _compare_folders(os.path.join(pypi_dir), os.path.join(build_dir))
+        # clean up empty strings
+        errors = [e for e in errors if e]
+        if errors:
+            subheading('Errors in {}'.format(mod))
+            for error in errors:
+                logger.warning(error)
+        results[mod] = {
+            'local_version': build_version,
+            'public_version': downloaded_version,
+            'status': 'OK' if not errors else 'ERROR'
+        }
+    return results
 
-    shutil.rmtree(temp_dir)
-    os.chdir(original_cwd)
+
+def _diff_files(filename, dir1, dir2):
+    import difflib
+    file1 = os.path.join(dir1, filename)
+    file2 = os.path.join(dir2, filename)
+    errors = []
+    with open(file1, 'r') as f1, open(file2, 'r') as f2:
+        errors.append(os.linesep.join(diff for diff in difflib.context_diff(f1.readlines(), f2.readlines())))
+    return errors
+
+
+def _compare_common_files(common_files, dir1, dir2):
+    import hashlib
+    errors = []
+    for filename in common_files:
+        errors = errors + _diff_files(filename, dir1, dir2)
+    return errors
+
+
+def _compare_folders(dir1, dir2):
+    import filecmp
+    dirs_cmp = filecmp.dircmp(dir1, dir2)
+    errors = []
+    if len(dirs_cmp.left_only) > 0 or len(dirs_cmp.right_only) > 0 or len(dirs_cmp.funny_files) > 0:
+        # allow some special cases
+        if len(dirs_cmp.left_only) == 1 and '__init__.py' in dirs_cmp.left_only:
+            pass
+        elif len(dirs_cmp.right_only) == 1 and dirs_cmp.right_only[0].endswith('.whl'):
+            pass
+        else:
+            errors.append('Different files in directory structure.')
+    errors = errors + _compare_common_files(dirs_cmp.common_files, dir1, dir2)
+    for common_dir in dirs_cmp.common_dirs:
+        new_dir1 = os.path.join(dir1, common_dir)
+        new_dir2 = os.path.join(dir2, common_dir)
+        if common_dir.endswith('.dist-info'):
+            # special case to check for dependency-only changes
+            errors = errors + _compare_dependencies(new_dir1, new_dir2)
+        else:
+            errors = errors + _compare_folders(new_dir1, new_dir2)
+    return errors
+
+
+def _extract_dependencies(path):
+    dependencies = {}
+    with open(path, 'r') as f:
+        for line in f.readlines():
+            if line.startswith('Requires-Dist:'):
+                comps = line.split()
+                dependencies[comps[1]] = '_ANY_' if len(comps) == 2 else comps[2]
+    return dependencies
+
+
+def _compare_dependencies(dir1, dir2):
+    deps1 = _extract_dependencies(os.path.join(dir1, 'METADATA'))
+    deps2 = _extract_dependencies(os.path.join(dir2, 'METADATA'))
+    errors = []
+    mismatch = {}
+    matched = []
+    for key, val in deps1.items():
+        if key in deps2:
+            if deps2[key] != val:
+                mismatch[key] = '{} != {}'.format(val, deps2[key])
+            deps2.pop(key)
+            matched.append(key)
+    for key in matched:
+        deps1.pop(key)
+    for key, val in deps2.items():
+        if key in deps1:
+            if deps1[key] != val:
+                mismatch[key] = '{} != {}'.format(val, deps1[key])
+            deps1.pop(key)
+    if deps1:
+        errors.append('New dependencies: {}'.format(deps1))
+    if deps2:
+        errors.append('Removed dependencies: {}'.format(deps2))
+    if mismatch:
+        errors.append('Changed dependencies: {}'.format(mismatch))
+    return errors
+# endregion
