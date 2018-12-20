@@ -86,7 +86,7 @@ def _install_modules(cli_path):
 
 def _extension_only_install():
     # TODO: Need to install azure-cli-testsdk (not currently on PyPI)
-    pip_cmd("install -q 'azure-cli>=2.0.52'", "Installing `azure-cli`...")
+    pip_cmd("install -q 'azure-cli>=2.0.53'", "Installing `azure-cli`...")
 
 
 def _cli_and_extension_install(cli_path, ext_path):

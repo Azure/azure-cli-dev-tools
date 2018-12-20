@@ -248,6 +248,7 @@ def verify_versions(modules=None):
 
     results = {}
     for mod, mod_path in modules:
+        # currently, this is not published
         if mod == 'azure-cli-testsdk':
             continue
         results.update(_check_module(temp_dir, mod, mod_path))
@@ -259,6 +260,8 @@ def verify_versions(modules=None):
     subheading('RESULTS')
     if failed_mods:
         logger.error('The following modules need their versions bumped. Scroll up for details: %s', ', '.join(failed_mods.keys()))
+        logger.warning('\nNote that before changing versions, you should consider running `git clean` to remove untracked files from your repo. '
+                       'Files that were once tracked but removed from the source may still be on your machine, resuling in false positives.')
     else:
         display('OK!')
 
@@ -281,7 +284,7 @@ def _check_module(root_dir, mod, mod_path):
     # download the public PyPI package and extract the version
     result = pip_cmd('download {} --no-deps -d {}'.format(mod, root_dir)).result
     for line in result.splitlines():
-        if line.endswith('.whl') and 'cached' not in line:
+        if line.endswith('.whl') and line.startswith('Saved'):
             downloaded_path = line.replace('Saved ', '').strip()
             downloaded_version = version_pattern.match(downloaded_path).group(1)
             break
@@ -304,17 +307,17 @@ def _check_module(root_dir, mod, mod_path):
         }
     else:
         # slight difference in dist-info dirs, so we must extract the azure folders and compare them
-        with zipfile.ZipFile(downloaded_path, 'r') as z:
+        with zipfile.ZipFile(str(downloaded_path), 'r') as z:
             z.extractall(pypi_dir)
 
-        with zipfile.ZipFile(build_path, 'r') as z:
+        with zipfile.ZipFile(str(build_path), 'r') as z:
             z.extractall(build_dir)
 
         errors = _compare_folders(os.path.join(pypi_dir), os.path.join(build_dir))
         # clean up empty strings
         errors = [e for e in errors if e]
         if errors:
-            subheading('Errors in {}'.format(mod))
+            subheading('Differences found in {}'.format(mod))
             for error in errors:
                 logger.warning(error)
         results[mod] = {
@@ -322,6 +325,13 @@ def _check_module(root_dir, mod, mod_path):
             'public_version': downloaded_version,
             'status': 'OK' if not errors else 'ERROR'
         }
+
+        # special case: to make a release, these MUST be bumped
+        if mod in ['azure-cli', 'azure-cli-core']:
+            if results[mod]['status'] == 'OK':
+                logger.warning('%s version must be bumped to support release!', mod)
+                results[mod]['status'] = 'ERROR'
+
     return results
 
 
@@ -354,6 +364,12 @@ def _compare_folders(dir1, dir2):
         elif len(dirs_cmp.right_only) == 1 and dirs_cmp.right_only[0].endswith('.whl'):
             pass
         else:
+            if dirs_cmp.left_only:
+                logger.debug('LO: %s', dirs_cmp.left_only)
+            if dirs_cmp.right_only:
+                logger.debug('RO: %s', dirs_cmp.right_only)
+            if dirs_cmp.funny_files:
+                logger.debug('FF: %s', dirs_cmp.funny_files)
             errors.append('Different files in directory structure.')
     errors = errors + _compare_common_files(dirs_cmp.common_files, dir1, dir2)
     for common_dir in dirs_cmp.common_dirs:
@@ -372,8 +388,14 @@ def _extract_dependencies(path):
     with open(path, 'r') as f:
         for line in f.readlines():
             if line.startswith('Requires-Dist:'):
-                comps = line.split()
-                dependencies[comps[1]] = '_ANY_' if len(comps) == 2 else comps[2]
+                line = line.replace(' ;', '').replace(';', '')
+                comps = line.split(' ', 2)
+                if len(comps) == 2:
+                    dependencies[comps[1]] = '_ANY_'
+                elif len(comps) > 2:
+                    dependencies[comps[1]] = comps[2]
+                else:
+                    raise CLIError('Unrecognized format in METADATA: {}'.format(line))
     return dependencies
 
 
