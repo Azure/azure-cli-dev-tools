@@ -104,7 +104,11 @@ def _check_readme_render(mod_path):
         error_lines = []
         target_line = 'The following syntax errors were detected'
         suppress = True
+        logger.debug(result.error.output)
+
+        # TODO: Checks for syntax errors but potentially not other things
         for line in result.error.output.splitlines():
+            line = str(line).strip()
             if not suppress and line:
                 error_lines.append(line)
             if target_line in line:

@@ -17,7 +17,7 @@ from knack.util import CLIError
 from azdev.params import Flag
 from azdev.utilities import (
     display, heading, subheading, cmd, py_cmd, pip_cmd, find_file, IS_WINDOWS, get_path_table,
-    get_env_config_dir, get_env_config)
+    get_env_config_dir, get_env_config, require_virtual_env)
 
 logger = get_logger(__name__)
 
@@ -33,19 +33,6 @@ def _clone_repo(name, path):
     message = "Cloning repo {} at path: {}".format(name, path)
     command = "git clone https://github.com/Azure/{}.git {}".format(name, path)
     cmd(command, message)
-
-
-def _prompt_to_create_venv(name, path):
-    if prompt_y_n("Virtual environment '{}' does not exist at path '{}'. Create?".format(name, path)):
-        return True
-    else:
-        raise CLIError("Operation aborted.")
-
-
-def _create_venv(path):
-    message = "\nCreating virtual environment: {}".format(path)
-    command = "virtualenv {}".format(path)
-    py_cmd(command, message)
 
 
 def _get_path(path, file_name, default):
@@ -86,7 +73,7 @@ def _install_modules(cli_path):
 
 def _extension_only_install():
     # TODO: Need to install azure-cli-testsdk (not currently on PyPI)
-    pip_cmd("install -q 'azure-cli>=2.0.53'", "Installing `azure-cli`...")
+    pip_cmd('install --upgrade azure-cli', "Installing `azure-cli`...")
 
 
 def _cli_and_extension_install(cli_path, ext_path):
@@ -134,10 +121,6 @@ def _cli_and_extension_install(cli_path, ext_path):
     pip_cmd("install -q -I azure-mgmt-nspkg==1.0.0", "Installing `azure-mgmt-nspkg`...")
 
 
-def _get_venv_activate_command(venv):
-    return os.path.join(venv, "Scripts" if IS_WINDOWS else "bin", "activate")
-
-
 def _copy_config_files():
     from glob import glob
     from importlib import import_module
@@ -154,7 +137,9 @@ def _copy_config_files():
         os.remove(path)
 
 
-def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
+def setup(cmd, cli_path=None, ext_path=None, yes=None):
+
+    require_virtual_env()
 
     start = time.time()
 
@@ -168,7 +153,6 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
 
     cli_clone = False
     ext_clone = False
-    create_venv = False
 
     if cli_path:
         if cli_exists:
@@ -184,35 +168,12 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
         else:
             ext_clone = _prompt_to_clone_repo("azure-cli-extensions", ext_path)
 
-    # setup virtual environment or use existing
-    env_path = os.path.abspath(venv)
-    if not os.path.isdir(env_path):
-        create_venv = _prompt_to_create_venv(venv, env_path)
-    else:
-        display("Virtual environment found at: {}".format(env_path))
-
-    # perform any cloning or venv creation
+    # perform any cloning
     if cli_clone:
         _clone_repo("azure-cli", cli_path)
     if ext_clone:
         _clone_repo("azure-cli-extensions", ext_path)
-    if create_venv:
-        _create_venv(env_path)
-        logger.warning(
-            "Virtual environment created. Run `{}` and then re-run this command to continue.".format(
-                _get_venv_activate_command(venv)
-            )
-        )
-        sys.exit(0)
 
-    # before any packages can be pip installed, the desired virtual environment must be activated by the user
-    virtual_env_var = os.environ.get("VIRTUAL_ENV", None)
-    if env_path != virtual_env_var:
-        raise CLIError(
-            "To continue with CLI setup, you must activate the virtual environment by running `{}`".format(
-                _get_venv_activate_command(venv)
-            )
-        )
     config = get_env_config()
 
     # save data to config files
@@ -226,15 +187,15 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
         config.set_value('cli', 'repo_path', cli_path)
 
     # install packages
-    heading('Installing packages')
+    subheading('Installing packages')
+
+    # upgrade to latest pip
+    pip_cmd('install --upgrade pip -q')
 
     if ext_path and not cli_path:
         _extension_only_install()
     else:
         _cli_and_extension_install(cli_path, ext_path)
-
-    # TODO: Final step, re-install azdev in the virtual environment
-    # in order to have all needed packages.
 
     _copy_config_files()
 
@@ -243,10 +204,12 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
     elapsed_sec = int(end - start) % 60
     display('\nElapsed time: {} min {} sec'.format(elapsed_min, elapsed_sec))
 
-    heading('Finished dev setup!')
+    subheading('Finished dev setup!')
 
 
 def configure(cmd, cli_path=None, ext_path=None):
+
+    require_virtual_env()
 
     heading('Azdev Configure')
 

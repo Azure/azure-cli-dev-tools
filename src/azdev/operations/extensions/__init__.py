@@ -7,7 +7,8 @@ from collections import OrderedDict
 import os
 import shutil
 
-from azdev.utilities import pip_cmd, display, get_ext_repo_path, find_files
+from azdev.utilities import (
+    pip_cmd, display, get_ext_repo_path, find_files, get_azure_config)
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -62,23 +63,29 @@ def remove_extension(extensions):
 
 
 def list_extensions():
-    ext_path = get_ext_repo_path()
-    installed_paths = find_files(ext_path, '*.*-info')
 
-    results = []
-    installed = []
-    for path in installed_paths:
-        folder = os.path.dirname(path)
-        long_name = os.path.basename(folder)
-        results.append({'name': '{} (INSTALLED)'.format(long_name), 'path': folder})
-        installed.append(long_name)
+    from azure.cli.core.extension import get_extensions, DevExtension
+    dev_exts = get_extensions(ext_type=DevExtension)
+    return dev_exts
+    # azure_config = get_azure_config()
+    # dev_sources = azure_config.get('extension', 'dev_sources', None)
+    # dev_sources = dev_sources.split(',') if dev_sources else []
+    # installed_paths = find_files(ext_path, '*.*-info')
 
-    for path in find_files(ext_path, 'setup.py'):
-        folder = os.path.dirname(path)
-        long_name = os.path.basename(folder)
-        if long_name not in installed:
-            results.append({'name': long_name, 'path': folder})
-    return results
+    # results = []
+    # installed = []
+    # for path in installed_paths:
+    #     folder = os.path.dirname(path)
+    #     long_name = os.path.basename(folder)
+    #     results.append({'name': '{} (INSTALLED)'.format(long_name), 'path': folder})
+    #     installed.append(long_name)
+
+    # for path in find_files(ext_path, 'setup.py'):
+    #     folder = os.path.dirname(path)
+    #     long_name = os.path.basename(folder)
+    #     if long_name not in installed:
+    #         results.append({'name': long_name, 'path': folder})
+    # return results
 
 
 def _get_sha256sum(a_file):
@@ -87,6 +94,46 @@ def _get_sha256sum(a_file):
     with open(a_file, 'rb') as f:
         sha256.update(f.read())
     return sha256.hexdigest()
+
+
+def build_extension():
+    raise CLIError('This command coming soon!')
+
+
+def publish_extension():
+    raise CLIError('This command coming soon!')
+
+
+def add_extension_repo(repos):
+    az_config = get_azure_config()
+    dev_sources = az_config.get('extension', 'dev_sources', None)
+    dev_sources = dev_sources.split(',') if dev_sources else []
+    for repo in repos:
+        repo = os.path.abspath(repo)
+        # TODO: Verify that the repo being added is a valid Git repo?
+        if repo not in dev_sources:
+            dev_sources.append(repo)
+    az_config.set_value('extension', 'dev_sources', ','.join(dev_sources))
+    return list_extension_repos()
+
+
+def remove_extension_repo(repos):
+    az_config = get_azure_config()
+    dev_sources = az_config.get('extension', 'dev_sources', None)
+    dev_sources = dev_sources.split(',') if dev_sources else []
+    for repo in repos:
+        try:
+            dev_sources.remove(os.path.abspath(repo))
+        except ValueError:
+            logger.warning("Repo '%s' was not found in the list of repositories to search.", os.path.abspath(repo))
+    az_config.set_value('extension', 'dev_sources', ','.join(dev_sources))
+    return list_extension_repos()
+
+
+def list_extension_repos():
+    az_config = get_azure_config()
+    dev_sources = az_config.get('extension', 'dev_sources', None)
+    return dev_sources.split(',') if dev_sources else dev_sources
 
 
 def update_extension_index(extension):

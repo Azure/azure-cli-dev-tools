@@ -23,7 +23,7 @@ HELP_FILE_NAME = '_help.py'
 DOC_SOURCE_MAP_PATH = os.path.join('doc', 'sphinx', 'azhelpgen', DOC_MAP_NAME)
 
 
-def check_document_map(*args):
+def check_document_map():
 
     heading('Verify Document Map')
 

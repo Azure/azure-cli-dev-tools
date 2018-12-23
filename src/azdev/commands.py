@@ -52,7 +52,14 @@ def load_command_table(self, args):
         g.command('add', 'add_extension')
         g.command('remove', 'remove_extension')
         g.command('list', 'list_extensions')
+        g.command('build', 'build_extension')
+        g.command('publish', 'publish_extension')
         g.command('update-index', 'update_extension_index')
+
+    with CommandGroup(self, 'extension repo', operation_group('extensions')) as g:
+        g.command('add', 'add_extension_repo')
+        g.command('remove', 'remove_extension_repo')
+        g.command('list', 'list_extension_repos')
 
     with CommandGroup(self, 'group', operation_group('resource')) as g:
         g.command('delete', 'delete_groups')

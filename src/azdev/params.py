@@ -71,6 +71,10 @@ def load_arguments(self, command):
         with ArgumentsContext(self, scope) as c:
             c.positional('extensions', metavar='NAME', nargs='+', help='Space-separated list of extension names.')
 
+    for scope in ['extension repo add', 'extension repo remove']:
+        with ArgumentsContext(self, scope) as c:
+            c.positional('repos', metavar='PATH', nargs='+', help='Space-separated list of paths to Git repositories.')
+
     with ArgumentsContext(self, 'extension update-index') as c:
         c.positional('extension', metavar='URL', help='URL to an extension WHL file.')
 
