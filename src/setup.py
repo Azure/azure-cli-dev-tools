@@ -10,7 +10,7 @@
 import os
 from setuptools import setup
 
-__VERSION__ = '0.1.0'
+__VERSION__ = '0.0.1'
 
 
 def read(fname):
@@ -22,7 +22,7 @@ setup(
     name='azdev',
     version=__VERSION__,
     description='Azure Developer Tools command line',
-    url='https://github.com/Azure/azdev',
+    url='https://github.com/Azure/azure-cli-dev-tools',
     author='Microsoft Corporation',
     author_email='azpycli@microsoft.com',
     license='MIT',
