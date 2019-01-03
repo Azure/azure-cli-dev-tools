@@ -14,7 +14,18 @@ helps[''] = """
 
 helps['setup'] = """
     short-summary: Set up your environment for development of Azure CLI command modules and/or extensions.
-    long-summary: Find or clones the relevant repositories and installs the necessary modules.
+    examples:
+        - name: Fully interactive setup.
+          text: azdev setup
+
+        - name: Install only the CLI in dev mode and search for the existing repo.
+          text: azdev setup -c
+
+        - name: Install public CLI and setup an extensions repo. Do not install any extensions.
+          text: azdev setup -r azure-cli-extensions
+
+        - name: Install CLI in dev mode, along with the extensions repo. Auto-find the CLI repo and install the `alias` extension in dev mode.
+          text: azdev setup -r azure-cli-extensions -e alias
 """
 
 

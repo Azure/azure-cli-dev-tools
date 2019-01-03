@@ -24,11 +24,10 @@ def load_arguments(self, command):
         c.argument('ci_mode', options_list='--ci', action='store_true', help='Run in CI mode.')
         c.argument('private', action='store_true', help='Target the private repo.')
 
-    with ArgumentsContext(self, '') as c:
-        c.argument('cli_path', options_list=['--cli', '-c'], nargs='?', const=Flag, help='Path to an existing Azure CLI repo or the location where it will be cloned. No value to search for existing repo.')
-        c.argument('ext_path', options_list=['--ext', '-e'], nargs='?', const=Flag, help='Path to an existing Azure CLI extensions repo or the location where it will be cloned. No value to search for existing repo.')
-        c.argument('yes', action='store_true', options_list=['--yes', '-y'], help='Accept all prompts.')
-        c.argument('venv', options_list=['--venv', '-v'], help='Path to a virtual environment. One will be created if it does not exist.')
+    with ArgumentsContext(self, 'setup') as c:
+        c.argument('cli_path', options_list=['--cli', '-c'], nargs='?', const=Flag, help='Path to an existing Azure CLI repo. Omit value to search for the repo.')
+        c.argument('ext_repo_path', options_list=['--repo', '-r'], nargs='+', help='Space-separated list of paths to existing Azure CLI extensions repos.')
+        c.argument('ext', options_list=['--ext', '-e'], nargs='+', help='Space-separated list of extensions to install initially.')
 
     with ArgumentsContext(self, 'test') as c:
         c.argument('ci_mode', options_list='--ci', action='store_true', help='Run the tests in CI mode.')

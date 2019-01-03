@@ -12,11 +12,6 @@ def load_command_table(self, args):
     def operation_group(name):
         return 'azdev.operations.{}#{{}}'.format(name)
 
-    # TODO: Experimental - can remove
-    # with CommandGroup(self, 'github', operation_group('github')) as g:
-    #     g.command('list-issues', 'list_issues')
-    #     g.command('diff', 'show_diff')
-
     with CommandGroup(self, '', operation_group('setup')) as g:
         g.command('setup', 'setup')
         g.command('configure', 'configure')
@@ -52,8 +47,8 @@ def load_command_table(self, args):
         g.command('add', 'add_extension')
         g.command('remove', 'remove_extension')
         g.command('list', 'list_extensions')
-        g.command('build', 'build_extension')
-        g.command('publish', 'publish_extension')
+        # g.command('build', 'build_extension')
+        # g.command('publish', 'publish_extension')
         g.command('update-index', 'update_extension_index')
 
     with CommandGroup(self, 'extension repo', operation_group('extensions')) as g:

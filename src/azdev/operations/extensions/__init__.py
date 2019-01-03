@@ -62,30 +62,44 @@ def remove_extension(extensions):
                 shutil.rmtree(path_to_remove)
 
 
+def _get_installed_dev_extensions(dev_sources):
+    from glob import glob
+    exts = []
+
+    def _collect(path, depth=0, max_depth=3):
+        if not os.path.isdir(path) or depth == max_depth or os.path.split(path)[-1].startswith('.'):
+            return
+        pattern = os.path.join(path, '*.egg-info')
+        match = glob(pattern)
+        if match:
+            ext_path = os.path.dirname(match[0])
+            ext_name = os.path.split(ext_path)[-1]
+            exts.append(DevExtension(ext_name, ext_path))
+        else:
+            for item in os.listdir(path):
+                _collect(os.path.join(path, item), depth + 1, max_depth)
+    for source in dev_sources:
+        _collect(source)
+    return exts
+
+
 def list_extensions():
+    azure_config = get_azure_config()
+    dev_sources = azure_config.get('extension', 'dev_sources', None)
+    dev_sources = dev_sources.split(',') if dev_sources else []
 
-    from azure.cli.core.extension import get_extensions, DevExtension
-    dev_exts = get_extensions(ext_type=DevExtension)
-    return dev_exts
-    # azure_config = get_azure_config()
-    # dev_sources = azure_config.get('extension', 'dev_sources', None)
-    # dev_sources = dev_sources.split(',') if dev_sources else []
-    # installed_paths = find_files(ext_path, '*.*-info')
+    installed = _get_installed_dev_extensions(dev_sources)
+    results = []
 
-    # results = []
-    # installed = []
-    # for path in installed_paths:
-    #     folder = os.path.dirname(path)
-    #     long_name = os.path.basename(folder)
-    #     results.append({'name': '{} (INSTALLED)'.format(long_name), 'path': folder})
-    #     installed.append(long_name)
-
-    # for path in find_files(ext_path, 'setup.py'):
-    #     folder = os.path.dirname(path)
-    #     long_name = os.path.basename(folder)
-    #     if long_name not in installed:
-    #         results.append({'name': long_name, 'path': folder})
-    # return results
+    for ext_source in dev_sources:
+        for ext_path in find_files(ext_source, 'setup.py'):
+            folder = os.path.dirname(ext_path)
+            long_name = os.path.basename(folder)
+            if long_name not in installed:
+                results.append({'name': long_name, 'inst': '', 'path': folder})
+            else:
+                results.append({'name': long_name, 'inst': 'Y', 'path': folder})
+    return results
 
 
 def _get_sha256sum(a_file):
@@ -96,21 +110,14 @@ def _get_sha256sum(a_file):
     return sha256.hexdigest()
 
 
-def build_extension():
-    raise CLIError('This command coming soon!')
-
-
-def publish_extension():
-    raise CLIError('This command coming soon!')
-
-
 def add_extension_repo(repos):
+    from azdev.operations.setup import _check_repo
     az_config = get_azure_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
     dev_sources = dev_sources.split(',') if dev_sources else []
     for repo in repos:
         repo = os.path.abspath(repo)
-        # TODO: Verify that the repo being added is a valid Git repo?
+        _check_repo(repo)
         if repo not in dev_sources:
             dev_sources.append(repo)
     az_config.set_value('extension', 'dev_sources', ','.join(dev_sources))
