@@ -64,7 +64,7 @@ def remove_extension(extensions):
 
 def _get_installed_dev_extensions(dev_sources):
     from glob import glob
-    exts = []
+    installed = []
 
     def _collect(path, depth=0, max_depth=3):
         if not os.path.isdir(path) or depth == max_depth or os.path.split(path)[-1].startswith('.'):
@@ -74,13 +74,13 @@ def _get_installed_dev_extensions(dev_sources):
         if match:
             ext_path = os.path.dirname(match[0])
             ext_name = os.path.split(ext_path)[-1]
-            exts.append(DevExtension(ext_name, ext_path))
+            installed.append({'name': ext_name, 'path': ext_path})
         else:
             for item in os.listdir(path):
                 _collect(os.path.join(path, item), depth + 1, max_depth)
     for source in dev_sources:
         _collect(source)
-    return exts
+    return installed
 
 
 def list_extensions():
