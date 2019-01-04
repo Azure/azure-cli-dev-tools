@@ -8,7 +8,7 @@ import os
 import shutil
 
 from azdev.utilities import (
-    pip_cmd, display, get_ext_repo_path, find_files, get_azure_config)
+    pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config)
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -17,8 +17,8 @@ logger = get_logger(__name__)
 
 
 def add_extension(extensions):
-    ext_path = get_ext_repo_path()
-    all_extensions = find_files(ext_path, 'setup.py')
+    ext_paths = get_ext_repo_paths()
+    all_extensions = find_files(ext_paths, 'setup.py')
 
     paths_to_add = []
     for path in all_extensions:
@@ -39,8 +39,8 @@ def add_extension(extensions):
 
 
 def remove_extension(extensions):
-    ext_path = get_ext_repo_path()
-    installed_paths = find_files(ext_path, '*.*-info')
+    ext_paths = get_ext_repo_paths()
+    installed_paths = find_files(ext_paths, '*.*-info')
     paths_to_remove = []
     for path in installed_paths:
         target_path = None
@@ -89,16 +89,16 @@ def list_extensions():
     dev_sources = dev_sources.split(',') if dev_sources else []
 
     installed = _get_installed_dev_extensions(dev_sources)
+    installed_names = [x['name'] for x in installed]
     results = []
 
-    for ext_source in dev_sources:
-        for ext_path in find_files(ext_source, 'setup.py'):
-            folder = os.path.dirname(ext_path)
-            long_name = os.path.basename(folder)
-            if long_name not in installed:
-                results.append({'name': long_name, 'inst': '', 'path': folder})
-            else:
-                results.append({'name': long_name, 'inst': 'Y', 'path': folder})
+    for ext_path in find_files(dev_sources, 'setup.py'):
+        folder = os.path.dirname(ext_path)
+        long_name = os.path.basename(folder)
+        if long_name not in installed_names:
+            results.append({'name': long_name, 'inst': '', 'path': folder})
+        else:
+            results.append({'name': long_name, 'inst': 'Y', 'path': folder})
     return results
 
 
@@ -152,7 +152,7 @@ def update_extension_index(extension):
 
     NAME_REGEX = r'.*/([^/]*)-\d+.\d+.\d+'
 
-    ext_path = get_ext_repo_path()
+    ext_paths = get_ext_repo_paths()
 
     # Get extension WHL from URL
     if not extension.endswith('.whl') or not extension.startswith('https:'):

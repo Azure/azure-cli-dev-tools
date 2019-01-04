@@ -37,7 +37,7 @@ from .path import (
     make_dirs,
     get_azdev_repo_path,
     get_cli_repo_path,
-    get_ext_repo_path,
+    get_ext_repo_paths,
     get_path_table
 )
 from .tools import (
@@ -71,7 +71,7 @@ __all__ = [
     'make_dirs',
     'get_azdev_repo_path',
     'get_cli_repo_path',
-    'get_ext_repo_path',
+    'get_ext_repo_paths',
     'get_path_table',
     'require_virtual_env'
 ]

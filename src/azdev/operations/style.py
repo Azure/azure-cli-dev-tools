@@ -19,13 +19,13 @@ logger = get_logger(__name__)
 
 from azdev.utilities import (
     display, heading, subheading, py_cmd, get_path_table, EXTENSION_PREFIX,
-    get_env_config_dir, get_cli_repo_path, get_ext_repo_path)
+    get_env_config_dir, get_cli_repo_path, get_ext_repo_paths)
 
 
 def check_style(cmd, modules=None, pylint=False, pep8=False):
 
     cli_path = get_cli_repo_path()
-    ext_path = get_ext_repo_path()
+    ext_paths = get_ext_repo_paths()
 
     heading('Style Check')
 

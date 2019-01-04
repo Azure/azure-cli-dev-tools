@@ -14,7 +14,7 @@ def load_command_table(self, args):
 
     with CommandGroup(self, '', operation_group('setup')) as g:
         g.command('setup', 'setup')
-        g.command('configure', 'configure')
+        # g.command('configure', 'configure')
 
     # TODO: enhance with tox support
     with CommandGroup(self, '', operation_group('tests')) as g:
@@ -40,8 +40,8 @@ def load_command_table(self, args):
     with CommandGroup(self, 'perf', operation_group('performance')) as g:
         g.command('load-times', 'check_load_time')
 
-    with CommandGroup(self, 'sdk', operation_group('python_sdk')) as g:
-        g.command('draft', 'install_draft_sdk')
+    # with CommandGroup(self, 'sdk', operation_group('python_sdk')) as g:
+    #     g.command('draft', 'install_draft_sdk')
 
     with CommandGroup(self, 'extension', operation_group('extensions')) as g:
         g.command('add', 'add_extension')
@@ -49,15 +49,15 @@ def load_command_table(self, args):
         g.command('list', 'list_extensions')
         # g.command('build', 'build_extension')
         # g.command('publish', 'publish_extension')
-        g.command('update-index', 'update_extension_index')
+        # g.command('update-index', 'update_extension_index')
 
     with CommandGroup(self, 'extension repo', operation_group('extensions')) as g:
         g.command('add', 'add_extension_repo')
         g.command('remove', 'remove_extension_repo')
         g.command('list', 'list_extension_repos')
 
-    with CommandGroup(self, 'group', operation_group('resource')) as g:
-        g.command('delete', 'delete_groups')
+    # with CommandGroup(self, 'group', operation_group('resource')) as g:
+    #     g.command('delete', 'delete_groups')
 
     # TODO: implement
     # with CommandGroup(self, operation_group('help')) as g:

@@ -202,7 +202,7 @@ def _interactive_setup():
         subheading('Summary')
         display('CLI: {}'.format(cli_path if cli_path else 'PyPI'))
         display('Extension repos: {}'.format(' '.join(ext_repos)))
-        display('Extensions: {}'.format(' '.join(exts)))
+        display('Extensions: \n    {}'.format('\n    '.join(exts)))
         if prompt_y_n('\nProceed with installation? '):
             return cli_path, ext_repos, exts
         else:
