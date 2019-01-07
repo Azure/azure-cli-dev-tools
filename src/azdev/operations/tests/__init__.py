@@ -204,10 +204,11 @@ def _discover_tests(profile):
 
     logger.info('\nCommand Modules: %s', ', '.join([name for name, _ in command_modules]))
     for mod_name, mod_path in command_modules:
+        short_name = mod_name.replace(COMMAND_MODULE_PREFIX, '')
         mod_data = {
-            'alt_name': mod_name.replace(COMMAND_MODULE_PREFIX, ''),
-            'filepath': os.path.join(mod_path, 'azure', 'cli', 'command_modules', mod_name, 'tests', profile_namespace),
-            'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(mod_name, profile_namespace),
+            'alt_name': short_name,
+            'filepath': os.path.join(mod_path, 'azure', 'cli', 'command_modules', short_name, 'tests', profile_namespace),
+            'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(short_name, profile_namespace),
             'files': {}
         }
         tests = _discover_module_tests(mod_name, mod_data)
