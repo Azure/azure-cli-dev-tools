@@ -44,7 +44,7 @@ def get_ext_repo_paths():
     """
     from .config import get_env_config
     try:
-        return get_env_config().get('ext', 'repo_path').split(',')
+        return get_env_config().get('ext', 'repo_paths').split(',')
     except Exception:
         CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup`.')
 
@@ -112,10 +112,10 @@ def get_path_table(include_only=None):
     get_all = not include_only
 
     table = {}
-    cli_path = get_cli_repo_path()
+    cli_repo_path = get_cli_repo_path()
     ext_repo_paths = get_ext_repo_paths()
-    modules_paths = glob(os.path.normcase(os.path.join(cli_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py')))
-    core_paths = glob(os.path.normcase(os.path.join(cli_path, 'src', '*', 'setup.py')))
+    modules_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py')))
+    core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
     ext_paths = find_files(ext_repo_paths, '*.*-info')
 
     def _update_table(paths, key):

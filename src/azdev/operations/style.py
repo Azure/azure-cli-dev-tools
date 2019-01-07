@@ -50,11 +50,11 @@ def check_style(cmd, modules=None, pylint=False, pep8=False):
 
     exit_code_sum = 0
     if pep8:
-        pep8_result = _run_pep8(cli_path, ext_path, selected_modules)
+        pep8_result = _run_pep8(cli_path, ext_paths, selected_modules)
         exit_code_sum += pep8_result.exit_code
 
     if pylint:
-        pylint_result = _run_pylint(cli_path, ext_path, selected_modules)
+        pylint_result = _run_pylint(cli_path, ext_paths, selected_modules)
         exit_code_sum += pylint_result.exit_code
 
     display('')
@@ -108,14 +108,14 @@ def _run_pylint(cli_path, ext_path, modules):
     for path in list(modules['ext'].values()):
         glob_pattern = os.path.normcase(os.path.join('{}*'.format(EXTENSION_PREFIX)))
         ext_paths.append(glob(os.path.join(path, glob_pattern))[0])
-    
+
     def run(paths, rcfile, desc):
         if not paths:
             return None
         config_path = os.path.join(get_env_config_dir(), 'config_files', rcfile)
         logger.info('Using rcfile file: %s', config_path)
         logger.info('Running on %s: %s', desc, ' '.join(paths))
-        command = 'pylint {} --rcfile={} -j {}'.format(' '.join(paths),
+        command = 'pylint {} --ignore vendored_sdks,privates --rcfile={} -j {}'.format(' '.join(paths),
             config_path,
             multiprocessing.cpu_count())
         return py_cmd(command, message='Running pylint on {}...'.format(desc))

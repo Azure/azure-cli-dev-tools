@@ -8,7 +8,7 @@ import os
 import shutil
 
 from azdev.utilities import (
-    pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config)
+    pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_env_config)
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -39,19 +39,26 @@ def add_extension(extensions):
 
 
 def remove_extension(extensions):
+
     ext_paths = get_ext_repo_paths()
     installed_paths = find_files(ext_paths, '*.*-info')
     paths_to_remove = []
+    names_to_remove = []
     for path in installed_paths:
         target_path = None
         folder = os.path.dirname(path)
         long_name = os.path.basename(folder)
         if long_name in extensions:
             paths_to_remove.append(folder)
+            names_to_remove.append(long_name)
             extensions.remove(long_name)
     # raise error if any extension not installed
     if extensions:
         raise CLIError('extension(s) not installed: {}'.format(' '.join(extensions)))
+
+    # removes any links that may have been added to site-packages.
+    for ext in names_to_remove:
+        pip_cmd('uninstall {} -y'.format(ext))
 
     for path in paths_to_remove:
         for d in os.listdir(path):
@@ -113,6 +120,7 @@ def _get_sha256sum(a_file):
 def add_extension_repo(repos):
     from azdev.operations.setup import _check_repo
     az_config = get_azure_config()
+    env_config = get_env_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
     dev_sources = dev_sources.split(',') if dev_sources else []
     for repo in repos:
@@ -121,11 +129,14 @@ def add_extension_repo(repos):
         if repo not in dev_sources:
             dev_sources.append(repo)
     az_config.set_value('extension', 'dev_sources', ','.join(dev_sources))
+    env_config.set_value('ext', 'repo_paths', ','.join(dev_sources))
+
     return list_extension_repos()
 
 
 def remove_extension_repo(repos):
     az_config = get_azure_config()
+    env_config = get_env_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
     dev_sources = dev_sources.split(',') if dev_sources else []
     for repo in repos:
@@ -134,6 +145,7 @@ def remove_extension_repo(repos):
         except ValueError:
             logger.warning("Repo '%s' was not found in the list of repositories to search.", os.path.abspath(repo))
     az_config.set_value('extension', 'dev_sources', ','.join(dev_sources))
+    env_config.set_value('ext', 'repo_paths', ','.join(dev_sources))
     return list_extension_repos()
 
 
