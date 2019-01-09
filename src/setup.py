@@ -54,7 +54,7 @@ setup(
         'future',
         'gitpython',
         'knack~=0.5.1',
-        'pylint==1.9.2',
+        'pylint~=2.0.0',
         'pytest',
         'pytest-xdist',
         'tox',
