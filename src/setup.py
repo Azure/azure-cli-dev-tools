@@ -54,12 +54,15 @@ setup(
         'future',
         'gitpython',
         'knack~=0.5.1',
-        'pylint~=2.0.0',
         'pytest',
         'pytest-xdist',
         'tox',
         'virtualenv'
     ],
+    extras_require={
+        ":python_version<'3.0'": ['pylint~=1.9.2'],
+        ":python_version>='3.0'": ['pylint~=2.0.0']
+    },
     package_data={'azdev.config': ['*.*']},
     include_package_data=True,
     entry_points={

@@ -15,7 +15,7 @@ except ImportError:
 
 from azdev.utilities import (
     display, heading, subheading, cmd, py_cmd, get_cli_repo_path, get_path_table,
-    pip_cmd, call)
+    pip_cmd, call, COMMAND_MODULE_PREFIX)
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -252,6 +252,8 @@ def verify_versions(modules=None):
 
     results = {}
     for mod, mod_path in modules:
+        if not mod.startswith(COMMAND_MODULE_PREFIX):
+            mod = '{}{}'.format(COMMAND_MODULE_PREFIX, mod)
         # currently, this is not published
         if mod == 'azure-cli-testsdk':
             continue
@@ -259,6 +261,10 @@ def verify_versions(modules=None):
 
     shutil.rmtree(temp_dir)
     os.chdir(original_cwd)
+
+    logger.info('Module'.ljust(20) + 'Local Version'.rjust(20) + 'Public Version'.rjust(20))
+    for mod, data in results.items():
+        logger.info(mod.ljust(20) + data['local_version'].rjust(20) + data['public_version'].rjust(20))
 
     failed_mods = {k: v for k, v in results.items() if v['status'] != 'OK'}
     subheading('RESULTS')
@@ -286,12 +292,24 @@ def _check_module(root_dir, mod, mod_path):
     pypi_dir = os.path.join(root_dir, mod, 'public')
 
     # download the public PyPI package and extract the version
+    logger.info('Checking {}...'.format(mod))
     result = pip_cmd('download {} --no-deps -d {}'.format(mod, root_dir)).result
+    try:
+        result = result.decode('utf-8')
+    except AttributeError:
+        pass
     for line in result.splitlines():
+        line = line.strip()
         if line.endswith('.whl') and line.startswith('Saved'):
             downloaded_path = line.replace('Saved ', '').strip()
             downloaded_version = version_pattern.match(downloaded_path).group(1)
             break
+        if line.startswith('No matching distribution found'):
+            downloaded_path = None
+            downloaded_version = 'Unavailable'
+            break
+    if not downloaded_version:
+        raise CLIError('Unexpected error trying to acquire {}: {}'.format(mod, result))
 
     # build from source and extract the version
     setup_path = os.path.normpath(mod_path.strip())
@@ -309,32 +327,33 @@ def _check_module(root_dir, mod, mod_path):
             'public_version': downloaded_version,
             'status': 'OK'
         }
-    else:
-        # slight difference in dist-info dirs, so we must extract the azure folders and compare them
-        with zipfile.ZipFile(str(downloaded_path), 'r') as z:
-            z.extractall(pypi_dir)
+        return results
 
-        with zipfile.ZipFile(str(build_path), 'r') as z:
-            z.extractall(build_dir)
+    # slight difference in dist-info dirs, so we must extract the azure folders and compare them
+    with zipfile.ZipFile(str(downloaded_path), 'r') as z:
+        z.extractall(pypi_dir)
 
-        errors = _compare_folders(os.path.join(pypi_dir), os.path.join(build_dir))
-        # clean up empty strings
-        errors = [e for e in errors if e]
-        if errors:
-            subheading('Differences found in {}'.format(mod))
-            for error in errors:
-                logger.warning(error)
-        results[mod] = {
-            'local_version': build_version,
-            'public_version': downloaded_version,
-            'status': 'OK' if not errors else 'ERROR'
-        }
+    with zipfile.ZipFile(str(build_path), 'r') as z:
+        z.extractall(build_dir)
 
-        # special case: to make a release, these MUST be bumped
-        if mod in ['azure-cli', 'azure-cli-core']:
-            if results[mod]['status'] == 'OK':
-                logger.warning('%s version must be bumped to support release!', mod)
-                results[mod]['status'] = 'ERROR'
+    errors = _compare_folders(os.path.join(pypi_dir), os.path.join(build_dir))
+    # clean up empty strings
+    errors = [e for e in errors if e]
+    if errors:
+        subheading('Differences found in {}'.format(mod))
+        for error in errors:
+            logger.warning(error)
+    results[mod] = {
+        'local_version': build_version,
+        'public_version': downloaded_version,
+        'status': 'OK' if not errors else 'ERROR'
+    }
+
+    # special case: to make a release, these MUST be bumped
+    if mod in ['azure-cli', 'azure-cli-core']:
+        if results[mod]['status'] == 'OK':
+            logger.warning('%s version must be bumped to support release!', mod)
+            results[mod]['status'] = 'ERROR'
 
     return results
 
