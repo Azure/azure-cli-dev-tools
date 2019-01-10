@@ -14,7 +14,18 @@ helps[''] = """
 
 helps['setup'] = """
     short-summary: Set up your environment for development of Azure CLI command modules and/or extensions.
-    long-summary: Find or clones the relevant repositories and installs the necessary modules.
+    examples:
+        - name: Fully interactive setup.
+          text: azdev setup
+
+        - name: Install only the CLI in dev mode and search for the existing repo.
+          text: azdev setup -c
+
+        - name: Install public CLI and setup an extensions repo. Do not install any extensions.
+          text: azdev setup -r azure-cli-extensions
+
+        - name: Install CLI in dev mode, along with the extensions repo. Auto-find the CLI repo and install the `alias` extension in dev mode.
+          text: azdev setup -r azure-cli-extensions -e alias
 """
 
 
@@ -74,18 +85,13 @@ helps['verify version'] = """
 """
 
 
-helps['load-all'] = """
-    short-summary: Load the full command table, command arguments and help.
-"""
-
-
 helps['style'] = """
     short-summary: Check code style (pylint and PEP8).
 """
 
 
 helps['test'] = """
-    short-summary: Record or reply CLI tests.
+    short-summary: Record or replay CLI tests.
     parameters:
         - name: --pytest-args -a
           populator-commands:
@@ -115,7 +121,7 @@ helps['perf'] = """
 """
 
 
-helps['perf load-time'] = """
+helps['perf load-times'] = """
     short-summary: Verify that all modules load within an acceptable timeframe.
 """
 
@@ -154,6 +160,44 @@ helps['extension list'] = """
 helps['extension update-index'] = """
     short-summary: Update the extensions index.json from a built WHL file.
 """
+
+
+helps['extension repo'] = """
+    short-summary: Commands to manage extension repositories for development.
+    long-summary: >
+        Extensions installed via the `az extension` commands are located in a specific
+        folder. This folder is not well-suited for development. The CLI will look for
+        in-development extensions in any number of Git repositories. These commands are
+        used to add and remove repositories from the list of locations the CLI will search
+        when looking for in-development extensions.
+"""
+
+
+helps['extension repo add'] = """
+    short-summary: Add an extension repository to search for in-development extensions.
+"""
+
+
+helps['extension repo remove'] = """
+    short-summary: >
+        Remove a repository from the list of places to search for in-development extensions.
+    long-summary: >
+        This will not remove the extension repository from your system, but will appear to
+        have the effect of uninstalling any extensions that were previously installed from
+        that repository.
+"""
+
+
+helps['extension repo list'] = """
+    short-summary: >
+        List the repositories that will be searched for in-development extensions.
+"""
+
+
+helps['group'] = """
+    short-summary: Convenience commands to manage Azure resource groups.
+"""
+
 
 helps['group delete'] = """
     short-summary: Delete several resource groups with filters. Useful for cleaning up test resources.

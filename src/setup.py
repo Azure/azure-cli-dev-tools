@@ -10,7 +10,7 @@
 import os
 from setuptools import setup
 
-__VERSION__ = '0.1.0'
+__VERSION__ = '0.0.1'
 
 
 def read(fname):
@@ -22,7 +22,7 @@ setup(
     name='azdev',
     version=__VERSION__,
     description='Azure Developer Tools command line',
-    url='https://github.com/Azure/azdev',
+    url='https://github.com/Azure/azure-cli-dev-tools',
     author='Microsoft Corporation',
     author_email='azpycli@microsoft.com',
     license='MIT',
@@ -54,12 +54,15 @@ setup(
         'future',
         'gitpython',
         'knack~=0.5.1',
-        'pylint==1.9.2',
         'pytest',
         'pytest-xdist',
         'tox',
         'virtualenv'
     ],
+    extras_require={
+        ":python_version<'3.0'": ['pylint~=1.9.2'],
+        ":python_version>='3.0'": ['pylint~=2.0.0']
+    },
     package_data={'azdev.config': ['*.*']},
     include_package_data=True,
     entry_points={

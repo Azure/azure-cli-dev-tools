@@ -14,52 +14,29 @@ from knack.log import get_logger
 from knack.prompting import prompt_y_n
 from knack.util import CLIError
 
+from azdev.operations.extensions import (
+    list_extensions, add_extension_repo, remove_extension)
 from azdev.params import Flag
 from azdev.utilities import (
     display, heading, subheading, cmd, py_cmd, pip_cmd, find_file, IS_WINDOWS, get_path_table,
-    get_env_config_dir, get_env_config)
+    get_env_config_dir, get_env_config, require_virtual_env, get_azure_config)
 
 logger = get_logger(__name__)
 
 
-def _prompt_to_clone_repo(name, path):
-    if prompt_y_n("Repo '{}' does not exist at path '{}'. Clone?".format(name, path)):
-        return True
-    else:
-        raise CLIError("Operation aborted.")
-
-
-def _clone_repo(name, path):
-    message = "Cloning repo {} at path: {}".format(name, path)
-    command = "git clone https://github.com/Azure/{}.git {}".format(name, path)
-    cmd(command, message)
-
-
-def _prompt_to_create_venv(name, path):
-    if prompt_y_n("Virtual environment '{}' does not exist at path '{}'. Create?".format(name, path)):
-        return True
-    else:
-        raise CLIError("Operation aborted.")
-
-
-def _create_venv(path):
-    message = "\nCreating virtual environment: {}".format(path)
-    command = "virtualenv {}".format(path)
-    py_cmd(command, message)
-
-
-def _get_path(path, file_name, default):
-    if not path:
-        return None, None
-    if path == Flag:
-        path = find_file(file_name) or default
+def _check_path(path, file_name):
+    """ Ensures the file_name is provided in the supplied path. """
     path = os.path.abspath(path)
-    exists = os.path.isdir(path)
-    return path, exists
+    if not os.path.exists(path):
+        raise CLIError('{} is not a valid path.'.format(path))
+    _check_repo(path)
+    if file_name not in os.listdir(path):
+        raise CLIError("'{}' does not contain the expected file '{}'".format(path, file_name))
+    return path
 
 
 def _check_repo(path):
-    if not os.path.isdir(os.path.join(path, ".git")):
+    if not os.path.isdir(os.path.join(path, '.git')):
         raise CLIError("'{}' is not a valid git repository.".format(path))
 
 
@@ -84,12 +61,27 @@ def _install_modules(cli_path):
     return not any(failures)
 
 
-def _extension_only_install():
-    # TODO: Need to install azure-cli-testsdk (not currently on PyPI)
-    pip_cmd("install -q azure-cli", "Installing `azure-cli`...")
+def _install_extensions(ext_paths):
+    # clear pre-existing dev extensions
+    installed_extensions = [x['name'] for x in list_extensions() if x['inst'] == 'Y']
+    remove_extension(installed_extensions)
+
+    # install specified extensions
+    for path in ext_paths or []:
+        result = pip_cmd('install -e {}'.format(path), "Adding extension '{}'...".format(path))
+        if result.error:
+            raise result.error
 
 
-def _cli_and_extension_install(cli_path, ext_path):
+def _install_cli(cli_path):
+
+    # install public CLI off PyPI if no repo found
+    if not cli_path:
+        pip_cmd('install --upgrade azure-cli', "Installing `azure-cli`...")
+        pip_cmd('install git+https://github.com/Azure/azure-cli@master#subdirectory=src/azure-cli-testsdk', "Installing `azure-cli-testsdk`...")
+        return
+
+    # otherwise editable install from source
     # install private whls if there are any
     privates_dir = os.path.join(cli_path, "privates")
     if os.path.isdir(privates_dir) and os.listdir(privates_dir):
@@ -134,10 +126,6 @@ def _cli_and_extension_install(cli_path, ext_path):
     pip_cmd("install -q -I azure-mgmt-nspkg==1.0.0", "Installing `azure-mgmt-nspkg`...")
 
 
-def _get_venv_activate_command(venv):
-    return os.path.join(venv, "Scripts" if IS_WINDOWS else "bin", "activate")
-
-
 def _copy_config_files():
     from glob import glob
     from importlib import import_module
@@ -154,88 +142,137 @@ def _copy_config_files():
         os.remove(path)
 
 
-def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
+def _interactive_setup():
+    from knack.prompting import prompt_y_n, prompt
+    while True:
+        cli_path = None
+        ext_repos = []
+        exts = []
+
+        # CLI Installation
+        if prompt_y_n('Do you plan to develop CLI modules?'):
+            display('\nGreat! Please enter the path to your azure-cli repo or press RETURN and we will attempt to find it for you.')
+            while True:
+                cli_path = prompt('\nPath (RETURN to auto-find): ', None)
+                cli_path = os.path.abspath(cli_path) if cli_path else None
+                CLI_SENTINEL = 'azure-cli.pyproj'
+                if not cli_path:
+                    cli_path = find_file(CLI_SENTINEL)
+                try:
+                    cli_path = _check_path(cli_path, CLI_SENTINEL)
+                    display('Found: {}'.format(cli_path))
+                    break
+                except CLIError as ex:
+                    logger.error(ex)
+                    continue
+        else:
+            display('\nOK. We will install the latest `azure-cli` from PyPI then.')
+
+        # Determine extension repos
+        if prompt_y_n('\nDo you plan to develop CLI extensions?'):
+            display('\nGreat! Input the paths for the extension repos you wish to develop for, one per'
+                    'line. You can add as many repos as you like. Press RETURN to continue to the next step.')
+            while True:
+                ext_repo_path = prompt('\nPath (RETURN to continue): ', None)
+                if not ext_repo_path:
+                    break
+                try:
+                    _check_repo(os.path.abspath(ext_repo_path))
+                except CLIError as ex:
+                    logger.error(ex)
+                    continue
+                ext_repos.append(ext_repo_path)
+                display('Repo {} OK.'.format(ext_repo_path))
+
+        if not ext_repos:
+            display('\nNo problem! You can always add extension repos later with `azdev extension repo add`.')
+
+        # Determine extensions
+        if ext_repos:
+            if prompt_y_n('\nWould you like to install certain extensions by default? '):
+                display('\nGreat! Input the names of the extensions you wish to install, one per '
+                        'line. You can add as many repos as you like. Press RETURN to continue to the next step.')
+                available_extensions = [x['name'] for x in list_extensions()]
+                while True:
+                    ext_name = prompt('\nName (RETURN to continue): ', None)
+                    if not ext_name:
+                        break
+                    if ext_name not in available_extensions:
+                        logger.error("Extension '%s' not found. Check the spelling, and make sure you added the repo first!", ext_name)
+                        continue
+                    display('Extension {} OK.'.format(ext_name))
+                    exts.append(next(x['path'] for x in list_extensions() if x['name'] == ext_name))
+            else:
+                display('\nNo problem! You can always add extensions later with `azdev extension add`.')
+
+        subheading('Summary')
+        display('CLI: {}'.format(cli_path if cli_path else 'PyPI'))
+        display('Extension repos: {}'.format(' '.join(ext_repos)))
+        display('Extensions: \n    {}'.format('\n    '.join(exts)))
+        if prompt_y_n('\nProceed with installation? '):
+            return cli_path, ext_repos, exts
+        else:
+            display("\nNo problem! Let's start again.\n")
+
+
+def setup(cmd, cli_path=None, ext_repo_path=None, ext=None):
+
+    require_virtual_env()
 
     start = time.time()
 
     heading('Azure CLI Dev Setup')
 
-    if not (cli_path or ext_path):
-        raise CLIError("usage error: must specify at least one of --cli or --ext")
-
-    cli_path, cli_exists = _get_path(cli_path, 'azure-cli.pyproj', 'azure-cli')
-    ext_path, ext_exists = _get_path(ext_path, 'azure-cli-extensions.pyproj', 'azure-cli-extensions')
-
-    cli_clone = False
-    ext_clone = False
-    create_venv = False
-
-    if cli_path:
-        if cli_exists:
-            _check_repo(cli_path)
-            display("Azure CLI repo found at: {}".format(cli_path))
-        else:
-            cli_clone = _prompt_to_clone_repo("azure-cli", cli_path)
-
-    if ext_path:
-        if ext_exists:
-            _check_repo(ext_path)
-            display("Azure CLI extensions repo found at: {}".format(ext_path))
-        else:
-            ext_clone = _prompt_to_clone_repo("azure-cli-extensions", ext_path)
-
-    # setup virtual environment or use existing
-    env_path = os.path.abspath(venv)
-    if not os.path.isdir(env_path):
-        create_venv = _prompt_to_create_venv(venv, env_path)
+    ext_to_install = []
+    if not any([cli_path, ext_repo_path, ext]):
+        cli_path, ext_repo_path, ext_to_install = _interactive_setup()
     else:
-        display("Virtual environment found at: {}".format(env_path))
+        # otherwise assume programmatic setup
+        if cli_path:
+            CLI_SENTINEL = 'azure-cli.pyproj'
+            if cli_path == Flag:
+                cli_path = find_file(CLI_SENTINEL)
+            cli_path = _check_path(cli_path, CLI_SENTINEL)
+            display('Azure CLI:\n    {}\n'.format(cli_path))
+        else:
+            display('Azure CLI:\n    PyPI\n')
 
-    # perform any cloning or venv creation
-    if cli_clone:
-        _clone_repo("azure-cli", cli_path)
-    if ext_clone:
-        _clone_repo("azure-cli-extensions", ext_path)
-    if create_venv:
-        _create_venv(env_path)
-        logger.warning(
-            "Virtual environment created. Run `{}` and then re-run this command to continue.".format(
-                _get_venv_activate_command(venv)
-            )
-        )
-        sys.exit(0)
+        # must add the necessary repo to add an extension
+        if ext and not ext_repo_path:
+            raise CLIError('usage error: --repo EXT_REPO [EXT_REPO ...] [--ext EXT_NAME ...]')
 
-    # before any packages can be pip installed, the desired virtual environment must be activated by the user
-    virtual_env_var = os.environ.get("VIRTUAL_ENV", None)
-    if env_path != virtual_env_var:
-        raise CLIError(
-            "To continue with CLI setup, you must activate the virtual environment by running `{}`".format(
-                _get_venv_activate_command(venv)
-            )
-        )
-    config = get_env_config()
+        get_azure_config().set_value('extension', 'dev_sources', '')
+        if ext_repo_path:
+            # add extension repo(s)
+            add_extension_repo(ext_repo_path)
+            display('Azure CLI extension repos:\n    {}'.format('\n    '.join([os.path.abspath(x) for x in ext_repo_path])))
+
+        if ext:
+            # add extension(s)
+            available_extensions = [x['name'] for x in list_extensions()]
+            not_found = [x for x in ext if x not in available_extensions]
+            if not_found:
+                raise CLIError("The following extensions were not found. Ensure you have added the repo using `--repo/-r PATH`.\n    {}".format('\n    '.join(not_found)))
+            ext_to_install = [x['path'] for x in list_extensions() if x['name'] in ext]
+
+        if ext_to_install:
+            display('\nAzure CLI extensions:\n    {}'.format('\n    '.join(ext_to_install)))
+
+    dev_sources = get_azure_config().get('extension', 'dev_sources', None)
 
     # save data to config files
-    if ext_path:
-        from azdev.utilities import get_azure_config
-        config.set_value('ext', 'repo_path', ext_path)
-        az_config = get_azure_config()
-        az_config.set_value('extension', 'dir', os.path.join(ext_path))
-
-    if cli_path:
-        config.set_value('cli', 'repo_path', cli_path)
+    config  = get_env_config()
+    config.set_value('ext', 'repo_paths', dev_sources if dev_sources else '_NONE_')
+    config.set_value('cli', 'repo_path', cli_path if cli_path else '_NONE_')
 
     # install packages
-    heading('Installing packages')
+    subheading('Installing packages')
 
-    if ext_path and not cli_path:
-        _extension_only_install()
-    else:
-        _cli_and_extension_install(cli_path, ext_path)
+    # upgrade to latest pip
+    pip_cmd('install --upgrade pip -q', 'Upgrading pip...')
 
-    # TODO: Final step, re-install azdev in the virtual environment
-    # in order to have all needed packages.
-
+    _install_cli(cli_path)
+    _install_extensions(ext_to_install)
     _copy_config_files()
 
     end = time.time()
@@ -243,35 +280,4 @@ def setup(cmd, venv='env', cli_path=None, ext_path=None, yes=None):
     elapsed_sec = int(end - start) % 60
     display('\nElapsed time: {} min {} sec'.format(elapsed_min, elapsed_sec))
 
-    heading('Finished dev setup!')
-
-
-def configure(cmd, cli_path=None, ext_path=None):
-
-    heading('Azdev Configure')
-
-    cli_path, cli_exists = _get_path(cli_path or Flag, 'azure-cli.pyproj', 'azure-cli')
-    ext_path, ext_exists = _get_path(ext_path or Flag, 'azure-cli-extensions.pyproj', 'azure-cli-extensions')
-
-    if cli_path and cli_exists:
-        _check_repo(cli_path)
-        display("Azure CLI repo found at: {}".format(cli_path))
-
-    if ext_path and ext_exists:
-        _check_repo(ext_path)
-        display("Azure CLI extensions repo found at: {}".format(ext_path))
-
-    # save data to config files
-    config = get_env_config()
-    if ext_path:
-        from azdev.utilities import get_azure_config
-        config.set_value('ext', 'repo_path', ext_path)
-        az_config = get_azure_config()
-        az_config.set_value('extension', 'dir', os.path.join(ext_path))
-
-    if cli_path:
-        config.set_value('cli', 'repo_path', cli_path)
-
-    _copy_config_files()
-
-    subheading('Azdev configured!')
+    subheading('Finished dev setup!')

@@ -22,7 +22,8 @@ from .const import (
     EXTENSION_PREFIX,
     IS_WINDOWS,
     ENV_VAR_TEST_MODULES,
-    ENV_VAR_TEST_LIVE
+    ENV_VAR_TEST_LIVE,
+    ENV_VAR_VIRTUAL_ENV
 )
 from .display import (
     display,
@@ -32,11 +33,15 @@ from .display import (
 )
 from .path import (
     find_file,
+    find_files,
     make_dirs,
     get_azdev_repo_path,
     get_cli_repo_path,
-    get_ext_repo_path,
+    get_ext_repo_paths,
     get_path_table
+)
+from .tools import (
+    require_virtual_env
 )
 
 
@@ -59,11 +64,14 @@ __all__ = [
     'get_env_config_dir',
     'ENV_VAR_TEST_MODULES',
     'ENV_VAR_TEST_LIVE',
+    'ENV_VAR_VIRTUAL_ENV',
     'IS_WINDOWS',
     'find_file',
+    'find_files',
     'make_dirs',
     'get_azdev_repo_path',
     'get_cli_repo_path',
-    'get_ext_repo_path',
-    'get_path_table'
+    'get_ext_repo_paths',
+    'get_path_table',
+    'require_virtual_env'
 ]

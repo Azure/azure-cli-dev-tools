@@ -21,17 +21,18 @@ from azdev.utilities import (
     ENV_VAR_TEST_MODULES, ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_env_config_dir,
-    get_path_table)
+    get_path_table, require_virtual_env)
 
 logger = get_logger(__name__)
 
 
-DEFAULT_RESULT_FILE = 'test_results.xml'
-DEFAULT_RESULT_PATH = os.path.join(get_env_config_dir(), DEFAULT_RESULT_FILE)
-
-
 def run_tests(cmd, tests, xml_path=None, ci_mode=False, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None):
+
+    require_virtual_env()
+
+    DEFAULT_RESULT_FILE = 'test_results.xml'
+    DEFAULT_RESULT_PATH = os.path.join(get_env_config_dir(), DEFAULT_RESULT_FILE)
 
     from .pytest_runner import get_test_runner
 
@@ -192,21 +193,27 @@ def _discover_tests(profile):
         for comp in mod_name.split('-'):
             filepath = os.path.join(filepath, comp)
         mod_data = {
+            'alt_name': 'main' if mod_name == 'azure-cli' else mod_name.replace(COMMAND_MODULE_PREFIX, ''),
             'filepath': os.path.join(filepath, 'tests'),
             'base_path': '{}.tests'.format(mod_name).replace('-', '.'),
             'files': {}
         }
-        module_data[mod_name] = _discover_module_tests(mod_name, mod_data)
+        tests = _discover_module_tests(mod_name, mod_data)
+        if tests:
+            module_data[mod_name] = tests
 
     logger.info('\nCommand Modules: %s', ', '.join([name for name, _ in command_modules]))
     for mod_name, mod_path in command_modules:
-        mod_name = mod_name.replace(COMMAND_MODULE_PREFIX, '')
+        short_name = mod_name.replace(COMMAND_MODULE_PREFIX, '')
         mod_data = {
-            'filepath': os.path.join(mod_path, 'azure', 'cli', 'command_modules', mod_name, 'tests', profile_namespace),
-            'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(mod_name, profile_namespace),
+            'alt_name': short_name,
+            'filepath': os.path.join(mod_path, 'azure', 'cli', 'command_modules', short_name, 'tests', profile_namespace),
+            'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(short_name, profile_namespace),
             'files': {}
         }
-        module_data[mod_name] = _discover_module_tests(mod_name, mod_data)
+        tests = _discover_module_tests(mod_name, mod_data)
+        if tests:
+            module_data[mod_name] = tests
 
     logger.info('\nExtensions: %s', ', '.join([name for name, _ in extensions]))
     for mod_name, mod_path in extensions:
@@ -214,11 +221,14 @@ def _discover_tests(profile):
         filepath = glob.glob(os.path.join(mod_path, glob_pattern))[0]
         import_name = os.path.basename(filepath)
         mod_data = {
+            'alt_name': os.path.split(filepath)[1],
             'filepath': os.path.join(filepath, 'tests', profile_namespace),
             'base_path': '{}.tests.{}'.format(import_name, profile_namespace),
             'files': {}
         }
-        module_data[import_name] = _discover_module_tests(import_name, mod_data)
+        tests = _discover_module_tests(import_name, mod_data)
+        if tests:
+            module_data[mod_name] = tests
 
     test_index = {}
     conflicted_keys = []
@@ -257,6 +267,7 @@ def _discover_tests(profile):
                 add_to_index(class_name, class_path)
             add_to_index(file_name, file_path)
         add_to_index(mod_name, mod_path)
+        add_to_index(mod_data['alt_name'], mod_path)
 
     # remove the conflicted keys since they would arbitrarily point to a random implementation
     for key in conflicted_keys:

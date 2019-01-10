@@ -4,11 +4,11 @@
 # --------------------------------------------------------------------------------------------
 
 from collections import OrderedDict
-from glob import glob
 import os
 import shutil
 
-from azdev.utilities import pip_cmd, display, get_ext_repo_path
+from azdev.utilities import (
+    pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_env_config)
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -17,9 +17,8 @@ logger = get_logger(__name__)
 
 
 def add_extension(extensions):
-    ext_path = get_ext_repo_path()
-    all_ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', 'setup.py'))
-    all_extensions = glob(all_ext_pattern)
+    ext_paths = get_ext_repo_paths()
+    all_extensions = find_files(ext_paths, 'setup.py')
 
     paths_to_add = []
     for path in all_extensions:
@@ -40,20 +39,26 @@ def add_extension(extensions):
 
 
 def remove_extension(extensions):
-    ext_path = get_ext_repo_path()
-    installed_paths = []
-    installed_paths.extend(glob(os.path.normcase(os.path.join(ext_path, 'src', '*', '*.*-info'))))
+
+    ext_paths = get_ext_repo_paths()
+    installed_paths = find_files(ext_paths, '*.*-info')
     paths_to_remove = []
+    names_to_remove = []
     for path in installed_paths:
         target_path = None
         folder = os.path.dirname(path)
         long_name = os.path.basename(folder)
         if long_name in extensions:
             paths_to_remove.append(folder)
+            names_to_remove.append(long_name)
             extensions.remove(long_name)
     # raise error if any extension not installed
     if extensions:
         raise CLIError('extension(s) not installed: {}'.format(' '.join(extensions)))
+
+    # removes any links that may have been added to site-packages.
+    for ext in names_to_remove:
+        pip_cmd('uninstall {} -y'.format(ext))
 
     for path in paths_to_remove:
         for d in os.listdir(path):
@@ -64,25 +69,43 @@ def remove_extension(extensions):
                 shutil.rmtree(path_to_remove)
 
 
-def list_extensions():
-    ext_path = get_ext_repo_path()
-    all_ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', 'setup.py'))
-    installed_paths = []
-    installed_paths.extend(glob(os.path.normcase(os.path.join(ext_path, 'src', '*', '*.*-info'))))
-
-    results = []
+def _get_installed_dev_extensions(dev_sources):
+    from glob import glob
     installed = []
-    for path in installed_paths:
-        folder = os.path.dirname(path)
-        long_name = os.path.basename(folder)
-        results.append({'name': '{} (INSTALLED)'.format(long_name), 'path': folder})
-        installed.append(long_name)
 
-    for path in glob(all_ext_pattern):
-        folder = os.path.dirname(path)
+    def _collect(path, depth=0, max_depth=3):
+        if not os.path.isdir(path) or depth == max_depth or os.path.split(path)[-1].startswith('.'):
+            return
+        pattern = os.path.join(path, '*.egg-info')
+        match = glob(pattern)
+        if match:
+            ext_path = os.path.dirname(match[0])
+            ext_name = os.path.split(ext_path)[-1]
+            installed.append({'name': ext_name, 'path': ext_path})
+        else:
+            for item in os.listdir(path):
+                _collect(os.path.join(path, item), depth + 1, max_depth)
+    for source in dev_sources:
+        _collect(source)
+    return installed
+
+
+def list_extensions():
+    azure_config = get_azure_config()
+    dev_sources = azure_config.get('extension', 'dev_sources', None)
+    dev_sources = dev_sources.split(',') if dev_sources else []
+
+    installed = _get_installed_dev_extensions(dev_sources)
+    installed_names = [x['name'] for x in installed]
+    results = []
+
+    for ext_path in find_files(dev_sources, 'setup.py'):
+        folder = os.path.dirname(ext_path)
         long_name = os.path.basename(folder)
-        if long_name not in installed:
-            results.append({'name': long_name, 'path': folder})
+        if long_name not in installed_names:
+            results.append({'name': long_name, 'inst': '', 'path': folder})
+        else:
+            results.append({'name': long_name, 'inst': 'Y', 'path': folder})
     return results
 
 
@@ -94,6 +117,44 @@ def _get_sha256sum(a_file):
     return sha256.hexdigest()
 
 
+def add_extension_repo(repos):
+    from azdev.operations.setup import _check_repo
+    az_config = get_azure_config()
+    env_config = get_env_config()
+    dev_sources = az_config.get('extension', 'dev_sources', None)
+    dev_sources = dev_sources.split(',') if dev_sources else []
+    for repo in repos:
+        repo = os.path.abspath(repo)
+        _check_repo(repo)
+        if repo not in dev_sources:
+            dev_sources.append(repo)
+    az_config.set_value('extension', 'dev_sources', ','.join(dev_sources))
+    env_config.set_value('ext', 'repo_paths', ','.join(dev_sources))
+
+    return list_extension_repos()
+
+
+def remove_extension_repo(repos):
+    az_config = get_azure_config()
+    env_config = get_env_config()
+    dev_sources = az_config.get('extension', 'dev_sources', None)
+    dev_sources = dev_sources.split(',') if dev_sources else []
+    for repo in repos:
+        try:
+            dev_sources.remove(os.path.abspath(repo))
+        except ValueError:
+            logger.warning("Repo '%s' was not found in the list of repositories to search.", os.path.abspath(repo))
+    az_config.set_value('extension', 'dev_sources', ','.join(dev_sources))
+    env_config.set_value('ext', 'repo_paths', ','.join(dev_sources))
+    return list_extension_repos()
+
+
+def list_extension_repos():
+    az_config = get_azure_config()
+    dev_sources = az_config.get('extension', 'dev_sources', None)
+    return dev_sources.split(',') if dev_sources else dev_sources
+
+
 def update_extension_index(extension):
     import json
     import re
@@ -103,7 +164,7 @@ def update_extension_index(extension):
 
     NAME_REGEX = r'.*/([^/]*)-\d+.\d+.\d+'
 
-    ext_path = get_ext_repo_path()
+    ext_paths = get_ext_repo_paths()
 
     # Get extension WHL from URL
     if not extension.endswith('.whl') or not extension.startswith('https:'):

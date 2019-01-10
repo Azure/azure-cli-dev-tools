@@ -37,14 +37,14 @@ def get_cli_repo_path():
         CLIError('Unable to retrieve CLI repo path from config. Please run `azdev setup`.')
 
 
-def get_ext_repo_path():
-    """ Return the path to the Azure CLI Extensions repo.
+def get_ext_repo_paths():
+    """ Return the paths to the Azure CLI dev extensions.
 
-    :returns: Path (str) to Azure CLI extensions repo.
+    :returns: Path (str) to Azure CLI dev extension repos.
     """
     from .config import get_env_config
     try:
-        return get_env_config().get('ext', 'repo_path')
+        return get_env_config().get('ext', 'repo_paths').split(',')
     except Exception:
         CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup`.')
 
@@ -58,6 +58,21 @@ def find_file(file_name):
         if file_name in files:
             return path
     return None
+
+
+def find_files(root_paths, file_pattern):
+    """ Returns the paths to all files that match a given pattern.
+
+    :returns: Paths ([str]) to files matching the given pattern.
+    """
+    if isinstance(root_paths, str):
+        root_paths = [root_paths]
+    paths = []
+    for root_path in root_paths:
+        for path, dirs, files in os.walk(root_path):
+            pattern = os.path.join(path, file_pattern)
+            paths.extend(glob(pattern))
+    return paths
 
 
 def make_dirs(path):
@@ -97,19 +112,19 @@ def get_path_table(include_only=None):
     get_all = not include_only
 
     table = {}
-    cli_path = get_cli_repo_path()
-    ext_path = get_ext_repo_path()
-    module_pattern = os.path.normcase(os.path.join(cli_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py'))
-    core_pattern = os.path.normcase(os.path.join(cli_path, 'src', '*', 'setup.py'))
-    ext_pattern = os.path.normcase(os.path.join(ext_path, 'src', '*', '*.*-info'))
+    cli_repo_path = get_cli_repo_path()
+    ext_repo_paths = get_ext_repo_paths()
+    modules_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py')))
+    core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
+    ext_paths = find_files(ext_repo_paths, '*.*-info')
 
-    def _update_table(pattern, key):
+    def _update_table(paths, key):
         if key not in table:
             table[key] = {}
         folder = None
         long_name = None
         short_name = None
-        for path in glob(pattern):
+        for path in paths:
             folder = os.path.dirname(path)
             long_name = os.path.basename(folder)
             # determine short-names
@@ -138,9 +153,9 @@ def get_path_table(include_only=None):
                     table[key].pop(short_name, None)
                     table[key][long_name] = folder
 
-    _update_table(module_pattern, 'mod')
-    _update_table(core_pattern, 'core')
-    _update_table(ext_pattern, 'ext')
+    _update_table(modules_paths, 'mod')
+    _update_table(core_paths, 'core')
+    _update_table(ext_paths, 'ext')
 
     if include_only:
         raise CLIError('unrecognized names: {}'.format(' '.join(include_only)))
