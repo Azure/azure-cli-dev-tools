@@ -142,7 +142,7 @@ def _discover_module_tests(mod_name, mod_data):
         contents = os.listdir(mod_data['filepath'])
         test_files = {x[:-len('.py')]: {} for x in contents if x.startswith('test_') and x.endswith('.py')}
         total_files = len(test_files)
-    except Exception:
+    except FileNotFoundError:
         # skip modules that don't have tests
         logger.info('  No test files found.')
         return None

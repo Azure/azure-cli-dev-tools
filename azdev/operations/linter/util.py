@@ -76,7 +76,7 @@ def share_element(first_iter, second_iter):
 
 
 def _get_command_source(command_name, command_table):
-    from azure.cli.core.commands import ExtensionCommandSource
+    from azure.cli.core.commands import ExtensionCommandSource  # pylint: disable=import-error
     command = command_table.get(command_name)
     # see if command is from an extension
     if isinstance(command.command_source, ExtensionCommandSource):

@@ -7,7 +7,7 @@
 import os
 import json
 import zipfile
-from wheel.install import WHEEL_INFO_RE
+from wheel.install import WHEEL_INFO_RE  # pylint: disable=import-error,no-name-in-module
 
 from azdev.utilities import EXTENSION_PREFIX
 

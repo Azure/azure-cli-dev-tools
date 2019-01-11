@@ -12,12 +12,15 @@ from knack.log import get_logger
 from knack.util import CLIError
 
 from azdev.utilities import (
-    pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_env_config)
+    pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_env_config, require_azure_cli)
 
 logger = get_logger(__name__)
 
 
 def add_extension(extensions):
+
+    require_azure_cli()
+
     ext_paths = get_ext_repo_paths()
     all_extensions = find_files(ext_paths, 'setup.py')
 
@@ -39,6 +42,8 @@ def add_extension(extensions):
 
 
 def remove_extension(extensions):
+
+    require_azure_cli()
 
     ext_paths = get_ext_repo_paths()
     installed_paths = find_files(ext_paths, '*.*-info')
@@ -90,6 +95,9 @@ def _get_installed_dev_extensions(dev_sources):
 
 
 def list_extensions():
+
+    require_azure_cli()
+
     azure_config = get_azure_config()
     dev_sources = azure_config.get('extension', 'dev_sources', None)
     dev_sources = dev_sources.split(',') if dev_sources else []
@@ -117,6 +125,9 @@ def _get_sha256sum(a_file):
 
 
 def add_extension_repo(repos):
+
+    require_azure_cli()
+
     from azdev.operations.setup import _check_repo
     az_config = get_azure_config()
     env_config = get_env_config()
@@ -134,6 +145,9 @@ def add_extension_repo(repos):
 
 
 def remove_extension_repo(repos):
+
+    require_azure_cli()
+
     az_config = get_azure_config()
     env_config = get_env_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
@@ -149,6 +163,9 @@ def remove_extension_repo(repos):
 
 
 def list_extension_repos():
+
+    require_azure_cli()
+
     az_config = get_azure_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
     return dev_sources.split(',') if dev_sources else dev_sources
@@ -160,6 +177,8 @@ def update_extension_index(extension):
     import tempfile
 
     from .util import get_ext_metadata, get_whl_from_url
+
+    require_azure_cli()
 
     NAME_REGEX = r'.*/([^/]*)-\d+.\d+.\d+'
 

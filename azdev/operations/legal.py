@@ -24,10 +24,11 @@ def check_license_headers():
     heading('Verify License Headers')
 
     # TODO: The env could be somewhere else
-    env_path = os.path.join(get_cli_repo_path(), 'env')
+    cli_path = get_cli_repo_path()
+    env_path = os.path.join(cli_path, 'env')
 
     files_without_header = []
-    for current_dir, _, files in os.walk(get_cli_repo_path()):
+    for current_dir, _, files in os.walk(cli_path):
         if current_dir.startswith(env_path):
             continue
 

@@ -14,7 +14,7 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     display, heading, subheading, cmd, py_cmd, get_path_table,
-    pip_cmd, COMMAND_MODULE_PREFIX)
+    pip_cmd, COMMAND_MODULE_PREFIX, require_azure_cli)
 
 logger = get_logger(__name__)
 
@@ -26,6 +26,9 @@ SETUP_PY_NAME = 'setup.py'
 
 # region verify History Headings
 def check_history(modules=None):
+
+    require_azure_cli()
+
     # TODO: Does not work with extensions
     path_table = get_path_table(include_only=modules)
     selected_modules = list(path_table['core'].items()) + list(path_table['mod'].items())
@@ -83,13 +86,15 @@ def _check_history_headings(mod_path):
 
         # Check that the current package version has a history entry
         if not all_versions:
-            errors.append("Unable to get versions from {}. Check formatting. e.g. there should be a new line after the 'Release History' heading.".format(history_path))
+            errors.append("Unable to get versions from {}. Check formatting. e.g. there should be a new "
+                          "line after the 'Release History' heading.".format(history_path))
 
         first_version_history = all_versions[0]
         actual_version = cmd('python setup.py --version', cwd=mod_path)
         actual_version = actual_version.result.strip()
         if first_version_history != actual_version:
-            errors.append("The topmost version in {} does not match version {} defined in setup.py.".format(history_path, actual_version))
+            errors.append("The topmost version in {} does not match version {} defined in setup.py.".format(
+                history_path, actual_version))
     return errors
 
 
@@ -172,7 +177,8 @@ def _check_readme_render(mod_path):
 #     errors.append(_is_unreleased_version(package_name, mod_version))
 #     #errors.append(_is_latest_version(package_name, mod_version))
 #     errors.append(_contains_no_plus_dev(mod_version))
-#     errors.append(_changes_require_version_bump(package_name, mod_version, mod_path, base_repo=base_repo, base_tag=base_tag))
+#     errors.append(_changes_require_version_bump(
+#        package_name, mod_version, mod_path, base_repo=base_repo, base_tag=base_tag))
 
 #     # filter out "None" results
 #     errors = [e for e in errors if e]
@@ -206,9 +212,11 @@ def _check_readme_render(mod_path):
 #         changes = cmd('git diff {} -- {} :(exclude)*/tests/*'.format(revision_range, mod_path)).result
 #         if changes:
 #             if check_versions_on_pypi(package_name, mod_version):
-#                 error = 'There are changes to {} and the current version {} is already available on PyPI! Bump the version.'.format(package_name, mod_version)
+#                 error = 'There are changes to {} and the current version {} is already available on PyPI! '
+#                         'Bump the version.'.format(package_name, mod_version)
 #             elif base_repo and _version_in_base_repo(base_repo, mod_path, package_name, mod_version):
-#                 error = 'There are changes to {} and the current version {} is already used at tag {}. Bump the version.'.format(package_name, mod_version, base_tag)
+#                 error = 'There are changes to {} and the current version {} is already used at tag {}. '
+#                         'Bump the version.'.format(package_name, mod_version, base_tag)
 #             error += '\nChanges are as follows:'
 #             error += changes
 #     return error
@@ -236,6 +244,8 @@ def verify_versions(modules=None):
     import tempfile
     import shutil
 
+    require_azure_cli()
+
     heading('Verify Package Versions')
 
     original_cwd = os.getcwd()
@@ -261,9 +271,9 @@ def verify_versions(modules=None):
     shutil.rmtree(temp_dir)
     os.chdir(original_cwd)
 
-    logger.info('Module'.ljust(20) + 'Local Version'.rjust(20) + 'Public Version'.rjust(20))  # pylint: logging-not-lazy
+    logger.info('Module'.ljust(40) + 'Local Version'.rjust(20) + 'Public Version'.rjust(20))  # pylint: disable=logging-not-lazy
     for mod, data in results.items():
-        logger.info(mod.ljust(20) + data['local_version'].rjust(20) + data['public_version'].rjust(20))
+        logger.info(mod.ljust(40) + data['local_version'].rjust(20) + data['public_version'].rjust(20))
 
     failed_mods = {k: v for k, v in results.items() if v['status'] != 'OK'}
     subheading('RESULTS')

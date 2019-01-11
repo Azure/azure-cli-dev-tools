@@ -15,7 +15,7 @@ from knack.help_files import helps
 from knack.log import get_logger
 
 from azdev.utilities import (
-    heading, subheading, display, get_path_table)
+    heading, subheading, display, get_path_table, require_azure_cli)
 
 from .linter import LinterManager
 from .util import filter_modules
@@ -26,8 +26,11 @@ logger = get_logger(__name__)
 
 # pylint:disable=too-many-locals
 def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
-    from azure.cli.core import get_default_cli
-    from azure.cli.core.file_util import (
+
+    require_azure_cli()
+
+    from azure.cli.core import get_default_cli  # pylint: disable=import-error
+    from azure.cli.core.file_util import (  # pylint: disable=import-error
         get_all_help, create_invoker_and_load_cmds_and_args)
 
     heading('CLI Linter')
@@ -38,9 +41,9 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
     path_table = get_path_table(include_only=modules)
 
     selected_mod_names = list(path_table['mod'].keys()) + list(path_table['core'].keys()) + \
-                         list(path_table['ext'].keys())
+        list(path_table['ext'].keys())
     selected_mod_paths = list(path_table['mod'].values()) + list(path_table['core'].values()) + \
-                         list(path_table['ext'].values())
+        list(path_table['ext'].values())
 
     # collect all rule exclusions
     for path in selected_mod_paths:

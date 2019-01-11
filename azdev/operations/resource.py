@@ -11,7 +11,7 @@ from knack.prompting import prompt_y_n
 from knack.util import CLIError
 
 from azdev.utilities import (
-    cmd as run_cmd, subheading, display)
+    cmd as run_cmd, subheading, display, require_azure_cli)
 
 logger = get_logger(__name__)
 
@@ -20,12 +20,14 @@ class Data(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
         if 'properties' in self.__dict__:
-            self.__dict__.update(self.properties)
-            del self.properties
+            self.__dict__.update(self.properties)  # pylint: disable=no-member
+            del self.properties  # pylint: disable=no-member
 
 
 def delete_groups(prefixes=None, older_than=6, product='azurecli', cause='automation', yes=False):
     from datetime import datetime, timedelta
+
+    require_azure_cli()
 
     groups = json.loads(run_cmd('az group list -ojson').result)
     groups_to_delete = []
@@ -34,10 +36,10 @@ def delete_groups(prefixes=None, older_than=6, product='azurecli', cause='automa
         for group in groups:
             group = Data(**group)
 
-            if not group.tags:
+            if not group.tags:  # pylint: disable=no-member
                 continue
 
-            tags = Data(**group.tags)
+            tags = Data(**group.tags)  # pylint: disable=no-member
             try:
                 date_tag = datetime.strptime(tags.date, '%Y-%m-%dT%H:%M:%SZ')
                 curr_time = datetime.utcnow()

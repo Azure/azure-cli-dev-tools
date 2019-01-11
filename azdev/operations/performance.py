@@ -10,8 +10,7 @@ from knack.log import get_logger
 from knack.util import CLIError
 
 from azdev.utilities import (
-    display, heading, subheading, cmd
-)
+    display, heading, subheading, cmd, require_azure_cli)
 
 logger = get_logger(__name__)
 
@@ -30,6 +29,9 @@ THRESHOLDS = {
 
 
 def check_load_time(runs=3):
+
+    require_azure_cli()
+
     heading('Module Load Performance')
 
     regex = r"[^']*'([^']*)'[\D]*([\d\.]*)"

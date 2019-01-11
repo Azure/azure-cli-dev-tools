@@ -42,7 +42,8 @@ from .path import (
     get_path_table
 )
 from .tools import (
-    require_virtual_env
+    require_virtual_env,
+    require_azure_cli
 )
 
 
@@ -74,5 +75,6 @@ __all__ = [
     'get_cli_repo_path',
     'get_ext_repo_paths',
     'get_path_table',
-    'require_virtual_env'
+    'require_virtual_env',
+    'require_azure_cli'
 ]

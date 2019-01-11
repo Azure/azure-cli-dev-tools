@@ -56,8 +56,10 @@ setup(
         'knack~=0.5.1',
         'pytest',
         'pytest-xdist',
+        'requests',
         'tox',
-        'virtualenv'
+        'virtualenv',
+        'wheel'
     ],
     extras_require={
         ":python_version<'3.0'": ['pylint~=1.9.2'],

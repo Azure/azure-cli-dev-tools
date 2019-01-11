@@ -69,7 +69,7 @@ def _install_extensions(ext_paths):
     for path in ext_paths or []:
         result = pip_cmd('install -e {}'.format(path), "Adding extension '{}'...".format(path))
         if result.error:
-            raise result.error
+            raise result.error  # pylint: disable=raising-bad-type
 
 
 def _install_cli(cli_path):
@@ -160,6 +160,12 @@ def _interactive_setup():
                 CLI_SENTINEL = 'azure-cli.pyproj'
                 if not cli_path:
                     cli_path = find_file(CLI_SENTINEL)
+                if not cli_path:
+                    raise CLIError('Unable to locate your CLI repo. Things to check:'
+                                   '\n    Ensure you have cloned the repo. '
+                                   '\n    Specify the path explicitly with `-c PATH`. '
+                                   '\n    If you run with `-c` to autodetect, ensure you are running '
+                                   'this command from a folder upstream of the repo.')
                 try:
                     cli_path = _check_path(cli_path, CLI_SENTINEL)
                     display('Found: {}'.format(cli_path))
@@ -234,6 +240,12 @@ def setup(cli_path=None, ext_repo_path=None, ext=None):
             CLI_SENTINEL = 'azure-cli.pyproj'
             if cli_path == Flag:
                 cli_path = find_file(CLI_SENTINEL)
+            if not cli_path:
+                raise CLIError('Unable to locate your CLI repo. Things to check:'
+                               '\n    Ensure you have cloned the repo. '
+                               '\n    Specify the path explicitly with `-c PATH`. '
+                               '\n    If you run with `-c` to autodetect, ensure you are running '
+                               'this command from a folder upstream of the repo.')
             cli_path = _check_path(cli_path, CLI_SENTINEL)
             display('Azure CLI:\n    {}\n'.format(cli_path))
         else:
