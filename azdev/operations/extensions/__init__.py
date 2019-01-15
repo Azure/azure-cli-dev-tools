@@ -38,7 +38,7 @@ def add_extension(extensions):
     for path in paths_to_add:
         result = pip_cmd('install -e {}'.format(path), "Adding extension '{}'...".format(path))
         if result.error:
-            raise result.error
+            raise result.error  # pylint: disable=raising-bad-type
 
 
 def remove_extension(extensions):
@@ -180,17 +180,25 @@ def update_extension_index(extension):
 
     require_azure_cli()
 
-    NAME_REGEX = r'.*/([^/]*)-\d+.\d+.\d+'
+    ext_repos = get_ext_repo_paths()
+    index_path = next((x for x in find_files(ext_repos, 'index.json') if 'azure-cli-extensions' in x), None)
+    if not index_path:
+        raise CLIError("Unable to find 'index.json' in your extension repos. Have "
+                       "you cloned 'azure-cli-extensions' and added it to you repo "
+                       "sources with `azdev extension repo add`?")
 
-    ext_paths = get_ext_repo_paths()
+    NAME_REGEX = r'.*/([^/]*)-\d+.\d+.\d+'
 
     # Get extension WHL from URL
     if not extension.endswith('.whl') or not extension.startswith('https:'):
         raise ValueError('usage error: only URL to a WHL file currently supported.')
 
+    # TODO: extend to consider other options
+    ext_path = extension
+
     # Extract the extension name
     try:
-        extension_name = re.findall(NAME_REGEX, extension)[0]
+        extension_name = re.findall(NAME_REGEX, ext_path)[0]
         extension_name = extension_name.replace('_', '-')
     except IndexError:
         raise ValueError('unable to parse extension name')
@@ -199,22 +207,25 @@ def update_extension_index(extension):
     ext_dir = tempfile.mkdtemp(dir=extensions_dir)
     whl_cache_dir = tempfile.mkdtemp()
     whl_cache = {}
-    ext_file = get_whl_from_url(whl_path, extension_name, whl_cache_dir, whl_cache)
+    ext_file = get_whl_from_url(ext_path, extension_name, whl_cache_dir, whl_cache)
 
-    with open(os.path.join(ext_path, 'src', 'index.json'), 'r') as infile:
+    with open(index_path, 'r') as infile:
         curr_index = json.loads(infile.read())
 
-    try:
-        entry = curr_index['extensions'][extension_name]
-    except IndexError:
-        raise ValueError('{} not found in index.json'.format(extension_name))
+    entry = {
+        'downloadUrl': ext_path,
+        'sha256Digest': _get_sha256sum(ext_file),
+        'filename': ext_path.split('/')[-1],
+        'metadata': get_ext_metadata(ext_dir, ext_file, extension_name)
+    }
 
-    entry[0]['downloadUrl'] = whl_path
-    entry[0]['sha256Digest'] = _get_sha256sum(ext_file)
-    entry[0]['filename'] = whl_path.split('/')[-1]
-    entry[0]['metadata'] = get_ext_metadata(ext_dir, ext_file, extension_name)
+    if extension_name not in curr_index['extensions'].keys():
+        logger.info("Adding '%s' to index...", extension_name)
+        curr_index['extensions'][extension_name] = [entry]
+    else:
+        logger.info("Updating '%s' in index...", extension_name)
+        curr_index['extensions'][extension_name].append(entry)
 
     # update index and write back to file
-    curr_index['extensions'][extension_name] = entry
-    with open(os.path.ßjoin(ext_path, 'src', 'index.json'), 'w') as outfile:
+    with open(os.path.join(index_path), 'w') as outfile:
         outfile.write(json.dumps(curr_index, indent=4, sort_keys=True))

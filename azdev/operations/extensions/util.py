@@ -9,6 +9,8 @@ import json
 import zipfile
 from wheel.install import WHEEL_INFO_RE  # pylint: disable=import-error,no-name-in-module
 
+from knack.util import CLIError
+
 from azdev.utilities import EXTENSION_PREFIX
 
 
@@ -62,7 +64,10 @@ def get_whl_from_url(url, filename, tmp_dir, whl_cache=None):
         return whl_cache[url]
     import requests
     r = requests.get(url, stream=True)
-    assert r.status_code == 200, "Request to {} failed with {}".format(url, r.status_code)
+    try:
+        assert r.status_code == 200, "Request to {} failed with {}".format(url, r.status_code)
+    except AssertionError:
+        raise CLIError("unable to download (status code {}): {}".format(r.status_code, url))
     ext_file = os.path.join(tmp_dir, filename)
     with open(ext_file, 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024):
