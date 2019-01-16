@@ -68,6 +68,6 @@ setup(
     package_data={'azdev.config': ['*.*']},
     include_package_data=True,
     entry_points={
-        'console_scripts': ['azdev=azdev:launch']
+        'console_scripts': ['azdev=azdev.__main__:main']
     }
 )

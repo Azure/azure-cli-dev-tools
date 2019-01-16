@@ -8,8 +8,10 @@ import os
 import unittest
 import argparse
 import mock
-from automation.cli_linter import main
-from automation.cli_linter.linter import LinterScope, RuleError
+
+from azdev.operations.linter import (
+    run_linter as main, LinterScope, RuleError)
+
 from azure.cli.core.commands import AzCliCommand, ExtensionCommandSource
 
 
@@ -28,7 +30,7 @@ class TestExtensionsBase(unittest.TestCase):
                 self.cmd_table[cmd].command_source = mock.MagicMock()
                 self.cmd_table[cmd].command_source = 'foo'
 
-        def get_command_modules_paths(**_):
+        def get_path_table(**_):
             return [(mod, os.path.dirname(__file__)) for mod in ('foo', 'drool')]
 
         def get_all_help(_):
@@ -42,8 +44,8 @@ class TestExtensionsBase(unittest.TestCase):
         self.patches.append(mock.patch('azure.cli.core.file_util.get_all_help', get_all_help))
         self.patches.append(mock.patch('azure.cli.core.file_util.create_invoker_and_load_cmds_and_args',
                                        create_invoker_and_load_cmds_and_args))
-        self.patches.append(mock.patch('automation.utilities.path.get_command_modules_paths',
-                                       get_command_modules_paths))
+        self.patches.append(mock.patch('azdev.utilities.get_path_table',
+                                       get_path_table))
         self.patches.append(mock.patch('knack.cli.CLI', mock.MagicMock))
         self.patches.append(mock.patch('sys.exit', lambda _: None))
 
@@ -66,7 +68,7 @@ class TestExtensionsBase(unittest.TestCase):
             for command_name in expected_cmds:
                 self.assertIn(command_name, command_table)
 
-        with mock.patch('automation.cli_linter.linter.LinterManager.run', check_cmd_table):
+        with mock.patch('azdev.operations.linter.LinterManager.run', check_cmd_table):
             # all extensions/modules loaded if no specific extensions or modules specified
             expected_cmd_table_size = 5
             main(args)
@@ -91,7 +93,7 @@ class TestExtensionsBase(unittest.TestCase):
             main(args)
 
     def test_rule_exclusion(self):
-        from automation.cli_linter.rule_decorators import command_rule
+        from azdev.operations.linter.rule_decorators import command_rule
 
         violations = []
 
@@ -110,7 +112,7 @@ class TestExtensionsBase(unittest.TestCase):
                     violations.extend(sorted(rule_func()) or [])
 
         # run the rule, `foo command_1` should be excluded from being linted
-        with mock.patch('automation.cli_linter.linter.LinterManager.run', run):
+        with mock.patch('azdev.operations.linter.LinterManager.run', run):
             args = argparse.Namespace(ci=False, func=main, modules=None, extensions=None, rule_types_to_run=None,
                                       rules=None)
             main(args)

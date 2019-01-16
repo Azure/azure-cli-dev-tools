@@ -17,7 +17,7 @@ from knack.log import get_logger
 from azdev.utilities import (
     heading, subheading, display, get_path_table, require_azure_cli)
 
-from .linter import LinterManager
+from .linter import LinterManager, LinterScope, RuleError
 from .util import filter_modules
 
 
