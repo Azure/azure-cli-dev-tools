@@ -6,3 +6,4 @@ src/aztool/__pycache__/
 src/azdev.egg-info/*
 *.pyc
 .vscode/
+azdev.egg-info/
