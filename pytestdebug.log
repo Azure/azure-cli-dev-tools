@@ -1,0 +1,2739 @@
+versions pytest-4.1.1, py-1.7.0, python-3.6.5.final.0
+cwd=E:\github\azdev
+args=['--debug']
+
+  pytest_cmdline_main [hook]
+      config: <_pytest.config.Config object at 0x000001183C54E588>
+    pytest_plugin_registered [hook]
+        plugin: <Session azdev>
+        manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+    finish pytest_plugin_registered --> [] [hook]
+    pytest_configure [hook]
+        config: <_pytest.config.Config object at 0x000001183C54E588>
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.LFPlugin object at 0x000001183C823438>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.NFPlugin object at 0x000001183C823710>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.logging.LoggingPlugin object at 0x000001183C823860>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.stepwise.StepwisePlugin object at 0x000001183C823B38>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+    early skip of rewriting module: py._io [assertion]
+    early skip of rewriting module: py._io.terminalwriter [assertion]
+    early skip of rewriting module: unicodedata [assertion]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.config.Config object at 0x000001183C54E588>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.mark' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\mark\\__init__.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.main' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\main.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.terminal' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\terminal.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.runner' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\runner.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.python' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\python.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.fixtures' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\fixtures.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.debugging' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\debugging.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.unittest' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\unittest.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.capture' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\capture.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.skipping' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\skipping.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.tmpdir' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\tmpdir.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.monkeypatch' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\monkeypatch.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.recwarn' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\recwarn.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.pastebin' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\pastebin.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.helpconfig' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\helpconfig.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.nose' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\nose.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.assertion' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\assertion\\__init__.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.junitxml' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\junitxml.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.resultlog' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\resultlog.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.doctest' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\doctest.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.cacheprovider' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\cacheprovider.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.freeze_support' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\freeze_support.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.setuponly' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\setuponly.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.setupplan' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\setupplan.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.stepwise' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\stepwise.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.warnings' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\warnings.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.logging' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\logging.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'xdist.plugin' from 'e:\\github\\env\\lib\\site-packages\\xdist\\plugin.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'xdist.looponfail' from 'e:\\github\\env\\lib\\site-packages\\xdist\\looponfail.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'pytest_forked' from 'e:\\github\\env\\lib\\site-packages\\pytest_forked\\__init__.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.capture.CaptureManager object at 0x000001183C6ADBE0>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <Session azdev>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.LFPlugin object at 0x000001183C823438>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.NFPlugin object at 0x000001183C823710>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.logging.LoggingPlugin object at 0x000001183C823860>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.stepwise.StepwisePlugin object at 0x000001183C823B38>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.terminal.TerminalReporter object at 0x000001183C823E48>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+    finish pytest_configure --> [] [hook]
+    pytest_sessionstart [hook]
+        session: <Session azdev>
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.config.Config object at 0x000001183C54E588>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.mark' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\mark\\__init__.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.main' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\main.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.terminal' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\terminal.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.runner' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\runner.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.python' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\python.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.fixtures' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\fixtures.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.debugging' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\debugging.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.unittest' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\unittest.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.capture' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\capture.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.skipping' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\skipping.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.tmpdir' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\tmpdir.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.monkeypatch' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\monkeypatch.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.recwarn' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\recwarn.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.pastebin' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\pastebin.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.helpconfig' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\helpconfig.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.nose' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\nose.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.assertion' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\assertion\\__init__.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.junitxml' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\junitxml.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.resultlog' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\resultlog.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.doctest' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\doctest.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.cacheprovider' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\cacheprovider.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.freeze_support' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\freeze_support.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.setuponly' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\setuponly.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.setupplan' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\setupplan.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.stepwise' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\stepwise.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.warnings' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\warnings.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module '_pytest.logging' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\logging.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'xdist.plugin' from 'e:\\github\\env\\lib\\site-packages\\xdist\\plugin.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'xdist.looponfail' from 'e:\\github\\env\\lib\\site-packages\\xdist\\looponfail.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <module 'pytest_forked' from 'e:\\github\\env\\lib\\site-packages\\pytest_forked\\__init__.py'>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.capture.CaptureManager object at 0x000001183C6ADBE0>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <Session azdev>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.LFPlugin object at 0x000001183C823438>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.cacheprovider.NFPlugin object at 0x000001183C823710>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.logging.LoggingPlugin object at 0x000001183C823860>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.stepwise.StepwisePlugin object at 0x000001183C823B38>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.terminal.TerminalReporter object at 0x000001183C823E48>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_plugin_registered [hook]
+          plugin: <_pytest.fixtures.FixtureManager object at 0x000001183C83C860>
+          manager: <_pytest.config.PytestPluginManager object at 0x000001183B6ABB00>
+      finish pytest_plugin_registered --> [] [hook]
+      pytest_report_header [hook]
+          config: <_pytest.config.Config object at 0x000001183C54E588>
+          startdir: E:\github\azdev
+      finish pytest_report_header --> [['rootdir: E:\\github\\azdev, inifile:', 'plugins: xdist-1.26.0, forked-1.0.1'], ['using: pytest-4.1.1 pylib-1.7.0', 'setuptools registered plugins:', '  pytest-xdist-1.26.0 at e:\\github\\env\\lib\\site-packages\\xdist\\plugin.py', '  pytest-xdist-1.26.0 at e:\\github\\env\\lib\\site-packages\\xdist\\looponfail.py', '  pytest-forked-1.0.1 at e:\\github\\env\\lib\\site-packages\\pytest_forked\\__init__.py']] [hook]
+    finish pytest_sessionstart --> [] [hook]
+    pytest_collection [hook]
+        session: <Session azdev>
+    perform_collect <Session azdev> ['E:\\github\\azdev'] [collection]
+        pytest_collectstart [hook]
+            collector: <Session azdev>
+        finish pytest_collectstart --> [] [hook]
+        pytest_make_collect_report [hook]
+            collector: <Session azdev>
+        processing argument E:\github\azdev [collection]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\.git
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\.pytest_cache
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\.tox
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\azdev
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev.egg-info
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\azdev.egg-info
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\scripts
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\scripts
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\tests
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\tests
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\.flake8
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\.flake8
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\.gitignore
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\.gitignore
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\.pylintrc
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\.pylintrc
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\.travis.yml
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\.travis.yml
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\LICENSE
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\LICENSE
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\README.md
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\README.md
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev.pyproj
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev.pyproj
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev.sln
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev.sln
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\pyproject.toml
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\pyproject.toml
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\pytestdebug.log
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\pytestdebug.log
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\setup.cfg
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\setup.cfg
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\setup.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\setup.py
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\tox.ini
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\tox.ini
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\config
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\azdev\config
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\operations
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\azdev\operations
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\utilities
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\azdev\utilities
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\__init__.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev\__init__.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\azdev\__init__.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Package E:\github\azdev\azdev> [hook]
+            finish pytest_collect_file --> [<Package E:\github\azdev\azdev>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\config\__init__.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev\config\__init__.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\azdev\config\__init__.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Package E:\github\azdev\azdev\config> [hook]
+            finish pytest_collect_file --> [<Package E:\github\azdev\azdev\config>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\operations\extensions
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\azdev\operations\extensions
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\operations\linter
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\azdev\operations\linter
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\operations\tests
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\azdev\operations\tests
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\operations\__init__.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev\operations\__init__.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\azdev\operations\__init__.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Package E:\github\azdev\azdev\operations> [hook]
+            finish pytest_collect_file --> [<Package E:\github\azdev\azdev\operations>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\operations\extensions\__init__.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev\operations\extensions\__init__.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\azdev\operations\extensions\__init__.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Package E:\github\azdev\azdev\operations\extensions> [hook]
+            finish pytest_collect_file --> [<Package E:\github\azdev\azdev\operations\extensions>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\operations\linter\rules
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_directory [hook]
+                path: E:\github\azdev\azdev\operations\linter\rules
+                parent: <Session azdev>
+            finish pytest_collect_directory --> None [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\operations\linter\__init__.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev\operations\linter\__init__.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\azdev\operations\linter\__init__.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Package E:\github\azdev\azdev\operations\linter> [hook]
+            finish pytest_collect_file --> [<Package E:\github\azdev\azdev\operations\linter>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\operations\linter\rules\__init__.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev\operations\linter\rules\__init__.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\azdev\operations\linter\rules\__init__.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Package E:\github\azdev\azdev\operations\linter\rules> [hook]
+            finish pytest_collect_file --> [<Package E:\github\azdev\azdev\operations\linter\rules>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\operations\tests\__init__.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev\operations\tests\__init__.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\azdev\operations\tests\__init__.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Package E:\github\azdev\azdev\operations\tests> [hook]
+            finish pytest_collect_file --> [<Package E:\github\azdev\azdev\operations\tests>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev\utilities\__init__.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev\utilities\__init__.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\azdev\utilities\__init__.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Package E:\github\azdev\azdev\utilities> [hook]
+            finish pytest_collect_file --> [<Package E:\github\azdev\azdev\utilities>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev.egg-info\PKG-INFO
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev.egg-info\PKG-INFO
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev.egg-info\SOURCES.txt
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev.egg-info\SOURCES.txt
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev.egg-info\dependency_links.txt
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev.egg-info\dependency_links.txt
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev.egg-info\entry_points.txt
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev.egg-info\entry_points.txt
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev.egg-info\requires.txt
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev.egg-info\requires.txt
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\azdev.egg-info\top_level.txt
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\azdev.egg-info\top_level.txt
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\scripts\license_verify.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\scripts\license_verify.py
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\tests\linter_exclusions.yml
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\tests\linter_exclusions.yml
+                parent: <Session azdev>
+            finish pytest_collect_file --> [] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\tests\test_extensions.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\tests\test_extensions.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\tests\test_extensions.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Module tests/test_extensions.py> [hook]
+            finish pytest_collect_file --> [<Module tests/test_extensions.py>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\tests\test_linter.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\tests\test_linter.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\tests\test_linter.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Module tests/test_linter.py> [hook]
+            finish pytest_collect_file --> [<Module tests/test_linter.py>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\tests\test_setup.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\tests\test_setup.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\tests\test_setup.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Module tests/test_setup.py> [hook]
+            finish pytest_collect_file --> [<Module tests/test_setup.py>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\tests\test_style.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\tests\test_style.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\tests\test_style.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Module tests/test_style.py> [hook]
+            finish pytest_collect_file --> [<Module tests/test_style.py>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\tests\test_tests.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\tests\test_tests.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\tests\test_tests.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Module tests/test_tests.py> [hook]
+            finish pytest_collect_file --> [<Module tests/test_tests.py>] [hook]
+            pytest_ignore_collect [hook]
+                path: E:\github\azdev\tests\test_verify.py
+                config: <_pytest.config.Config object at 0x000001183C54E588>
+            finish pytest_ignore_collect --> False [hook]
+            pytest_collect_file [hook]
+                path: E:\github\azdev\tests\test_verify.py
+                parent: <Session azdev>
+              pytest_pycollect_makemodule [hook]
+                  path: E:\github\azdev\tests\test_verify.py
+                  parent: <Session azdev>
+              finish pytest_pycollect_makemodule --> <Module tests/test_verify.py> [hook]
+            finish pytest_collect_file --> [<Module tests/test_verify.py>] [hook]
+        finish pytest_make_collect_report --> <CollectReport '' lenresult=14 outcome='passed'> [hook]
+        pytest_collectreport [hook]
+            report: <CollectReport '' lenresult=14 outcome='passed'>
+        finish pytest_collectreport --> [] [hook]
+    genitems <Package E:\github\azdev\azdev> [collection]
+      pytest_collectstart [hook]
+          collector: <Package E:\github\azdev\azdev>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Package E:\github\azdev\azdev>
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\config
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\config
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\operations
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\utilities
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\__main__.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\__main__.py
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\__pycache__
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\__pycache__
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\azdev.completion.sh
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\azdev.completion.sh
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\commands.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\commands.py
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\completer.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\completer.py
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\config
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\config
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\help.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\help.py
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\params.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\params.py
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\utilities
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\config\__init__.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\extensions
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\operations\extensions
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\operations\linter
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\tests
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\operations\tests
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\__init__.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules
+            parent: <Package E:\github\azdev\azdev>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities\__init__.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+      finish pytest_make_collect_report --> <CollectReport 'azdev/__init__.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'azdev/__init__.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Package E:\github\azdev\azdev\config> [collection]
+      pytest_collectstart [hook]
+          collector: <Package E:\github\azdev\azdev\config>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Package E:\github\azdev\azdev\config>
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\config\__pycache__
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\config\__pycache__
+            parent: <Package E:\github\azdev\azdev\config>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\config\cli.flake8
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\config\cli.flake8
+            parent: <Package E:\github\azdev\azdev\config>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\config\cli_pylintrc
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\config\cli_pylintrc
+            parent: <Package E:\github\azdev\azdev\config>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\config\ext.flake8
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\config\ext.flake8
+            parent: <Package E:\github\azdev\azdev\config>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\config\ext_pylintrc
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\config\ext_pylintrc
+            parent: <Package E:\github\azdev\azdev\config>
+        finish pytest_collect_file --> [] [hook]
+      finish pytest_make_collect_report --> <CollectReport 'azdev/config/__init__.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'azdev/config/__init__.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Package E:\github\azdev\azdev\operations> [collection]
+      pytest_collectstart [hook]
+          collector: <Package E:\github\azdev\azdev\operations>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Package E:\github\azdev\azdev\operations>
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\extensions
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\operations\extensions
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\operations\linter
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\tests
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\operations\tests
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\__pycache__
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\__pycache__
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\extensions
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\extensions
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\help.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\help.py
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\legal.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\legal.py
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\performance.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\performance.py
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\pypi.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\pypi.py
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\python_sdk.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\python_sdk.py
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\resource.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\resource.py
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\setup.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\setup.py
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\style.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\style.py
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\tests
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\tests
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\extensions\__init__.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules
+            parent: <Package E:\github\azdev\azdev\operations>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\__init__.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\tests\__init__.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+      finish pytest_make_collect_report --> <CollectReport 'azdev/operations/__init__.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'azdev/operations/__init__.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Package E:\github\azdev\azdev\operations\extensions> [collection]
+      pytest_collectstart [hook]
+          collector: <Package E:\github\azdev\azdev\operations\extensions>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Package E:\github\azdev\azdev\operations\extensions>
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\extensions\__pycache__
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\extensions\__pycache__
+            parent: <Package E:\github\azdev\azdev\operations\extensions>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\extensions\util.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\extensions\util.py
+            parent: <Package E:\github\azdev\azdev\operations\extensions>
+        finish pytest_collect_file --> [] [hook]
+      finish pytest_make_collect_report --> <CollectReport 'azdev/operations/extensions/__init__.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'azdev/operations/extensions/__init__.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Package E:\github\azdev\azdev\operations\linter> [collection]
+      pytest_collectstart [hook]
+          collector: <Package E:\github\azdev\azdev\operations\linter>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Package E:\github\azdev\azdev\operations\linter>
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_directory [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules
+            parent: <Package E:\github\azdev\azdev\operations\linter>
+        finish pytest_collect_directory --> None [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\__pycache__
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\__pycache__
+            parent: <Package E:\github\azdev\azdev\operations\linter>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\linter.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\linter.py
+            parent: <Package E:\github\azdev\azdev\operations\linter>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rule_decorators.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\rule_decorators.py
+            parent: <Package E:\github\azdev\azdev\operations\linter>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules
+            parent: <Package E:\github\azdev\azdev\operations\linter>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\util.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\util.py
+            parent: <Package E:\github\azdev\azdev\operations\linter>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\__init__.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+      finish pytest_make_collect_report --> <CollectReport 'azdev/operations/linter/__init__.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'azdev/operations/linter/__init__.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Package E:\github\azdev\azdev\operations\linter\rules> [collection]
+      pytest_collectstart [hook]
+          collector: <Package E:\github\azdev\azdev\operations\linter\rules>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Package E:\github\azdev\azdev\operations\linter\rules>
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\__pycache__
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\__pycache__
+            parent: <Package E:\github\azdev\azdev\operations\linter\rules>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\ci_exclusions.yml
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\ci_exclusions.yml
+            parent: <Package E:\github\azdev\azdev\operations\linter\rules>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\command_group_rules.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\command_group_rules.py
+            parent: <Package E:\github\azdev\azdev\operations\linter\rules>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\command_rules.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\command_rules.py
+            parent: <Package E:\github\azdev\azdev\operations\linter\rules>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\help_rules.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\help_rules.py
+            parent: <Package E:\github\azdev\azdev\operations\linter\rules>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\linter_exclusions.yml
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\linter_exclusions.yml
+            parent: <Package E:\github\azdev\azdev\operations\linter\rules>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\parameter_rules.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\linter\rules\parameter_rules.py
+            parent: <Package E:\github\azdev\azdev\operations\linter\rules>
+        finish pytest_collect_file --> [] [hook]
+      finish pytest_make_collect_report --> <CollectReport 'azdev/operations/linter/rules/__init__.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'azdev/operations/linter/rules/__init__.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Package E:\github\azdev\azdev\operations\tests> [collection]
+      pytest_collectstart [hook]
+          collector: <Package E:\github\azdev\azdev\operations\tests>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Package E:\github\azdev\azdev\operations\tests>
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\tests\__pycache__
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\tests\__pycache__
+            parent: <Package E:\github\azdev\azdev\operations\tests>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\operations\tests\pytest_runner.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\operations\tests\pytest_runner.py
+            parent: <Package E:\github\azdev\azdev\operations\tests>
+        finish pytest_collect_file --> [] [hook]
+      finish pytest_make_collect_report --> <CollectReport 'azdev/operations/tests/__init__.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'azdev/operations/tests/__init__.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Package E:\github\azdev\azdev\utilities> [collection]
+      pytest_collectstart [hook]
+          collector: <Package E:\github\azdev\azdev\utilities>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Package E:\github\azdev\azdev\utilities>
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities\__pycache__
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\utilities\__pycache__
+            parent: <Package E:\github\azdev\azdev\utilities>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities\command.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\utilities\command.py
+            parent: <Package E:\github\azdev\azdev\utilities>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities\config.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\utilities\config.py
+            parent: <Package E:\github\azdev\azdev\utilities>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities\const.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\utilities\const.py
+            parent: <Package E:\github\azdev\azdev\utilities>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities\display.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\utilities\display.py
+            parent: <Package E:\github\azdev\azdev\utilities>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities\path.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\utilities\path.py
+            parent: <Package E:\github\azdev\azdev\utilities>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities\pypi.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\utilities\pypi.py
+            parent: <Package E:\github\azdev\azdev\utilities>
+        finish pytest_collect_file --> [] [hook]
+        pytest_ignore_collect [hook]
+            path: E:\github\azdev\azdev\utilities\tools.py
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+        finish pytest_ignore_collect --> False [hook]
+        pytest_collect_file [hook]
+            path: E:\github\azdev\azdev\utilities\tools.py
+            parent: <Package E:\github\azdev\azdev\utilities>
+        finish pytest_collect_file --> [] [hook]
+      finish pytest_make_collect_report --> <CollectReport 'azdev/utilities/__init__.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'azdev/utilities/__init__.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Module tests/test_extensions.py> [collection]
+      pytest_collectstart [hook]
+          collector: <Module tests/test_extensions.py>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Module tests/test_extensions.py>
+      find_module called for: test_extensions [assertion]
+      matched test file 'E:\\github\\azdev\\tests\\test_extensions.py' [assertion]
+      found cached rewritten pyc for 'E:\\github\\azdev\\tests\\test_extensions.py' [assertion]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __name__
+            obj: test_extensions
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __doc__
+            obj: None
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __package__
+            obj: 
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __loader__
+            obj: <_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __spec__
+            obj: ModuleSpec(name='test_extensions', loader=<_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>, origin='E:\\github\\azdev\\tests\\test_extensions.py')
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __file__
+            obj: E:\github\azdev\tests\test_extensions.py
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __cached__
+            obj: E:\github\azdev\tests\__pycache__\test_extensions.cpython-36-PYTEST.pyc
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __builtins__
+            obj: {'__name__': 'builtins', '__doc__': "Built-in functions, exceptions, and other objects.\n\nNoteworthy: None is the `nil' object; Ellipsis represents `...' in slices.", '__package__': '', '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__spec__': ModuleSpec(name='builtins', loader=<class '_frozen_importlib.BuiltinImporter'>), '__build_class__': <built-in function __build_class__>, '__import__': <built-in function __import__>, 'abs': <built-in function abs>, 'all': <built-in function all>, 'any': <built-in function any>, 'ascii': <built-in function ascii>, 'bin': <built-in function bin>, 'callable': <built-in function callable>, 'chr': <built-in function chr>, 'compile': <built-in function compile>, 'delattr': <built-in function delattr>, 'dir': <built-in function dir>, 'divmod': <built-in function divmod>, 'eval': <built-in function eval>, 'exec': <built-in function exec>, 'format': <built-in function format>, 'getattr': <built-in function getattr>, 'globals': <built-in function globals>, 'hasattr': <built-in function hasattr>, 'hash': <built-in function hash>, 'hex': <built-in function hex>, 'id': <built-in function id>, 'input': <built-in function input>, 'isinstance': <built-in function isinstance>, 'issubclass': <built-in function issubclass>, 'iter': <built-in function iter>, 'len': <built-in function len>, 'locals': <built-in function locals>, 'max': <built-in function max>, 'min': <built-in function min>, 'next': <built-in function next>, 'oct': <built-in function oct>, 'ord': <built-in function ord>, 'pow': <built-in function pow>, 'print': <built-in function print>, 'repr': <built-in function repr>, 'round': <built-in function round>, 'setattr': <built-in function setattr>, 'sorted': <built-in function sorted>, 'sum': <built-in function sum>, 'vars': <built-in function vars>, 'None': None, 'Ellipsis': Ellipsis, 'NotImplemented': NotImplemented, 'False': False, 'True': True, 'bool': <class 'bool'>, 'memoryview': <class 'memoryview'>, 'bytearray': <class 'bytearray'>, 'bytes': <class 'bytes'>, 'classmethod': <class 'classmethod'>, 'complex': <class 'complex'>, 'dict': <class 'dict'>, 'enumerate': <class 'enumerate'>, 'filter': <class 'filter'>, 'float': <class 'float'>, 'frozenset': <class 'frozenset'>, 'property': <class 'property'>, 'int': <class 'int'>, 'list': <class 'list'>, 'map': <class 'map'>, 'object': <class 'object'>, 'range': <class 'range'>, 'reversed': <class 'reversed'>, 'set': <class 'set'>, 'slice': <class 'slice'>, 'staticmethod': <class 'staticmethod'>, 'str': <class 'str'>, 'super': <class 'super'>, 'tuple': <class 'tuple'>, 'type': <class 'type'>, 'zip': <class 'zip'>, '__debug__': True, 'BaseException': <class 'BaseException'>, 'Exception': <class 'Exception'>, 'TypeError': <class 'TypeError'>, 'StopAsyncIteration': <class 'StopAsyncIteration'>, 'StopIteration': <class 'StopIteration'>, 'GeneratorExit': <class 'GeneratorExit'>, 'SystemExit': <class 'SystemExit'>, 'KeyboardInterrupt': <class 'KeyboardInterrupt'>, 'ImportError': <class 'ImportError'>, 'ModuleNotFoundError': <class 'ModuleNotFoundError'>, 'OSError': <class 'OSError'>, 'EnvironmentError': <class 'OSError'>, 'IOError': <class 'OSError'>, 'WindowsError': <class 'OSError'>, 'EOFError': <class 'EOFError'>, 'RuntimeError': <class 'RuntimeError'>, 'RecursionError': <class 'RecursionError'>, 'NotImplementedError': <class 'NotImplementedError'>, 'NameError': <class 'NameError'>, 'UnboundLocalError': <class 'UnboundLocalError'>, 'AttributeError': <class 'AttributeError'>, 'SyntaxError': <class 'SyntaxError'>, 'IndentationError': <class 'IndentationError'>, 'TabError': <class 'TabError'>, 'LookupError': <class 'LookupError'>, 'IndexError': <class 'IndexError'>, 'KeyError': <class 'KeyError'>, 'ValueError': <class 'ValueError'>, 'UnicodeError': <class 'UnicodeError'>, 'UnicodeEncodeError': <class 'UnicodeEncodeError'>, 'UnicodeDecodeError': <class 'UnicodeDecodeError'>, 'UnicodeTranslateError': <class 'UnicodeTranslateError'>, 'AssertionError': <class 'AssertionError'>, 'ArithmeticError': <class 'ArithmeticError'>, 'FloatingPointError': <class 'FloatingPointError'>, 'OverflowError': <class 'OverflowError'>, 'ZeroDivisionError': <class 'ZeroDivisionError'>, 'SystemError': <class 'SystemError'>, 'ReferenceError': <class 'ReferenceError'>, 'BufferError': <class 'BufferError'>, 'MemoryError': <class 'MemoryError'>, 'Warning': <class 'Warning'>, 'UserWarning': <class 'UserWarning'>, 'DeprecationWarning': <class 'DeprecationWarning'>, 'PendingDeprecationWarning': <class 'PendingDeprecationWarning'>, 'SyntaxWarning': <class 'SyntaxWarning'>, 'RuntimeWarning': <class 'RuntimeWarning'>, 'FutureWarning': <class 'FutureWarning'>, 'ImportWarning': <class 'ImportWarning'>, 'UnicodeWarning': <class 'UnicodeWarning'>, 'BytesWarning': <class 'BytesWarning'>, 'ResourceWarning': <class 'ResourceWarning'>, 'ConnectionError': <class 'ConnectionError'>, 'BlockingIOError': <class 'BlockingIOError'>, 'BrokenPipeError': <class 'BrokenPipeError'>, 'ChildProcessError': <class 'ChildProcessError'>, 'ConnectionAbortedError': <class 'ConnectionAbortedError'>, 'ConnectionRefusedError': <class 'ConnectionRefusedError'>, 'ConnectionResetError': <class 'ConnectionResetError'>, 'FileExistsError': <class 'FileExistsError'>, 'FileNotFoundError': <class 'FileNotFoundError'>, 'IsADirectoryError': <class 'IsADirectoryError'>, 'NotADirectoryError': <class 'NotADirectoryError'>, 'InterruptedError': <class 'InterruptedError'>, 'PermissionError': <class 'PermissionError'>, 'ProcessLookupError': <class 'ProcessLookupError'>, 'TimeoutError': <class 'TimeoutError'>, 'open': <built-in function open>, 'quit': Use quit() or Ctrl-Z plus Return to exit, 'exit': Use exit() or Ctrl-Z plus Return to exit, 'copyright': Copyright (c) 2001-2018 Python Software Foundation.
+All Rights Reserved.
+
+Copyright (c) 2000 BeOpen.com.
+All Rights Reserved.
+
+Copyright (c) 1995-2001 Corporation for National Research Initiatives.
+All Rights Reserved.
+
+Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.
+All Rights Reserved., 'credits':     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
+    for supporting Python development.  See www.python.org for more information., 'license': Type license() to see the full license text, 'help': Type help() for interactive help, or help(object) for help about object.}
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __repr__
+            obj: <slot wrapper '__repr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __getattribute__
+            obj: <slot wrapper '__getattribute__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __setattr__
+            obj: <slot wrapper '__setattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __delattr__
+            obj: <slot wrapper '__delattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __init__
+            obj: <slot wrapper '__init__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __new__
+            obj: <built-in method __new__ of type object at 0x000000005762A020>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __dir__
+            obj: <method '__dir__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __dict__
+            obj: <member '__dict__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __hash__
+            obj: <slot wrapper '__hash__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __str__
+            obj: <slot wrapper '__str__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __lt__
+            obj: <slot wrapper '__lt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __le__
+            obj: <slot wrapper '__le__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __eq__
+            obj: <slot wrapper '__eq__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __ne__
+            obj: <slot wrapper '__ne__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __gt__
+            obj: <slot wrapper '__gt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __ge__
+            obj: <slot wrapper '__ge__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __reduce_ex__
+            obj: <method '__reduce_ex__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __reduce__
+            obj: <method '__reduce__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __subclasshook__
+            obj: <method '__subclasshook__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __init_subclass__
+            obj: <method '__init_subclass__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __format__
+            obj: <method '__format__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __sizeof__
+            obj: <method '__sizeof__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_extensions.py>
+            name: __class__
+            obj: <attribute '__class__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_extensions.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_extensions.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Module tests/test_linter.py> [collection]
+      pytest_collectstart [hook]
+          collector: <Module tests/test_linter.py>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Module tests/test_linter.py>
+      find_module called for: test_linter [assertion]
+      matched test file 'E:\\github\\azdev\\tests\\test_linter.py' [assertion]
+      found cached rewritten pyc for 'E:\\github\\azdev\\tests\\test_linter.py' [assertion]
+      early skip of rewriting module: mock [assertion]
+      early skip of rewriting module: mock.mock [assertion]
+      early skip of rewriting module: pbr [assertion]
+      early skip of rewriting module: pbr.version [assertion]
+      find_module called for: azdev [assertion]
+      early skip of rewriting module: azdev.operations [assertion]
+      early skip of rewriting module: azdev.operations.linter [assertion]
+      early skip of rewriting module: yaml [assertion]
+      early skip of rewriting module: yaml.error [assertion]
+      early skip of rewriting module: yaml.tokens [assertion]
+      early skip of rewriting module: yaml.events [assertion]
+      early skip of rewriting module: yaml.nodes [assertion]
+      early skip of rewriting module: yaml.loader [assertion]
+      early skip of rewriting module: yaml.reader [assertion]
+      early skip of rewriting module: yaml.scanner [assertion]
+      early skip of rewriting module: yaml.parser [assertion]
+      early skip of rewriting module: yaml.composer [assertion]
+      early skip of rewriting module: yaml.constructor [assertion]
+      early skip of rewriting module: yaml.resolver [assertion]
+      early skip of rewriting module: yaml.dumper [assertion]
+      early skip of rewriting module: yaml.emitter [assertion]
+      early skip of rewriting module: yaml.serializer [assertion]
+      early skip of rewriting module: yaml.representer [assertion]
+      early skip of rewriting module: yaml.cyaml [assertion]
+      early skip of rewriting module: _yaml [assertion]
+      early skip of rewriting module: knack [assertion]
+      early skip of rewriting module: knack.cli [assertion]
+      early skip of rewriting module: knack.invocation [assertion]
+      early skip of rewriting module: knack.deprecation [assertion]
+      early skip of rewriting module: knack.util [assertion]
+      early skip of rewriting module: knack.parser [assertion]
+      early skip of rewriting module: knack.events [assertion]
+      early skip of rewriting module: knack.commands [assertion]
+      early skip of rewriting module: knack.prompting [assertion]
+      early skip of rewriting module: getpass [assertion]
+      early skip of rewriting module: termios [assertion]
+      early skip of rewriting module: knack.log [assertion]
+      early skip of rewriting module: knack.arguments [assertion]
+      early skip of rewriting module: knack.introspection [assertion]
+      early skip of rewriting module: knack.help [assertion]
+      early skip of rewriting module: knack.help_files [assertion]
+      early skip of rewriting module: knack.completion [assertion]
+      early skip of rewriting module: argcomplete [assertion]
+      early skip of rewriting module: argcomplete.completers [assertion]
+      early skip of rewriting module: argcomplete.compat [assertion]
+      early skip of rewriting module: argcomplete.my_shlex [assertion]
+      early skip of rewriting module: StringIO [assertion]
+      early skip of rewriting module: argcomplete.my_argparse [assertion]
+      early skip of rewriting module: argcomplete.shellintegration [assertion]
+      early skip of rewriting module: knack.output [assertion]
+      early skip of rewriting module: knack.config [assertion]
+      early skip of rewriting module: configparser [assertion]
+      early skip of rewriting module: knack.query [assertion]
+      early skip of rewriting module: azdev.utilities [assertion]
+      early skip of rewriting module: azdev.utilities.config [assertion]
+      early skip of rewriting module: azdev.utilities.command [assertion]
+      early skip of rewriting module: azdev.utilities.const [assertion]
+      early skip of rewriting module: azdev.utilities.display [assertion]
+      early skip of rewriting module: azdev.utilities.path [assertion]
+      early skip of rewriting module: azdev.utilities.tools [assertion]
+      early skip of rewriting module: azdev.operations.linter.linter [assertion]
+      early skip of rewriting module: azdev.operations.linter.util [assertion]
+      early skip of rewriting module: azure [assertion]
+      early skip of rewriting module: azure.cli [assertion]
+      early skip of rewriting module: azure.cli.core [assertion]
+      early skip of rewriting module: timeit [assertion]
+      early skip of rewriting module: gc [assertion]
+      early skip of rewriting module: azure.cli.core.commands [assertion]
+      early skip of rewriting module: azure.cli.core.commands.constants [assertion]
+      early skip of rewriting module: azure.cli.core.commands.parameters [assertion]
+      early skip of rewriting module: azure.cli.core.commands.validators [assertion]
+      early skip of rewriting module: azure.cli.core.profiles [assertion]
+      early skip of rewriting module: azure.cli.core.profiles._shared [assertion]
+      early skip of rewriting module: azure.cli.core.decorators [assertion]
+      early skip of rewriting module: azure.cli.core.extension [assertion]
+      early skip of rewriting module: azure.cli.core._config [assertion]
+      early skip of rewriting module: azure.cli.core._environment [assertion]
+      early skip of rewriting module: azure.cli.core.util [assertion]
+      early skip of rewriting module: azure.cli.core.telemetry [assertion]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __name__
+            obj: test_linter
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __doc__
+            obj: None
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __package__
+            obj: 
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __loader__
+            obj: <_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __spec__
+            obj: ModuleSpec(name='test_linter', loader=<_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>, origin='E:\\github\\azdev\\tests\\test_linter.py')
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __file__
+            obj: E:\github\azdev\tests\test_linter.py
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __cached__
+            obj: E:\github\azdev\tests\__pycache__\test_linter.cpython-36-PYTEST.pyc
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __builtins__
+            obj: {'__name__': 'builtins', '__doc__': "Built-in functions, exceptions, and other objects.\n\nNoteworthy: None is the `nil' object; Ellipsis represents `...' in slices.", '__package__': '', '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__spec__': ModuleSpec(name='builtins', loader=<class '_frozen_importlib.BuiltinImporter'>), '__build_class__': <built-in function __build_class__>, '__import__': <built-in function __import__>, 'abs': <built-in function abs>, 'all': <built-in function all>, 'any': <built-in function any>, 'ascii': <built-in function ascii>, 'bin': <built-in function bin>, 'callable': <built-in function callable>, 'chr': <built-in function chr>, 'compile': <built-in function compile>, 'delattr': <built-in function delattr>, 'dir': <built-in function dir>, 'divmod': <built-in function divmod>, 'eval': <built-in function eval>, 'exec': <built-in function exec>, 'format': <built-in function format>, 'getattr': <built-in function getattr>, 'globals': <built-in function globals>, 'hasattr': <built-in function hasattr>, 'hash': <built-in function hash>, 'hex': <built-in function hex>, 'id': <built-in function id>, 'input': <built-in function input>, 'isinstance': <built-in function isinstance>, 'issubclass': <built-in function issubclass>, 'iter': <built-in function iter>, 'len': <built-in function len>, 'locals': <built-in function locals>, 'max': <built-in function max>, 'min': <built-in function min>, 'next': <built-in function next>, 'oct': <built-in function oct>, 'ord': <built-in function ord>, 'pow': <built-in function pow>, 'print': <built-in function print>, 'repr': <built-in function repr>, 'round': <built-in function round>, 'setattr': <built-in function setattr>, 'sorted': <built-in function sorted>, 'sum': <built-in function sum>, 'vars': <built-in function vars>, 'None': None, 'Ellipsis': Ellipsis, 'NotImplemented': NotImplemented, 'False': False, 'True': True, 'bool': <class 'bool'>, 'memoryview': <class 'memoryview'>, 'bytearray': <class 'bytearray'>, 'bytes': <class 'bytes'>, 'classmethod': <class 'classmethod'>, 'complex': <class 'complex'>, 'dict': <class 'dict'>, 'enumerate': <class 'enumerate'>, 'filter': <class 'filter'>, 'float': <class 'float'>, 'frozenset': <class 'frozenset'>, 'property': <class 'property'>, 'int': <class 'int'>, 'list': <class 'list'>, 'map': <class 'map'>, 'object': <class 'object'>, 'range': <class 'range'>, 'reversed': <class 'reversed'>, 'set': <class 'set'>, 'slice': <class 'slice'>, 'staticmethod': <class 'staticmethod'>, 'str': <class 'str'>, 'super': <class 'super'>, 'tuple': <class 'tuple'>, 'type': <class 'type'>, 'zip': <class 'zip'>, '__debug__': True, 'BaseException': <class 'BaseException'>, 'Exception': <class 'Exception'>, 'TypeError': <class 'TypeError'>, 'StopAsyncIteration': <class 'StopAsyncIteration'>, 'StopIteration': <class 'StopIteration'>, 'GeneratorExit': <class 'GeneratorExit'>, 'SystemExit': <class 'SystemExit'>, 'KeyboardInterrupt': <class 'KeyboardInterrupt'>, 'ImportError': <class 'ImportError'>, 'ModuleNotFoundError': <class 'ModuleNotFoundError'>, 'OSError': <class 'OSError'>, 'EnvironmentError': <class 'OSError'>, 'IOError': <class 'OSError'>, 'WindowsError': <class 'OSError'>, 'EOFError': <class 'EOFError'>, 'RuntimeError': <class 'RuntimeError'>, 'RecursionError': <class 'RecursionError'>, 'NotImplementedError': <class 'NotImplementedError'>, 'NameError': <class 'NameError'>, 'UnboundLocalError': <class 'UnboundLocalError'>, 'AttributeError': <class 'AttributeError'>, 'SyntaxError': <class 'SyntaxError'>, 'IndentationError': <class 'IndentationError'>, 'TabError': <class 'TabError'>, 'LookupError': <class 'LookupError'>, 'IndexError': <class 'IndexError'>, 'KeyError': <class 'KeyError'>, 'ValueError': <class 'ValueError'>, 'UnicodeError': <class 'UnicodeError'>, 'UnicodeEncodeError': <class 'UnicodeEncodeError'>, 'UnicodeDecodeError': <class 'UnicodeDecodeError'>, 'UnicodeTranslateError': <class 'UnicodeTranslateError'>, 'AssertionError': <class 'AssertionError'>, 'ArithmeticError': <class 'ArithmeticError'>, 'FloatingPointError': <class 'FloatingPointError'>, 'OverflowError': <class 'OverflowError'>, 'ZeroDivisionError': <class 'ZeroDivisionError'>, 'SystemError': <class 'SystemError'>, 'ReferenceError': <class 'ReferenceError'>, 'BufferError': <class 'BufferError'>, 'MemoryError': <class 'MemoryError'>, 'Warning': <class 'Warning'>, 'UserWarning': <class 'UserWarning'>, 'DeprecationWarning': <class 'DeprecationWarning'>, 'PendingDeprecationWarning': <class 'PendingDeprecationWarning'>, 'SyntaxWarning': <class 'SyntaxWarning'>, 'RuntimeWarning': <class 'RuntimeWarning'>, 'FutureWarning': <class 'FutureWarning'>, 'ImportWarning': <class 'ImportWarning'>, 'UnicodeWarning': <class 'UnicodeWarning'>, 'BytesWarning': <class 'BytesWarning'>, 'ResourceWarning': <class 'ResourceWarning'>, 'ConnectionError': <class 'ConnectionError'>, 'BlockingIOError': <class 'BlockingIOError'>, 'BrokenPipeError': <class 'BrokenPipeError'>, 'ChildProcessError': <class 'ChildProcessError'>, 'ConnectionAbortedError': <class 'ConnectionAbortedError'>, 'ConnectionRefusedError': <class 'ConnectionRefusedError'>, 'ConnectionResetError': <class 'ConnectionResetError'>, 'FileExistsError': <class 'FileExistsError'>, 'FileNotFoundError': <class 'FileNotFoundError'>, 'IsADirectoryError': <class 'IsADirectoryError'>, 'NotADirectoryError': <class 'NotADirectoryError'>, 'InterruptedError': <class 'InterruptedError'>, 'PermissionError': <class 'PermissionError'>, 'ProcessLookupError': <class 'ProcessLookupError'>, 'TimeoutError': <class 'TimeoutError'>, 'open': <built-in function open>, 'quit': Use quit() or Ctrl-Z plus Return to exit, 'exit': Use exit() or Ctrl-Z plus Return to exit, 'copyright': Copyright (c) 2001-2018 Python Software Foundation.
+All Rights Reserved.
+
+Copyright (c) 2000 BeOpen.com.
+All Rights Reserved.
+
+Copyright (c) 1995-2001 Corporation for National Research Initiatives.
+All Rights Reserved.
+
+Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.
+All Rights Reserved., 'credits':     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
+    for supporting Python development.  See www.python.org for more information., 'license': Type license() to see the full license text, 'help': Type help() for interactive help, or help(object) for help about object.}
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: @py_builtins
+            obj: <module 'builtins' (built-in)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: @pytest_ar
+            obj: <module '_pytest.assertion.rewrite' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\assertion\\rewrite.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: os
+            obj: <module 'os' from 'C:\\Users\\travi\\AppData\\Local\\Programs\\Python\\Python36\\lib\\os.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: unittest
+            obj: <module 'unittest' from 'C:\\Users\\travi\\AppData\\Local\\Programs\\Python\\Python36\\lib\\unittest\\__init__.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: argparse
+            obj: <module 'argparse' from 'C:\\Users\\travi\\AppData\\Local\\Programs\\Python\\Python36\\lib\\argparse.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: mock
+            obj: <module 'mock' from 'e:\\github\\env\\lib\\site-packages\\mock\\__init__.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: main
+            obj: <function run_linter at 0x000001183C89E1E0>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: LinterScope
+            obj: <class 'azdev.operations.linter.linter.LinterScope'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: RuleError
+            obj: <class 'azdev.operations.linter.linter.RuleError'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: AzCliCommand
+            obj: <class 'azure.cli.core.commands.AzCliCommand'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: ExtensionCommandSource
+            obj: <class 'azure.cli.core.commands.ExtensionCommandSource'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __repr__
+            obj: <slot wrapper '__repr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __getattribute__
+            obj: <slot wrapper '__getattribute__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __setattr__
+            obj: <slot wrapper '__setattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __delattr__
+            obj: <slot wrapper '__delattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __init__
+            obj: <slot wrapper '__init__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __new__
+            obj: <built-in method __new__ of type object at 0x000000005762A020>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __dir__
+            obj: <method '__dir__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __dict__
+            obj: <member '__dict__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __hash__
+            obj: <slot wrapper '__hash__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __str__
+            obj: <slot wrapper '__str__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __lt__
+            obj: <slot wrapper '__lt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __le__
+            obj: <slot wrapper '__le__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __eq__
+            obj: <slot wrapper '__eq__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __ne__
+            obj: <slot wrapper '__ne__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __gt__
+            obj: <slot wrapper '__gt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __ge__
+            obj: <slot wrapper '__ge__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __reduce_ex__
+            obj: <method '__reduce_ex__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __reduce__
+            obj: <method '__reduce__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __subclasshook__
+            obj: <method '__subclasshook__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __init_subclass__
+            obj: <method '__init_subclass__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __format__
+            obj: <method '__format__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __sizeof__
+            obj: <method '__sizeof__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_linter.py>
+            name: __class__
+            obj: <attribute '__class__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_linter.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_linter.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Module tests/test_setup.py> [collection]
+      pytest_collectstart [hook]
+          collector: <Module tests/test_setup.py>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Module tests/test_setup.py>
+      find_module called for: test_setup [assertion]
+      matched test file 'E:\\github\\azdev\\tests\\test_setup.py' [assertion]
+      found cached rewritten pyc for 'E:\\github\\azdev\\tests\\test_setup.py' [assertion]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __name__
+            obj: test_setup
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __doc__
+            obj: None
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __package__
+            obj: 
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __loader__
+            obj: <_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __spec__
+            obj: ModuleSpec(name='test_setup', loader=<_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>, origin='E:\\github\\azdev\\tests\\test_setup.py')
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __file__
+            obj: E:\github\azdev\tests\test_setup.py
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __cached__
+            obj: E:\github\azdev\tests\__pycache__\test_setup.cpython-36-PYTEST.pyc
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __builtins__
+            obj: {'__name__': 'builtins', '__doc__': "Built-in functions, exceptions, and other objects.\n\nNoteworthy: None is the `nil' object; Ellipsis represents `...' in slices.", '__package__': '', '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__spec__': ModuleSpec(name='builtins', loader=<class '_frozen_importlib.BuiltinImporter'>), '__build_class__': <built-in function __build_class__>, '__import__': <built-in function __import__>, 'abs': <built-in function abs>, 'all': <built-in function all>, 'any': <built-in function any>, 'ascii': <built-in function ascii>, 'bin': <built-in function bin>, 'callable': <built-in function callable>, 'chr': <built-in function chr>, 'compile': <built-in function compile>, 'delattr': <built-in function delattr>, 'dir': <built-in function dir>, 'divmod': <built-in function divmod>, 'eval': <built-in function eval>, 'exec': <built-in function exec>, 'format': <built-in function format>, 'getattr': <built-in function getattr>, 'globals': <built-in function globals>, 'hasattr': <built-in function hasattr>, 'hash': <built-in function hash>, 'hex': <built-in function hex>, 'id': <built-in function id>, 'input': <built-in function input>, 'isinstance': <built-in function isinstance>, 'issubclass': <built-in function issubclass>, 'iter': <built-in function iter>, 'len': <built-in function len>, 'locals': <built-in function locals>, 'max': <built-in function max>, 'min': <built-in function min>, 'next': <built-in function next>, 'oct': <built-in function oct>, 'ord': <built-in function ord>, 'pow': <built-in function pow>, 'print': <built-in function print>, 'repr': <built-in function repr>, 'round': <built-in function round>, 'setattr': <built-in function setattr>, 'sorted': <built-in function sorted>, 'sum': <built-in function sum>, 'vars': <built-in function vars>, 'None': None, 'Ellipsis': Ellipsis, 'NotImplemented': NotImplemented, 'False': False, 'True': True, 'bool': <class 'bool'>, 'memoryview': <class 'memoryview'>, 'bytearray': <class 'bytearray'>, 'bytes': <class 'bytes'>, 'classmethod': <class 'classmethod'>, 'complex': <class 'complex'>, 'dict': <class 'dict'>, 'enumerate': <class 'enumerate'>, 'filter': <class 'filter'>, 'float': <class 'float'>, 'frozenset': <class 'frozenset'>, 'property': <class 'property'>, 'int': <class 'int'>, 'list': <class 'list'>, 'map': <class 'map'>, 'object': <class 'object'>, 'range': <class 'range'>, 'reversed': <class 'reversed'>, 'set': <class 'set'>, 'slice': <class 'slice'>, 'staticmethod': <class 'staticmethod'>, 'str': <class 'str'>, 'super': <class 'super'>, 'tuple': <class 'tuple'>, 'type': <class 'type'>, 'zip': <class 'zip'>, '__debug__': True, 'BaseException': <class 'BaseException'>, 'Exception': <class 'Exception'>, 'TypeError': <class 'TypeError'>, 'StopAsyncIteration': <class 'StopAsyncIteration'>, 'StopIteration': <class 'StopIteration'>, 'GeneratorExit': <class 'GeneratorExit'>, 'SystemExit': <class 'SystemExit'>, 'KeyboardInterrupt': <class 'KeyboardInterrupt'>, 'ImportError': <class 'ImportError'>, 'ModuleNotFoundError': <class 'ModuleNotFoundError'>, 'OSError': <class 'OSError'>, 'EnvironmentError': <class 'OSError'>, 'IOError': <class 'OSError'>, 'WindowsError': <class 'OSError'>, 'EOFError': <class 'EOFError'>, 'RuntimeError': <class 'RuntimeError'>, 'RecursionError': <class 'RecursionError'>, 'NotImplementedError': <class 'NotImplementedError'>, 'NameError': <class 'NameError'>, 'UnboundLocalError': <class 'UnboundLocalError'>, 'AttributeError': <class 'AttributeError'>, 'SyntaxError': <class 'SyntaxError'>, 'IndentationError': <class 'IndentationError'>, 'TabError': <class 'TabError'>, 'LookupError': <class 'LookupError'>, 'IndexError': <class 'IndexError'>, 'KeyError': <class 'KeyError'>, 'ValueError': <class 'ValueError'>, 'UnicodeError': <class 'UnicodeError'>, 'UnicodeEncodeError': <class 'UnicodeEncodeError'>, 'UnicodeDecodeError': <class 'UnicodeDecodeError'>, 'UnicodeTranslateError': <class 'UnicodeTranslateError'>, 'AssertionError': <class 'AssertionError'>, 'ArithmeticError': <class 'ArithmeticError'>, 'FloatingPointError': <class 'FloatingPointError'>, 'OverflowError': <class 'OverflowError'>, 'ZeroDivisionError': <class 'ZeroDivisionError'>, 'SystemError': <class 'SystemError'>, 'ReferenceError': <class 'ReferenceError'>, 'BufferError': <class 'BufferError'>, 'MemoryError': <class 'MemoryError'>, 'Warning': <class 'Warning'>, 'UserWarning': <class 'UserWarning'>, 'DeprecationWarning': <class 'DeprecationWarning'>, 'PendingDeprecationWarning': <class 'PendingDeprecationWarning'>, 'SyntaxWarning': <class 'SyntaxWarning'>, 'RuntimeWarning': <class 'RuntimeWarning'>, 'FutureWarning': <class 'FutureWarning'>, 'ImportWarning': <class 'ImportWarning'>, 'UnicodeWarning': <class 'UnicodeWarning'>, 'BytesWarning': <class 'BytesWarning'>, 'ResourceWarning': <class 'ResourceWarning'>, 'ConnectionError': <class 'ConnectionError'>, 'BlockingIOError': <class 'BlockingIOError'>, 'BrokenPipeError': <class 'BrokenPipeError'>, 'ChildProcessError': <class 'ChildProcessError'>, 'ConnectionAbortedError': <class 'ConnectionAbortedError'>, 'ConnectionRefusedError': <class 'ConnectionRefusedError'>, 'ConnectionResetError': <class 'ConnectionResetError'>, 'FileExistsError': <class 'FileExistsError'>, 'FileNotFoundError': <class 'FileNotFoundError'>, 'IsADirectoryError': <class 'IsADirectoryError'>, 'NotADirectoryError': <class 'NotADirectoryError'>, 'InterruptedError': <class 'InterruptedError'>, 'PermissionError': <class 'PermissionError'>, 'ProcessLookupError': <class 'ProcessLookupError'>, 'TimeoutError': <class 'TimeoutError'>, 'open': <built-in function open>, 'quit': Use quit() or Ctrl-Z plus Return to exit, 'exit': Use exit() or Ctrl-Z plus Return to exit, 'copyright': Copyright (c) 2001-2018 Python Software Foundation.
+All Rights Reserved.
+
+Copyright (c) 2000 BeOpen.com.
+All Rights Reserved.
+
+Copyright (c) 1995-2001 Corporation for National Research Initiatives.
+All Rights Reserved.
+
+Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.
+All Rights Reserved., 'credits':     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
+    for supporting Python development.  See www.python.org for more information., 'license': Type license() to see the full license text, 'help': Type help() for interactive help, or help(object) for help about object.}
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: @py_builtins
+            obj: <module 'builtins' (built-in)>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: @pytest_ar
+            obj: <module '_pytest.assertion.rewrite' from 'e:\\github\\env\\lib\\site-packages\\_pytest\\assertion\\rewrite.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: unittest
+            obj: <module 'unittest' from 'C:\\Users\\travi\\AppData\\Local\\Programs\\Python\\Python36\\lib\\unittest\\__init__.py'>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: TestSetup
+            obj: <class 'test_setup.TestSetup'>
+        finish pytest_pycollect_makeitem --> <UnitTestCase TestSetup> [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __repr__
+            obj: <slot wrapper '__repr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __getattribute__
+            obj: <slot wrapper '__getattribute__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __setattr__
+            obj: <slot wrapper '__setattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __delattr__
+            obj: <slot wrapper '__delattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __init__
+            obj: <slot wrapper '__init__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __new__
+            obj: <built-in method __new__ of type object at 0x000000005762A020>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __dir__
+            obj: <method '__dir__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __dict__
+            obj: <member '__dict__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __hash__
+            obj: <slot wrapper '__hash__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __str__
+            obj: <slot wrapper '__str__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __lt__
+            obj: <slot wrapper '__lt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __le__
+            obj: <slot wrapper '__le__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __eq__
+            obj: <slot wrapper '__eq__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __ne__
+            obj: <slot wrapper '__ne__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __gt__
+            obj: <slot wrapper '__gt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __ge__
+            obj: <slot wrapper '__ge__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __reduce_ex__
+            obj: <method '__reduce_ex__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __reduce__
+            obj: <method '__reduce__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __subclasshook__
+            obj: <method '__subclasshook__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __init_subclass__
+            obj: <method '__init_subclass__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __format__
+            obj: <method '__format__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __sizeof__
+            obj: <method '__sizeof__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_setup.py>
+            name: __class__
+            obj: <attribute '__class__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_setup.py' lenresult=1 outcome='passed'> [hook]
+    genitems <UnitTestCase TestSetup> [collection]
+      pytest_collectstart [hook]
+          collector: <UnitTestCase TestSetup>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <UnitTestCase TestSetup>
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_setup.py::TestSetup' lenresult=1 outcome='passed'> [hook]
+    genitems <TestCaseFunction test_setup> [collection]
+      pytest_itemcollected [hook]
+          item: <TestCaseFunction test_setup>
+      finish pytest_itemcollected --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_setup.py::TestSetup' lenresult=1 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_setup.py' lenresult=1 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Module tests/test_style.py> [collection]
+      pytest_collectstart [hook]
+          collector: <Module tests/test_style.py>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Module tests/test_style.py>
+      find_module called for: test_style [assertion]
+      matched test file 'E:\\github\\azdev\\tests\\test_style.py' [assertion]
+      found cached rewritten pyc for 'E:\\github\\azdev\\tests\\test_style.py' [assertion]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __name__
+            obj: test_style
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __doc__
+            obj: None
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __package__
+            obj: 
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __loader__
+            obj: <_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __spec__
+            obj: ModuleSpec(name='test_style', loader=<_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>, origin='E:\\github\\azdev\\tests\\test_style.py')
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __file__
+            obj: E:\github\azdev\tests\test_style.py
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __cached__
+            obj: E:\github\azdev\tests\__pycache__\test_style.cpython-36-PYTEST.pyc
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __builtins__
+            obj: {'__name__': 'builtins', '__doc__': "Built-in functions, exceptions, and other objects.\n\nNoteworthy: None is the `nil' object; Ellipsis represents `...' in slices.", '__package__': '', '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__spec__': ModuleSpec(name='builtins', loader=<class '_frozen_importlib.BuiltinImporter'>), '__build_class__': <built-in function __build_class__>, '__import__': <built-in function __import__>, 'abs': <built-in function abs>, 'all': <built-in function all>, 'any': <built-in function any>, 'ascii': <built-in function ascii>, 'bin': <built-in function bin>, 'callable': <built-in function callable>, 'chr': <built-in function chr>, 'compile': <built-in function compile>, 'delattr': <built-in function delattr>, 'dir': <built-in function dir>, 'divmod': <built-in function divmod>, 'eval': <built-in function eval>, 'exec': <built-in function exec>, 'format': <built-in function format>, 'getattr': <built-in function getattr>, 'globals': <built-in function globals>, 'hasattr': <built-in function hasattr>, 'hash': <built-in function hash>, 'hex': <built-in function hex>, 'id': <built-in function id>, 'input': <built-in function input>, 'isinstance': <built-in function isinstance>, 'issubclass': <built-in function issubclass>, 'iter': <built-in function iter>, 'len': <built-in function len>, 'locals': <built-in function locals>, 'max': <built-in function max>, 'min': <built-in function min>, 'next': <built-in function next>, 'oct': <built-in function oct>, 'ord': <built-in function ord>, 'pow': <built-in function pow>, 'print': <built-in function print>, 'repr': <built-in function repr>, 'round': <built-in function round>, 'setattr': <built-in function setattr>, 'sorted': <built-in function sorted>, 'sum': <built-in function sum>, 'vars': <built-in function vars>, 'None': None, 'Ellipsis': Ellipsis, 'NotImplemented': NotImplemented, 'False': False, 'True': True, 'bool': <class 'bool'>, 'memoryview': <class 'memoryview'>, 'bytearray': <class 'bytearray'>, 'bytes': <class 'bytes'>, 'classmethod': <class 'classmethod'>, 'complex': <class 'complex'>, 'dict': <class 'dict'>, 'enumerate': <class 'enumerate'>, 'filter': <class 'filter'>, 'float': <class 'float'>, 'frozenset': <class 'frozenset'>, 'property': <class 'property'>, 'int': <class 'int'>, 'list': <class 'list'>, 'map': <class 'map'>, 'object': <class 'object'>, 'range': <class 'range'>, 'reversed': <class 'reversed'>, 'set': <class 'set'>, 'slice': <class 'slice'>, 'staticmethod': <class 'staticmethod'>, 'str': <class 'str'>, 'super': <class 'super'>, 'tuple': <class 'tuple'>, 'type': <class 'type'>, 'zip': <class 'zip'>, '__debug__': True, 'BaseException': <class 'BaseException'>, 'Exception': <class 'Exception'>, 'TypeError': <class 'TypeError'>, 'StopAsyncIteration': <class 'StopAsyncIteration'>, 'StopIteration': <class 'StopIteration'>, 'GeneratorExit': <class 'GeneratorExit'>, 'SystemExit': <class 'SystemExit'>, 'KeyboardInterrupt': <class 'KeyboardInterrupt'>, 'ImportError': <class 'ImportError'>, 'ModuleNotFoundError': <class 'ModuleNotFoundError'>, 'OSError': <class 'OSError'>, 'EnvironmentError': <class 'OSError'>, 'IOError': <class 'OSError'>, 'WindowsError': <class 'OSError'>, 'EOFError': <class 'EOFError'>, 'RuntimeError': <class 'RuntimeError'>, 'RecursionError': <class 'RecursionError'>, 'NotImplementedError': <class 'NotImplementedError'>, 'NameError': <class 'NameError'>, 'UnboundLocalError': <class 'UnboundLocalError'>, 'AttributeError': <class 'AttributeError'>, 'SyntaxError': <class 'SyntaxError'>, 'IndentationError': <class 'IndentationError'>, 'TabError': <class 'TabError'>, 'LookupError': <class 'LookupError'>, 'IndexError': <class 'IndexError'>, 'KeyError': <class 'KeyError'>, 'ValueError': <class 'ValueError'>, 'UnicodeError': <class 'UnicodeError'>, 'UnicodeEncodeError': <class 'UnicodeEncodeError'>, 'UnicodeDecodeError': <class 'UnicodeDecodeError'>, 'UnicodeTranslateError': <class 'UnicodeTranslateError'>, 'AssertionError': <class 'AssertionError'>, 'ArithmeticError': <class 'ArithmeticError'>, 'FloatingPointError': <class 'FloatingPointError'>, 'OverflowError': <class 'OverflowError'>, 'ZeroDivisionError': <class 'ZeroDivisionError'>, 'SystemError': <class 'SystemError'>, 'ReferenceError': <class 'ReferenceError'>, 'BufferError': <class 'BufferError'>, 'MemoryError': <class 'MemoryError'>, 'Warning': <class 'Warning'>, 'UserWarning': <class 'UserWarning'>, 'DeprecationWarning': <class 'DeprecationWarning'>, 'PendingDeprecationWarning': <class 'PendingDeprecationWarning'>, 'SyntaxWarning': <class 'SyntaxWarning'>, 'RuntimeWarning': <class 'RuntimeWarning'>, 'FutureWarning': <class 'FutureWarning'>, 'ImportWarning': <class 'ImportWarning'>, 'UnicodeWarning': <class 'UnicodeWarning'>, 'BytesWarning': <class 'BytesWarning'>, 'ResourceWarning': <class 'ResourceWarning'>, 'ConnectionError': <class 'ConnectionError'>, 'BlockingIOError': <class 'BlockingIOError'>, 'BrokenPipeError': <class 'BrokenPipeError'>, 'ChildProcessError': <class 'ChildProcessError'>, 'ConnectionAbortedError': <class 'ConnectionAbortedError'>, 'ConnectionRefusedError': <class 'ConnectionRefusedError'>, 'ConnectionResetError': <class 'ConnectionResetError'>, 'FileExistsError': <class 'FileExistsError'>, 'FileNotFoundError': <class 'FileNotFoundError'>, 'IsADirectoryError': <class 'IsADirectoryError'>, 'NotADirectoryError': <class 'NotADirectoryError'>, 'InterruptedError': <class 'InterruptedError'>, 'PermissionError': <class 'PermissionError'>, 'ProcessLookupError': <class 'ProcessLookupError'>, 'TimeoutError': <class 'TimeoutError'>, 'open': <built-in function open>, 'quit': Use quit() or Ctrl-Z plus Return to exit, 'exit': Use exit() or Ctrl-Z plus Return to exit, 'copyright': Copyright (c) 2001-2018 Python Software Foundation.
+All Rights Reserved.
+
+Copyright (c) 2000 BeOpen.com.
+All Rights Reserved.
+
+Copyright (c) 1995-2001 Corporation for National Research Initiatives.
+All Rights Reserved.
+
+Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.
+All Rights Reserved., 'credits':     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
+    for supporting Python development.  See www.python.org for more information., 'license': Type license() to see the full license text, 'help': Type help() for interactive help, or help(object) for help about object.}
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __repr__
+            obj: <slot wrapper '__repr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __getattribute__
+            obj: <slot wrapper '__getattribute__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __setattr__
+            obj: <slot wrapper '__setattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __delattr__
+            obj: <slot wrapper '__delattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __init__
+            obj: <slot wrapper '__init__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __new__
+            obj: <built-in method __new__ of type object at 0x000000005762A020>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __dir__
+            obj: <method '__dir__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __dict__
+            obj: <member '__dict__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __hash__
+            obj: <slot wrapper '__hash__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __str__
+            obj: <slot wrapper '__str__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __lt__
+            obj: <slot wrapper '__lt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __le__
+            obj: <slot wrapper '__le__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __eq__
+            obj: <slot wrapper '__eq__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __ne__
+            obj: <slot wrapper '__ne__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __gt__
+            obj: <slot wrapper '__gt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __ge__
+            obj: <slot wrapper '__ge__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __reduce_ex__
+            obj: <method '__reduce_ex__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __reduce__
+            obj: <method '__reduce__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __subclasshook__
+            obj: <method '__subclasshook__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __init_subclass__
+            obj: <method '__init_subclass__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __format__
+            obj: <method '__format__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __sizeof__
+            obj: <method '__sizeof__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_style.py>
+            name: __class__
+            obj: <attribute '__class__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_style.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_style.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Module tests/test_tests.py> [collection]
+      pytest_collectstart [hook]
+          collector: <Module tests/test_tests.py>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Module tests/test_tests.py>
+      find_module called for: test_tests [assertion]
+      matched test file 'E:\\github\\azdev\\tests\\test_tests.py' [assertion]
+      found cached rewritten pyc for 'E:\\github\\azdev\\tests\\test_tests.py' [assertion]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __name__
+            obj: test_tests
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __doc__
+            obj: None
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __package__
+            obj: 
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __loader__
+            obj: <_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __spec__
+            obj: ModuleSpec(name='test_tests', loader=<_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>, origin='E:\\github\\azdev\\tests\\test_tests.py')
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __file__
+            obj: E:\github\azdev\tests\test_tests.py
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __cached__
+            obj: E:\github\azdev\tests\__pycache__\test_tests.cpython-36-PYTEST.pyc
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __builtins__
+            obj: {'__name__': 'builtins', '__doc__': "Built-in functions, exceptions, and other objects.\n\nNoteworthy: None is the `nil' object; Ellipsis represents `...' in slices.", '__package__': '', '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__spec__': ModuleSpec(name='builtins', loader=<class '_frozen_importlib.BuiltinImporter'>), '__build_class__': <built-in function __build_class__>, '__import__': <built-in function __import__>, 'abs': <built-in function abs>, 'all': <built-in function all>, 'any': <built-in function any>, 'ascii': <built-in function ascii>, 'bin': <built-in function bin>, 'callable': <built-in function callable>, 'chr': <built-in function chr>, 'compile': <built-in function compile>, 'delattr': <built-in function delattr>, 'dir': <built-in function dir>, 'divmod': <built-in function divmod>, 'eval': <built-in function eval>, 'exec': <built-in function exec>, 'format': <built-in function format>, 'getattr': <built-in function getattr>, 'globals': <built-in function globals>, 'hasattr': <built-in function hasattr>, 'hash': <built-in function hash>, 'hex': <built-in function hex>, 'id': <built-in function id>, 'input': <built-in function input>, 'isinstance': <built-in function isinstance>, 'issubclass': <built-in function issubclass>, 'iter': <built-in function iter>, 'len': <built-in function len>, 'locals': <built-in function locals>, 'max': <built-in function max>, 'min': <built-in function min>, 'next': <built-in function next>, 'oct': <built-in function oct>, 'ord': <built-in function ord>, 'pow': <built-in function pow>, 'print': <built-in function print>, 'repr': <built-in function repr>, 'round': <built-in function round>, 'setattr': <built-in function setattr>, 'sorted': <built-in function sorted>, 'sum': <built-in function sum>, 'vars': <built-in function vars>, 'None': None, 'Ellipsis': Ellipsis, 'NotImplemented': NotImplemented, 'False': False, 'True': True, 'bool': <class 'bool'>, 'memoryview': <class 'memoryview'>, 'bytearray': <class 'bytearray'>, 'bytes': <class 'bytes'>, 'classmethod': <class 'classmethod'>, 'complex': <class 'complex'>, 'dict': <class 'dict'>, 'enumerate': <class 'enumerate'>, 'filter': <class 'filter'>, 'float': <class 'float'>, 'frozenset': <class 'frozenset'>, 'property': <class 'property'>, 'int': <class 'int'>, 'list': <class 'list'>, 'map': <class 'map'>, 'object': <class 'object'>, 'range': <class 'range'>, 'reversed': <class 'reversed'>, 'set': <class 'set'>, 'slice': <class 'slice'>, 'staticmethod': <class 'staticmethod'>, 'str': <class 'str'>, 'super': <class 'super'>, 'tuple': <class 'tuple'>, 'type': <class 'type'>, 'zip': <class 'zip'>, '__debug__': True, 'BaseException': <class 'BaseException'>, 'Exception': <class 'Exception'>, 'TypeError': <class 'TypeError'>, 'StopAsyncIteration': <class 'StopAsyncIteration'>, 'StopIteration': <class 'StopIteration'>, 'GeneratorExit': <class 'GeneratorExit'>, 'SystemExit': <class 'SystemExit'>, 'KeyboardInterrupt': <class 'KeyboardInterrupt'>, 'ImportError': <class 'ImportError'>, 'ModuleNotFoundError': <class 'ModuleNotFoundError'>, 'OSError': <class 'OSError'>, 'EnvironmentError': <class 'OSError'>, 'IOError': <class 'OSError'>, 'WindowsError': <class 'OSError'>, 'EOFError': <class 'EOFError'>, 'RuntimeError': <class 'RuntimeError'>, 'RecursionError': <class 'RecursionError'>, 'NotImplementedError': <class 'NotImplementedError'>, 'NameError': <class 'NameError'>, 'UnboundLocalError': <class 'UnboundLocalError'>, 'AttributeError': <class 'AttributeError'>, 'SyntaxError': <class 'SyntaxError'>, 'IndentationError': <class 'IndentationError'>, 'TabError': <class 'TabError'>, 'LookupError': <class 'LookupError'>, 'IndexError': <class 'IndexError'>, 'KeyError': <class 'KeyError'>, 'ValueError': <class 'ValueError'>, 'UnicodeError': <class 'UnicodeError'>, 'UnicodeEncodeError': <class 'UnicodeEncodeError'>, 'UnicodeDecodeError': <class 'UnicodeDecodeError'>, 'UnicodeTranslateError': <class 'UnicodeTranslateError'>, 'AssertionError': <class 'AssertionError'>, 'ArithmeticError': <class 'ArithmeticError'>, 'FloatingPointError': <class 'FloatingPointError'>, 'OverflowError': <class 'OverflowError'>, 'ZeroDivisionError': <class 'ZeroDivisionError'>, 'SystemError': <class 'SystemError'>, 'ReferenceError': <class 'ReferenceError'>, 'BufferError': <class 'BufferError'>, 'MemoryError': <class 'MemoryError'>, 'Warning': <class 'Warning'>, 'UserWarning': <class 'UserWarning'>, 'DeprecationWarning': <class 'DeprecationWarning'>, 'PendingDeprecationWarning': <class 'PendingDeprecationWarning'>, 'SyntaxWarning': <class 'SyntaxWarning'>, 'RuntimeWarning': <class 'RuntimeWarning'>, 'FutureWarning': <class 'FutureWarning'>, 'ImportWarning': <class 'ImportWarning'>, 'UnicodeWarning': <class 'UnicodeWarning'>, 'BytesWarning': <class 'BytesWarning'>, 'ResourceWarning': <class 'ResourceWarning'>, 'ConnectionError': <class 'ConnectionError'>, 'BlockingIOError': <class 'BlockingIOError'>, 'BrokenPipeError': <class 'BrokenPipeError'>, 'ChildProcessError': <class 'ChildProcessError'>, 'ConnectionAbortedError': <class 'ConnectionAbortedError'>, 'ConnectionRefusedError': <class 'ConnectionRefusedError'>, 'ConnectionResetError': <class 'ConnectionResetError'>, 'FileExistsError': <class 'FileExistsError'>, 'FileNotFoundError': <class 'FileNotFoundError'>, 'IsADirectoryError': <class 'IsADirectoryError'>, 'NotADirectoryError': <class 'NotADirectoryError'>, 'InterruptedError': <class 'InterruptedError'>, 'PermissionError': <class 'PermissionError'>, 'ProcessLookupError': <class 'ProcessLookupError'>, 'TimeoutError': <class 'TimeoutError'>, 'open': <built-in function open>, 'quit': Use quit() or Ctrl-Z plus Return to exit, 'exit': Use exit() or Ctrl-Z plus Return to exit, 'copyright': Copyright (c) 2001-2018 Python Software Foundation.
+All Rights Reserved.
+
+Copyright (c) 2000 BeOpen.com.
+All Rights Reserved.
+
+Copyright (c) 1995-2001 Corporation for National Research Initiatives.
+All Rights Reserved.
+
+Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.
+All Rights Reserved., 'credits':     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
+    for supporting Python development.  See www.python.org for more information., 'license': Type license() to see the full license text, 'help': Type help() for interactive help, or help(object) for help about object.}
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __repr__
+            obj: <slot wrapper '__repr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __getattribute__
+            obj: <slot wrapper '__getattribute__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __setattr__
+            obj: <slot wrapper '__setattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __delattr__
+            obj: <slot wrapper '__delattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __init__
+            obj: <slot wrapper '__init__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __new__
+            obj: <built-in method __new__ of type object at 0x000000005762A020>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __dir__
+            obj: <method '__dir__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __dict__
+            obj: <member '__dict__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __hash__
+            obj: <slot wrapper '__hash__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __str__
+            obj: <slot wrapper '__str__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __lt__
+            obj: <slot wrapper '__lt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __le__
+            obj: <slot wrapper '__le__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __eq__
+            obj: <slot wrapper '__eq__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __ne__
+            obj: <slot wrapper '__ne__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __gt__
+            obj: <slot wrapper '__gt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __ge__
+            obj: <slot wrapper '__ge__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __reduce_ex__
+            obj: <method '__reduce_ex__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __reduce__
+            obj: <method '__reduce__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __subclasshook__
+            obj: <method '__subclasshook__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __init_subclass__
+            obj: <method '__init_subclass__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __format__
+            obj: <method '__format__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __sizeof__
+            obj: <method '__sizeof__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_tests.py>
+            name: __class__
+            obj: <attribute '__class__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_tests.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_tests.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+    genitems <Module tests/test_verify.py> [collection]
+      pytest_collectstart [hook]
+          collector: <Module tests/test_verify.py>
+      finish pytest_collectstart --> [] [hook]
+      pytest_make_collect_report [hook]
+          collector: <Module tests/test_verify.py>
+      find_module called for: test_verify [assertion]
+      matched test file 'E:\\github\\azdev\\tests\\test_verify.py' [assertion]
+      found cached rewritten pyc for 'E:\\github\\azdev\\tests\\test_verify.py' [assertion]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __name__
+            obj: test_verify
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __doc__
+            obj: None
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __package__
+            obj: 
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __loader__
+            obj: <_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __spec__
+            obj: ModuleSpec(name='test_verify', loader=<_pytest.assertion.rewrite.AssertionRewritingHook object at 0x000001183C659240>, origin='E:\\github\\azdev\\tests\\test_verify.py')
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __file__
+            obj: E:\github\azdev\tests\test_verify.py
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __cached__
+            obj: E:\github\azdev\tests\__pycache__\test_verify.cpython-36-PYTEST.pyc
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __builtins__
+            obj: {'__name__': 'builtins', '__doc__': "Built-in functions, exceptions, and other objects.\n\nNoteworthy: None is the `nil' object; Ellipsis represents `...' in slices.", '__package__': '', '__loader__': <class '_frozen_importlib.BuiltinImporter'>, '__spec__': ModuleSpec(name='builtins', loader=<class '_frozen_importlib.BuiltinImporter'>), '__build_class__': <built-in function __build_class__>, '__import__': <built-in function __import__>, 'abs': <built-in function abs>, 'all': <built-in function all>, 'any': <built-in function any>, 'ascii': <built-in function ascii>, 'bin': <built-in function bin>, 'callable': <built-in function callable>, 'chr': <built-in function chr>, 'compile': <built-in function compile>, 'delattr': <built-in function delattr>, 'dir': <built-in function dir>, 'divmod': <built-in function divmod>, 'eval': <built-in function eval>, 'exec': <built-in function exec>, 'format': <built-in function format>, 'getattr': <built-in function getattr>, 'globals': <built-in function globals>, 'hasattr': <built-in function hasattr>, 'hash': <built-in function hash>, 'hex': <built-in function hex>, 'id': <built-in function id>, 'input': <built-in function input>, 'isinstance': <built-in function isinstance>, 'issubclass': <built-in function issubclass>, 'iter': <built-in function iter>, 'len': <built-in function len>, 'locals': <built-in function locals>, 'max': <built-in function max>, 'min': <built-in function min>, 'next': <built-in function next>, 'oct': <built-in function oct>, 'ord': <built-in function ord>, 'pow': <built-in function pow>, 'print': <built-in function print>, 'repr': <built-in function repr>, 'round': <built-in function round>, 'setattr': <built-in function setattr>, 'sorted': <built-in function sorted>, 'sum': <built-in function sum>, 'vars': <built-in function vars>, 'None': None, 'Ellipsis': Ellipsis, 'NotImplemented': NotImplemented, 'False': False, 'True': True, 'bool': <class 'bool'>, 'memoryview': <class 'memoryview'>, 'bytearray': <class 'bytearray'>, 'bytes': <class 'bytes'>, 'classmethod': <class 'classmethod'>, 'complex': <class 'complex'>, 'dict': <class 'dict'>, 'enumerate': <class 'enumerate'>, 'filter': <class 'filter'>, 'float': <class 'float'>, 'frozenset': <class 'frozenset'>, 'property': <class 'property'>, 'int': <class 'int'>, 'list': <class 'list'>, 'map': <class 'map'>, 'object': <class 'object'>, 'range': <class 'range'>, 'reversed': <class 'reversed'>, 'set': <class 'set'>, 'slice': <class 'slice'>, 'staticmethod': <class 'staticmethod'>, 'str': <class 'str'>, 'super': <class 'super'>, 'tuple': <class 'tuple'>, 'type': <class 'type'>, 'zip': <class 'zip'>, '__debug__': True, 'BaseException': <class 'BaseException'>, 'Exception': <class 'Exception'>, 'TypeError': <class 'TypeError'>, 'StopAsyncIteration': <class 'StopAsyncIteration'>, 'StopIteration': <class 'StopIteration'>, 'GeneratorExit': <class 'GeneratorExit'>, 'SystemExit': <class 'SystemExit'>, 'KeyboardInterrupt': <class 'KeyboardInterrupt'>, 'ImportError': <class 'ImportError'>, 'ModuleNotFoundError': <class 'ModuleNotFoundError'>, 'OSError': <class 'OSError'>, 'EnvironmentError': <class 'OSError'>, 'IOError': <class 'OSError'>, 'WindowsError': <class 'OSError'>, 'EOFError': <class 'EOFError'>, 'RuntimeError': <class 'RuntimeError'>, 'RecursionError': <class 'RecursionError'>, 'NotImplementedError': <class 'NotImplementedError'>, 'NameError': <class 'NameError'>, 'UnboundLocalError': <class 'UnboundLocalError'>, 'AttributeError': <class 'AttributeError'>, 'SyntaxError': <class 'SyntaxError'>, 'IndentationError': <class 'IndentationError'>, 'TabError': <class 'TabError'>, 'LookupError': <class 'LookupError'>, 'IndexError': <class 'IndexError'>, 'KeyError': <class 'KeyError'>, 'ValueError': <class 'ValueError'>, 'UnicodeError': <class 'UnicodeError'>, 'UnicodeEncodeError': <class 'UnicodeEncodeError'>, 'UnicodeDecodeError': <class 'UnicodeDecodeError'>, 'UnicodeTranslateError': <class 'UnicodeTranslateError'>, 'AssertionError': <class 'AssertionError'>, 'ArithmeticError': <class 'ArithmeticError'>, 'FloatingPointError': <class 'FloatingPointError'>, 'OverflowError': <class 'OverflowError'>, 'ZeroDivisionError': <class 'ZeroDivisionError'>, 'SystemError': <class 'SystemError'>, 'ReferenceError': <class 'ReferenceError'>, 'BufferError': <class 'BufferError'>, 'MemoryError': <class 'MemoryError'>, 'Warning': <class 'Warning'>, 'UserWarning': <class 'UserWarning'>, 'DeprecationWarning': <class 'DeprecationWarning'>, 'PendingDeprecationWarning': <class 'PendingDeprecationWarning'>, 'SyntaxWarning': <class 'SyntaxWarning'>, 'RuntimeWarning': <class 'RuntimeWarning'>, 'FutureWarning': <class 'FutureWarning'>, 'ImportWarning': <class 'ImportWarning'>, 'UnicodeWarning': <class 'UnicodeWarning'>, 'BytesWarning': <class 'BytesWarning'>, 'ResourceWarning': <class 'ResourceWarning'>, 'ConnectionError': <class 'ConnectionError'>, 'BlockingIOError': <class 'BlockingIOError'>, 'BrokenPipeError': <class 'BrokenPipeError'>, 'ChildProcessError': <class 'ChildProcessError'>, 'ConnectionAbortedError': <class 'ConnectionAbortedError'>, 'ConnectionRefusedError': <class 'ConnectionRefusedError'>, 'ConnectionResetError': <class 'ConnectionResetError'>, 'FileExistsError': <class 'FileExistsError'>, 'FileNotFoundError': <class 'FileNotFoundError'>, 'IsADirectoryError': <class 'IsADirectoryError'>, 'NotADirectoryError': <class 'NotADirectoryError'>, 'InterruptedError': <class 'InterruptedError'>, 'PermissionError': <class 'PermissionError'>, 'ProcessLookupError': <class 'ProcessLookupError'>, 'TimeoutError': <class 'TimeoutError'>, 'open': <built-in function open>, 'quit': Use quit() or Ctrl-Z plus Return to exit, 'exit': Use exit() or Ctrl-Z plus Return to exit, 'copyright': Copyright (c) 2001-2018 Python Software Foundation.
+All Rights Reserved.
+
+Copyright (c) 2000 BeOpen.com.
+All Rights Reserved.
+
+Copyright (c) 1995-2001 Corporation for National Research Initiatives.
+All Rights Reserved.
+
+Copyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.
+All Rights Reserved., 'credits':     Thanks to CWI, CNRI, BeOpen.com, Zope Corporation and a cast of thousands
+    for supporting Python development.  See www.python.org for more information., 'license': Type license() to see the full license text, 'help': Type help() for interactive help, or help(object) for help about object.}
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __repr__
+            obj: <slot wrapper '__repr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __getattribute__
+            obj: <slot wrapper '__getattribute__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __setattr__
+            obj: <slot wrapper '__setattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __delattr__
+            obj: <slot wrapper '__delattr__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __init__
+            obj: <slot wrapper '__init__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __new__
+            obj: <built-in method __new__ of type object at 0x000000005762A020>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __dir__
+            obj: <method '__dir__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __dict__
+            obj: <member '__dict__' of 'module' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __hash__
+            obj: <slot wrapper '__hash__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __str__
+            obj: <slot wrapper '__str__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __lt__
+            obj: <slot wrapper '__lt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __le__
+            obj: <slot wrapper '__le__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __eq__
+            obj: <slot wrapper '__eq__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __ne__
+            obj: <slot wrapper '__ne__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __gt__
+            obj: <slot wrapper '__gt__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __ge__
+            obj: <slot wrapper '__ge__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __reduce_ex__
+            obj: <method '__reduce_ex__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __reduce__
+            obj: <method '__reduce__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __subclasshook__
+            obj: <method '__subclasshook__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __init_subclass__
+            obj: <method '__init_subclass__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __format__
+            obj: <method '__format__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __sizeof__
+            obj: <method '__sizeof__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+        pytest_pycollect_makeitem [hook]
+            collector: <Module tests/test_verify.py>
+            name: __class__
+            obj: <attribute '__class__' of 'object' objects>
+        finish pytest_pycollect_makeitem --> None [hook]
+      finish pytest_make_collect_report --> <CollectReport 'tests/test_verify.py' lenresult=0 outcome='passed'> [hook]
+      pytest_collectreport [hook]
+          report: <CollectReport 'tests/test_verify.py' lenresult=0 outcome='passed'>
+      finish pytest_collectreport --> [] [hook]
+      pytest_collection_modifyitems [hook]
+          session: <Session azdev>
+          config: <_pytest.config.Config object at 0x000001183C54E588>
+          items: [<TestCaseFunction test_setup>]
+      finish pytest_collection_modifyitems --> [] [hook]
+      pytest_collection_finish [hook]
+          session: <Session azdev>
+        pytest_report_collectionfinish [hook]
+            config: <_pytest.config.Config object at 0x000001183C54E588>
+            startdir: E:\github\azdev
+            items: [<TestCaseFunction test_setup>]
+        finish pytest_report_collectionfinish --> [] [hook]
+      finish pytest_collection_finish --> [] [hook]
+    finish pytest_collection --> [<TestCaseFunction test_setup>] [hook]
+    pytest_runtestloop [hook]
+        session: <Session azdev>
+      pytest_runtest_protocol [hook]
+          item: <TestCaseFunction test_setup>
+          nextitem: None
+        pytest_runtest_logstart [hook]
+            nodeid: tests/test_setup.py::TestSetup::test_setup
+            location: ('tests\\test_setup.py', 11, 'TestSetup.test_setup')
+        early skip of rewriting module: py._io.capture [assertion]
+        finish pytest_runtest_logstart --> [] [hook]
+        pytest_runtest_setup [hook]
+            item: <TestCaseFunction test_setup>
+        finish pytest_runtest_setup --> [] [hook]
+        pytest_runtest_makereport [hook]
+            item: <TestCaseFunction test_setup>
+            call: <CallInfo when='setup' result: []>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_setup.py::TestSetup::test_setup' when='setup' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_setup.py::TestSetup::test_setup' when='setup' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_setup.py::TestSetup::test_setup' when='setup' outcome='passed'>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_call [hook]
+            item: <TestCaseFunction test_setup>
+        finish pytest_runtest_call --> [] [hook]
+        pytest_runtest_makereport [hook]
+            item: <TestCaseFunction test_setup>
+            call: <CallInfo when='call' result: []>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_setup.py::TestSetup::test_setup' when='call' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_setup.py::TestSetup::test_setup' when='call' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_setup.py::TestSetup::test_setup' when='call' outcome='passed'>
+          finish pytest_report_teststatus --> ('passed', '.', 'PASSED') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_teardown [hook]
+            item: <TestCaseFunction test_setup>
+            nextitem: None
+        finish pytest_runtest_teardown --> [] [hook]
+        pytest_runtest_makereport [hook]
+            item: <TestCaseFunction test_setup>
+            call: <CallInfo when='teardown' result: []>
+        finish pytest_runtest_makereport --> <TestReport 'tests/test_setup.py::TestSetup::test_setup' when='teardown' outcome='passed'> [hook]
+        pytest_runtest_logreport [hook]
+            report: <TestReport 'tests/test_setup.py::TestSetup::test_setup' when='teardown' outcome='passed'>
+          pytest_report_teststatus [hook]
+              report: <TestReport 'tests/test_setup.py::TestSetup::test_setup' when='teardown' outcome='passed'>
+          finish pytest_report_teststatus --> ('', '', '') [hook]
+        finish pytest_runtest_logreport --> [] [hook]
+        pytest_runtest_logfinish [hook]
+            nodeid: tests/test_setup.py::TestSetup::test_setup
+            location: ('tests\\test_setup.py', 11, 'TestSetup.test_setup')
+        finish pytest_runtest_logfinish --> [] [hook]
+      finish pytest_runtest_protocol --> True [hook]
+    finish pytest_runtestloop --> True [hook]
+    pytest_sessionfinish [hook]
+        session: <Session azdev>
+        exitstatus: 0
+      pytest_terminal_summary [hook]
+          terminalreporter: <_pytest.terminal.TerminalReporter object at 0x000001183C823E48>
+          exitstatus: 0
+      finish pytest_terminal_summary --> [] [hook]
+    finish pytest_sessionfinish --> [] [hook]
+    pytest_unconfigure [hook]
+        config: <_pytest.config.Config object at 0x000001183C54E588>
+    finish pytest_unconfigure --> [] [hook]

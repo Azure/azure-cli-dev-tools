@@ -41,6 +41,7 @@ from .path import (
     get_ext_repo_paths,
     get_path_table
 )
+from .testing import test_cmd
 from .tools import (
     require_virtual_env,
     require_azure_cli
@@ -58,6 +59,7 @@ __all__ = [
     'cmd',
     'py_cmd',
     'pip_cmd',
+    'test_cmd',
     'get_azure_config_dir',
     'get_azure_config',
     'get_azdev_config_dir',

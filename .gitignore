@@ -7,3 +7,4 @@ src/azdev.egg-info/*
 *.pyc
 .vscode/
 azdev.egg-info/
+.tox/

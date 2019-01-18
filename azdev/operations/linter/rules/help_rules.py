@@ -4,12 +4,14 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+import shlex
+
+import mock
+from knack.log import get_logger
+
 from ..rule_decorators import help_file_entry_rule
 from ..linter import RuleError
 from ..util import LinterError
-import shlex
-import mock
-from knack.log import get_logger
 
 logger = get_logger(__name__)
 
@@ -61,10 +63,11 @@ def faulty_help_example_parameters_rule(linter, help_entry):
     for example in linter.get_help_entry_examples(help_entry):
         max_profile = example.get('max_profile')
         if max_profile and max_profile != 'latest':
-            logger.warning("\n\tSKIPPING example: {}\n\tas its max profile is {}, instead of latest.".format(example['text'], example['max_profile']))
+            logger.warning('\n\tSKIPPING example: %s\n\tas its max profile is %s, '
+                           'instead of latest.', example['text'], example['max_profile'])
             continue
 
-        example_text = example.get('text','')
+        example_text = example.get('text', '')
         commands = _extract_commands_from_example(example_text)
         while commands:
             command = commands.pop()
@@ -141,7 +144,7 @@ def _process_command_args(command_args):
     result_args = []
     new_commands = []
     unwanted_chars = "$()`"
-    control_operators = ["&&","||"]
+    control_operators = ["&&", "||"]
 
     for arg in command_args: # strip unnecessary punctuation, otherwise arg validation could fail.
         if arg in control_operators: # handle cases where multiple commands are connected by control operators.
