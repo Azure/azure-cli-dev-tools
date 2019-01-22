@@ -59,9 +59,8 @@ def run_tests(tests, xml_path=None, ci_mode=False, discover=False, in_series=Fal
 
     if ci_mode:
         # CI Mode runs specific modules
-        # TODO: linter was included, but now this will be in azdev...
         path_table = get_path_table()
-        tests = path_table['core'].keys() + path_table['mod'].keys()
+        tests = list(path_table['core'].keys()) + list(path_table['mod'].keys())
 
     def _find_test(index, name):
         name_comps = name.split('.')

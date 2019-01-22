@@ -25,7 +25,7 @@ helps['setup'] = """
           text: azdev setup -r azure-cli-extensions
 
         - name: Install CLI in dev mode, along with the extensions repo. Auto-find the CLI repo and install the `alias` extension in dev mode.
-          text: azdev setup -r azure-cli-extensions -e alias
+          text: azdev setup -c -r azure-cli-extensions -e alias
 """
 
 
