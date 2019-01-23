@@ -19,8 +19,6 @@ logger = get_logger(__name__)
 
 def add_extension(extensions):
 
-    require_azure_cli()
-
     ext_paths = get_ext_repo_paths()
     all_extensions = find_files(ext_paths, 'setup.py')
 
@@ -42,8 +40,6 @@ def add_extension(extensions):
 
 
 def remove_extension(extensions):
-
-    require_azure_cli()
 
     ext_paths = get_ext_repo_paths()
     installed_paths = find_files(ext_paths, '*.*-info')
@@ -95,8 +91,6 @@ def _get_installed_dev_extensions(dev_sources):
 
 
 def list_extensions():
-
-    require_azure_cli()
 
     azure_config = get_azure_config()
     dev_sources = azure_config.get('extension', 'dev_sources', None)
@@ -171,8 +165,6 @@ def update_extension_index(extension):
     import tempfile
 
     from .util import get_ext_metadata, get_whl_from_url
-
-    require_azure_cli()
 
     ext_repos = get_ext_repo_paths()
     index_path = next((x for x in find_files(ext_repos, 'index.json') if 'azure-cli-extensions' in x), None)
