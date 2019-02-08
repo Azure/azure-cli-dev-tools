@@ -1,6 +1,6 @@
 # Microsoft Azure CLI Dev Tools (azdev)
 
-The `azdev` tool is desigend to aid new and experienced developers in contributing to Azure CLI command modules and extensions.
+The `azdev` tool is designed to aid new and experienced developers in contributing to Azure CLI command modules and extensions.
 
 ## Setting up your development environment
 
@@ -14,6 +14,10 @@ The `azdev` tool is desigend to aid new and experienced developers in contributi
     Python 3.5+ (all platforms):
     ```BatchFile
     python -m venv env
+    ```
+    or
+    ```Shell
+    python3 -m venv env
     ```
 
     Python 2.7+ (all platforms)
