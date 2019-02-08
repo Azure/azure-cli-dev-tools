@@ -29,8 +29,8 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
 
     require_azure_cli()
 
-    from azure.cli.core import get_default_cli  # pylint: disable=import-error,no-name-in-module
-    from azure.cli.core.file_util import (  # pylint: disable=import-error,no-name-in-module
+    from azure.cli.core import get_default_cli  # pylint: disable=import-error
+    from azure.cli.core.file_util import (  # pylint: disable=import-error
         get_all_help, create_invoker_and_load_cmds_and_args)
 
     heading('CLI Linter')

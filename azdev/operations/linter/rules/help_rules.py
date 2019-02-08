@@ -6,8 +6,9 @@
 
 import shlex
 
-import mock
 from knack.log import get_logger
+
+import mock
 
 from ..rule_decorators import help_file_entry_rule
 from ..linter import RuleError

@@ -78,7 +78,7 @@ def _combine_command_result(cli_result, ext_result):
 
     final_result = CommandResultItem(None)
 
-    def apply(item):
+    def apply_result(item):
         if item:
             final_result.exit_code += item.exit_code
             if item.error:
@@ -91,8 +91,8 @@ def _combine_command_result(cli_result, ext_result):
                     final_result.result += item.result
                 else:
                     final_result.result = item.result
-    apply(cli_result)
-    apply(ext_result)
+    apply_result(cli_result)
+    apply_result(ext_result)
     return final_result
 
 
