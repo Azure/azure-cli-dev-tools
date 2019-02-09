@@ -6,12 +6,19 @@
 
 import os
 import json
+import re
 import zipfile
-from wheel.install import WHEEL_INFO_RE  # pylint:disable=import-error
 
 from knack.util import CLIError
 
 from azdev.utilities import EXTENSION_PREFIX
+
+
+WHEEL_INFO_RE = re.compile(
+    r"""^(?P<namever>(?P<name>.+?)(-(?P<ver>\d.+?))?)
+    ((-(?P<build>\d.*?))?-(?P<pyver>.+?)-(?P<abi>.+?)-(?P<plat>.+?)
+    \.whl|\.dist-info)$""",
+    re.VERBOSE).match
 
 
 def _get_extension_modname(ext_dir):

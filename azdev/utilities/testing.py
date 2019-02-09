@@ -4,6 +4,7 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+
 def test_cmd(args):
     from azdev.__main__ import main
     import sys

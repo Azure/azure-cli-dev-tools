@@ -1,12 +1,15 @@
 [MESSAGES CONTROL]
 # For all codes, run 'pylint --list-msgs' or go to 'http://pylint-messages.wikidot.com/all-codes'
-# C0103 Invalid %s name "%s"
-# I0011 Warning locally suppressed using disable-msg
-disable=C0103,I0011,fixme,missing-docstring,too-many-arguments,too-few-public-methods,cyclic-import,useless-object-inheritance,useless-import-alias
-
-# note: This is useful but some pylint suppressions only apply to Python 2 or 3
-# and we run pylint on both Python 2 and 3. e.g. You may see some no-member useless-suppression messages.
-enable=useless-suppression
+disable=
+    invalid-name,
+    fixme,
+    missing-docstring,
+    too-many-arguments,
+    too-few-public-methods,
+    cyclic-import,
+    useless-object-inheritance,
+    useless-import-alias,
+    useless-suppression
 
 [FORMAT]
 max-line-length=120

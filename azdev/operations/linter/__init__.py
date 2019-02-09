@@ -13,6 +13,7 @@ from knack.arguments import ignore_type, ArgumentsContext
 from knack import events
 from knack.help_files import helps
 from knack.log import get_logger
+from knack.util import CLIError
 
 from azdev.utilities import (
     heading, subheading, display, get_path_table, require_azure_cli)
@@ -77,10 +78,12 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
         help_entry = yaml.load(help_yaml)
         help_file_entries[entry_name] = help_entry
 
-    # TODO: Not working for extensions!
     # trim command table and help to just selected_modules
     command_loader, help_file_entries = filter_modules(
         command_loader, help_file_entries, modules=selected_mod_names)
+
+    if not command_loader.command_table:
+        raise CLIError('No commands selected to check.')
 
     # Instantiate and run Linter
     linter_manager = LinterManager(command_loader=command_loader,
