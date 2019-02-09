@@ -81,7 +81,16 @@ helps['verify history'] = """
 
 
 helps['verify version'] = """
-    short-summary: Verify package versions.
+    short-summary: Verify package versions against those hosted on PyPI and/or in the azure-cli setup.py file.
+    long-summary: >
+        This is used to ensure the correct module versions are bumped prior to release and that all
+        module versions are present in the azure-cli setup.py with their versions pinned.
+    examples:
+        - name: Verify all versions and update azure-cli's setup.py with each module's verison.
+          text: azdev verify version
+
+        - name: Verify all versions and audit them against azure-cli's setup.py ONLY.
+          text: azdev verify version --no-update
 """
 
 
