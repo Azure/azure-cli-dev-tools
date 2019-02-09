@@ -23,7 +23,6 @@ def check_license_headers():
 
     heading('Verify License Headers')
 
-    # TODO: The env could be somewhere else
     cli_path = get_cli_repo_path()
     env_path = os.path.join(cli_path, 'env')
 

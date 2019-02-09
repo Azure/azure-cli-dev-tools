@@ -4,6 +4,8 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import os
 import inspect
 from importlib import import_module
@@ -247,7 +249,7 @@ class RuleError(Exception):
     pass
 
 
-class LinterScope():
+class LinterScope(object):
     def __init__(self, linter_manager, linter_callable):
         self.linter_manager = linter_manager
         self.linter = linter_callable()

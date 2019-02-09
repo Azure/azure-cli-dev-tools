@@ -51,15 +51,14 @@ setup(
     install_requires=[
         'docutils',
         'flake8',
-        'future',
+        'futures',
         'gitpython',
         'knack~=0.5.1',
+        'mock',
         'pytest',
         'pytest-xdist',
         'requests',
-        'tox',
-        'virtualenv',
-        'wheel'
+        'tox'
     ],
     extras_require={
         ":python_version<'3.0'": ['pylint~=1.9.2'],

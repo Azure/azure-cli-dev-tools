@@ -133,6 +133,7 @@ def _get_profile(profile):
 
 
 def _discover_module_tests(mod_name, mod_data):
+
     # get the list of test files in each module
     total_tests = 0
     total_files = 0
@@ -141,10 +142,12 @@ def _discover_module_tests(mod_name, mod_data):
         contents = os.listdir(mod_data['filepath'])
         test_files = {x[:-len('.py')]: {} for x in contents if x.startswith('test_') and x.endswith('.py')}
         total_files = len(test_files)
-    except FileNotFoundError:
-        # skip modules that don't have tests
-        logger.info('  No test files found.')
-        return None
+    except OSError as ex:
+        if 'cannot find' in str(ex):
+            # skip modules that don't have tests
+            logger.info('  No test files found.')
+            return None
+        raise
 
     for file_name in test_files:
         mod_data['files'][file_name] = {}

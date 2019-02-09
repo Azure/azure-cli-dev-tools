@@ -204,7 +204,7 @@ def _check_readme_render(mod_path):
 # def _changes_require_version_bump(package_name, mod_version, mod_path, base_repo=None, base_tag=None):
 #     revision_range = os.environ.get('TRAVIS_COMMIT_RANGE', None)
 #     if not revision_range:
-#         # TODO: Shoud not depend on CI! Must be able to run locally.
+#         # Shoud not depend on CI! Must be able to run locally.
 #         # TRAVIS_COMMIT_RANGE looks like <ID>...<ID>
 #         pass
 #     error = None
