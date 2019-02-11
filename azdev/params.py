@@ -54,7 +54,7 @@ def load_arguments(self, _):
             c.positional('modules', nargs='*', help='Space-separated list of modules to check.')
 
     with ArgumentsContext(self, 'verify version') as c:
-        c.argument('no_update', action='store_true', help='If provided, the command will audit versions in modules against setup.py but not update anything.')
+        c.argument('update', action='store_true', help='If provided, the command will update the versions in azure-cli\'s setup.py file.')
 
     with ArgumentsContext(self, 'linter') as c:
         c.positional('modules', nargs='*', help='Space-separated list of modules or extensions to check.')

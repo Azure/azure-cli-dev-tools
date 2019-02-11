@@ -242,7 +242,7 @@ def _check_readme_render(mod_path):
 
 
 # region verify PyPI versions
-def verify_versions(modules=None, no_update=False):
+def verify_versions(modules=None, update=False):
     import tempfile
     import shutil
 
@@ -252,7 +252,7 @@ def verify_versions(modules=None, no_update=False):
 
     if modules:
         logger.warning('When checking individual modules, azure-cli\'s setup.py file will be ignored!\n')
-        no_update = None
+        update = None
 
     original_cwd = os.getcwd()
     path_table = get_path_table(include_only=modules)
@@ -266,6 +266,7 @@ def verify_versions(modules=None, no_update=False):
     temp_dir = tempfile.mkdtemp()
 
     results = {}
+
     for mod, mod_path in modules:
         if not mod.startswith(COMMAND_MODULE_PREFIX) and mod != 'azure-cli':
             mod = '{}{}'.format(COMMAND_MODULE_PREFIX, mod)
@@ -277,7 +278,7 @@ def verify_versions(modules=None, no_update=False):
     shutil.rmtree(temp_dir)
     os.chdir(original_cwd)
 
-    results = _check_setup_py(results, no_update)
+    results = _check_setup_py(results, update)
 
     logger.info('Module'.ljust(40) + 'Local Version'.rjust(20) + 'Public Version'.rjust(20))  # pylint: disable=logging-not-lazy
     for mod, data in results.items():
@@ -293,7 +294,7 @@ def verify_versions(modules=None, no_update=False):
                        'running `git clean` to remove untracked files from your repo. '
                        'Files that were once tracked but removed from the source may '
                        'still be on your machine, resuling in false positives.')
-    elif mismatch_mods and no_update:
+    elif mismatch_mods and not update:
         logger.error('The following modules have a mismatch between the module version '
                      'and the version in azure-cli\'s setup.py file. '
                      'Scroll up for details: %s', ', '.join(mismatch_mods.keys()))
@@ -301,36 +302,36 @@ def verify_versions(modules=None, no_update=False):
         display('OK!')
 
 
-def _check_setup_py(results, no_update):
+def _check_setup_py(results, update):
     # only audit or update setup.py when all modules are being considered
     # otherwise, edge cases could arise
-    if no_update is None:
+    if update is None:
         return results
 
     # retrieve current versions from azure-cli's setup.py file
     azure_cli_path = get_path_table(include_only='azure-cli')['core']['azure-cli']
     azure_cli_setup_path = find_files(azure_cli_path, SETUP_PY_NAME)[0]
     with open(azure_cli_setup_path, 'r') as f:
-        setup_py_version_regex = re.compile(r"'([^'=]*)==([\d.]*)'")
+        setup_py_version_regex = re.compile(r"(?P<quote>[\"'])(?P<mod>[^'=]*)==(?P<ver>[\d.]*)(?P=quote)")
         for line in f.readlines():
             if line.strip().startswith("'azure-cli-"):
                 match = setup_py_version_regex.match(line.strip())
-                mod = match.group(1)
+                mod = match.group('mod')
                 if mod == 'azure-cli-command-modules-nspkg':
                     mod = 'azure-cli-command_modules-nspkg'
                 try:
-                    results[mod]['setup_version'] = match.group(2)
+                    results[mod]['setup_version'] = match.group('ver')
                 except KeyError:
                     # something that is in setup.py but isn't module is
                     # inherently a mismatch
                     results[mod] = {
                         'local_version': 'Unavailable',
                         'public_version': 'Unknown',
-                        'setup_version': match.group(2),
+                        'setup_version': match.group('ver'),
                         'status': 'MISMATCH'
                     }
 
-    if no_update:
+    if not update:
         display('\nAuditing azure-cli setup.py against local module versions...')
         for mod, data in results.items():
             if mod == 'azure-cli':
