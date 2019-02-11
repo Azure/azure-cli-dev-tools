@@ -56,7 +56,7 @@ setup(
         'gitpython',
         'knack~=0.5.1',
         'mock',
-        'pytest',
+        'pytest>=3.6.0',
         'pytest-xdist',
         'requests',
         'tox'
