@@ -189,7 +189,7 @@ class LinterManager(object):
         return self._exit_code
 
     def run(self, run_params=None, run_commands=None, run_command_groups=None, run_help_files_entries=None, ci=False):
-        self._ci = ci
+        self._ci = os.environ.get('CI', False)
         paths = import_module('{}.rules'.format(PACAKGE_NAME)).__path__
 
         if paths:

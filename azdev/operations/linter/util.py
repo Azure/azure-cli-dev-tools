@@ -7,6 +7,8 @@
 import copy
 import re
 
+from azdev.utilities import COMMAND_MODULE_PREFIX
+
 from knack.log import get_logger
 
 
@@ -38,6 +40,7 @@ def exclude_commands(command_loader, help_file_entries, module_exclusions):
 
 def _filter_mods(command_loader, help_file_entries, modules=None, exclude=False):
     modules = modules or []
+    modules = [x.replace(COMMAND_MODULE_PREFIX, '') for x in modules]
 
     # command tables and help entries must be copied to allow for seperate linter scope
     command_table = command_loader.command_table.copy()
@@ -64,6 +67,7 @@ def _filter_mods(command_loader, help_file_entries, modules=None, exclude=False)
     # Remove unneeded command groups
     retained_command_groups = {' '.join(x.split(' ')[:-1]) for x in command_loader.command_table}
     excluded_command_groups = set(command_loader.command_group_table.keys()) - retained_command_groups
+
     for group_name in excluded_command_groups:
         command_loader.command_group_table.pop(group_name, None)
         help_file_entries.pop(group_name, None)

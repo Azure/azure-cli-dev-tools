@@ -65,7 +65,10 @@ setup(
         ":python_version<'3.0'": ['pylint~=1.9.2'],
         ":python_version>='3.0'": ['pylint~=2.0.0']
     },
-    package_data={'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc']},
+    package_data={
+        'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
+        'azdev.operations.linter.rules': ['ci_exclusions.yml']
+    },
     include_package_data=True,
     entry_points={
         'console_scripts': ['azdev=azdev.__main__:main']
