@@ -5,8 +5,10 @@
 # -----------------------------------------------------------------------------
 
 import os
+import re
 import sys
 
+from distutils.version import LooseVersion  # pylint:disable=import-error,no-name-in-module
 from docutils import core, io
 
 from knack.log import get_logger
@@ -14,7 +16,7 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     display, heading, subheading, cmd, py_cmd, get_path_table,
-    pip_cmd, COMMAND_MODULE_PREFIX, require_azure_cli)
+    pip_cmd, COMMAND_MODULE_PREFIX, require_azure_cli, find_files)
 
 logger = get_logger(__name__)
 
@@ -240,13 +242,17 @@ def _check_readme_render(mod_path):
 
 
 # region verify PyPI versions
-def verify_versions(modules=None):
+def verify_versions(modules=None, update=False):
     import tempfile
     import shutil
 
     require_azure_cli()
 
     heading('Verify Package Versions')
+
+    if modules:
+        logger.warning('When checking individual modules, azure-cli\'s setup.py file will be ignored!\n')
+        update = None
 
     original_cwd = os.getcwd()
     path_table = get_path_table(include_only=modules)
@@ -260,37 +266,111 @@ def verify_versions(modules=None):
     temp_dir = tempfile.mkdtemp()
 
     results = {}
+
     for mod, mod_path in modules:
-        if not mod.startswith(COMMAND_MODULE_PREFIX):
+        if not mod.startswith(COMMAND_MODULE_PREFIX) and mod != 'azure-cli':
             mod = '{}{}'.format(COMMAND_MODULE_PREFIX, mod)
         # currently, this is not published
         if mod == 'azure-cli-testsdk':
             continue
-        results.update(_check_module(temp_dir, mod, mod_path))
+        results.update(_compare_module_against_pypi(temp_dir, mod, mod_path))
 
     shutil.rmtree(temp_dir)
     os.chdir(original_cwd)
+
+    results = _check_setup_py(results, update)
 
     logger.info('Module'.ljust(40) + 'Local Version'.rjust(20) + 'Public Version'.rjust(20))  # pylint: disable=logging-not-lazy
     for mod, data in results.items():
         logger.info(mod.ljust(40) + data['local_version'].rjust(20) + data['public_version'].rjust(20))
 
-    failed_mods = {k: v for k, v in results.items() if v['status'] != 'OK'}
+    bump_mods = {k: v for k, v in results.items() if v['status'] == 'BUMP'}
+    mismatch_mods = {k: v for k, v in results.items() if v['status'] == 'MISMATCH'}
     subheading('RESULTS')
-    if failed_mods:
+    if bump_mods:
         logger.error('The following modules need their versions bumped. '
-                     'Scroll up for details: %s', ', '.join(failed_mods.keys()))
+                     'Scroll up for details: %s', ', '.join(bump_mods.keys()))
         logger.warning('\nNote that before changing versions, you should consider '
                        'running `git clean` to remove untracked files from your repo. '
                        'Files that were once tracked but removed from the source may '
                        'still be on your machine, resuling in false positives.')
+    elif mismatch_mods and not update:
+        logger.error('The following modules have a mismatch between the module version '
+                     'and the version in azure-cli\'s setup.py file. '
+                     'Scroll up for details: %s', ', '.join(mismatch_mods.keys()))
     else:
         display('OK!')
 
 
+def _check_setup_py(results, update):
+    # only audit or update setup.py when all modules are being considered
+    # otherwise, edge cases could arise
+    if update is None:
+        return results
+
+    # retrieve current versions from azure-cli's setup.py file
+    azure_cli_path = get_path_table(include_only='azure-cli')['core']['azure-cli']
+    azure_cli_setup_path = find_files(azure_cli_path, SETUP_PY_NAME)[0]
+    with open(azure_cli_setup_path, 'r') as f:
+        setup_py_version_regex = re.compile(r"(?P<quote>[\"'])(?P<mod>[^'=]*)==(?P<ver>[\d.]*)(?P=quote)")
+        for line in f.readlines():
+            if line.strip().startswith("'azure-cli-"):
+                match = setup_py_version_regex.match(line.strip())
+                mod = match.group('mod')
+                if mod == 'azure-cli-command-modules-nspkg':
+                    mod = 'azure-cli-command_modules-nspkg'
+                try:
+                    results[mod]['setup_version'] = match.group('ver')
+                except KeyError:
+                    # something that is in setup.py but isn't module is
+                    # inherently a mismatch
+                    results[mod] = {
+                        'local_version': 'Unavailable',
+                        'public_version': 'Unknown',
+                        'setup_version': match.group('ver'),
+                        'status': 'MISMATCH'
+                    }
+
+    if not update:
+        display('\nAuditing azure-cli setup.py against local module versions...')
+        for mod, data in results.items():
+            if mod == 'azure-cli':
+                continue
+            if data['local_version'] != data['setup_version']:
+                data['status'] = 'MISMATCH'
+        return results
+
+    # update azure-cli's setup.py file with the collected versions
+    logger.warning('\nUpdating azure-cli setup.py with collected module versions...')
+    old_lines = []
+    with open(azure_cli_setup_path, 'r') as f:
+        old_lines = f.readlines()
+
+    with open(azure_cli_setup_path, 'w') as f:
+        start_line = 'DEPENDENCIES = ['
+        end_line = ']'
+        write_versions = False
+
+        for line in old_lines:
+            if line.strip() == start_line:
+                write_versions = True
+                f.write(line)
+                for mod, data in results.items():
+                    if mod == 'azure-cli' or data['local_version'] == 'Unavailable':
+                        continue
+                    f.write("    '{}=={}'\n".format(mod, data['local_version']))
+                continue
+            elif line.strip() == end_line:
+                write_versions = False
+            elif write_versions:
+                # stop writing lines until the end bracket is found
+                continue
+            f.write(line)
+    return results
+
+
 # pylint: disable=too-many-statements
-def _check_module(root_dir, mod, mod_path):
-    import re
+def _compare_module_against_pypi(root_dir, mod, mod_path):
     import zipfile
 
     version_pattern = re.compile(r'.*azure_cli[^-]*-(\d*.\d*.\d*).*')
@@ -333,13 +413,20 @@ def _check_module(root_dir, mod, mod_path):
     build_path = os.path.join(build_dir, os.listdir(build_dir)[0])
     build_version = version_pattern.match(build_path).group(1)
 
-    if build_version != downloaded_version:
-        # TODO: Make this more robust? What if local version < public?
-        results[mod] = {
-            'local_version': build_version,
-            'public_version': downloaded_version,
-            'status': 'OK'
-        }
+    results[mod] = {
+        'local_version': build_version,
+        'public_version': downloaded_version,
+        'setup_version': None,
+        'status': None
+    }
+
+    # OK if package is new
+    if downloaded_version == 'Unavailable':
+        results[mod]['status'] = 'OK'
+        return results
+    # OK if local version is higher than what's on PyPI
+    if LooseVersion(build_version) > LooseVersion(downloaded_version):
+        results[mod]['status'] = 'OK'
         return results
 
     # slight difference in dist-info dirs, so we must extract the azure folders and compare them
@@ -356,17 +443,13 @@ def _check_module(root_dir, mod, mod_path):
         subheading('Differences found in {}'.format(mod))
         for error in errors:
             logger.warning(error)
-    results[mod] = {
-        'local_version': build_version,
-        'public_version': downloaded_version,
-        'status': 'OK' if not errors else 'ERROR'
-    }
+    results[mod]['status'] = 'OK' if not errors else 'BUMP'
 
-    # special case: to make a release, these MUST be bumped
+    # special case: to make a release, these MUST be bumped, even if it wouldn't otherwise be necessary
     if mod in ['azure-cli', 'azure-cli-core']:
         if results[mod]['status'] == 'OK':
             logger.warning('%s version must be bumped to support release!', mod)
-            results[mod]['status'] = 'ERROR'
+            results[mod]['status'] = 'BUMP'
 
     return results
 

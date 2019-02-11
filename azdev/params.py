@@ -53,9 +53,8 @@ def load_arguments(self, _):
         with ArgumentsContext(self, 'verify {}'.format(scope)) as c:
             c.positional('modules', nargs='*', help='Space-separated list of modules to check.')
 
-    with ArgumentsContext(self, 'verify versions') as c:
-        c.argument('base_repo', help='Path to directory containeing the CLI repo with the base versions to compare against.')
-        c.argument('base_tag', help='The Git tag name that represents the base repo.')
+    with ArgumentsContext(self, 'verify version') as c:
+        c.argument('update', action='store_true', help='If provided, the command will update the versions in azure-cli\'s setup.py file.')
 
     with ArgumentsContext(self, 'linter') as c:
         c.positional('modules', nargs='*', help='Space-separated list of modules or extensions to check.')
