@@ -27,8 +27,6 @@ SETUP_PY_NAME = 'setup.py'
 # region verify History Headings
 def check_history(modules=None):
 
-    require_azure_cli()
-
     # TODO: Does not work with extensions
     path_table = get_path_table(include_only=modules)
     selected_modules = list(path_table['core'].items()) + list(path_table['mod'].items())
@@ -91,7 +89,8 @@ def _check_history_headings(mod_path):
 
         first_version_history = all_versions[0]
         actual_version = cmd('python setup.py --version', cwd=mod_path)
-        actual_version = actual_version.result.strip()
+        # command can output warnings as well, so we just want the last line, which should have the version
+        actual_version = actual_version.result.splitlines()[-1].strip()
         if first_version_history != actual_version:
             errors.append("The topmost version in {} does not match version {} defined in setup.py.".format(
                 history_path, actual_version))

@@ -14,7 +14,7 @@ from knack.util import CLIError, CommandResultItem
 
 from azdev.utilities import (
     display, heading, subheading, py_cmd, get_path_table, EXTENSION_PREFIX,
-    get_env_config_dir)
+    get_env_config_dir, require_azure_cli)
 
 
 logger = get_logger(__name__)
@@ -27,6 +27,12 @@ def check_style(modules=None, pylint=False, pep8=False):
     selected_modules = get_path_table(include_only=modules)
     pep8_result = None
     pylint_result = None
+
+    if pylint:
+        try:
+            require_azure_cli()
+        except CLIError:
+            raise CLIError('usage error: --pylint requires Azure CLI to be installed.')
 
     if not selected_modules:
         raise CLIError('No modules selected.')

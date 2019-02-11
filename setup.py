@@ -44,6 +44,7 @@ setup(
         'azdev.config',
         'azdev.operations',
         'azdev.operations.linter',
+        'azdev.operations.linter.rules',
         'azdev.operations.tests',
         'azdev.operations.extensions',
         'azdev.utilities',
@@ -64,7 +65,7 @@ setup(
         ":python_version<'3.0'": ['pylint~=1.9.2'],
         ":python_version>='3.0'": ['pylint~=2.0.0']
     },
-    package_data={'azdev.config': ['*.*']},
+    package_data={'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc']},
     include_package_data=True,
     entry_points={
         'console_scripts': ['azdev=azdev.__main__:main']
