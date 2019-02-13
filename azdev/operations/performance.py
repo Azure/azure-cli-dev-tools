@@ -15,16 +15,12 @@ from azdev.utilities import (
 logger = get_logger(__name__)
 
 TOTAL = 'ALL'
+TOTAL_THRESHOLD = 300
 DEFAULT_THRESHOLD = 10
-
-# TODO: Treat everything as bubble instead of specific modules
-# explicit thresholds that deviate from the default
 THRESHOLDS = {
-    'network': 30,
-    'vm': 30,
-    'batch': 30,
-    'storage': 50,
-    TOTAL: 300
+    # threshold value: num of exceptions allowed
+    50: 1,
+    30: 4
 }
 
 
@@ -34,7 +30,7 @@ def check_load_time(runs=3):
 
     heading('Module Load Performance')
 
-    regex = r"[^']*'([^']*)'[\D]*([\d\.]*)"
+    regex = r"[^']*'(?P<mod>[^']*)'[\D]*(?P<val>[\d\.]*)"
 
     results = {TOTAL: []}
     # Time the module loading X times
@@ -52,8 +48,8 @@ def check_load_time(runs=3):
         for line in lines:
             if line.startswith('DEBUG: Loaded module'):
                 matches = re.match(regex, line)
-                mod = matches.group(1)
-                val = float(matches.group(2)) * 1000
+                mod = matches.group('mod')
+                val = float(matches.group('val')) * 1000
                 total_time = total_time + val
                 if mod in results:
                     results[mod].append(val)
@@ -64,13 +60,22 @@ def check_load_time(runs=3):
     passed_mods = {}
     failed_mods = {}
 
+    def _claim_higher_threshold(val):
+        avail_thresholds = {k:v for k, v in THRESHOLDS.items() if v}
+        new_threshold = None
+        for threshold in sorted(avail_thresholds):
+            if val < threshold:
+                THRESHOLDS[threshold] = THRESHOLDS[threshold] - 1
+                new_threshold = threshold
+            break
+        return new_threshold
+
     mods = sorted(results.keys())
-    bubble_found = False
     for mod in mods:
         val = results[mod]
         mean_val = mean(val)
         stdev_val = pstdev(val)
-        threshold = THRESHOLDS.get(mod) or DEFAULT_THRESHOLD
+        threshold = TOTAL_THRESHOLD if mod == TOTAL else DEFAULT_THRESHOLD
         statistics = {
             'average': mean_val,
             'stdev': stdev_val,
@@ -78,10 +83,10 @@ def check_load_time(runs=3):
             'values': val
         }
         if mean_val > threshold:
-            if not bubble_found and mean_val < 30:
-                # This temporary measure allows one floating performance
-                # failure up to 30 ms. See issue #6224 and #6218.
-                bubble_found = True
+            # claim a threshold exception if available
+            new_threshold = _claim_higher_threshold(mean_val)
+            if new_threshold:
+                statistics['threshold'] = new_threshold
                 passed_mods[mod] = statistics
             else:
                 failed_mods[mod] = statistics
