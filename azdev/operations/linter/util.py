@@ -7,9 +7,10 @@
 import copy
 import re
 
+from knack.log import get_logger
+
 from azdev.utilities import COMMAND_MODULE_PREFIX
 
-from knack.log import get_logger
 
 
 logger = get_logger(__name__)

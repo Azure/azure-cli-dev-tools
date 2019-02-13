@@ -49,6 +49,9 @@ def run_linter(modules=None, rule_types=None, rules=None):
     selected_mod_paths = list(selected_modules['mod'].values()) + list(selected_modules['core'].values()) + \
         list(selected_modules['ext'].values())
 
+    if selected_mod_names:
+        display('Modules: {}\n'.format(', '.join(selected_mod_names)))
+
     # collect all rule exclusions
     for path in selected_mod_paths:
         exclusion_path = os.path.join(path, 'linter_exclusions.yml')

@@ -245,8 +245,6 @@ def _check_readme_render(mod_path):
 
 
 def update_setup_py(pin=False):
-    import tempfile
-    import shutil
 
     require_azure_cli()
 
