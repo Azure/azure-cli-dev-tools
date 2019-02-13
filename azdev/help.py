@@ -29,6 +29,33 @@ helps['setup'] = """
 """
 
 
+helps['cli'] = """
+    short-summary: Commands for working with CLI modules.
+"""
+
+helps['cli check-versions'] = """
+    short-summary: Verify package versions against those hosted on PyPI and/or in the azure-cli setup.py file.
+    long-summary: >
+        This is used to ensure the correct module versions are bumped prior to release.
+    examples:
+        - name: Verify all versions and audit them against azure-cli's setup.py ONLY.
+          text: azdev cli check-versions
+
+        - name: Verify all versions and update azure-cli's setup.py with each module's verison.
+          text: azdev cli check-versions --update --pin
+"""
+
+helps['cli update-setup'] = """
+    short-summary: Update the azure-cli setup.py file.
+    examples:
+        - name: Update azure-cli's setup.py with unpinned module verions.
+          text: azdev cli update-setup
+
+        - name: Update azure-cli's setup.py with pinned module versions.
+          text: azdev cli update-setup --pin
+"""
+
+
 helps['configure'] = """
     short-summary: Configure azdev for use without installing anything.
 """
@@ -77,20 +104,6 @@ helps['verify package'] = """
 
 helps['verify history'] = """
     short-summary: Verify the README and HISTORY files for each module so they format correctly on PyPI.
-"""
-
-
-helps['verify version'] = """
-    short-summary: Verify package versions against those hosted on PyPI and/or in the azure-cli setup.py file.
-    long-summary: >
-        This is used to ensure the correct module versions are bumped prior to release and that all
-        module versions are present in the azure-cli setup.py with their versions pinned.
-    examples:
-        - name: Verify all versions and audit them against azure-cli's setup.py ONLY.
-          text: azdev verify version
-
-        - name: Verify all versions and update azure-cli's setup.py with each module's verison.
-          text: azdev verify version --update
 """
 
 
