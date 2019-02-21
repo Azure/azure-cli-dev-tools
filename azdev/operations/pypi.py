@@ -257,7 +257,7 @@ def update_setup_py(pin=False):
     modules = list(path_table['core'].items()) + list(path_table['mod'].items())
     modules = [x for x in modules if x[0] not in EXCLUDED_MODULES]
 
-    results = {mod[0]:{} for mod in modules}
+    results = {mod[0]: {} for mod in modules}
 
     results = _get_module_versions(results, modules)
     _update_setup_py(results, azure_cli_setup_path, pin)
@@ -293,7 +293,7 @@ def verify_versions(modules=None, update=False, pin=False):
 
     display('MODULES: {}'.format(', '.join([x[0] for x in modules])))
 
-    results = {mod[0]:{} for mod in modules}
+    results = {mod[0]: {} for mod in modules}
 
     original_cwd = os.getcwd()
     temp_dir = tempfile.mkdtemp()

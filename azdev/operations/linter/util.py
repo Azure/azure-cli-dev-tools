@@ -12,7 +12,6 @@ from knack.log import get_logger
 from azdev.utilities import COMMAND_MODULE_PREFIX
 
 
-
 logger = get_logger(__name__)
 
 

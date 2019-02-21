@@ -24,6 +24,7 @@ THRESHOLDS = {
 }
 
 
+# pylint: disable=too-many-statements
 def check_load_time(runs=3):
 
     require_azure_cli()
@@ -61,7 +62,7 @@ def check_load_time(runs=3):
     failed_mods = {}
 
     def _claim_higher_threshold(val):
-        avail_thresholds = {k:v for k, v in THRESHOLDS.items() if v}
+        avail_thresholds = {k: v for k, v in THRESHOLDS.items() if v}
         new_threshold = None
         for threshold in sorted(avail_thresholds):
             if val < threshold:
