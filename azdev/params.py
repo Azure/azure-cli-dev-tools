@@ -20,7 +20,6 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, '') as c:
         c.argument('modules', options_list=['--modules', '-m'], nargs='+', help='Space-separated list of modules to check. Omit to check all.')
-        c.argument('ci_mode', options_list='--ci', action='store_true', help='Run in CI mode.')
         c.argument('private', action='store_true', help='Target the private repo.')
 
     with ArgumentsContext(self, 'setup') as c:
@@ -29,7 +28,6 @@ def load_arguments(self, _):
         c.argument('ext', options_list=['--ext', '-e'], nargs='+', help='Space-separated list of extensions to install initially.')
 
     with ArgumentsContext(self, 'test') as c:
-        c.argument('ci_mode', options_list='--ci', action='store_true', help='Run the tests in CI mode.')
         c.argument('discover', options_list='--discover', action='store_true', help='Build an index of test names so that you don\'t need to specify fully qualified test paths.')
         c.argument('xml_path', options_list='--xml-path', help='Path and filename at which to store the results in XML format. If omitted, the file will be saved as `test_results.xml` in your `.azdev` directory.')
         c.argument('in_series', options_list='--series', action='store_true', help='Disable test parallelization.')
@@ -55,6 +53,7 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'verify version') as c:
         c.argument('update', action='store_true', help='If provided, the command will update the versions in azure-cli\'s setup.py file.')
+        c.argument('pin', action='store_true', help='If provided and used with --update, will pin the module versions in azure-cli\'s setup.py file.')
 
     with ArgumentsContext(self, 'linter') as c:
         c.positional('modules', nargs='*', help='Space-separated list of modules or extensions to check.')

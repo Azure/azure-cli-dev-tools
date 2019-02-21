@@ -27,7 +27,10 @@ def load_command_table(self, _):
 
     with CommandGroup(self, 'verify', operation_group('pypi')) as g:
         g.command('history', 'check_history')
-        g.command('version', 'verify_versions')
+
+    with CommandGroup(self, 'cli', operation_group('pypi')) as g:
+        g.command('check-versions', 'verify_versions')
+        g.command('update-setup', 'update_setup_py')
 
     with CommandGroup(self, 'verify', operation_group('help')) as g:
         g.command('document-map', 'check_document_map')

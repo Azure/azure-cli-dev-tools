@@ -26,7 +26,7 @@ logger = get_logger(__name__)
 
 
 # pylint:disable=too-many-locals
-def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
+def run_linter(modules=None, rule_types=None, rules=None):
 
     require_azure_cli()
 
@@ -39,12 +39,18 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
     # needed to remove helps from azdev
     azdev_helps = helps.copy()
     exclusions = {}
-    path_table = get_path_table(include_only=modules)
+    selected_modules = get_path_table(include_only=modules)
 
-    selected_mod_names = list(path_table['mod'].keys()) + list(path_table['core'].keys()) + \
-        list(path_table['ext'].keys())
-    selected_mod_paths = list(path_table['mod'].values()) + list(path_table['core'].values()) + \
-        list(path_table['ext'].values())
+    if not selected_modules:
+        raise CLIError('No modules selected.')
+
+    selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
+        list(selected_modules['ext'].keys())
+    selected_mod_paths = list(selected_modules['mod'].values()) + list(selected_modules['core'].values()) + \
+        list(selected_modules['ext'].values())
+
+    if selected_mod_names:
+        display('Modules: {}\n'.format(', '.join(selected_mod_names)))
 
     # collect all rule exclusions
     for path in selected_mod_paths:
@@ -99,6 +105,5 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_mode=False):
         run_params=not rule_types or 'params' in rule_types,
         run_commands=not rule_types or 'commands' in rule_types,
         run_command_groups=not rule_types or 'command_groups'in rule_types,
-        run_help_files_entries=not rule_types or 'help_entries' in rule_types,
-        ci=ci_mode)
+        run_help_files_entries=not rule_types or 'help_entries' in rule_types)
     sys.exit(exit_code)

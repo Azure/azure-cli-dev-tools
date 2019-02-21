@@ -18,7 +18,7 @@ from knack.util import CLIError
 from azdev.utilities import (
     display, output, heading, subheading,
     cmd as raw_cmd, py_cmd, pip_cmd, find_file, IS_WINDOWS,
-    ENV_VAR_TEST_MODULES, ENV_VAR_TEST_LIVE,
+    ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_env_config_dir,
     get_path_table, require_virtual_env)
@@ -26,7 +26,7 @@ from azdev.utilities import (
 logger = get_logger(__name__)
 
 
-def run_tests(tests, xml_path=None, ci_mode=False, discover=False, in_series=False,
+def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None):
 
     require_virtual_env()
@@ -39,8 +39,12 @@ def run_tests(tests, xml_path=None, ci_mode=False, discover=False, in_series=Fal
     heading('Run Tests')
 
     profile = _get_profile(profile)
+    path_table = get_path_table()
     test_index = _get_test_index(profile, discover)
-    tests = tests or []
+    tests = tests or list(path_table['mod'].keys()) + list(path_table['core'].keys())
+
+    if tests:
+        display('\nTESTS: {}\n'.format(', '.join(tests)))
 
     # resolve the path at which to dump the XML results
     xml_path = xml_path or DEFAULT_RESULT_PATH
@@ -51,16 +55,6 @@ def run_tests(tests, xml_path=None, ci_mode=False, discover=False, in_series=Fal
     if run_live:
         logger.warning('RUNNING TESTS LIVE')
         os.environ[ENV_VAR_TEST_LIVE] = 'True'
-
-    if os.environ.get(ENV_VAR_TEST_MODULES, None):
-        # TODO: Can this be removed?
-        display('Test modules list parsed from environment variable {}.'.format(ENV_VAR_TEST_MODULES))
-        tests = [m.strip() for m in os.environ.get(ENV_VAR_TEST_MODULES).split(',')]
-
-    if ci_mode:
-        # CI Mode runs specific modules
-        path_table = get_path_table()
-        tests = list(path_table['core'].keys()) + list(path_table['mod'].keys())
 
     def _find_test(index, name):
         name_comps = name.split('.')
@@ -140,10 +134,13 @@ def _discover_module_tests(mod_name, mod_data):
     logger.info('Mod: %s', mod_name)
     try:
         contents = os.listdir(mod_data['filepath'])
-        test_files = {x[:-len('.py')]: {} for x in contents if x.startswith('test_') and x.endswith('.py')}
+        test_files = {
+            x[:-len('.py')]: {} for x in contents if x.startswith('test_') and x.endswith('.py')
+        }
         total_files = len(test_files)
-    except OSError as ex:
-        if 'cannot find' in str(ex):
+    except (OSError, IOError) as ex:
+        err_string = str(ex)
+        if 'system cannot find the path' in err_string or 'No such file or directory' in err_string:
             # skip modules that don't have tests
             logger.info('  No test files found.')
             return None
