@@ -8,3 +8,4 @@ src/azdev.egg-info/*
 .vscode/
 azdev.egg-info/
 .tox/
+*.idea

@@ -9,10 +9,17 @@ import shlex
 from knack.log import get_logger
 
 import mock
+import re
 
 from ..rule_decorators import help_file_entry_rule
 from ..linter import RuleError
 from ..util import LinterError
+
+# 'az' space then repeating runs of quoted tokens or non quoted characters
+_az_pattern = 'az\s*' + '(([^\"\'])*|' + '((\"[^\"]*\"\s*)|(\'[^\']*\'\s*))' + ')'
+# match the two types of command substitutions
+_CMD_SUB_1 = re.compile("\$\(\s*" + "(" + _az_pattern + ")" + "\)")
+_CMD_SUB_2 = re.compile("`\s*" + "(" + _az_pattern + ")" + "`")
 
 logger = get_logger(__name__)
 
@@ -65,15 +72,14 @@ def faulty_help_example_parameters_rule(linter, help_entry):
     for example in linter.get_help_entry_examples(help_entry):
         max_profile = example.get('max_profile')
         if max_profile and max_profile != 'latest':
-            logger.warning('\n\tSKIPPING example: %s\n\tas its max profile is %s, '
-                           'instead of latest.', example['text'], example['max_profile'])
+            logger.warning("\n\tSKIPPING example: {}\n\tas its max profile is {}, instead of latest.".format(example['text'], example['max_profile']))
             continue
 
-        example_text = example.get('text', '')
+        example_text = example.get('text','')
         commands = _extract_commands_from_example(example_text)
         while commands:
             command = commands.pop()
-            violation, nested_commands = _lint_example_command(command, parser)  # pylint:disable=no-value-for-parameter
+            violation, nested_commands = _lint_example_command(command, parser)
 
             commands.extend(nested_commands)  # append commands that are the source of any arguments
             if violation:
@@ -87,13 +93,13 @@ def faulty_help_example_parameters_rule(linter, help_entry):
         raise RuleError(violation_msg + "\n\n")
 
 
-# Faulty help example parameters rule helpers
+### Faulty help example parameters rule helpers
 
 @mock.patch("azure.cli.core.parser.AzCliCommandParser._check_value")
 @mock.patch("argparse.ArgumentParser._get_value")
 @mock.patch("azure.cli.core.parser.AzCliCommandParser.error")
-def _lint_example_command(command, parser, mocked_error_method, mocked_get_value, _):
-    def get_value_side_effect(_, arg_string):
+def _lint_example_command(command, parser, mocked_error_method, mocked_get_value, mocked_check_value):
+    def get_value_side_effect(action, arg_string):
         return arg_string
     mocked_error_method.side_effect = LinterError  # mock call of parser.error so usage won't be printed.
     mocked_get_value.side_effect = get_value_side_effect
@@ -102,7 +108,7 @@ def _lint_example_command(command, parser, mocked_error_method, mocked_get_value
     nested_commands = []
 
     try:
-        command_args = shlex.split(command)[1:]
+        command_args = shlex.split(command, comments=True)[1:] # split commands into command args, ignore comments.
         command_args, nested_commands = _process_command_args(command_args)
         parser.parse_args(command_args)
     except ValueError as e:  # handle exception thrown by shlex.
@@ -125,19 +131,23 @@ def _lint_example_command(command, parser, mocked_error_method, mocked_get_value
 def _extract_commands_from_example(example_text):
 
     # fold commands spanning multiple lines into one line. Split commands that use pipes
-    example_text = example_text.replace("\\\n", " ")
-    example_text = example_text.replace("\\ ", " ")
-    example_text = example_text.replace(" | ", "\n")
+    example_text = example_text.replace("\\\n", " ") # wrap escaped newline into one line.
+    example_text = example_text.replace("\\ ", " ")  # remove left over escape after wrapping
 
     commands = example_text.splitlines()
     processed_commands = []
     for command in commands:  # filter out commands
-        if command.startswith("az"):
+        command.strip()
+        if command.startswith("az"): # if this is a single az command add it.
             processed_commands.append(command)
-        elif "az " in command:  # some commands start with "$(az ..." and even "`az in one case"
-            idx = command.find("az ")
-            command = command[idx:]
-            processed_commands.append(command)
+
+        for re_prog in [_CMD_SUB_1, _CMD_SUB_2]:
+            start = 0
+            match = re_prog.search(command, start)
+            while match:  # while there is a nested az command of type 1 $( az ...)
+                processed_commands.append(match.group(1).strip())  # add it
+                start = match.end(1)  # get index of rest of string
+                match = re_prog.search(command, start)  # attempt to get next match
 
     return processed_commands
 
@@ -145,13 +155,10 @@ def _extract_commands_from_example(example_text):
 def _process_command_args(command_args):
     result_args = []
     new_commands = []
-    unwanted_chars = "$()`"
-    control_operators = ["&&", "||"]
+    operators = ["&&","||", "|"]
 
-    # strip unnecessary punctuation, otherwise arg validation could fail.
-    for arg in command_args:
-        # handle cases where multiple commands are connected by control operators.
-        if arg in control_operators:
+    for arg in command_args: # strip unnecessary punctuation, otherwise arg validation could fail.
+        if arg in operators: # handle cases where multiple commands are connected by control operators or pipe.
             idx = command_args.index(arg)
             maybe_new_command = " ".join(command_args[idx:])
 
@@ -160,9 +167,6 @@ def _process_command_args(command_args):
                 new_commands.append(maybe_new_command[idx:])  # remaining command is in fact a new command / commands.
             break
 
-        arg = arg.strip(unwanted_chars)
-        if arg.startswith("az "):  # store any new commands
-            new_commands.append(arg)
         result_args.append(arg)
 
     return result_args, new_commands
