@@ -230,7 +230,6 @@ def _discover_tests(profile):
         if tests:
             module_data[mod_name] = tests
 
-
     logger.info('\nIndependent Command Modules: %s', ', '.join([name for name, _ in independent_command_modules]))
     for mod_name, mod_path in independent_command_modules:
         short_name = mod_name.replace(COMMAND_MODULE_PREFIX, '')
