@@ -100,9 +100,21 @@ def make_dirs(path):
             raise
 
 
+def get_integrated_command_modules():
+    """ Fetches the directories containing a command_module which is shipped inside of the azure-cli PyPI package.
+    """
+    cli_repo_path = get_cli_repo_path()
+
+    module_paths = glob(os.path.normcase(
+        os.path.join(cli_repo_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules', '*', '__init__.py')
+    ))
+
+    return {os.path.basename(os.path.dirname(dir)):os.path.dirname(dir) for dir in module_paths}
+
+
 def get_path_table(include_only=None):
-    """ Gets a table which contains the long and short names of different modules and extensions and the path to them.
-        The structure looks like:
+    """ Gets a table which contains the long and short names of each package and extension containing CLI command
+        modules. The structure looks like:
 
     {
         'core': {

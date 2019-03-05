@@ -21,7 +21,7 @@ from azdev.utilities import (
     ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
-    get_path_table, require_virtual_env)
+    get_path_table, require_virtual_env, get_integrated_command_modules)
 
 logger = get_logger(__name__)
 
@@ -103,13 +103,17 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
 
 def _extract_module_name(path):
-    mod_name_regex = re.compile(r'azure-cli-([^/\\]+)[/\\]azure[/\\]cli')
+    indep_mod_name_regex = re.compile(r'azure-cli-([^/\\]+)[/\\]azure[/\\]cli')
+    integ_mod_name_regex = re.compile(r'azure[/\\]cli[/\\]([^/\\]+)')
     ext_name_regex = re.compile(r'.*(azext_[^/\\]+).*')
 
-    try:
-        return re.search(mod_name_regex, path).group(1)
-    except AttributeError:
-        return re.search(ext_name_regex, path).group(1)
+    prioritized = [indep_mod_name_regex, integ_mod_name_regex, ext_name_regex]
+
+    for pattern in prioritized:
+        try:
+            return re.search(pattern, path).group(1)
+        except AttributeError:
+            pass
 
 
 def _get_profile(profile):
@@ -193,8 +197,9 @@ def _discover_tests(profile):
 
     path_table = get_path_table()
     core_modules = path_table['core'].items()
-    command_modules = path_table['mod'].items()
+    independent_command_modules = path_table['mod'].items()
     extensions = path_table['ext'].items()
+    integrated_command_modules = get_integrated_command_modules().items()
 
     module_data = {}
 
@@ -213,8 +218,21 @@ def _discover_tests(profile):
         if tests:
             module_data[mod_name] = tests
 
-    logger.info('\nCommand Modules: %s', ', '.join([name for name, _ in command_modules]))
-    for mod_name, mod_path in command_modules:
+    logger.info('\nIntegrated Command Modules: %s', ', '.join([name for name, _ in integrated_command_modules]))
+    for mod_name, mod_path in integrated_command_modules:
+        mod_data = {
+            'alt_name': mod_name,
+            'filepath': os.path.join(mod_path, 'tests', profile_namespace),
+            'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(mod_name, profile_namespace),
+            'files': {},
+        }
+        tests = _discover_module_tests(mod_name, mod_data)
+        if tests:
+            module_data[mod_name] = tests
+
+
+    logger.info('\nIndependent Command Modules: %s', ', '.join([name for name, _ in independent_command_modules]))
+    for mod_name, mod_path in independent_command_modules:
         short_name = mod_name.replace(COMMAND_MODULE_PREFIX, '')
         mod_data = {
             'alt_name': short_name,
