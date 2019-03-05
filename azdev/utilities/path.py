@@ -109,7 +109,7 @@ def get_integrated_command_modules():
         os.path.join(cli_repo_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules', '*', '__init__.py')
     ))
 
-    return {os.path.basename(os.path.dirname(dir)):os.path.dirname(dir) for dir in module_paths}
+    return {os.path.basename(os.path.dirname(folder)): os.path.dirname(folder) for folder in module_paths}
 
 
 def get_path_table(include_only=None):
