@@ -21,7 +21,7 @@ def get_test_runner(parallel, log_path, last_failed):
             arguments.append('--lf')
         if pytest_args:
             arguments += pytest_args
-        cmd = 'pytest {}'.format(' '.join(arguments))
+        cmd = 'python -m pytest {}'.format(' '.join(arguments))
         logger.info('Running: %s', cmd)
         return call(cmd)
 
