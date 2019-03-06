@@ -54,16 +54,17 @@ setup(
         'flake8',
         'futures',
         'gitpython',
-        'knack~=0.5.1',
+        'knack>=0.5.3',
         'mock',
         'pytest>=3.6.0',
         'pytest-xdist',
+        'pyyaml',
         'requests',
         'tox'
     ],
     extras_require={
-        ":python_version<'3.0'": ['pylint~=1.9.2'],
-        ":python_version>='3.0'": ['pylint~=2.0.0']
+        ":python_version<'3.0'": ['pylint==1.9.2'],
+        ":python_version>='3.0'": ['pylint==2.0.0']
     },
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
