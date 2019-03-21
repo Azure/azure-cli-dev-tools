@@ -56,7 +56,7 @@ def run_linter(modules=None, rule_types=None, rules=None):
     for path in selected_mod_paths:
         exclusion_path = os.path.join(path, 'linter_exclusions.yml')
         if os.path.isfile(exclusion_path):
-            mod_exclusions = yaml.load(open(exclusion_path))
+            mod_exclusions = yaml.safe_load(open(exclusion_path))
             exclusions.update(mod_exclusions)
 
     start = time.time()
@@ -81,7 +81,7 @@ def run_linter(modules=None, rule_types=None, rules=None):
         # with a CLI or extension command name.
         if entry_name in azdev_helps and entry_name not in command_loader.command_table:
             continue
-        help_entry = yaml.load(help_yaml)
+        help_entry = yaml.safe_load(help_yaml)
         help_file_entries[entry_name] = help_entry
 
     # trim command table and help to just selected_modules

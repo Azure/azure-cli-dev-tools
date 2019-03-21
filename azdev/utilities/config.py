@@ -33,9 +33,10 @@ def get_azure_config_dir():
 
 
 def get_env_config_dir():
-    from azdev.utilities.const import ENV_VAR_VIRTUAL_ENV
+    from azdev.utilities import get_env_path, require_virtual_env
+    require_virtual_env()
     env_name = None
-    _, env_name = os.path.splitdrive(os.getenv(ENV_VAR_VIRTUAL_ENV))
+    _, env_name = os.path.splitdrive(get_env_path())
     if not env_name:
         raise CLIError('An active Python virtual environment is required.')
     azdev_config_dir = get_azdev_config_dir()

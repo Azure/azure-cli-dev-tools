@@ -11,10 +11,6 @@ import sys
 from knack.log import get_logger
 from knack.util import CommandResultItem
 
-from .const import ENV_VAR_VIRTUAL_ENV, IS_WINDOWS
-from .display import display
-
-
 logger = get_logger(__name__)
 
 
@@ -25,6 +21,7 @@ def call(command, **kwargs):
     :param kwargs: Any kwargs supported by subprocess.Popen
     :returns: (int) process exit code.
     """
+    from azdev.utilities import IS_WINDOWS
     return subprocess.call(
         command.split(),
         shell=IS_WINDOWS,
@@ -40,6 +37,8 @@ def cmd(command, message=False, show_stderr=True, **kwargs):
     :param kwargs: Any kwargs supported by subprocess.Popen
     :returns: CommandResultItem object.
     """
+    from azdev.utilities import IS_WINDOWS, display
+
     # use default message if custom not provided
     if message is True:
         message = 'Running: {}\n'.format(command)
@@ -67,7 +66,8 @@ def py_cmd(command, message=False, show_stderr=True, **kwargs):
     :param kwargs: Any kwargs supported by subprocess.Popen
     :returns: CommandResultItem object.
     """
-    env_path = os.environ.get(ENV_VAR_VIRTUAL_ENV, None)
+    from azdev.utilities import get_env_path
+    env_path = get_env_path()
     python_bin = sys.executable if not env_path else os.path.join(
         env_path, 'Scripts' if sys.platform == 'win32' else 'bin', 'python')
     command = '{} -m {}'.format(python_bin, command)

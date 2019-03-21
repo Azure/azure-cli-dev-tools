@@ -19,8 +19,8 @@ TOTAL_THRESHOLD = 300
 DEFAULT_THRESHOLD = 10
 THRESHOLDS = {
     # threshold value: num of exceptions allowed
-    50: 1,
-    30: 4
+    50: 2,
+    40: 3
 }
 
 
