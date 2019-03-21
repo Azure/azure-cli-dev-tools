@@ -95,4 +95,4 @@ class LinterError(Exception):
     """
     Exception thrown by linter for non rule violation reasons
     """
-    pass
+    pass  # pylint: disable=unnecessary-pass

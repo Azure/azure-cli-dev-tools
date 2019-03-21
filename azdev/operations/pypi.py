@@ -126,126 +126,7 @@ def _check_readme_render(mod_path):
 # endregion
 
 
-# region verify PyPI versions
-# def check_versions(modules=None, base_repo=None, base_tag=None):
-#     path_table = get_path_table(include_only=modules)
-#     selected_modules = list(path_table['core'].items()) + list(path_table['mod'].items())
-#     base_repo = base_repo or get_cli_repo_path()
-
-#     heading('Verify PyPI Verions')
-
-#     module_names = sorted([name for name, _ in selected_modules])
-#     display('Verifying PyPI versions for modules: {}'.format(' '.join(module_names)))
-
-#     failed_mods = []
-#     for name, path in selected_modules:
-#         errors = _check_package_version(name, path, base_repo=base_repo, base_tag=base_tag)
-#         if errors:
-#             failed_mods.append(name)
-#             subheading('{} errors'.format(name))
-#             for error in errors:
-#                 logger.error('%s\n', error)
-#     subheading('Results')
-#     if failed_mods:
-#         display('The following modules have invalid versions:')
-#         logger.error('\n'.join(failed_mods))
-#         logger.warning('See above for the full warning/errors')
-#         sys.exit(1)
-#     display('OK')
-
-
-# def check_versions_on_pypi(package_name, versions=None):
-#     """ Query PyPI for package versions.
-
-#     :param package_name: Name of the package on PyPI.
-#     :module_version: The version(s) to query. Omit to return all versions.
-#     :return [str] sorted list of version strings that match.
-#     """
-#     if isinstance(versions, str):
-#         versions = [versions]
-
-#     client = xmlrpclib.ServerProxy('https://pypi.python.org/pypi')
-#     available_versions = sorted(client.package_releases(package_name, True))
-#     if not versions:
-#         return available_versions
-#     return [v for v in available_versions if v in versions]
-
-
-# def _get_mod_version(mod_path):
-#     return cmd('python setup.py --version', cwd=mod_path).result
-
-
-# def _check_package_version(mod_name, mod_path, base_repo=None, base_tag=None):
-#     mod_version = _get_mod_version(mod_path)
-#     package_name = 'azure-cli-{}'.format(mod_name)
-#     errors = []
-#     errors.append(_is_unreleased_version(package_name, mod_version))
-#     #errors.append(_is_latest_version(package_name, mod_version))
-#     errors.append(_contains_no_plus_dev(mod_version))
-#     errors.append(_changes_require_version_bump(
-#        package_name, mod_version, mod_path, base_repo=base_repo, base_tag=base_tag))
-
-#     # filter out "None" results
-#     errors = [e for e in errors if e]
-#     return errors
-
-
-# def _is_unreleased_version(package_name, mod_version):
-#     if check_versions_on_pypi(package_name, mod_version):
-#         return '{} {} is already available on PyPI! Update the version.'.format(package_name, mod_version)
-
-
-# def _is_latest_version(package_name, mod_version):
-#     latest = check_versions_on_pypi(package_name)[-1]
-#     if mod_version != latest:
-#         return '{} {} is not the latest version on PyPI! Use version {}.'.format(package_name, mod_version, latest)
-
-
-# def _contains_no_plus_dev(mod_version):
-#     if '+dev' in mod_version:
-#         return "Version contains the invalid '+dev'. Actual version {}".format(mod_version)
-
-
-# def _changes_require_version_bump(package_name, mod_version, mod_path, base_repo=None, base_tag=None):
-#     revision_range = os.environ.get('TRAVIS_COMMIT_RANGE', None)
-#     if not revision_range:
-#         # Shoud not depend on CI! Must be able to run locally.
-#         # TRAVIS_COMMIT_RANGE looks like <ID>...<ID>
-#         pass
-#     error = None
-#     if revision_range:
-#         changes = cmd('git diff {} -- {} :(exclude)*/tests/*'.format(revision_range, mod_path)).result
-#         if changes:
-#             if check_versions_on_pypi(package_name, mod_version):
-#                 error = 'There are changes to {} and the current version {} is already available on PyPI! '
-#                         'Bump the version.'.format(package_name, mod_version)
-#             elif base_repo and _version_in_base_repo(base_repo, mod_path, package_name, mod_version):
-#                 error = 'There are changes to {} and the current version {} is already used at tag {}. '
-#                         'Bump the version.'.format(package_name, mod_version, base_tag)
-#             error += '\nChanges are as follows:'
-#             error += changes
-#     return error
-
-
-# def _version_in_base_repo(base_repo, mod_path, package_name, mod_version):
-#     cli_path = get_cli_repo_path()
-#     base_repo_mod_path = mod_path.replace(cli_path, base_repo)
-#     try:
-#         if mod_version == _get_mod_version(base_repo_mod_path):
-#             logger.error('Version %s of %s is already used in the base repo.', mod_version, package_name)
-#             return True
-#     except FileNotFoundError:
-#         logger.warning('Module %s not in base repo. Skipping...', package_name)
-#     except Exception as ex:
-#         # warning if unable to get module from base version (e.g. mod didn't exist there)
-#         logger.warning('Warning: Unable to get module version from base repo... skipping...')
-#         logger.warning(str(ex))
-#     return False
-# endregion
-
-
 def update_setup_py(pin=False):
-
     require_azure_cli()
 
     heading('Update azure-cli setup.py')
@@ -277,7 +158,7 @@ def verify_versions(modules=None, update=False, pin=False):
     usage_err = CLIError('usage error: <MODULES> | --update [--pin]')
     if modules and (update or pin):
         raise usage_err
-    elif not modules and pin and not update:
+    if not modules and pin and not update:
         raise usage_err
 
     if modules:
@@ -321,10 +202,12 @@ def verify_versions(modules=None, update=False, pin=False):
                        'running `git clean` to remove untracked files from your repo. '
                        'Files that were once tracked but removed from the source may '
                        'still be on your machine, resuling in false positives.')
+        sys.exit(1)
     elif mismatch_mods and not update:
         logger.error('The following modules have a mismatch between the module version '
                      'and the version in azure-cli\'s setup.py file. '
                      'Scroll up for details: %s', ', '.join(mismatch_mods.keys()))
+        sys.exit(1)
     else:
         display('OK!')
 

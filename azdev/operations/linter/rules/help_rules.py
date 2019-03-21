@@ -38,7 +38,7 @@ def unrecognized_help_entry_rule(linter, help_entry):
 def faulty_help_type_rule(linter, help_entry):
     if linter.get_help_entry_type(help_entry) != 'group' and help_entry in linter.command_groups:
         raise RuleError('Command-group should be of help-type `group`')
-    elif linter.get_help_entry_type(help_entry) != 'command' and help_entry in linter.commands:
+    if linter.get_help_entry_type(help_entry) != 'command' and help_entry in linter.commands:
         raise RuleError('Command should be of help-type `command`')
 
 
@@ -76,14 +76,14 @@ def faulty_help_example_parameters_rule(linter, help_entry):
     for example in linter.get_help_entry_examples(help_entry):
         supported_profiles = example.get('supported-profiles')
         if supported_profiles and 'latest' not in supported_profiles:
-            logger.warning("\n\tSKIPPING example: {}\n\tas 'latest' is not in its supported profiles."
-                           "\n\t\tsupported-profiles: {}.".format(example['text'], example['supported-profiles']))
+            logger.warning("\n\tSKIPPING example: %s\n\tas 'latest' is not in its supported profiles."
+                           "\n\t\tsupported-profiles: %s.", example['text'], example['supported-profiles'])
             continue
 
         unsupported_profiles = example.get('unsupported-profiles')
         if unsupported_profiles and 'latest' in unsupported_profiles:
-            logger.warning("\n\tSKIPPING example: {}\n\tas 'latest' is in its unsupported profiles."
-                           "\n\t\tunsupported-profiles: {}.".format(example['text'], example['unsupported-profiles']))
+            logger.warning("\n\tSKIPPING example: %s\n\tas 'latest' is in its unsupported profiles."
+                           "\n\t\tunsupported-profiles: %s.", example['text'], example['unsupported-profiles'])
             continue
 
         example_text = example.get('text', '')

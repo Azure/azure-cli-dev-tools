@@ -246,7 +246,7 @@ class RuleError(Exception):
     """
     Exception thrown by rule violation
     """
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 class LinterScope(object):

@@ -64,7 +64,7 @@ setup(
     ],
     extras_require={
         ":python_version<'3.0'": ['pylint==1.9.2'],
-        ":python_version>='3.0'": ['pylint==2.0.0']
+        ":python_version>='3.0'": ['pylint==2.3.0']
     },
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],

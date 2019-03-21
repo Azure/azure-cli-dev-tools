@@ -9,7 +9,20 @@ from glob import glob
 
 from knack.util import CLIError
 
-from .const import COMMAND_MODULE_PREFIX, EXTENSION_PREFIX
+from .const import COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, ENV_VAR_VIRTUAL_ENV
+
+
+def get_env_path():
+    """ Returns the path to the current virtual environment.
+
+    :returns: Path (str) to the virtual env or None.
+    """
+    env_path = None
+    for item in ENV_VAR_VIRTUAL_ENV:
+        env_path = os.environ.get(item)
+        if env_path:
+            break
+    return env_path
 
 
 def get_azdev_repo_path():
