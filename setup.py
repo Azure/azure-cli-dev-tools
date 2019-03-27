@@ -60,7 +60,8 @@ setup(
         'pytest-xdist',
         'pyyaml',
         'requests',
-        'tox'
+        'tox',
+        'wheel==0.30.0'
     ],
     extras_require={
         ":python_version<'3.0'": ['pylint==1.9.2'],
