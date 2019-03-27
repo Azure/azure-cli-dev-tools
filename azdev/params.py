@@ -21,6 +21,7 @@ def load_arguments(self, _):
     with ArgumentsContext(self, '') as c:
         c.argument('modules', options_list=['--modules', '-m'], nargs='+', help='Space-separated list of modules to check. Omit to check all.')
         c.argument('private', action='store_true', help='Target the private repo.')
+        c.argument('yes', options_list=['--yes', '-y'], action='store_true', help='Answer "yes" to all prompts.')
 
     with ArgumentsContext(self, 'setup') as c:
         c.argument('cli_path', options_list=['--cli', '-c'], nargs='?', const=Flag, help='Path to an existing Azure CLI repo. Omit value to search for the repo.')
@@ -64,7 +65,18 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')
 
-    for scope in ['extension add', 'extension remove']:
+    with ArgumentsContext(self, 'extension') as c:
+        c.argument('dist_dir', help='Name of a directory in which to save the resulting WHL files.')
+
+    with ArgumentsContext(self, 'extension publish') as c:
+        c.argument('update_index', action='store_true', help='Update the index.json file after publishing is complete.')
+
+    with ArgumentsContext(self, 'extension publish') as c:
+        c.argument('storage_account', help='Name of the storage account to publish to.', arg_group='Storage', configured_default='storage_account')
+        c.argument('storage_container', help='Name of the storage container to publish to.', arg_group='Storage', configured_default='storage_container')
+        c.argument('storage_subscription', help='Subscription ID of the storage account.', arg_group='Storage', configured_default='storage_subscription')
+
+    for scope in ['extension add', 'extension remove', 'extension build', 'extension publish']:
         with ArgumentsContext(self, scope) as c:
             c.positional('extensions', metavar='NAME', nargs='+', help='Space-separated list of extension names.')
 
@@ -73,11 +85,4 @@ def load_arguments(self, _):
             c.positional('repos', metavar='PATH', nargs='+', help='Space-separated list of paths to Git repositories.')
 
     with ArgumentsContext(self, 'extension update-index') as c:
-        c.positional('extension', metavar='URL', help='URL to an extension WHL file.')
-
-    with ArgumentsContext(self, 'group delete') as c:
-        c.argument('product', help='Value for tag `product` to mark for deletion.', arg_group='Tag')
-        c.argument('older_than', type=int, help='Minimum age (in hours) for tag `date` to mark for deletion.', arg_group='Tag')
-        c.argument('cause', help='Value for tag `cause` to mark for deletion.', arg_group='Tag')
-        c.argument('yes', options_list=['--yes', '-y'], help='Do not prompt.')
-        c.argument('prefixes', options_list=['--prefixes', '-p'], nargs='+', help='Space-separated list of prefixes to filter by.')
+        c.positional('extensions', nargs='+', metavar='URL', help='Space-separated list of URLs to extension WHL files.')
