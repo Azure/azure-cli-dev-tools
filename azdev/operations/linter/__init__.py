@@ -26,7 +26,7 @@ logger = get_logger(__name__)
 
 
 # pylint:disable=too-many-locals
-def run_linter(modules=None, rule_types=None, rules=None):
+def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None):
 
     require_azure_cli()
 
@@ -96,7 +96,8 @@ def run_linter(modules=None, rule_types=None, rules=None):
                                    help_file_entries=help_file_entries,
                                    loaded_help=loaded_help,
                                    exclusions=exclusions,
-                                   rule_inclusions=rules)
+                                   rule_inclusions=rules,
+                                   use_ci_exclusions=ci_exclusions)
 
     subheading('Results')
     logger.info('Running linter: %i commands, %i help entries',
