@@ -144,7 +144,7 @@ class Linter(object):
 # pylint: disable=too-many-instance-attributes
 class LinterManager(object):
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, exclusions=None,
-                 rule_inclusions=None):
+                 rule_inclusions=None, use_ci_exclusions=None):
         self.linter = Linter(command_loader=command_loader, help_file_entries=help_file_entries,
                              loaded_help=loaded_help)
         self._exclusions = exclusions or {}
@@ -160,7 +160,7 @@ class LinterManager(object):
         self._command_loader = command_loader
         self._help_file_entries = help_file_entries
         self._exit_code = 0
-        self._ci = False
+        self._ci = use_ci_exclusions if use_ci_exclusions is not None else os.environ.get('CI', False)
 
     def add_rule(self, rule_type, rule_name, rule_callable):
         include_rule = not self._rule_inclusions or rule_name in self._rule_inclusions
@@ -189,7 +189,6 @@ class LinterManager(object):
         return self._exit_code
 
     def run(self, run_params=None, run_commands=None, run_command_groups=None, run_help_files_entries=None):
-        self._ci = os.environ.get('CI', False)
         paths = import_module('{}.rules'.format(PACAKGE_NAME)).__path__
 
         if paths:

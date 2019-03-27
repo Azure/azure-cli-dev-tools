@@ -59,6 +59,7 @@ def load_arguments(self, _):
         c.positional('modules', nargs='*', help='Space-separated list of modules or extensions to check.')
         c.argument('rules', options_list=['--rules', '-r'], nargs='+', help='Space-separated list of rules to run. Omit to run all rules.')
         c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries'], help='Space-separated list of rule types to run. Omit to run all.')
+        c.argument('ci_exclusions', action='store_true', help='Force application of CI exclusions list when run locally.')
 
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')
