@@ -23,7 +23,6 @@ WHEEL_INFO_RE = re.compile(
 
 def _get_extension_modname(ext_dir):
     # Modification of https://github.com/Azure/azure-cli/blob/dev/src/azure-cli-core/azure/cli/core/extension.py#L153
-    print(list(os.listdir(ext_dir)))
     pos_mods = [n for n in os.listdir(ext_dir)
                 if n.startswith(EXTENSION_PREFIX) and os.path.isdir(os.path.join(ext_dir, n))]
     if len(pos_mods) != 1:
@@ -76,9 +75,7 @@ def get_whl_from_url(url, filename, tmp_dir, whl_cache=None):
         assert r.status_code == 200, "Request to {} failed with {}".format(url, r.status_code)
     except AssertionError:
         raise CLIError("unable to download (status code {}): {}".format(r.status_code, url))
-    print(filename)
     ext_file = os.path.join(tmp_dir, filename)
-    print(ext_file)
     with open(ext_file, 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024):
             if chunk:  # ignore keep-alive new chunks

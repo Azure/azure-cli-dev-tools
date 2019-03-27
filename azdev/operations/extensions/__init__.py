@@ -164,7 +164,6 @@ def list_extension_repos():
 
 
 def update_extension_index(extensions):
-    import json
     import re
     import tempfile
 
@@ -238,11 +237,15 @@ def build_extensions(extensions, dist_dir='dist'):
     if extensions:
         raise CLIError('extension(s) not found: {}'.format(' '.join(extensions)))
 
+    original_cwd = os.getcwd()
+    dist_dir = os.path.join(original_cwd, dist_dir)
     for path in paths_to_build:
-        command = '{} bdist_wheel -b bdist -d {}'.format(os.path.join(path, 'setup.py'), dist_dir)
+        os.chdir(path)
+        command = 'setup.py bdist_wheel -b bdist -d {} --universal'.format(dist_dir)
         result = py_cmd(command, "Building extension '{}'...".format(path), is_module=False)
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
+    os.chdir(original_cwd)
 
 
 def publish_extensions(extensions, storage_subscription=None, storage_account=None, storage_container=None,
@@ -257,7 +260,7 @@ def publish_extensions(extensions, storage_subscription=None, storage_account=No
     try:
         shutil.rmtree(dist_dir)
     except Exception as ex:  # pylint: disable=broad-except
-        logger.error("Unable to clear folder '%s'. Error: %s", dist_dir, ex)
+        logger.debug("Unable to clear folder '%s'. Error: %s", dist_dir, ex)
     build_extensions(extensions, dist_dir=dist_dir)
 
     whl_files = find_files(dist_dir, '*.whl')
@@ -282,7 +285,7 @@ def publish_extensions(extensions, storage_subscription=None, storage_account=No
             storage_subscription, storage_account, storage_container, whl_file, os.path.abspath(whl_path))
         cmd(command, "Uploading '{}'...".format(whl_file))
         command = 'az storage blob url --subscription {} --account-name {} -c {} -n {} -otsv'.format(
-                storage_subscription, storage_account, storage_container, whl_file)
+            storage_subscription, storage_account, storage_container, whl_file)
         url = cmd(command).result
         logger.info(url)
         uploaded_urls.append(url)

@@ -16,6 +16,7 @@ class Flag(object):
     pass
 
 
+# pylint: disable=too-many-statements
 def load_arguments(self, _):
 
     with ArgumentsContext(self, '') as c:
