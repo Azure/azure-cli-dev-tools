@@ -220,7 +220,10 @@ def _discover_tests(profile):
     logger.info('\nExtensions: %s', ', '.join([name for name, _ in extensions]))
     for mod_name, mod_path in extensions:
         glob_pattern = os.path.normcase(os.path.join('{}*'.format(EXTENSION_PREFIX)))
-        filepath = glob.glob(os.path.join(mod_path, glob_pattern))[0]
+        try:
+            filepath = glob.glob(os.path.join(mod_path, glob_pattern))[0]
+        except IndexError:
+            logger.debug("No extension found at: %s", os.path.join(mod_path, glob_pattern))
         import_name = os.path.basename(filepath)
         mod_data = {
             'alt_name': os.path.split(filepath)[1],
