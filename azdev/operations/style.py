@@ -14,7 +14,7 @@ from knack.util import CLIError, CommandResultItem
 
 from azdev.utilities import (
     display, heading, subheading, py_cmd, get_path_table, EXTENSION_PREFIX,
-    get_env_config_dir, require_azure_cli)
+    get_azdev_config_dir, require_azure_cli)
 
 
 logger = get_logger(__name__)
@@ -116,7 +116,7 @@ def _run_pylint(modules):
     def run(paths, rcfile, desc):
         if not paths:
             return None
-        config_path = os.path.join(get_env_config_dir(), 'config_files', rcfile)
+        config_path = os.path.join(get_azdev_config_dir(), 'config_files', rcfile)
         logger.info('Using rcfile file: %s', config_path)
         logger.info('Running on %s: %s', desc, ' '.join(paths))
         command = 'pylint {} --ignore vendored_sdks,privates --rcfile={} -j {}'.format(
@@ -138,7 +138,7 @@ def _run_pep8(modules):
     def run(paths, config_file, desc):
         if not paths:
             return None
-        config_path = os.path.join(get_env_config_dir(), 'config_files', config_file)
+        config_path = os.path.join(get_azdev_config_dir(), 'config_files', config_file)
         logger.info('Using config file: %s', config_path)
         logger.info('Running on %s: %s', desc, ' '.join(paths))
         command = 'flake8 --statistics --append-config={} {}'.format(

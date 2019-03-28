@@ -15,8 +15,8 @@ from knack.prompting import prompt_y_n
 from knack.util import CLIError
 
 from azdev.utilities import (
-    cmd, py_cmd, pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_env_config,
-    require_azure_cli, heading, subheading)
+    cmd, py_cmd, pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_azdev_config,
+    require_azure_cli, heading, subheading, EXTENSION_PREFIX)
 
 logger = get_logger(__name__)
 
@@ -95,6 +95,7 @@ def _get_installed_dev_extensions(dev_sources):
 
 
 def list_extensions():
+    from glob import glob
 
     azure_config = get_azure_config()
     dev_sources = azure_config.get('extension', 'dev_sources', None)
@@ -105,12 +106,19 @@ def list_extensions():
     results = []
 
     for ext_path in find_files(dev_sources, 'setup.py'):
+        # skip non-extension packages that may be in the extension folder (for example, from a virtual environment)
+        try:
+            glob_pattern = os.path.join(os.path.split(ext_path)[0], '{}*'.format(EXTENSION_PREFIX))
+            _ = glob(glob_pattern)[0]
+        except IndexError:
+            continue
+
         folder = os.path.dirname(ext_path)
         long_name = os.path.basename(folder)
         if long_name not in installed_names:
-            results.append({'name': long_name, 'inst': '', 'path': folder})
+            results.append({'name': long_name, 'install': '', 'path': folder})
         else:
-            results.append({'name': long_name, 'inst': 'Y', 'path': folder})
+            results.append({'name': long_name, 'install': 'Installed', 'path': folder})
     return results
 
 
@@ -126,7 +134,7 @@ def add_extension_repo(repos):
 
     from azdev.operations.setup import _check_repo
     az_config = get_azure_config()
-    env_config = get_env_config()
+    env_config = get_azdev_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
     dev_sources = dev_sources.split(',') if dev_sources else []
     for repo in repos:
@@ -143,7 +151,7 @@ def add_extension_repo(repos):
 def remove_extension_repo(repos):
 
     az_config = get_azure_config()
-    env_config = get_env_config()
+    env_config = get_azdev_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
     dev_sources = dev_sources.split(',') if dev_sources else []
     for repo in repos:
@@ -248,7 +256,7 @@ def build_extensions(extensions, dist_dir='dist'):
     os.chdir(original_cwd)
 
 
-def publish_extensions(extensions, storage_subscription=None, storage_account=None, storage_container=None,
+def publish_extensions(extensions, storage_subscription, storage_account, storage_container,
                        dist_dir='dist', update_index=False, yes=False):
 
     heading('Publish Extensions')
@@ -293,3 +301,8 @@ def publish_extensions(extensions, storage_subscription=None, storage_account=No
     if update_index:
         subheading('Updating Index')
         update_extension_index(uploaded_urls)
+
+    subheading('Published')
+    display(uploaded_urls)
+    if not update_index:
+        logger.warning('You still need to update the index for your changes with `az extension update-index`.')

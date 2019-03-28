@@ -54,7 +54,7 @@ setup(
         'flake8',
         'futures',
         'gitpython',
-        'knack>=0.5.3',
+        'knack>=0.5.4',
         'mock',
         'pytest>=3.6.0',
         'pytest-xdist',
