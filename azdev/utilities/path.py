@@ -42,9 +42,9 @@ def get_cli_repo_path():
     :returns: Path (str) to Azure CLI repo.
     """
     from configparser import NoSectionError
-    from .config import get_env_config
+    from .config import get_azdev_config
     try:
-        return get_env_config().get('cli', 'repo_path')
+        return get_azdev_config().get('cli', 'repo_path')
     except NoSectionError:
         raise CLIError('Unable to retrieve CLI repo path from config. Please run `azdev setup`.')
 
@@ -55,9 +55,9 @@ def get_ext_repo_paths():
     :returns: Path (str) to Azure CLI dev extension repos.
     """
     from configparser import NoSectionError
-    from .config import get_env_config
+    from .config import get_azdev_config
     try:
-        return get_env_config().get('ext', 'repo_paths').split(',')
+        return get_azdev_config().get('ext', 'repo_paths').split(',')
     except NoSectionError:
         raise CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup`.')
 

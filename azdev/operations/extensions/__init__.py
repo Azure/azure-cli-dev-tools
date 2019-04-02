@@ -5,14 +5,18 @@
 # -----------------------------------------------------------------------------
 
 from collections import OrderedDict
+import json
 import os
 import shutil
+import sys
 
 from knack.log import get_logger
+from knack.prompting import prompt_y_n
 from knack.util import CLIError
 
 from azdev.utilities import (
-    pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_env_config, require_azure_cli)
+    cmd, py_cmd, pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_azdev_config,
+    require_azure_cli, heading, subheading, EXTENSION_PREFIX)
 
 logger = get_logger(__name__)
 
@@ -91,6 +95,7 @@ def _get_installed_dev_extensions(dev_sources):
 
 
 def list_extensions():
+    from glob import glob
 
     azure_config = get_azure_config()
     dev_sources = azure_config.get('extension', 'dev_sources', None)
@@ -101,12 +106,19 @@ def list_extensions():
     results = []
 
     for ext_path in find_files(dev_sources, 'setup.py'):
+        # skip non-extension packages that may be in the extension folder (for example, from a virtual environment)
+        try:
+            glob_pattern = os.path.join(os.path.split(ext_path)[0], '{}*'.format(EXTENSION_PREFIX))
+            _ = glob(glob_pattern)[0]
+        except IndexError:
+            continue
+
         folder = os.path.dirname(ext_path)
         long_name = os.path.basename(folder)
         if long_name not in installed_names:
-            results.append({'name': long_name, 'inst': '', 'path': folder})
+            results.append({'name': long_name, 'install': '', 'path': folder})
         else:
-            results.append({'name': long_name, 'inst': 'Y', 'path': folder})
+            results.append({'name': long_name, 'install': 'Installed', 'path': folder})
     return results
 
 
@@ -122,7 +134,7 @@ def add_extension_repo(repos):
 
     from azdev.operations.setup import _check_repo
     az_config = get_azure_config()
-    env_config = get_env_config()
+    env_config = get_azdev_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
     dev_sources = dev_sources.split(',') if dev_sources else []
     for repo in repos:
@@ -139,7 +151,7 @@ def add_extension_repo(repos):
 def remove_extension_repo(repos):
 
     az_config = get_azure_config()
-    env_config = get_env_config()
+    env_config = get_azdev_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
     dev_sources = dev_sources.split(',') if dev_sources else []
     for repo in repos:
@@ -159,8 +171,7 @@ def list_extension_repos():
     return dev_sources.split(',') if dev_sources else dev_sources
 
 
-def update_extension_index(extension):
-    import json
+def update_extension_index(extensions):
     import re
     import tempfile
 
@@ -175,43 +186,123 @@ def update_extension_index(extension):
 
     NAME_REGEX = r'.*/([^/]*)-\d+.\d+.\d+'
 
-    # Get extension WHL from URL
-    if not extension.endswith('.whl') or not extension.startswith('https:'):
-        raise ValueError('usage error: only URL to a WHL file currently supported.')
+    for extension in extensions:
+        # Get extension WHL from URL
+        if not extension.endswith('.whl') or not extension.startswith('https:'):
+            raise ValueError('usage error: only URL to a WHL file currently supported.')
 
-    # TODO: extend to consider other options
-    ext_path = extension
+        # TODO: extend to consider other options
+        ext_path = extension
 
-    # Extract the extension name
+        # Extract the extension name
+        try:
+            extension_name = re.findall(NAME_REGEX, ext_path)[0]
+            extension_name = extension_name.replace('_', '-')
+        except IndexError:
+            raise ValueError('unable to parse extension name')
+
+        # TODO: Update this!
+        extensions_dir = tempfile.mkdtemp()
+        ext_dir = tempfile.mkdtemp(dir=extensions_dir)
+        whl_cache_dir = tempfile.mkdtemp()
+        whl_cache = {}
+        ext_file = get_whl_from_url(ext_path, extension_name, whl_cache_dir, whl_cache)
+
+        with open(index_path, 'r') as infile:
+            curr_index = json.loads(infile.read())
+
+        entry = {
+            'downloadUrl': ext_path,
+            'sha256Digest': _get_sha256sum(ext_file),
+            'filename': ext_path.split('/')[-1],
+            'metadata': get_ext_metadata(ext_dir, ext_file, extension_name)
+        }
+
+        if extension_name not in curr_index['extensions'].keys():
+            logger.info("Adding '%s' to index...", extension_name)
+            curr_index['extensions'][extension_name] = [entry]
+        else:
+            logger.info("Updating '%s' in index...", extension_name)
+            curr_index['extensions'][extension_name].append(entry)
+
+        # update index and write back to file
+        with open(os.path.join(index_path), 'w') as outfile:
+            outfile.write(json.dumps(curr_index, indent=4, sort_keys=True))
+
+
+def build_extensions(extensions, dist_dir='dist'):
+    ext_paths = get_ext_repo_paths()
+    all_extensions = find_files(ext_paths, 'setup.py')
+
+    paths_to_build = []
+    for path in all_extensions:
+        folder = os.path.dirname(path)
+        long_name = os.path.basename(folder)
+        if long_name in extensions:
+            paths_to_build.append(folder)
+            extensions.remove(long_name)
+    # raise error if any extension wasn't found
+    if extensions:
+        raise CLIError('extension(s) not found: {}'.format(' '.join(extensions)))
+
+    original_cwd = os.getcwd()
+    dist_dir = os.path.join(original_cwd, dist_dir)
+    for path in paths_to_build:
+        os.chdir(path)
+        command = 'setup.py bdist_wheel -b bdist -d {} --universal'.format(dist_dir)
+        result = py_cmd(command, "Building extension '{}'...".format(path), is_module=False)
+        if result.error:
+            raise result.error  # pylint: disable=raising-bad-type
+    os.chdir(original_cwd)
+
+
+def publish_extensions(extensions, storage_subscription, storage_account, storage_container,
+                       dist_dir='dist', update_index=False, yes=False):
+
+    heading('Publish Extensions')
+
+    require_azure_cli()
+
+    # rebuild the extensions
+    subheading('Building WHLs')
     try:
-        extension_name = re.findall(NAME_REGEX, ext_path)[0]
-        extension_name = extension_name.replace('_', '-')
-    except IndexError:
-        raise ValueError('unable to parse extension name')
+        shutil.rmtree(dist_dir)
+    except Exception as ex:  # pylint: disable=broad-except
+        logger.debug("Unable to clear folder '%s'. Error: %s", dist_dir, ex)
+    build_extensions(extensions, dist_dir=dist_dir)
 
-    extensions_dir = tempfile.mkdtemp()
-    ext_dir = tempfile.mkdtemp(dir=extensions_dir)
-    whl_cache_dir = tempfile.mkdtemp()
-    whl_cache = {}
-    ext_file = get_whl_from_url(ext_path, extension_name, whl_cache_dir, whl_cache)
+    whl_files = find_files(dist_dir, '*.whl')
+    uploaded_urls = []
 
-    with open(index_path, 'r') as infile:
-        curr_index = json.loads(infile.read())
+    subheading('Uploading WHLs')
+    for whl_path in whl_files:
+        whl_file = os.path.split(whl_path)[-1]
+        # check if extension already exists unless user opted not to
+        if not yes:
+            command = 'az storage blob exists --subscription {} --account-name {} -c {} -n {}'.format(
+                storage_subscription, storage_account, storage_container, whl_file)
+            exists = json.loads(cmd(command).result)['exists']
+            if exists:
+                if not prompt_y_n(
+                        "{} already exists. You may need to bump the extension version. Replace?".format(whl_file),
+                        default='n'):
+                    logger.warning("Skipping '%s'...", whl_file)
+                    continue
+        # upload the WHL file
+        command = 'az storage blob upload --subscription {} --account-name {} -c {} -n {} -f {}'.format(
+            storage_subscription, storage_account, storage_container, whl_file, os.path.abspath(whl_path))
+        cmd(command, "Uploading '{}'...".format(whl_file))
+        command = 'az storage blob url --subscription {} --account-name {} -c {} -n {} -otsv'.format(
+            storage_subscription, storage_account, storage_container, whl_file)
+        url = cmd(command).result
+        logger.info(url)
+        uploaded_urls.append(url)
 
-    entry = {
-        'downloadUrl': ext_path,
-        'sha256Digest': _get_sha256sum(ext_file),
-        'filename': ext_path.split('/')[-1],
-        'metadata': get_ext_metadata(ext_dir, ext_file, extension_name)
-    }
+    if update_index:
+        subheading('Updating Index')
+        update_extension_index(uploaded_urls)
 
-    if extension_name not in curr_index['extensions'].keys():
-        logger.info("Adding '%s' to index...", extension_name)
-        curr_index['extensions'][extension_name] = [entry]
-    else:
-        logger.info("Updating '%s' in index...", extension_name)
-        curr_index['extensions'][extension_name].append(entry)
-
-    # update index and write back to file
-    with open(os.path.join(index_path), 'w') as outfile:
-        outfile.write(json.dumps(curr_index, indent=4, sort_keys=True))
+    subheading('Published')
+    display(uploaded_urls)
+    if not update_index:
+        logger.warning('You still need to update the index for your changes with `az extension update-index`.')

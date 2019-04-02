@@ -57,12 +57,13 @@ def cmd(command, message=False, show_stderr=True, **kwargs):
         return CommandResultItem(err.output, exit_code=err.returncode, error=err)
 
 
-def py_cmd(command, message=False, show_stderr=True, **kwargs):
+def py_cmd(command, message=False, show_stderr=True, is_module=True, **kwargs):
     """ Run a script or command with Python.
 
     :param command: The arguments to run python with.
     :param message: A custom message to display, or True (bool) to use a default.
     :param show_stderr: On error, display the contents of STDERR.
+    :param is_module: Run a Python module as a script with -m.
     :param kwargs: Any kwargs supported by subprocess.Popen
     :returns: CommandResultItem object.
     """
@@ -70,7 +71,10 @@ def py_cmd(command, message=False, show_stderr=True, **kwargs):
     env_path = get_env_path()
     python_bin = sys.executable if not env_path else os.path.join(
         env_path, 'Scripts' if sys.platform == 'win32' else 'bin', 'python')
-    command = '{} -m {}'.format(python_bin, command)
+    if is_module:
+        command = '{} -m {}'.format(python_bin, command)
+    else:
+        command = '{} {}'.format(python_bin, command)
     return cmd(command, message, show_stderr, **kwargs)
 
 

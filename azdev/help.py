@@ -169,6 +169,11 @@ helps['extension add'] = """
 """
 
 
+helps['extension build'] = """
+    short-summary: Construct a WHL file for one or more extensions.
+"""
+
+
 helps['extension remove'] = """
     short-summary: Make an extension no longer visible to the development environment.
     long-summary: This does not remove the extensions source code from your machine.
@@ -178,6 +183,12 @@ helps['extension remove'] = """
 helps['extension list'] = """
     short-summary: List what extensions are currently visible to your development environment.
 """
+
+
+helps['extension publish'] = """
+    short-summary: Build and publish an extension to a storage account.
+"""
+
 
 helps['extension update-index'] = """
     short-summary: Update the extensions index.json from a built WHL file.

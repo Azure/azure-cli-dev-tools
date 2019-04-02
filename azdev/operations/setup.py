@@ -17,7 +17,7 @@ from azdev.operations.extensions import (
 from azdev.params import Flag
 from azdev.utilities import (
     display, heading, subheading, pip_cmd, find_file, get_path_table,
-    get_env_config_dir, get_env_config, require_virtual_env, get_azure_config)
+    get_azdev_config_dir, get_azdev_config, require_virtual_env, get_azure_config)
 
 logger = get_logger(__name__)
 
@@ -132,7 +132,7 @@ def _copy_config_files():
 
     config_mod = import_module('azdev.config')
     config_dir_path = config_mod.__dict__['__path__'][0]
-    dest_path = os.path.join(get_env_config_dir(), 'config_files')
+    dest_path = os.path.join(get_azdev_config_dir(), 'config_files')
     if os.path.exists(dest_path):
         rmtree(dest_path)
     copytree(config_dir_path, dest_path)
@@ -277,7 +277,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None):
     dev_sources = get_azure_config().get('extension', 'dev_sources', None)
 
     # save data to config files
-    config = get_env_config()
+    config = get_azdev_config()
     config.set_value('ext', 'repo_paths', dev_sources if dev_sources else '_NONE_')
     config.set_value('cli', 'repo_path', cli_path if cli_path else '_NONE_')
 

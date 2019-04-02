@@ -9,3 +9,4 @@ src/azdev.egg-info/*
 azdev.egg-info/
 .tox/
 *.idea
+pip-wheel-metadata/*

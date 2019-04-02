@@ -7,7 +7,6 @@
 import os
 
 from knack.config import CLIConfig
-from knack.util import CLIError
 
 
 def get_azdev_config():
@@ -18,27 +17,17 @@ def get_azure_config():
     return CLIConfig(config_dir=get_azure_config_dir(), config_env_var_prefix='AZURE')
 
 
-def get_env_config():
-    return CLIConfig(config_dir=get_env_config_dir(), config_env_var_prefix='AZDEV')
-
-
 def get_azdev_config_dir():
     """ Returns the user's .azdev directory. """
-    return os.getenv('AZDEV_CONFIG_DIR', None) or os.path.expanduser(os.path.join('~', '.azdev'))
+    from azdev.utilities import get_env_path
+    env_name = None
+    _, env_name = os.path.splitdrive(get_env_path())
+    azdev_dir = os.getenv('AZDEV_CONFIG_DIR', None) or os.path.expanduser(os.path.join('~', '.azdev'))
+    if not env_name:
+        return azdev_dir
+    return os.path.join(azdev_dir, 'env_config') + env_name
 
 
 def get_azure_config_dir():
     """ Returns the user's Azure directory. """
     return os.getenv('AZURE_CONFIG_DIR', None) or os.path.expanduser(os.path.join('~', '.azure'))
-
-
-def get_env_config_dir():
-    from azdev.utilities import get_env_path, require_virtual_env
-    require_virtual_env()
-    env_name = None
-    _, env_name = os.path.splitdrive(get_env_path())
-    if not env_name:
-        raise CLIError('An active Python virtual environment is required.')
-    azdev_config_dir = get_azdev_config_dir()
-    config_dir = os.path.join(azdev_config_dir, 'env_config') + env_name
-    return config_dir
