@@ -62,8 +62,12 @@ def _install_modules():
 
 def _install_extensions(ext_paths):
     # clear pre-existing dev extensions
-    installed_extensions = [x['name'] for x in list_extensions() if x['install'] == 'Y']
-    remove_extension(installed_extensions)
+    try:
+        installed_extensions = [x['name'] for x in list_extensions() if x['install'] == 'Y']
+        remove_extension(installed_extensions)
+    except KeyError as ex:
+        logger.warning('Error occurred determining installed extensions. Run with --debug for more info.')
+        logger.debug(ex)
 
     # install specified extensions
     for path in ext_paths or []:
