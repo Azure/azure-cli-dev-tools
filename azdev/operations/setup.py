@@ -62,7 +62,7 @@ def _install_modules():
 
 def _install_extensions(ext_paths):
     # clear pre-existing dev extensions
-    installed_extensions = [x['name'] for x in list_extensions() if x['inst'] == 'Y']
+    installed_extensions = [x['name'] for x in list_extensions() if x['install'] == 'Y']
     remove_extension(installed_extensions)
 
     # install specified extensions
