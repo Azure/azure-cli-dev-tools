@@ -174,13 +174,14 @@ def verify_versions(modules=None, update=False, pin=False):
 
     display('MODULES: {}'.format(', '.join([x[0] for x in modules])))
 
-    results = {mod[0]: {} for mod in modules}
+    results = {}
 
     original_cwd = os.getcwd()
     temp_dir = tempfile.mkdtemp()
     for mod, mod_path in modules:
         if not mod.startswith(COMMAND_MODULE_PREFIX) and mod != 'azure-cli':
             mod = '{}{}'.format(COMMAND_MODULE_PREFIX, mod)
+        results[mod] = {}
         results.update(_compare_module_against_pypi(results, temp_dir, mod, mod_path))
 
     shutil.rmtree(temp_dir)

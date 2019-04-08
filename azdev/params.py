@@ -87,3 +87,6 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'extension update-index') as c:
         c.positional('extensions', nargs='+', metavar='URL', help='Space-separated list of URLs to extension WHL files.')
+
+    with ArgumentsContext(self, 'cli check-versions') as c:
+        c.positional('modules', nargs='*', help='Space-separated list of modules to check.')

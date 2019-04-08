@@ -12,16 +12,16 @@ from setuptools import setup
 
 __VERSION__ = '0.0.5'
 
-
-def read(fname):
-    """Local read helper function for long documentation"""
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
+with open('README.rst', 'r', encoding='utf-8') as f:
+    README = f.read()
+with open('HISTORY.rst', 'r', encoding='utf-8') as f:
+    HISTORY = f.read()
 
 setup(
     name='azdev',
     version=__VERSION__,
-    description='Azure Developer Tools command line',
+    description='Microsoft Azure CLI Developer Tools',
+    long_description=README + '\n\n' + HISTORY,
     url='https://github.com/Azure/azure-cli-dev-tools',
     author='Microsoft Corporation',
     author_email='azpycli@microsoft.com',
