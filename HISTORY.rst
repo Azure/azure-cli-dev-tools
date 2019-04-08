@@ -7,6 +7,7 @@ Release History
 +++++
 * Fix issue where `azdev cli check-versions` did not accept the short form of a module name.
 * Update `azdev cli check-versions` to allow modules as a positional argument, consistent with other azdev commands.
+* Fix issue where `azdev test --discover` could result in a stack trace when a virtual environment exists within an extensions repo.
 
 0.0.4
 +++++
