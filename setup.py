@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # -----------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for
@@ -6,22 +8,22 @@
 
 """Azure Developer Tools package that can be installed using setuptools"""
 
-
+from codecs import open
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 __VERSION__ = '0.0.5'
 
-
-def read(fname):
-    """Local read helper function for long documentation"""
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
+with open('README.rst', 'r', encoding='utf-8') as f:
+    README = f.read()
+with open('HISTORY.rst', 'r', encoding='utf-8') as f:
+    HISTORY = f.read()
 
 setup(
     name='azdev',
     version=__VERSION__,
-    description='Azure Developer Tools command line',
+    description='Microsoft Azure CLI Developer Tools',
+    long_description=README + '\n\n' + HISTORY,
     url='https://github.com/Azure/azure-cli-dev-tools',
     author='Microsoft Corporation',
     author_email='azpycli@microsoft.com',
@@ -52,7 +54,6 @@ setup(
     install_requires=[
         'docutils',
         'flake8',
-        'futures',
         'gitpython',
         'knack>=0.5.4',
         'mock',
@@ -64,7 +65,7 @@ setup(
         'wheel==0.30.0'
     ],
     extras_require={
-        ":python_version<'3.0'": ['pylint==1.9.2'],
+        ":python_version<'3.0'": ['pylint==1.9.2', 'futures'],
         ":python_version>='3.0'": ['pylint==2.3.0']
     },
     package_data={
