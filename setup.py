@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # -----------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for
@@ -6,9 +8,9 @@
 
 """Azure Developer Tools package that can be installed using setuptools"""
 
-
+from codecs import open
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 __VERSION__ = '0.0.5'
 
@@ -52,7 +54,6 @@ setup(
     install_requires=[
         'docutils',
         'flake8',
-        'futures',
         'gitpython',
         'knack>=0.5.4',
         'mock',
@@ -64,7 +65,7 @@ setup(
         'wheel==0.30.0'
     ],
     extras_require={
-        ":python_version<'3.0'": ['pylint==1.9.2'],
+        ":python_version<'3.0'": ['pylint==1.9.2', 'futures'],
         ":python_version>='3.0'": ['pylint==2.3.0']
     },
     package_data={
