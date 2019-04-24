@@ -32,6 +32,9 @@ def load_command_table(self, _):
         g.command('check-versions', 'verify_versions')
         g.command('update-setup', 'update_setup_py')
 
+    with CommandGroup(self, '', operation_group('code_gen')) as g:
+        g.command('cli create', 'create_module')
+
     with CommandGroup(self, 'verify', operation_group('help')) as g:
         g.command('document-map', 'check_document_map')
 

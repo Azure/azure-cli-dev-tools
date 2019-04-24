@@ -45,6 +45,10 @@ helps['cli check-versions'] = """
           text: azdev cli check-versions --update --pin
 """
 
+helps['cli create'] = """
+    short-summary: Create a new Azure CLI module template.
+"""
+
 helps['cli update-setup'] = """
     short-summary: Update the azure-cli setup.py file.
     examples:

@@ -45,6 +45,7 @@ setup(
         'azdev',
         'azdev.config',
         'azdev.operations',
+        'azdev.mod_templates',
         'azdev.operations.linter',
         'azdev.operations.linter.rules',
         'azdev.operations.tests',
@@ -55,6 +56,7 @@ setup(
         'docutils',
         'flake8',
         'gitpython',
+        'jinja2',
         'knack~=0.6.1',
         'mock',
         'pytest~=4.4.0',
@@ -70,6 +72,7 @@ setup(
     },
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
+        'azdev.mod_templates': ['*.*'],
         'azdev.operations.linter.rules': ['ci_exclusions.yml']
     },
     include_package_data=True,

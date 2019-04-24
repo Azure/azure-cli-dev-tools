@@ -90,3 +90,6 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'cli check-versions') as c:
         c.positional('modules', nargs='*', help='Space-separated list of modules to check.')
+
+    with ArgumentsContext(self, 'cli create') as c:
+        c.positional('mod_name', help='Name of the module to create.')
