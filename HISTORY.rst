@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.0.6
++++++
+
+
 0.0.5
 +++++
 * Fix issue where `azdev cli check-versions` did not accept the short form of a module name.
