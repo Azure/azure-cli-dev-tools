@@ -27,9 +27,14 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
 
 4. Activate the env virtual environment by running:
 
-    Windows:
+    Windows CMD.exe:
     ```BatchFile
     env\scripts\activate.bat
+    ```
+
+    Windows Powershell:
+    ```
+    env\scripts\activate.ps1
     ```
 
     OSX/Ubuntu (bash):
