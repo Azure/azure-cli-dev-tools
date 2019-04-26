@@ -14,15 +14,23 @@ def load_command_table(self, _):
         operations_tmpl='{{ sdk_path }}.operations#{{ display_name }}Operations.{}',
         client_factory=cf_{{ name }})
 {% else %}
-    {{ name }}_sdk = CliCommandType(
-        operations_tmpl='{{ sdk_path }}.operations#{{ display_name }}Operations.{}',
-        client_factory=cf_{{ name }})
+    # TODO: Add command type here
+    # {{ name }}_sdk = CliCommandType(
+    #    operations_tmpl='<PATH>.operations#{{ display_name }}Operations.{}',
+    #    client_factory=cf_{{ name }})
 {% endif %}
-
+{% if sdk_path %}
     with self.command_group('{{ name }}', {{ name }}_sdk, client_factory=cf_{{ name }}) as g:
         g.custom_command('create', 'create_{{ name }}')
         g.command('delete', 'delete')
         g.custom_command('list', 'list_{{ name }}')
         g.show_command('show', 'get')
         g.generic_update_command('update', setter_name='update', custom_func_name='update_{{ name }}')
-
+{% else %}
+    with self.command_group('{{ name }}') as g:
+        g.custom_command('create', 'create_{{ name }}')
+        # g.command('delete', 'delete')
+        g.custom_command('list', 'list_{{ name }}')
+        # g.show_command('show', 'get')
+        # g.generic_update_command('update', setter_name='update', custom_func_name='update_{{ name }}')
+{% endif %}
