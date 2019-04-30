@@ -93,3 +93,6 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'cli create') as c:
         c.positional('mod_name', help='Name of the module to create.')
+
+    with ArgumentsContext(self, 'extension create') as c:
+        c.positional('ext_name', help='Name of the extension to create.')

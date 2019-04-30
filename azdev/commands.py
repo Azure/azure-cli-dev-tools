@@ -34,6 +34,7 @@ def load_command_table(self, _):
 
     with CommandGroup(self, '', operation_group('code_gen')) as g:
         g.command('cli create', 'create_module')
+        g.command('extension create', 'create_extension')
 
     with CommandGroup(self, 'verify', operation_group('help')) as g:
         g.command('document-map', 'check_document_map')

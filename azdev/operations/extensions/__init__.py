@@ -302,7 +302,10 @@ def publish_extensions(extensions, storage_subscription, storage_account, storag
         subheading('Updating Index')
         update_extension_index(uploaded_urls)
 
-    subheading('Published')
-    display(uploaded_urls)
+    subheading('Published WHLs')
+    for url in uploaded_urls:
+        display(url)
+
     if not update_index:
-        logger.warning('You still need to update the index for your changes with `az extension update-index`.')
+        logger.warning('You still need to update the index for your changes!')
+        logger.warning('    az extension update-index <URL>')

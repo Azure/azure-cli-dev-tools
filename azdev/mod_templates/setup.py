@@ -7,13 +7,12 @@
 
 
 from codecs import open
-from setuptools import setup
+from setuptools import setup, find_packages
 try:
     from azure_bdist_wheel import cmdclass
 except ImportError:
     from distutils import log as logger
     logger.warn("Wheel is not available, disabling bdist_wheel hook")
-    cmdclass = {}
 
 VERSION = '0.1.0'
 
@@ -34,7 +33,7 @@ CLASSIFIERS = [
 ]
 
 DEPENDENCIES = [
-    'azure-cli-core',
+    {% if is_ext %}'azure-cli-core',{% endif %}
 {% for dep in dependencies %}    '{{ dep.name }}{{ dep.op }}{{ dep.version }}',{% endfor %}
 ]
 
@@ -44,21 +43,16 @@ with open('HISTORY.rst', 'r', encoding='utf-8') as f:
     HISTORY = f.read()
 
 setup(
-    name='azure-cli-{{ name }}',
+    name='{{ pkg_name }}',
     version=VERSION,
-    description='Microsoft Azure Command-Line Tools {{ display_name }} Command Module',
+    description='Microsoft Azure Command-Line Tools {{ display_name }} {{ 'Extension' if is_ext else 'Command Module' }}',
     long_description=README + '\n\n' + HISTORY,
     license='MIT',
     author='Microsoft Corporation',
     author_email='azpycli@microsoft.com',
-    url='https://github.com/Azure/azure-cli',
+    url='https://github.com/Azure/{{ 'azure-cli-extensions' if is_ext else 'azure-cli' }}',
     classifiers=CLASSIFIERS,
-    packages=[
-        'azure',
-        'azure.cli',
-        'azure.cli.command_modules',
-        'azure.cli.command_modules.{{ name }}',
-    ],
+    packages=find_packages(),
+{% if is_ext %}    package_data={'{{ ext_long_name }}': ['azext_metadata.json']},{% endif %}
     install_requires=DEPENDENCIES,
-    cmdclass=cmdclass
 )
