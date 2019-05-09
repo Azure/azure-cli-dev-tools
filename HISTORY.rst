@@ -5,7 +5,8 @@ Release History
 
 0.0.6
 +++++
-
+* `azdev test`: Fix issue where using `--profile` did not use the correct index.
+                Changed the behavior to switch back to the original profile upon completion of tests.
 
 0.0.5
 +++++

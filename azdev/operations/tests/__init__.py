@@ -38,7 +38,9 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
     heading('Run Tests')
 
-    profile = _get_profile(profile)
+    original_profile = _get_profile(profile)
+    if not profile:
+        profile = original_profile
     path_table = get_path_table()
     test_index = _get_test_index(profile, discover)
     tests = tests or list(path_table['mod'].keys()) + list(path_table['core'].keys())
@@ -90,6 +92,13 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
     _summarize_test_results(xml_path)
 
+    # attempt to restore the original profile
+    if profile != original_profile:
+        result = raw_cmd('az cloud update --profile {}'.format(original_profile),
+                         "Restoring profile '{}'.".format(original_profile))
+        if result.exit_code != 0:
+            logger.warning("Failed to restore profile '%s'.", original_profile)
+
     sys.exit(0 if not exit_code else 1)
 
 
@@ -109,19 +118,20 @@ def _get_profile(profile):
     try:
         fore_red = colorama.Fore.RED if not IS_WINDOWS else ''
         fore_reset = colorama.Fore.RESET if not IS_WINDOWS else ''
-        current_profile = raw_cmd('az cloud show --query profile -otsv', show_stderr=False).result
-        if not profile or current_profile == profile:
-            profile = current_profile
+        original_profile = raw_cmd('az cloud show --query profile -otsv', show_stderr=False).result
+        if not profile or original_profile == profile:
+            profile = original_profile
             display('The tests are set to run against current profile {}.'
-                    .format(fore_red + current_profile + fore_reset))
-        elif current_profile != profile:
+                    .format(fore_red + original_profile + fore_reset))
+        elif original_profile != profile:
             display('The tests are set to run against profile {} but the current az cloud profile is {}.'
-                    .format(fore_red + profile + fore_reset, fore_red + current_profile + fore_reset))
+                    .format(fore_red + profile + fore_reset, fore_red + original_profile + fore_reset))
             result = raw_cmd('az cloud update --profile {}'.format(profile),
                              'SWITCHING TO PROFILE {}.'.format(fore_red + profile + fore_reset))
             if result.exit_code != 0:
                 raise CLIError(result.error.output)
-        return current_profile
+        # returns the original profile so we can switch back if need be
+        return original_profile
     except CalledProcessError:
         raise CLIError('Failed to retrieve current az profile')
 
