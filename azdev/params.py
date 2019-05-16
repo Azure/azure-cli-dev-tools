@@ -53,9 +53,12 @@ def load_arguments(self, _):
         with ArgumentsContext(self, 'verify {}'.format(scope)) as c:
             c.positional('modules', nargs='*', help='Space-separated list of modules to check.')
 
-    with ArgumentsContext(self, 'verify version') as c:
+    with ArgumentsContext(self, 'cli check-versions') as c:
         c.argument('update', action='store_true', help='If provided, the command will update the versions in azure-cli\'s setup.py file.')
         c.argument('pin', action='store_true', help='If provided and used with --update, will pin the module versions in azure-cli\'s setup.py file.')
+
+    with ArgumentsContext(self, 'cli update-setup') as c:
+        c.argument('pin', action='store_true', help='Pin the module versions in azure-cli\'s setup.py file.')
 
     with ArgumentsContext(self, 'linter') as c:
         c.positional('modules', nargs='*', help='Space-separated list of modules or extensions to check.')
@@ -73,9 +76,9 @@ def load_arguments(self, _):
         c.argument('update_index', action='store_true', help='Update the index.json file after publishing is complete.')
 
     with ArgumentsContext(self, 'extension publish') as c:
-        c.argument('storage_account', help='Name of the storage account to publish to.', arg_group='Storage', configured_default='storage_account')
-        c.argument('storage_container', help='Name of the storage container to publish to.', arg_group='Storage', configured_default='storage_container')
-        c.argument('storage_subscription', help='Subscription ID of the storage account.', arg_group='Storage', configured_default='storage_subscription')
+        c.argument('storage_account', help='Name of the storage account to publish to. Environment variable: AZDEV_DEFAULTS_STORAGE_ACCOUNT.', arg_group='Storage', configured_default='storage_account')
+        c.argument('storage_container', help='Name of the storage container to publish to. Environment variable: AZDEV_DEFAULTS_STORAGE_CONTAINER.', arg_group='Storage', configured_default='storage_container')
+        c.argument('storage_subscription', help='Subscription ID of the storage account. Environment variable: AZDEV_DEFAULTS_STORAGE_SUBSCRIPTION.', arg_group='Storage', configured_default='storage_subscription')
 
     for scope in ['extension add', 'extension remove', 'extension build', 'extension publish']:
         with ArgumentsContext(self, scope) as c:
@@ -96,3 +99,11 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'extension create') as c:
         c.positional('ext_name', help='Name of the extension to create.')
+
+    for scope in ['extension create', 'cli create']:
+        with ArgumentsContext(self, scope) as c:
+            c.argument('display_name', help='Display name in help text.')
+            c.argument('required_sdk', help='Name and version of the underlying Azure SDK. (ex: azure-mgmt-foo==0.1.0).', arg_group='SDK')
+            c.argument('client_name', help='Name of the Python SDK client object (ex: FooManagementClient).', arg_group='SDK')
+            c.argument('operation_name', help='Name of the principal Python SDK operation class (ex: FooOperations).', arg_group='SDK')
+            c.argument('repo_name', help='Name of the repo the extension will exist in.')

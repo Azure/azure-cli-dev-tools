@@ -11,12 +11,12 @@ from {{ mod_path }}._client_factory import cf_{{ name }}
 def load_command_table(self, _):
 {% if sdk_path %}
     {{ name }}_sdk = CliCommandType(
-        operations_tmpl='{{ sdk_path }}.operations#{{ display_name }}Operations.{}',
+        operations_tmpl='{{ sdk_path }}.operations#{{ operation_name }}.{}',
         client_factory=cf_{{ name }})
 {% else %}
     # TODO: Add command type here
     # {{ name }}_sdk = CliCommandType(
-    #    operations_tmpl='<PATH>.operations#{{ display_name }}Operations.{}',
+    #    operations_tmpl='<PATH>.operations#{{ operation_name }}.{}',
     #    client_factory=cf_{{ name }})
 {% endif %}
 {% if sdk_path %}

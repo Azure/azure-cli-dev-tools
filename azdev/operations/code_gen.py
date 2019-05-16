@@ -39,23 +39,25 @@ def _generate_files(env, generation_kwargs, file_list, dest_path):
 
 
 def create_module(mod_name='test', display_name=None, required_sdk=None,
-                  sdk_client=None):
+                  client_name=None, operation_name=None):
     repo_path = os.path.join(get_cli_repo_path(), 'src', 'command_modules')
-    _create_package(COMMAND_MODULE_PREFIX, repo_path, False, mod_name, display_name, required_sdk, sdk_client)
+    _create_package(COMMAND_MODULE_PREFIX, repo_path, False, mod_name, display_name, required_sdk,
+                    client_name, operation_name)
 
 def create_extension(ext_name='test', repo_name=None, display_name=None, required_sdk=None,
-                     sdk_client=None):
+                     client_name=None, operation_name=None):
     repo_paths = get_ext_repo_paths()
     repo_path = next((x for x in repo_paths if x.endswith('azure-cli-extensions')), None)
     if not repo_path:
         raise CLIError('Unable to find `azure-cli-extension` repo. Have you cloned it and added '
                        'with `azdev extension repo add`?')
     repo_path = os.path.join(repo_path, 'src')
-    _create_package(EXTENSION_PREFIX, repo_path, True, ext_name, display_name, required_sdk, sdk_client)
+    _create_package(EXTENSION_PREFIX, repo_path, True, ext_name, display_name, required_sdk,
+                    client_name, operation_name)
 
 
 def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, required_sdk=None,
-                    sdk_client=None):
+                    client_name=None, operation_name=None):
     from jinja2 import Environment, PackageLoader
 
     if name.startswith(prefix):
@@ -71,20 +73,21 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, r
         'name': name,
         'mod_path': '{}{}'.format(prefix, name) if is_ext else 'azure.cli.command_modules.{}'.format(name),
         'display_name': display_name,
-        'loader_name': '{}CommandsLoader'.format(display_name),
+        'loader_name': '{}CommandsLoader'.format(name.capitalize()),
         'pkg_name': package_name,
         'ext_long_name': '{}{}'.format(prefix, name) if is_ext else None,
         'is_ext': is_ext
     }
 
-    if required_sdk or sdk_client:
+    if required_sdk:
         version_regex = r'(?P<name>[a-zA-Z-]+)(?P<op>[~<>=]*)(?P<version>[\d.]*)'
         regex = re.compile(version_regex)
         version_comps = regex.match(required_sdk)
         sdk_kwargs = version_comps.groupdict()
         kwargs.update({
             'sdk_path': sdk_kwargs['name'].replace('-', '.'),
-            'sdk_client': sdk_client,
+            'client_name': client_name,
+            'operation_name': operation_name,
             'dependencies': [sdk_kwargs]
         })
 

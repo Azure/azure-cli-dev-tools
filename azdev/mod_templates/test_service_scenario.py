@@ -13,7 +13,7 @@ from azure.cli.testsdk import (ScenarioTest, ResourceGroupPreparer)
 TEST_DIR = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
 
 
-class {{ display_name }}ScenarioTest(ScenarioTest):
+class {{ name.capitalize() }}ScenarioTest(ScenarioTest):
 
     @ResourceGroupPreparer(name_prefix='cli_test_{{ name }}')
     def test_{{ name }}(self, resource_group):
