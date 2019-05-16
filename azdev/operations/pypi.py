@@ -344,7 +344,7 @@ def _compare_module_against_pypi(results, root_dir, mod, mod_path):
             downloaded_path = line.replace('Saved ', '').strip()
             downloaded_version = version_pattern.match(downloaded_path).group(1)
             break
-        if line.startswith('No matching distribution found'):
+        if 'No matching distribution found' in line:
             downloaded_path = None
             downloaded_version = 'Unavailable'
             break
