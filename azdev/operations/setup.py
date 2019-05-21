@@ -38,7 +38,7 @@ def _check_repo(path):
         raise CLIError("'{}' is not a valid git repository.".format(path))
 
 
-def _install_modules(force_reinstall):
+def _install_modules(ignore_installed):
 
     all_modules = list(get_path_table()['mod'].items())
 
@@ -49,7 +49,7 @@ def _install_modules(force_reinstall):
         try:
             pip_cmd("install -q -e {}".format(path),
                     "Installing module `{}` ({}/{})...".format(name, mod_num, total_mods),
-                    force_reinstall=force_reinstall)
+                    ignore_installed=ignore_installed)
             mod_num += 1
         except CalledProcessError as err:
             # exit code is not zero
@@ -61,7 +61,7 @@ def _install_modules(force_reinstall):
     return not any(failures)
 
 
-def _install_extensions(ext_paths, force_reinstall):
+def _install_extensions(ext_paths, ignore_installed):
     # clear pre-existing dev extensions
     try:
         installed_extensions = [x['name'] for x in list_extensions() if x['install'] == 'Y']
@@ -73,18 +73,18 @@ def _install_extensions(ext_paths, force_reinstall):
     # install specified extensions
     for path in ext_paths or []:
         result = pip_cmd('install -e {}'.format(path), "Adding extension '{}'...".format(path),
-                         force_reinstall=force_reinstall)
+                         ignore_installed=ignore_installed)
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
 
 
-def _install_cli(cli_path, force_reinstall):
+def _install_cli(cli_path, ignore_installed):
 
     # install public CLI off PyPI if no repo found
     if not cli_path:
-        pip_cmd('install --upgrade azure-cli', "Installing `azure-cli`...", force_reinstall=force_reinstall)
+        pip_cmd('install --upgrade azure-cli', "Installing `azure-cli`...", ignore_installed=ignore_installed)
         pip_cmd('install git+https://github.com/Azure/azure-cli@master#subdirectory=src/azure-cli-testsdk',
-                "Installing `azure-cli-testsdk`...", force_reinstall=force_reinstall)
+                "Installing `azure-cli-testsdk`...", ignore_installed=ignore_installed)
         return
 
     # otherwise editable install from source
@@ -94,41 +94,41 @@ def _install_cli(cli_path, force_reinstall):
         whl_list = " ".join(
             [os.path.join(privates_dir, f) for f in os.listdir(privates_dir)]
         )
-        pip_cmd("install -q {}".format(whl_list), "Installing private whl files...", force_reinstall=force_reinstall)
+        pip_cmd("install -q {}".format(whl_list), "Installing private whl files...", ignore_installed=ignore_installed)
 
     # install general requirements
     pip_cmd(
         "install -q -r {}/requirements.txt".format(cli_path),
         "Installing `requirements.txt`...",
-        force_reinstall=force_reinstall
+        ignore_installed=ignore_installed
     )
 
     # command modules have dependency on azure-cli-core so install this first
     pip_cmd(
         "install -q -e {}/src/azure-cli-nspkg".format(cli_path),
         "Installing `azure-cli-nspkg`...",
-        force_reinstall=force_reinstall
+        ignore_installed=ignore_installed
     )
     pip_cmd(
         "install -q -e {}/src/azure-cli-telemetry".format(cli_path),
         "Installing `azure-cli-telemetry`...",
-        force_reinstall=force_reinstall
+        ignore_installed=ignore_installed
     )
     pip_cmd(
         "install -q -e {}/src/azure-cli-core".format(cli_path),
         "Installing `azure-cli-core`...",
-        force_reinstall=force_reinstall
+        ignore_installed=ignore_installed
     )
-    _install_modules(force_reinstall)
+    _install_modules(ignore_installed)
 
     # azure cli has dependencies on the above packages so install this one last
     pip_cmd(
-        "install -q -e {}/src/azure-cli".format(cli_path), "Installing `azure-cli`...", force_reinstall=force_reinstall
+        "install -q -e {}/src/azure-cli".format(cli_path), "Installing `azure-cli`...", ignore_installed=ignore_installed
     )
     pip_cmd(
         "install -q -e {}/src/azure-cli-testsdk".format(cli_path),
         "Installing `azure-cli-testsdk`...",
-        force_reinstall=force_reinstall
+        ignore_installed=ignore_installed
     )
 
     # Ensure that the site package's azure/__init__.py has the old style namespace
@@ -247,7 +247,7 @@ def _interactive_setup():
         raise CLIError('Installation aborted.')
 
 
-def setup(cli_path=None, ext_repo_path=None, ext=None, force_reinstall=False):
+def setup(cli_path=None, ext_repo_path=None, ext=None, ignore_installed=False):
 
     require_virtual_env()
 
@@ -309,10 +309,10 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, force_reinstall=False):
     subheading('Installing packages')
 
     # upgrade to latest pip
-    pip_cmd('install --upgrade pip -q', 'Upgrading pip...', force_reinstall=force_reinstall)
+    pip_cmd('install --upgrade pip -q', 'Upgrading pip...', ignore_installed=ignore_installed)
 
-    _install_cli(cli_path, force_reinstall)
-    _install_extensions(ext_to_install, force_reinstall)
+    _install_cli(cli_path, ignore_installed)
+    _install_extensions(ext_to_install, ignore_installed)
     _copy_config_files()
 
     end = time.time()
