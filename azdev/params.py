@@ -28,7 +28,6 @@ def load_arguments(self, _):
         c.argument('cli_path', options_list=['--cli', '-c'], nargs='?', const=Flag, help='Path to an existing Azure CLI repo. Omit value to search for the repo.')
         c.argument('ext_repo_path', options_list=['--repo', '-r'], nargs='+', help='Space-separated list of paths to existing Azure CLI extensions repos.')
         c.argument('ext', options_list=['--ext', '-e'], nargs='+', help='Space-separated list of extensions to install initially.')
-        c.argument('ignore_installed', action='store_true', help='Use pip-supported option to ignore installed packages (reinstalling instead).')
 
     with ArgumentsContext(self, 'test') as c:
         c.argument('discover', options_list='--discover', action='store_true', help='Build an index of test names so that you don\'t need to specify fully qualified test paths.')

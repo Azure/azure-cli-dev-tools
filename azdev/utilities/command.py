@@ -88,6 +88,4 @@ def pip_cmd(command, message=False, show_stderr=True, **kwargs):
     :returns: CommandResultItem object.
     """
     command = 'pip {}'.format(command)
-    if kwargs.pop('ignore_installed', False):
-        command = '{} -I'.format(command)
     return py_cmd(command, message, show_stderr, **kwargs)
