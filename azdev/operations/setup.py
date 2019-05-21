@@ -38,7 +38,7 @@ def _check_repo(path):
         raise CLIError("'{}' is not a valid git repository.".format(path))
 
 
-def _install_modules():
+def _install_modules(force_reinstall):
 
     all_modules = list(get_path_table()['mod'].items())
 
@@ -48,7 +48,8 @@ def _install_modules():
     for name, path in all_modules:
         try:
             pip_cmd("install -q -e {}".format(path),
-                    "Installing module `{}` ({}/{})...".format(name, mod_num, total_mods))
+                    "Installing module `{}` ({}/{})...".format(name, mod_num, total_mods),
+                    force_reinstall=force_reinstall)
             mod_num += 1
         except CalledProcessError as err:
             # exit code is not zero
@@ -60,7 +61,7 @@ def _install_modules():
     return not any(failures)
 
 
-def _install_extensions(ext_paths):
+def _install_extensions(ext_paths, force_reinstall):
     # clear pre-existing dev extensions
     try:
         installed_extensions = [x['name'] for x in list_extensions() if x['install'] == 'Y']
@@ -71,18 +72,19 @@ def _install_extensions(ext_paths):
 
     # install specified extensions
     for path in ext_paths or []:
-        result = pip_cmd('install -e {}'.format(path), "Adding extension '{}'...".format(path))
+        result = pip_cmd('install -e {}'.format(path), "Adding extension '{}'...".format(path),
+                         force_reinstall=force_reinstall)
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
 
 
-def _install_cli(cli_path):
+def _install_cli(cli_path, force_reinstall):
 
     # install public CLI off PyPI if no repo found
     if not cli_path:
-        pip_cmd('install --upgrade azure-cli', "Installing `azure-cli`...")
+        pip_cmd('install --upgrade azure-cli', "Installing `azure-cli`...", force_reinstall=force_reinstall)
         pip_cmd('install git+https://github.com/Azure/azure-cli@master#subdirectory=src/azure-cli-testsdk',
-                "Installing `azure-cli-testsdk`...")
+                "Installing `azure-cli-testsdk`...", force_reinstall=force_reinstall)
         return
 
     # otherwise editable install from source
@@ -92,36 +94,41 @@ def _install_cli(cli_path):
         whl_list = " ".join(
             [os.path.join(privates_dir, f) for f in os.listdir(privates_dir)]
         )
-        pip_cmd("install -q {}".format(whl_list), "Installing private whl files...")
+        pip_cmd("install -q {}".format(whl_list), "Installing private whl files...", force_reinstall=force_reinstall)
 
     # install general requirements
     pip_cmd(
         "install -q -r {}/requirements.txt".format(cli_path),
         "Installing `requirements.txt`...",
+        force_reinstall=force_reinstall
     )
 
     # command modules have dependency on azure-cli-core so install this first
     pip_cmd(
         "install -q -e {}/src/azure-cli-nspkg".format(cli_path),
         "Installing `azure-cli-nspkg`...",
+        force_reinstall=force_reinstall
     )
     pip_cmd(
         "install -q -e {}/src/azure-cli-telemetry".format(cli_path),
         "Installing `azure-cli-telemetry`...",
+        force_reinstall=force_reinstall
     )
     pip_cmd(
         "install -q -e {}/src/azure-cli-core".format(cli_path),
         "Installing `azure-cli-core`...",
+        force_reinstall=force_reinstall
     )
-    _install_modules()
+    _install_modules(force_reinstall)
 
     # azure cli has dependencies on the above packages so install this one last
     pip_cmd(
-        "install -q -e {}/src/azure-cli".format(cli_path), "Installing `azure-cli`..."
+        "install -q -e {}/src/azure-cli".format(cli_path), "Installing `azure-cli`...", force_reinstall=force_reinstall
     )
     pip_cmd(
         "install -q -e {}/src/azure-cli-testsdk".format(cli_path),
         "Installing `azure-cli-testsdk`...",
+        force_reinstall=force_reinstall
     )
 
     # Ensure that the site package's azure/__init__.py has the old style namespace
@@ -160,7 +167,7 @@ def _interactive_setup():
                     'RETURN and we will attempt to find it for you.')
             while True:
                 cli_path = prompt('\nPath (RETURN to auto-find): ', None)
-                cli_path = os.path.abspath(cli_path) if cli_path else None
+                cli_path = os.path.abspath(os.path.expanduser(cli_path)) if cli_path else None
                 CLI_SENTINEL = 'azure-cli.pyproj'
                 if not cli_path:
                     cli_path = find_file(CLI_SENTINEL)
@@ -180,24 +187,37 @@ def _interactive_setup():
         else:
             display('\nOK. We will install the latest `azure-cli` from PyPI then.')
 
-        # Determine extension repos
-        if prompt_y_n('\nDo you plan to develop CLI extensions?'):
-            display('\nGreat! Input the paths for the extension repos you wish to develop for, one per'
-                    'line. You can add as many repos as you like. Press RETURN to continue to the next step.')
-            while True:
-                ext_repo_path = prompt('\nPath (RETURN to continue): ', None)
-                if not ext_repo_path:
-                    break
-                try:
-                    _check_repo(os.path.abspath(ext_repo_path))
-                except CLIError as ex:
-                    logger.error(ex)
-                    continue
-                ext_repos.append(ext_repo_path)
-                display('Repo {} OK.'.format(ext_repo_path))
+        def add_ext_repo(path):
+            try:
+                _check_repo(path)
+            except CLIError as ex:
+                logger.error(ex)
+                return False
+            ext_repos.append(path)
+            display('Repo {} OK.'.format(path))
+            return True
 
-        if not ext_repos:
-            display('\nNo problem! You can always add extension repos later with `azdev extension repo add`.')
+        # Determine extension repos
+        # Allows the user to simply press RETURN to use their cwd, assuming they are in their desired extension
+        # repo directory. To use multiple extension repos or identify a repo outside the cwd, they must specify
+        # the path.
+        if prompt_y_n('\nDo you plan to develop CLI extensions?'):
+            display('\nGreat! Input the paths for the extension repos you wish to develop for, one per '
+                    'line. You can add as many repos as you like. (TIP: to quickly get started, press RETURN to '
+                    'use your current working directory).')
+            first_repo = True
+            while True:
+                msg = '\nPath ({}): '.format('RETURN to use current directory' if first_repo else 'RETURN to continue')
+                ext_repo_path = prompt(msg, None)
+                if not ext_repo_path:
+                    if first_repo and not add_ext_repo(os.getcwd()):
+                        first_repo = False
+                        continue
+                    break
+                add_ext_repo(os.path.abspath(os.path.expanduser(ext_repo_path)))
+                first_repo = False
+
+        display('\nTIP: you can manage extension repos later with the `azdev extension repo` commands.')
 
         # Determine extensions
         if ext_repos:
@@ -215,8 +235,8 @@ def _interactive_setup():
                         continue
                     display('Extension {} OK.'.format(ext_name))
                     exts.append(next(x['path'] for x in list_extensions() if x['name'] == ext_name))
-            else:
-                display('\nNo problem! You can always add extensions later with `azdev extension add`.')
+
+            display('\nTIP: you can manage extensions later with the `azdev extension` commands.')
 
         subheading('Summary')
         display('CLI: {}'.format(cli_path if cli_path else 'PyPI'))
@@ -224,10 +244,10 @@ def _interactive_setup():
         display('Extensions: \n    {}'.format('\n    '.join(exts)))
         if prompt_y_n('\nProceed with installation? '):
             return cli_path, ext_repos, exts
-        display("\nNo problem! Let's start again.\n")
+        raise CLIError('Installation aborted.')
 
 
-def setup(cli_path=None, ext_repo_path=None, ext=None):
+def setup(cli_path=None, ext_repo_path=None, ext=None, force_reinstall=False):
 
     require_virtual_env()
 
@@ -289,10 +309,10 @@ def setup(cli_path=None, ext_repo_path=None, ext=None):
     subheading('Installing packages')
 
     # upgrade to latest pip
-    pip_cmd('install --upgrade pip -q', 'Upgrading pip...')
+    pip_cmd('install --upgrade pip -q', 'Upgrading pip...', force_reinstall=force_reinstall)
 
-    _install_cli(cli_path)
-    _install_extensions(ext_to_install)
+    _install_cli(cli_path, force_reinstall)
+    _install_extensions(ext_to_install, force_reinstall)
     _copy_config_files()
 
     end = time.time()

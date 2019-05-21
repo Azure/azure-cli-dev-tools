@@ -88,4 +88,6 @@ def pip_cmd(command, message=False, show_stderr=True, **kwargs):
     :returns: CommandResultItem object.
     """
     command = 'pip {}'.format(command)
+    if kwargs.pop('force_reinstall', False):
+        command = '{} --force-reinstall'.format(command)
     return py_cmd(command, message, show_stderr, **kwargs)
