@@ -9,7 +9,6 @@ from __future__ import print_function
 import os
 import re
 from subprocess import CalledProcessError
-import sys
 
 from knack.prompting import prompt_y_n
 from knack.util import CLIError
@@ -56,6 +55,7 @@ def create_extension(ext_name='test', repo_name=None, display_name=None, require
                     client_name, operation_name)
 
 
+# pylint: disable=too-many-locals, too-many-statements
 def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, required_sdk=None,
                     client_name=None, operation_name=None):
     from jinja2 import Environment, PackageLoader
