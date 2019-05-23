@@ -103,7 +103,7 @@ def load_arguments(self, _):
     for scope in ['extension create', 'cli create']:
         with ArgumentsContext(self, scope) as c:
             c.argument('display_name', help='Display name in help text.')
-            c.argument('required_sdk', help='Name and version of the underlying Azure SDK. (ex: azure-mgmt-foo==0.1.0).', arg_group='SDK')
-            c.argument('client_name', help='Name of the Python SDK client object (ex: FooManagementClient).', arg_group='SDK')
-            c.argument('operation_name', help='Name of the principal Python SDK operation class (ex: FooOperations).', arg_group='SDK')
+            c.argument('required_sdk', help='Name and version of the underlying Azure SDK. (ex: azure-mgmt-contoso==0.1.0).', arg_group='SDK')
+            c.argument('client_name', help='Name of the Python SDK client object (ex: ContosoManagementClient).', arg_group='SDK')
+            c.argument('operation_name', help='Name of the principal Python SDK operation class (ex: ContosoOperations).', arg_group='SDK')
             c.argument('repo_name', help='Name of the repo the extension will exist in.')

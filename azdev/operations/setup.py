@@ -47,8 +47,11 @@ def _install_modules():
     total_mods = len(all_modules)
     for name, path in all_modules:
         try:
-            pip_cmd("install -q -e {}".format(path),
-                    "Installing module `{}` ({}/{})...".format(name, mod_num, total_mods))
+            result = pip_cmd("install -q -e {}".format(path),
+                             "Installing module `{}` ({}/{})...".format(name, mod_num, total_mods))
+            if 'ERROR' in str(result.result):
+                failures.append('Failed to install {}. {}'.format(name, str(result.result)))
+                continue
             mod_num += 1
         except CalledProcessError as err:
             # exit code is not zero

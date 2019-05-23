@@ -160,7 +160,9 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, r
     if not is_ext:
         # install the newly created module
         try:
-            pip_cmd("install -q -e {}".format(new_package_path), "Installing `{}{}`...".format(prefix, name))
+            result = pip_cmd("install -q -e {}".format(new_package_path), "Installing `{}{}`...".format(prefix, name))
+            if 'ERROR' in str(result.result):
+                raise CLIError('Failed to install. {}'.format(str(result.result)))
         except CalledProcessError as err:
             # exit code is not zero
             raise CLIError("Failed to install. Error message: {}".format(err.output))

@@ -34,7 +34,11 @@ CLASSIFIERS = [
 
 DEPENDENCIES = [
     {% if is_ext %}'azure-cli-core',{% endif %}
-{% for dep in dependencies %}    '{{ dep.name }}{{ dep.op }}{{ dep.version }}',{% endfor %}
+    {% if dependencies %}
+    {% for dep in dependencies %}'{{ dep.name }}{{ dep.op }}{{ dep.version }}',{% endfor %}
+    {% else %}
+    # TODO: azure-mgmt-<NAME>==<VERSION>
+    {% endif %}
 ]
 
 with open('README.rst', 'r', encoding='utf-8') as f:
