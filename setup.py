@@ -57,7 +57,7 @@ setup(
         'flake8',
         'gitpython',
         'jinja2',
-        'knack~=0.6.1',
+        'knack~=0.6.2',
         'mock',
         'pytest~=4.4.0',
         'pytest-xdist',
