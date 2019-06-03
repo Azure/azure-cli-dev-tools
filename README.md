@@ -39,7 +39,7 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
 
     OSX/Ubuntu (bash):
     ```Shell
-    env/bin/activate
+    source env/bin/activate
     ```
 
 5. Install `azdev` by running:
