@@ -10,11 +10,15 @@ import os
 import re
 from subprocess import CalledProcessError
 
+from knack.log import get_logger
 from knack.prompting import prompt_y_n
 from knack.util import CLIError
 
 from azdev.utilities import (
-    pip_cmd, display, heading, COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, get_cli_repo_path, get_ext_repo_paths)
+    pip_cmd, display, heading, COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, get_cli_repo_path, get_ext_repo_paths,
+    find_files)
+
+logger = get_logger(__name__)
 
 
 def _ensure_dir(path):
@@ -45,14 +49,70 @@ def create_module(mod_name='test', display_name=None, required_sdk=None,
 
 def create_extension(ext_name='test', repo_name=None, display_name=None, required_sdk=None,
                      client_name=None, operation_name=None):
-    repo_paths = get_ext_repo_paths()
-    repo_path = next((x for x in repo_paths if x.endswith('azure-cli-extensions')), None)
+    repo_path = None
+    if repo_name:
+        pass
+    else:
+        repo_paths = get_ext_repo_paths()
+        repo_path = next((x for x in repo_paths if x.endswith('azure-cli-extensions')), None)
     if not repo_path:
         raise CLIError('Unable to find `azure-cli-extension` repo. Have you cloned it and added '
                        'with `azdev extension repo add`?')
     repo_path = os.path.join(repo_path, 'src')
     _create_package(EXTENSION_PREFIX, repo_path, True, ext_name, display_name, required_sdk,
                     client_name, operation_name)
+
+
+def _download_vendored_sdk(required_sdk, path):
+    import shutil
+    import zipfile
+
+    path_regex = re.compile(r'.*((\s*.*downloaded\s)|(\s*.*saved\s))(?P<path>.*\.whl)', re.IGNORECASE | re.S)
+
+    # download and extract the required SDK to the vendored_sdks folder
+    downloaded_path = None
+    if required_sdk:
+        display('Downloading {}...'.format(required_sdk))
+        vendored_sdks_path = path
+        result = pip_cmd('download {} --no-deps -d {}'.format(required_sdk, vendored_sdks_path)).result
+        try:
+            result = result.decode('utf-8')
+        except AttributeError:
+            pass
+        for line in result.splitlines():
+            try:
+                downloaded_path = path_regex.match(line).group('path')
+            except AttributeError:
+                continue
+            break
+        if not downloaded_path:
+            raise CLIError('Unable to download: {}'.format(required_sdk))
+
+        # extract the WHL file
+        with zipfile.ZipFile(str(downloaded_path), 'r') as z:
+            z.extractall(vendored_sdks_path)
+
+        # remove the WHL file
+        try:
+            os.remove(downloaded_path)
+        except PermissionError:
+            logger.warning('Unable to remove %s. Trying manually deleting.', downloaded_path)
+
+        try:
+            client_location = find_files(vendored_sdks_path, 'version.py')[0]
+        except KeyError:
+            raise CLIError('Unable to find client files.')
+
+        # copy the client files and folders to the root of vendored_sdks for easier access
+        client_dir = os.path.dirname(client_location)
+        for item in os.listdir(client_dir):
+            src = os.path.join(client_dir, item)
+            dest = os.path.join(vendored_sdks_path, item)
+            shutil.move(src, dest)
+        try:
+            os.remove(os.path.join(vendored_sdks_path, 'azure'))
+        except PermissionError:
+            logger.warning('Unable to remove %s. Try manually deleting.', os.path.join(vendored_sdks_path, 'azure'))
 
 
 # pylint: disable=too-many-locals, too-many-statements
@@ -76,20 +136,8 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, r
         'loader_name': '{}CommandsLoader'.format(name.capitalize()),
         'pkg_name': package_name,
         'ext_long_name': '{}{}'.format(prefix, name) if is_ext else None,
-        'is_ext': is_ext
+        'is_ext': is_ext,
     }
-
-    if required_sdk:
-        version_regex = r'(?P<name>[a-zA-Z-]+)(?P<op>[~<>=]*)(?P<version>[\d.]*)'
-        regex = re.compile(version_regex)
-        version_comps = regex.match(required_sdk)
-        sdk_kwargs = version_comps.groupdict()
-        kwargs.update({
-            'sdk_path': sdk_kwargs['name'].replace('-', '.'),
-            'client_name': client_name,
-            'operation_name': operation_name,
-            'dependencies': [sdk_kwargs]
-        })
 
     new_package_path = os.path.join(repo_path, package_name)
     if os.path.isdir(new_package_path):
@@ -107,6 +155,36 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, r
     else:
         _ensure_dir(os.path.join(new_package_path, 'azure', 'cli', 'command_modules', name, 'tests', 'latest'))
     env = Environment(loader=PackageLoader('azdev', 'mod_templates'))
+
+    # determine dependencies
+    dependencies = []
+    if is_ext:
+
+        dependencies.append("'azure-cli.core'")
+        _download_vendored_sdk(
+            required_sdk,
+            path=os.path.join(new_package_path, ext_folder, 'vendored_sdks')
+        )
+        kwargs.update({
+            'sdk_path': '{}{}.vendored_sdks'.format(prefix, package_name),
+            'client_name': client_name,
+            'operation_name': operation_name,
+        })
+    else:
+        if required_sdk:
+            version_regex = r'(?P<name>[a-zA-Z-]+)(?P<op>[~<>=]*)(?P<version>[\d.]*)'
+            version_comps = re.compile(version_regex).match(required_sdk)
+            sdk_kwargs = version_comps.groupdict()
+            kwargs.update({
+                'sdk_path': sdk_kwargs['name'].replace('-', '.'),
+                'client_name': client_name,
+                'operation_name': operation_name,
+            })
+            dependencies.append("'{}'".format(required_sdk))
+        else:
+            dependencies.append('# TODO: azure-mgmt-<NAME>==<VERSION>')
+
+    kwargs['dependencies'] = dependencies
 
     # generate code for root level
     dest_path = new_package_path

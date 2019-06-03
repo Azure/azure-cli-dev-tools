@@ -14,6 +14,8 @@ except ImportError:
     from distutils import log as logger
     logger.warn("Wheel is not available, disabling bdist_wheel hook")
 
+# TODO: Confirm this is the right version number you want and it matches your
+# HISTORY.rst entry.
 VERSION = '0.1.0'
 
 # The full list of classifiers is available at
@@ -32,13 +34,9 @@ CLASSIFIERS = [
     'License :: OSI Approved :: MIT License',
 ]
 
+# TODO: Add any additional SDK dependencies here
 DEPENDENCIES = [
-    {% if is_ext %}'azure-cli-core',{% endif %}
-    {% if dependencies %}
-    {% for dep in dependencies %}'{{ dep.name }}{{ dep.op }}{{ dep.version }}',{% endfor %}
-    {% else %}
-    # TODO: azure-mgmt-<NAME>==<VERSION>
-    {% endif %}
+    {{ dependencies|join(',\n    '|safe) }}
 ]
 
 with open('README.rst', 'r', encoding='utf-8') as f:
@@ -50,13 +48,15 @@ setup(
     name='{{ pkg_name }}',
     version=VERSION,
     description='Microsoft Azure Command-Line Tools {{ display_name }} {{ 'Extension' if is_ext else 'Command Module' }}',
-    long_description=README + '\n\n' + HISTORY,
-    license='MIT',
+    # TODO: Update author and email, if applicable
     author='Microsoft Corporation',
     author_email='azpycli@microsoft.com',
+    # TODO: consider pointing directly to your source code instead of the generic repo
     url='https://github.com/Azure/{{ 'azure-cli-extensions' if is_ext else 'azure-cli' }}',
+    long_description=README + '\n\n' + HISTORY,
+    license='MIT',
     classifiers=CLASSIFIERS,
     packages=find_packages(),
-{% if is_ext %}    package_data={'{{ ext_long_name }}': ['azext_metadata.json']},{% endif %}
     install_requires=DEPENDENCIES,
+{% if is_ext %}    package_data={'{{ ext_long_name }}': ['azext_metadata.json']},{% endif %}
 )

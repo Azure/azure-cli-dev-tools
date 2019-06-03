@@ -12,7 +12,7 @@ from codecs import open
 import os
 from setuptools import setup, find_packages
 
-__VERSION__ = '0.0.6'
+__VERSION__ = '0.0.7'
 
 with open('README.md', 'r', encoding='utf-8') as f:
     README = f.read()
