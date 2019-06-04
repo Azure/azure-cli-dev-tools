@@ -10,9 +10,14 @@
 
 from codecs import open
 import os
+import re
 from setuptools import setup, find_packages
 
-__VERSION__ = '0.0.7'
+
+azdev_path = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(azdev_path, 'azdev', '__init__.py'), 'r') as version_file:
+    __VERSION__ = re.search(r'^__VERSION__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                            version_file.read(), re.MULTILINE).group(1)
 
 with open('README.md', 'r', encoding='utf-8') as f:
     README = f.read()

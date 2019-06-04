@@ -8,3 +8,6 @@ ignore =
     F811,
     C901,
     W504
+
+exclude = 
+    mod_templates

@@ -41,26 +41,26 @@ def _generate_files(env, generation_kwargs, file_list, dest_path):
             f.write(env.get_template(metadata['template']).render(**generation_kwargs))
 
 
-def create_module(mod_name='test', display_name=None, required_sdk=None,
-                  client_name=None, operation_name=None):
+def create_module(mod_name='test', display_name=None, display_name_plural=None, required_sdk=None,
+                  client_name=None, operation_name=None, sdk_property=None, not_preview=False):
     repo_path = os.path.join(get_cli_repo_path(), 'src', 'command_modules')
-    _create_package(COMMAND_MODULE_PREFIX, repo_path, False, mod_name, display_name, required_sdk,
-                    client_name, operation_name)
+    _create_package(COMMAND_MODULE_PREFIX, repo_path, False, mod_name, display_name, display_name_plural,
+                    required_sdk, client_name, operation_name, sdk_property, not_preview)
 
-def create_extension(ext_name='test', repo_name=None, display_name=None, required_sdk=None,
-                     client_name=None, operation_name=None):
+
+def create_extension(ext_name='test', repo_name='azure-cli-extensions',
+                     display_name=None, display_name_plural=None,
+                     required_sdk=None, client_name=None, operation_name=None, sdk_property=None,
+                     not_preview=False):
     repo_path = None
-    if repo_name:
-        pass
-    else:
-        repo_paths = get_ext_repo_paths()
-        repo_path = next((x for x in repo_paths if x.endswith('azure-cli-extensions')), None)
+    repo_paths = get_ext_repo_paths()
+    repo_path = next((x for x in repo_paths if x.endswith(repo_name)), None)
     if not repo_path:
-        raise CLIError('Unable to find `azure-cli-extension` repo. Have you cloned it and added '
-                       'with `azdev extension repo add`?')
+        raise CLIError('Unable to find `{}` repo. Have you cloned it and added '
+                       'with `azdev extension repo add`?'.format(repo_name))
     repo_path = os.path.join(repo_path, 'src')
-    _create_package(EXTENSION_PREFIX, repo_path, True, ext_name, display_name, required_sdk,
-                    client_name, operation_name)
+    _create_package(EXTENSION_PREFIX, repo_path, True, ext_name, display_name, display_name_plural,
+                    required_sdk, client_name, operation_name, sdk_property, not_preview)
 
 
 def _download_vendored_sdk(required_sdk, path):
@@ -95,7 +95,7 @@ def _download_vendored_sdk(required_sdk, path):
         # remove the WHL file
         try:
             os.remove(downloaded_path)
-        except PermissionError:
+        except OSError:
             logger.warning('Unable to remove %s. Trying manually deleting.', downloaded_path)
 
         try:
@@ -111,13 +111,14 @@ def _download_vendored_sdk(required_sdk, path):
             shutil.move(src, dest)
         try:
             os.remove(os.path.join(vendored_sdks_path, 'azure'))
-        except PermissionError:
+        except OSError:
             logger.warning('Unable to remove %s. Try manually deleting.', os.path.join(vendored_sdks_path, 'azure'))
 
 
 # pylint: disable=too-many-locals, too-many-statements
-def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, required_sdk=None,
-                    client_name=None, operation_name=None):
+def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, display_name_plural=None,
+                    required_sdk=None, client_name=None, operation_name=None, sdk_property=None,
+                    not_preview=False):
     from jinja2 import Environment, PackageLoader
 
     if name.startswith(prefix):
@@ -133,10 +134,12 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, r
         'name': name,
         'mod_path': '{}{}'.format(prefix, name) if is_ext else 'azure.cli.command_modules.{}'.format(name),
         'display_name': display_name,
+        'display_name_plural': display_name_plural or '{}s'.format(display_name),
         'loader_name': '{}CommandsLoader'.format(name.capitalize()),
         'pkg_name': package_name,
         'ext_long_name': '{}{}'.format(prefix, name) if is_ext else None,
         'is_ext': is_ext,
+        'is_preview': not not_preview
     }
 
     new_package_path = os.path.join(repo_path, package_name)
@@ -160,15 +163,16 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, r
     dependencies = []
     if is_ext:
 
-        dependencies.append("'azure-cli.core'")
+        dependencies.append("'azure-cli-core'")
         _download_vendored_sdk(
             required_sdk,
             path=os.path.join(new_package_path, ext_folder, 'vendored_sdks')
         )
         kwargs.update({
-            'sdk_path': '{}{}.vendored_sdks'.format(prefix, package_name),
+            'sdk_path': required_sdk and '{}{}.vendored_sdks'.format(prefix, package_name),
             'client_name': client_name,
             'operation_name': operation_name,
+            'sdk_property': sdk_property or '{}_name'.format(name)
         })
     else:
         if required_sdk:
@@ -183,6 +187,7 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, r
             dependencies.append("'{}'".format(required_sdk))
         else:
             dependencies.append('# TODO: azure-mgmt-<NAME>==<VERSION>')
+        kwargs.update({'sdk_property': sdk_property or '{}_name'.format(name)})
 
     kwargs['dependencies'] = dependencies
 
@@ -250,11 +255,9 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, r
             pip_cmd("install -q -I azure-nspkg==1.0.0", "Installing `azure-nspkg`...")
             pip_cmd("install -q -I azure-mgmt-nspkg==1.0.0", "Installing `azure-mgmt-nspkg`...")
     else:
-        # TODO: Install extension
         result = pip_cmd('install -e {}'.format(new_package_path), "Installing `{}{}`...".format(prefix, name))
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
-
 
     if not is_ext:
         # TODO: add module to the azure-cli's "setup.py" file
@@ -262,5 +265,4 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, r
         pass
 
     # TODO: add module to Github code owners file
-
     display('\nCreation of {prefix}{mod} successful! Run `az {mod} -h` to get started!'.format(prefix=prefix, mod=name))

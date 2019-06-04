@@ -34,3 +34,8 @@ def load_command_table(self, _):
         # g.show_command('show', 'get')
         # g.generic_update_command('update', setter_name='update', custom_func_name='update_{{ name }}')
 {% endif %}
+{% if is_preview %}
+    with self.command_group('{{ name }}', is_preview=True):
+        pass
+{% endif %}
+
