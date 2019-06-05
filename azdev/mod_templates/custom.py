@@ -6,11 +6,11 @@
 from knack.util import CLIError
 
 
-def create_{{ name }}(cmd, {% if sdk_path %} client, {% endif %}resource_group_name, {{ name }}_name, location=None, tags=None):
+def create_{{ name }}(cmd, {% if sdk_path %}client, {% endif %}resource_group_name, {% if sdk_property %}{{sdk_property}}, {% else %} { name }}_name, {% endif %}location=None, tags=None):
     raise CLIError('TODO: Implement `{{ name }} create`')
 
 
-def list_{{ name }}(cmd, {% if sdk_path %} client, {% endif %}resource_group_name=None):
+def list_{{ name }}(cmd, {% if sdk_path %}client, {% endif %}resource_group_name=None):
     raise CLIError('TODO: Implement `{{ name }} list`')
 
 
