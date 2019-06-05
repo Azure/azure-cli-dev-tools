@@ -42,16 +42,17 @@ def _generate_files(env, generation_kwargs, file_list, dest_path):
 
 
 def create_module(mod_name='test', display_name=None, display_name_plural=None, required_sdk=None,
-                  client_name=None, operation_name=None, sdk_property=None, not_preview=False):
+                  client_name=None, operation_name=None, sdk_property=None, not_preview=False, github_alias=None):
     repo_path = os.path.join(get_cli_repo_path(), 'src', 'command_modules')
     _create_package(COMMAND_MODULE_PREFIX, repo_path, False, mod_name, display_name, display_name_plural,
-                    required_sdk, client_name, operation_name, sdk_property, not_preview)
+                    required_sdk, client_name, operation_name, sdk_property, not_preview,
+                    github_alias)
 
 
 def create_extension(ext_name='test', repo_name='azure-cli-extensions',
                      display_name=None, display_name_plural=None,
                      required_sdk=None, client_name=None, operation_name=None, sdk_property=None,
-                     not_preview=False):
+                     not_preview=False, github_alias=None):
     repo_path = None
     repo_paths = get_ext_repo_paths()
     repo_path = next((x for x in repo_paths if x.endswith(repo_name)), None)
@@ -60,7 +61,8 @@ def create_extension(ext_name='test', repo_name='azure-cli-extensions',
                        'with `azdev extension repo add`?'.format(repo_name))
     repo_path = os.path.join(repo_path, 'src')
     _create_package(EXTENSION_PREFIX, repo_path, True, ext_name, display_name, display_name_plural,
-                    required_sdk, client_name, operation_name, sdk_property, not_preview)
+                    required_sdk, client_name, operation_name, sdk_property, not_preview,
+                    github_alias)
 
 
 def _download_vendored_sdk(required_sdk, path):
@@ -115,10 +117,30 @@ def _download_vendored_sdk(required_sdk, path):
             logger.warning('Unable to remove %s. Try manually deleting.', os.path.join(vendored_sdks_path, 'azure'))
 
 
+def _add_to_codeowners(repo_path, prefix, name, github_alias):
+    # TODO: FINISH THIS!
+    try:
+        codeowners = find_files(os.path.join(repo_path, '..', '..'), 'CODEOWNERS')[0]
+    except IndexError:
+        raise CLIError('unexpected error: unable to find CODEOWNERS file.')
+
+    codeowner_lines = []
+    with open(codeowners, 'r') as f:
+        codeowner_lines = f.readlines()
+
+    if prefix == COMMAND_MODULE_PREFIX:
+        new_line = '/src/command_modules/{}{} @{}'.format(prefix, name, github_alias)
+    else:
+        new_line = '/src/{}{} @{}'.format(prefix, name, github_alias)
+
+    codeowner_lines.append(new_line)
+    print(codeowner_lines)
+
+
 # pylint: disable=too-many-locals, too-many-statements
 def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, display_name_plural=None,
                     required_sdk=None, client_name=None, operation_name=None, sdk_property=None,
-                    not_preview=False):
+                    not_preview=False, github_alias=None):
     from jinja2 import Environment, PackageLoader
 
     if name.startswith(prefix):
@@ -264,5 +286,6 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
         # TODO: add module to doc source map
         pass
 
-    # TODO: add module to Github code owners file
+    _add_to_codeowners(repo_path, prefix, name, github_alias)
+
     display('\nCreation of {prefix}{mod} successful! Run `az {mod} -h` to get started!'.format(prefix=prefix, mod=name))
