@@ -6,6 +6,7 @@
 
 from __future__ import print_function
 
+import json
 import os
 import re
 from subprocess import CalledProcessError
@@ -47,6 +48,12 @@ def create_module(mod_name='test', display_name=None, display_name_plural=None, 
     _create_package(COMMAND_MODULE_PREFIX, repo_path, False, mod_name, display_name, display_name_plural,
                     required_sdk, client_name, operation_name, sdk_property, not_preview,
                     github_alias)
+    _add_to_codeowners(get_cli_repo_path(), COMMAND_MODULE_PREFIX, mod_name, github_alias)
+    _add_to_setup_py(get_cli_repo_path(), mod_name)
+    _add_to_doc_map(get_cli_repo_path(), mod_name)
+
+    display('\nCreation of {prefix}{mod} successful! Run `az {mod} -h` to get started!'.format(
+        prefix=COMMAND_MODULE_PREFIX, mod=mod_name))
 
 
 def create_extension(ext_name='test', repo_name='azure-cli-extensions',
@@ -56,13 +63,18 @@ def create_extension(ext_name='test', repo_name='azure-cli-extensions',
     repo_path = None
     repo_paths = get_ext_repo_paths()
     repo_path = next((x for x in repo_paths if x.endswith(repo_name)), None)
+
     if not repo_path:
         raise CLIError('Unable to find `{}` repo. Have you cloned it and added '
                        'with `azdev extension repo add`?'.format(repo_name))
-    repo_path = os.path.join(repo_path, 'src')
-    _create_package(EXTENSION_PREFIX, repo_path, True, ext_name, display_name, display_name_plural,
-                    required_sdk, client_name, operation_name, sdk_property, not_preview,
+
+    _create_package(EXTENSION_PREFIX, os.path.join(repo_path, 'src'), True, ext_name, display_name,
+                    display_name_plural, required_sdk, client_name, operation_name, sdk_property, not_preview,
                     github_alias)
+    _add_to_codeowners(repo_path, EXTENSION_PREFIX, ext_name, github_alias)
+
+    display('\nCreation of {prefix}{mod} successful! Run `az {mod} -h` to get started!'.format(
+        prefix=EXTENSION_PREFIX, mod=ext_name))
 
 
 def _download_vendored_sdk(required_sdk, path):
@@ -118,23 +130,48 @@ def _download_vendored_sdk(required_sdk, path):
 
 
 def _add_to_codeowners(repo_path, prefix, name, github_alias):
-    # TODO: FINISH THIS!
+    # add the user Github alias to the CODEOWNERS file for new packages
+    if not github_alias:
+        from knack.prompting import prompt
+        display('\nWhat is the Github alias of the person responsible for maintaining this package?')
+        while not github_alias:
+            github_alias = prompt('Alias: ')
+
+    # accept a raw alias or @alias
+    github_alias = '@{}'.format(github_alias) if not github_alias.startswith('@') else github_alias
     try:
-        codeowners = find_files(os.path.join(repo_path, '..', '..'), 'CODEOWNERS')[0]
+        codeowners = find_files(repo_path, 'CODEOWNERS')[0]
     except IndexError:
         raise CLIError('unexpected error: unable to find CODEOWNERS file.')
 
-    codeowner_lines = []
-    with open(codeowners, 'r') as f:
-        codeowner_lines = f.readlines()
-
     if prefix == COMMAND_MODULE_PREFIX:
-        new_line = '/src/command_modules/{}{} @{}'.format(prefix, name, github_alias)
+        new_line = '/src/command_modules/{}{}/ {}'.format(prefix, name, github_alias)
     else:
-        new_line = '/src/{}{} @{}'.format(prefix, name, github_alias)
+        new_line = '/src/{}{}/ {}'.format(prefix, name, github_alias)
 
-    codeowner_lines.append(new_line)
-    print(codeowner_lines)
+    with open(codeowners, 'a') as f:
+        f.write(new_line)
+        f.write('\n')
+
+
+def _add_to_setup_py(repo_path, name):
+    setup_file = find_files(repo_path, 'setup.py')
+    print(setup_file)
+
+
+def _add_to_doc_map(repo_path, name):
+    try:
+        doc_source_file = find_files(repo_path, 'doc_source_map.json')[0]
+    except IndexError:
+        raise CLIError('unexpected error: unable to find doc_source_map.json file.')
+    doc_source = None
+    with open(doc_source_file, 'r') as f:
+        doc_source = json.loads(f.read())
+
+    # TODO: Fix format!
+    doc_source[name] = 'src/command_modules/azure-cli-{0}/azure/cli/command_modules/{0}/_help.py'.format(name)
+    with open(doc_source_file, 'w') as f:
+        f.write(json.dumps(doc_source))
 
 
 # pylint: disable=too-many-locals, too-many-statements
@@ -280,12 +317,3 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
         result = pip_cmd('install -e {}'.format(new_package_path), "Installing `{}{}`...".format(prefix, name))
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
-
-    if not is_ext:
-        # TODO: add module to the azure-cli's "setup.py" file
-        # TODO: add module to doc source map
-        pass
-
-    _add_to_codeowners(repo_path, prefix, name, github_alias)
-
-    display('\nCreation of {prefix}{mod} successful! Run `az {mod} -h` to get started!'.format(prefix=prefix, mod=name))
