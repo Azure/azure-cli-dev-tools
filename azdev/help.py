@@ -53,7 +53,7 @@ helps['cli create'] = """
         - name: Scaffold a new CLI module with the azure-mgmt-contoso SDK.
           text: >
             azdev cli create contoso --required-sdk azure-mgmt-contoso==0.1.0 --operation-name ContosoOperations
-            --client-name ContosoManagementClient
+            --client-name ContosoManagementClient --sdk-property contoso_name
 """
 
 helps['cli update-setup'] = """
@@ -181,8 +181,8 @@ helps['extension create'] = """
           text: azdev extension create contoso
         - name: Scaffold a new CLI extension with the azure-mgmt-contoso SDK.
           text: >
-            azdev extension create contoso --required-sdk azure-mgmt-contoso==0.1.0 --operation-name ContosoOperations
-            --client-name ContosoManagementClient
+            azdev extension create contoso --local-sdk {sdkPath} --operation-name ContosoOperations
+            --client-name ContosoManagementClient --sdk-property contoso_name
 """
 
 

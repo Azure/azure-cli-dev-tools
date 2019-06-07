@@ -31,7 +31,7 @@ class {{ name.capitalize() }}ScenarioTest(ScenarioTest):
         ])
         count = len(self.cmd('{{ name }} list').get_output_in_json())
         self.cmd('{{ name }} show - {rg} -n {name}', checks=[
-            self.check('name': '{name}'),
+            self.check('name', '{name}'),
             self.check('resourceGroup', '{rg}'),
             self.check('tags.foo', 'boo')
         ])

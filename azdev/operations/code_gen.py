@@ -12,7 +12,7 @@ import re
 from subprocess import CalledProcessError
 
 from knack.log import get_logger
-from knack.prompting import prompt_y_n
+from knack.prompting import prompt_y_n, prompt
 from knack.util import CLIError
 
 from azdev.utilities import (
@@ -43,23 +43,22 @@ def _generate_files(env, generation_kwargs, file_list, dest_path):
 
 
 def create_module(mod_name='test', display_name=None, display_name_plural=None, required_sdk=None,
-                  client_name=None, operation_name=None, sdk_property=None, not_preview=False, github_alias=None):
+                  client_name=None, operation_name=None, sdk_property=None, not_preview=False, github_alias=None,
+                  local_sdk=None):
     repo_path = os.path.join(get_cli_repo_path(), 'src', 'command_modules')
     _create_package(COMMAND_MODULE_PREFIX, repo_path, False, mod_name, display_name, display_name_plural,
-                    required_sdk, client_name, operation_name, sdk_property, not_preview,
-                    github_alias)
+                    required_sdk, client_name, operation_name, sdk_property, not_preview, local_sdk)
     _add_to_codeowners(get_cli_repo_path(), COMMAND_MODULE_PREFIX, mod_name, github_alias)
     _add_to_setup_py(get_cli_repo_path(), mod_name)
     _add_to_doc_map(get_cli_repo_path(), mod_name)
 
-    display('\nCreation of {prefix}{mod} successful! Run `az {mod} -h` to get started!'.format(
-        prefix=COMMAND_MODULE_PREFIX, mod=mod_name))
+    _display_success_message(COMMAND_MODULE_PREFIX + mod_name, mod_name)
 
 
 def create_extension(ext_name='test', repo_name='azure-cli-extensions',
                      display_name=None, display_name_plural=None,
                      required_sdk=None, client_name=None, operation_name=None, sdk_property=None,
-                     not_preview=False, github_alias=None):
+                     not_preview=False, github_alias=None, local_sdk=None):
     repo_path = None
     repo_paths = get_ext_repo_paths()
     repo_path = next((x for x in repo_paths if x.endswith(repo_name)), None)
@@ -70,25 +69,38 @@ def create_extension(ext_name='test', repo_name='azure-cli-extensions',
 
     _create_package(EXTENSION_PREFIX, os.path.join(repo_path, 'src'), True, ext_name, display_name,
                     display_name_plural, required_sdk, client_name, operation_name, sdk_property, not_preview,
-                    github_alias)
+                    local_sdk)
     _add_to_codeowners(repo_path, EXTENSION_PREFIX, ext_name, github_alias)
 
-    display('\nCreation of {prefix}{mod} successful! Run `az {mod} -h` to get started!'.format(
-        prefix=EXTENSION_PREFIX, mod=ext_name))
+    _display_success_message(EXTENSION_PREFIX + ext_name, ext_name)
+
+
+def _display_success_message(package_name, group_name):
+    heading('Creation of {} successful!'.format(package_name))
+    display('Getting started:')
+    display('\n  To see your new commands:')
+    display('    `az {} -h`'.format(group_name))
+    display('\n  To discover and run your tests:')
+    display('    `azdev test {} --discover`'.format(group_name))
+    display('\n  To identify code style issues (there will be some left over from code generation):')
+    display('    `azdev style {}`'.format(group_name))
+    display('\n  To identify CLI-specific linter violations:')
+    display('    `azdev linter {}`'.format(group_name))
 
 
 def _download_vendored_sdk(required_sdk, path):
-    import shutil
+    import tempfile
     import zipfile
 
     path_regex = re.compile(r'.*((\s*.*downloaded\s)|(\s*.*saved\s))(?P<path>.*\.whl)', re.IGNORECASE | re.S)
+    temp_path = tempfile.mkdtemp()
 
     # download and extract the required SDK to the vendored_sdks folder
     downloaded_path = None
     if required_sdk:
         display('Downloading {}...'.format(required_sdk))
         vendored_sdks_path = path
-        result = pip_cmd('download {} --no-deps -d {}'.format(required_sdk, vendored_sdks_path)).result
+        result = pip_cmd('download {} --no-deps -d {}'.format(required_sdk, temp_path)).result
         try:
             result = result.decode('utf-8')
         except AttributeError:
@@ -100,39 +112,33 @@ def _download_vendored_sdk(required_sdk, path):
                 continue
             break
         if not downloaded_path:
+            display('Unable to download')
             raise CLIError('Unable to download: {}'.format(required_sdk))
 
         # extract the WHL file
         with zipfile.ZipFile(str(downloaded_path), 'r') as z:
-            z.extractall(vendored_sdks_path)
+            z.extractall(temp_path)
 
-        # remove the WHL file
-        try:
-            os.remove(downloaded_path)
-        except OSError:
-            logger.warning('Unable to remove %s. Trying manually deleting.', downloaded_path)
+        _copy_vendored_sdk(temp_path, vendored_sdks_path)
 
-        try:
-            client_location = find_files(vendored_sdks_path, 'version.py')[0]
-        except KeyError:
-            raise CLIError('Unable to find client files.')
 
-        # copy the client files and folders to the root of vendored_sdks for easier access
-        client_dir = os.path.dirname(client_location)
-        for item in os.listdir(client_dir):
-            src = os.path.join(client_dir, item)
-            dest = os.path.join(vendored_sdks_path, item)
-            shutil.move(src, dest)
-        try:
-            os.remove(os.path.join(vendored_sdks_path, 'azure'))
-        except OSError:
-            logger.warning('Unable to remove %s. Try manually deleting.', os.path.join(vendored_sdks_path, 'azure'))
+def _copy_vendored_sdk(src_path, dest_path):
+    import shutil
+
+    try:
+        client_location = find_files(src_path, 'version.py')[0]
+    except IndexError:
+        raise CLIError('Unable to find client files.')
+
+    # copy the client files and folders to the root of vendored_sdks for easier access
+    client_dir = os.path.dirname(client_location)
+    shutil.rmtree(dest_path)
+    shutil.copytree(client_dir, dest_path)
 
 
 def _add_to_codeowners(repo_path, prefix, name, github_alias):
     # add the user Github alias to the CODEOWNERS file for new packages
     if not github_alias:
-        from knack.prompting import prompt
         display('\nWhat is the Github alias of the person responsible for maintaining this package?')
         while not github_alias:
             github_alias = prompt('Alias: ')
@@ -155,8 +161,29 @@ def _add_to_codeowners(repo_path, prefix, name, github_alias):
 
 
 def _add_to_setup_py(repo_path, name):
-    setup_file = find_files(repo_path, 'setup.py')
-    print(setup_file)
+    try:
+        setup_file = find_files(repo_path, os.path.join('azure-cli', 'setup.py'))[0]
+    except IndexError:
+        raise CLIError('unexpected error: unable to find azure-cli\'s setup.py file.')
+
+    old_lines = []
+    with open(setup_file, 'r') as f:
+        old_lines = f.readlines()
+
+    # TODO: finish this!
+    with open(setup_file, 'w') as f:
+        start_line = 'DEPENDENCIES = ['
+        end_line = ']'
+        start_found = False
+
+        for line in old_lines:
+            if line.strip() == start_line:
+                start_found = True
+
+            if line.strip() == end_line and start_found:
+                f.write("    'azure-cli-{}',\n".format(name))
+                start_found = False
+            f.write(line)
 
 
 def _add_to_doc_map(repo_path, name):
@@ -171,14 +198,17 @@ def _add_to_doc_map(repo_path, name):
     # TODO: Fix format!
     doc_source[name] = 'src/command_modules/azure-cli-{0}/azure/cli/command_modules/{0}/_help.py'.format(name)
     with open(doc_source_file, 'w') as f:
-        f.write(json.dumps(doc_source))
+        f.write(json.dumps(doc_source, indent=4))
 
 
-# pylint: disable=too-many-locals, too-many-statements
+# pylint: disable=too-many-locals, too-many-statements, too-many-branches
 def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, display_name_plural=None,
                     required_sdk=None, client_name=None, operation_name=None, sdk_property=None,
-                    not_preview=False, github_alias=None):
+                    not_preview=False, local_sdk=None):
     from jinja2 import Environment, PackageLoader
+
+    if local_sdk and required_sdk:
+        raise CLIError('usage error: --local-sdk PATH | --required-sdk NAME==VER')
 
     if name.startswith(prefix):
         name = name[len(prefix):]
@@ -206,7 +236,7 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
         if not prompt_y_n(
                 "{} '{}' already exists. Overwrite?".format('Extension' if is_ext else 'Module', package_name),
                 default='n'):
-            return
+            raise CLIError('aborted by user')
 
     ext_folder = '{}{}'.format(prefix, name) if is_ext else None
 
@@ -221,14 +251,19 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
     # determine dependencies
     dependencies = []
     if is_ext:
-
         dependencies.append("'azure-cli-core'")
-        _download_vendored_sdk(
-            required_sdk,
-            path=os.path.join(new_package_path, ext_folder, 'vendored_sdks')
-        )
+        if required_sdk:
+            _download_vendored_sdk(
+                required_sdk,
+                path=os.path.join(new_package_path, ext_folder, 'vendored_sdks')
+            )
+        elif local_sdk:
+            _copy_vendored_sdk(local_sdk, os.path.join(new_package_path, ext_folder, 'vendored_sdks'))
+        sdk_path = None
+        if any([local_sdk, required_sdk]):
+            sdk_path = '{}{}.vendored_sdks'.format(prefix, package_name)
         kwargs.update({
-            'sdk_path': required_sdk and '{}{}.vendored_sdks'.format(prefix, package_name),
+            'sdk_path': sdk_path,
             'client_name': client_name,
             'operation_name': operation_name,
             'sdk_property': sdk_property or '{}_name'.format(name)

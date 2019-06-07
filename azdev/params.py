@@ -102,11 +102,16 @@ def load_arguments(self, _):
 
     for scope in ['extension create', 'cli create']:
         with ArgumentsContext(self, scope) as c:
+            c.argument('github_alias', help='Github alias for the individual who will be the code owner for this package.')
             c.argument('not_preview', action='store_true', help='Do not create template commands under a "Preview" status.')
-            c.argument('required_sdk', help='Name and version of the underlying Azure SDK. (ex: azure-mgmt-contoso==0.1.0).', arg_group='SDK')
+            c.argument('required_sdk', help='Name and version of the underlying Azure SDK that is published on PyPI. (ex: azure-mgmt-contoso==0.1.0).', arg_group='SDK')
+            c.argument('local_sdk', help='Path to a locally saved SDK. Use if your SDK is not available on PyPI.', arg_group='SDK')
             c.argument('client_name', help='Name of the Python SDK client object (ex: ContosoManagementClient).', arg_group='SDK')
             c.argument('operation_name', help='Name of the principal Python SDK operation class (ex: ContosoOperations).', arg_group='SDK')
             c.argument('sdk_property', help='The name of the Python variable that describes the main object name in the SDK calls (i.e.: account_name)', arg_group='SDK')
             c.argument('repo_name', help='Name of the repo the extension will exist in.')
             c.argument('display_name', arg_group='Help', help='Description to display in help text.')
             c.argument('display_name_plural', arg_group='Help', help='Description to display in help text when plural.')
+
+    with ArgumentsContext(self, 'cli create') as c:
+        c.ignore('local_sdk')
