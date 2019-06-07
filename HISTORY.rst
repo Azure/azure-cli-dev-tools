@@ -5,6 +5,8 @@ Release History
 
 0.0.6
 +++++
+* Added new commands `azdev cli create` and `azdev extension create` to scaffold new modules/extensions.
+* `azdev setup`: Tweaks to interactive experience.
 * `azdev test`: Fix issue where using `--profile` did not use the correct index.
                 Changed the behavior to switch back to the original profile upon completion of tests.
 

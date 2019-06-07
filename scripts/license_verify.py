@@ -19,6 +19,12 @@ PY_LICENSE_HEADER = """# -------------------------------------------------------
 # -----------------------------------------------------------------------------
 """
 
+PY_LICENSE_HEADER_ALT = """# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+"""
+
 env_folders = [
     os.path.join(ROOT_DIR, 'env'),
     os.path.join(ROOT_DIR, 'env27'),
@@ -27,7 +33,10 @@ env_folders = [
 
 
 def contains_header(text):
-    return PY_LICENSE_HEADER in text
+    for header in [PY_LICENSE_HEADER, PY_LICENSE_HEADER_ALT]:
+        if header in text:
+            return True
+    return False
 
 
 def get_files_without_header():

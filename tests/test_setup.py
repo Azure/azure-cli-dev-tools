@@ -6,10 +6,13 @@
 
 import unittest
 
+from azdev.utilities import test_cmd as cmd
+
 
 class TestSetup(unittest.TestCase):
 
     def test_setup(self):
-        from azdev.utilities import test_cmd as cmd
+        from knack.prompting import NoTTYException
 
-        cmd('setup')
+        with self.assertRaises(NoTTYException):
+            cmd('setup')

@@ -45,6 +45,17 @@ helps['cli check-versions'] = """
           text: azdev cli check-versions --update --pin
 """
 
+helps['cli create'] = """
+    short-summary: Create a new Azure CLI module template.
+    examples:
+        - name: Scaffold a new CLI module named 'contoso'.
+          text: azdev cli create contoso
+        - name: Scaffold a new CLI module with the azure-mgmt-contoso SDK.
+          text: >
+            azdev cli create contoso --required-sdk azure-mgmt-contoso==0.1.0 --operation-name ContosoOperations
+            --client-name ContosoManagementClient --sdk-property contoso_name
+"""
+
 helps['cli update-setup'] = """
     short-summary: Update the azure-cli setup.py file.
     examples:
@@ -163,6 +174,18 @@ helps['extension'] = """
 """
 
 
+helps['extension create'] = """
+    short-summary: Create a new Azure CLI extension template.
+    examples:
+        - name: Scaffold a new CLI extension named 'contoso'.
+          text: azdev extension create contoso
+        - name: Scaffold a new CLI extension with the azure-mgmt-contoso SDK.
+          text: >
+            azdev extension create contoso --local-sdk {sdkPath} --operation-name ContosoOperations
+            --client-name ContosoManagementClient --sdk-property contoso_name
+"""
+
+
 helps['extension add'] = """
     short-summary: Make an extension visible to the development environment.
     long-summary: The source code for the extension must already be on your machine.
@@ -187,6 +210,12 @@ helps['extension list'] = """
 
 helps['extension publish'] = """
     short-summary: Build and publish an extension to a storage account.
+    long-summary: Storage parameters may be persisted in the [defaults] section of your config file for convenience.
+    examples:
+        - name: Publish the contoso extension to a storage account and update the index. This will then be ready for a PR.
+          text: >
+            azdev extension publish contoso --update-index --storage-account mystorage --storage-container extensions
+            --storage-subscription {subscriptionId}
 """
 
 
@@ -224,18 +253,4 @@ helps['extension repo remove'] = """
 helps['extension repo list'] = """
     short-summary: >
         List the repositories that will be searched for in-development extensions.
-"""
-
-
-helps['group'] = """
-    short-summary: Convenience commands to manage Azure resource groups.
-"""
-
-
-helps['group delete'] = """
-    short-summary: Delete several resource groups with filters. Useful for cleaning up test resources.
-    long-summary: >
-        Can filter either by key tags used by the CLI infrastructure, or by name prefix. If name prefix
-        is used, the tag filters will be ignored. This command doesn't guarantee the resource group will
-        be deleted.
 """

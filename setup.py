@@ -10,9 +10,14 @@
 
 from codecs import open
 import os
+import re
 from setuptools import setup, find_packages
 
-__VERSION__ = '0.0.6'
+
+azdev_path = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(azdev_path, 'azdev', '__init__.py'), 'r') as version_file:
+    __VERSION__ = re.search(r'^__VERSION__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                            version_file.read(), re.MULTILINE).group(1)
 
 with open('README.md', 'r', encoding='utf-8') as f:
     README = f.read()
@@ -45,6 +50,7 @@ setup(
         'azdev',
         'azdev.config',
         'azdev.operations',
+        'azdev.mod_templates',
         'azdev.operations.linter',
         'azdev.operations.linter.rules',
         'azdev.operations.tests',
@@ -55,7 +61,8 @@ setup(
         'docutils',
         'flake8',
         'gitpython',
-        'knack~=0.6.1',
+        'jinja2',
+        'knack~=0.6.2',
         'mock',
         'pytest~=4.4.0',
         'pytest-xdist',
@@ -70,6 +77,7 @@ setup(
     },
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
+        'azdev.mod_templates': ['*.*'],
         'azdev.operations.linter.rules': ['ci_exclusions.yml']
     },
     include_package_data=True,

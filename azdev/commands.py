@@ -32,6 +32,10 @@ def load_command_table(self, _):
         g.command('check-versions', 'verify_versions')
         g.command('update-setup', 'update_setup_py')
 
+    with CommandGroup(self, '', operation_group('code_gen')) as g:
+        g.command('cli create', 'create_module')
+        g.command('extension create', 'create_extension')
+
     with CommandGroup(self, 'verify', operation_group('help')) as g:
         g.command('document-map', 'check_document_map')
 
@@ -40,9 +44,6 @@ def load_command_table(self, _):
 
     with CommandGroup(self, 'perf', operation_group('performance')) as g:
         g.command('load-times', 'check_load_time')
-
-    # with CommandGroup(self, 'sdk', operation_group('python_sdk')) as g:
-    #     g.command('draft', 'install_draft_sdk')
 
     with CommandGroup(self, 'extension', operation_group('extensions')) as g:
         g.command('add', 'add_extension')
