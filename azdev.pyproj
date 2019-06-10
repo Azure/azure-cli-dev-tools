@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{6285073d-e427-48c1-9783-abddf33fa22c}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>src\azdev\__init__.py</StartupFile>
+    <StartupFile>azdev\__init__.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -21,38 +21,66 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\azdev\commands.py" />
-    <Compile Include="src\azdev\custom.py" />
-    <Compile Include="src\azdev\help.py" />
-    <Compile Include="src\azdev\params.py" />
-    <Compile Include="src\azdev\utilities\const.py">
+    <Compile Include="azdev\commands.py" />
+    <Compile Include="azdev\completer.py" />
+    <Compile Include="azdev\help.py" />
+    <Compile Include="azdev\operations\code_gen.py" />
+    <Compile Include="azdev\operations\extensions\util.py" />
+    <Compile Include="azdev\operations\extensions\__init__.py" />
+    <Compile Include="azdev\operations\help.py" />
+    <Compile Include="azdev\operations\legal.py" />
+    <Compile Include="azdev\operations\linter\linter.py" />
+    <Compile Include="azdev\operations\linter\rules\command_group_rules.py" />
+    <Compile Include="azdev\operations\linter\rules\command_rules.py" />
+    <Compile Include="azdev\operations\linter\rules\help_rules.py" />
+    <Compile Include="azdev\operations\linter\rules\parameter_rules.py" />
+    <Compile Include="azdev\operations\linter\rules\__init__.py" />
+    <Compile Include="azdev\operations\linter\rule_decorators.py" />
+    <Compile Include="azdev\operations\linter\util.py" />
+    <Compile Include="azdev\operations\linter\__init__.py" />
+    <Compile Include="azdev\operations\performance.py" />
+    <Compile Include="azdev\operations\pypi.py" />
+    <Compile Include="azdev\operations\python_sdk.py" />
+    <Compile Include="azdev\operations\resource.py" />
+    <Compile Include="azdev\operations\setup.py" />
+    <Compile Include="azdev\operations\style.py" />
+    <Compile Include="azdev\operations\tests\pytest_runner.py" />
+    <Compile Include="azdev\operations\tests\__init__.py" />
+    <Compile Include="azdev\operations\__init__.py" />
+    <Compile Include="azdev\params.py" />
+    <Compile Include="azdev\utilities\config.py" />
+    <Compile Include="azdev\utilities\const.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\azdev\utilities\display.py">
+    <Compile Include="azdev\utilities\display.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\azdev\utilities\command.py">
+    <Compile Include="azdev\utilities\command.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\azdev\utilities\path.py">
+    <Compile Include="azdev\utilities\path.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\azdev\utilities\pypi.py">
+    <Compile Include="azdev\utilities\pypi.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\azdev\utilities\__init__.py">
+    <Compile Include="azdev\utilities\testing.py" />
+    <Compile Include="azdev\utilities\tools.py" />
+    <Compile Include="azdev\utilities\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\azdev\validators.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="src\azdev\__init__.py" />
-    <Compile Include="src\setup.py" />
+    <Compile Include="azdev\__init__.py" />
+    <Compile Include="azdev\__main__.py" />
+    <Compile Include="setup.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src" />
-    <Folder Include="src\azdev\" />
-    <Folder Include="src\azdev\utilities\" />
+    <Folder Include="azdev\operations\" />
+    <Folder Include="azdev\operations\extensions\" />
+    <Folder Include="azdev\operations\linter\" />
+    <Folder Include="azdev\operations\linter\rules\" />
+    <Folder Include="azdev\operations\tests\" />
+    <Folder Include="azdev\" />
+    <Folder Include="azdev\utilities\" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
@@ -64,6 +92,10 @@
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
       <Architecture>X86</Architecture>
     </Interpreter>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="azdev\operations\linter\rules\ci_exclusions.yml" />
+    <Content Include="azdev\operations\linter\rules\linter_exclusions.yml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
