@@ -128,11 +128,20 @@ def get_path_table(include_only=None):
     table = {}
     cli_repo_path = get_cli_repo_path()
     ext_repo_paths = get_ext_repo_paths()
-    modules_paths = glob(
-        os.path.normcase(
-            os.path.join(cli_repo_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py')
+
+    # older azure-cli package with individual modules (2.0.67 and earlier)
+    old_paths = os.path.normcase(
+        os.path.join(
+            cli_repo_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py'
         )
     )
+    # unified azure-cli package (2.0.68 and later)
+    new_paths = os.path.normcase(
+        os.path.join(
+            cli_repo_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules', '*', 'commands.py'
+        )
+    )
+    modules_paths = glob(old_paths) + glob(new_paths)
     core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
     ext_paths = find_files(ext_repo_paths, '*.*-info')
 
