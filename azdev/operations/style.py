@@ -104,9 +104,7 @@ def _combine_command_result(cli_result, ext_result):
 
 def _run_pylint(modules):
 
-    cli_paths = []
-    for path in list(modules['core'].values()) + list(modules['mod'].values()):
-        cli_paths.append(os.path.join(path, 'azure'))
+    cli_paths = list(modules['core'].values()) + list(modules['mod'].values())
 
     ext_paths = []
     for path in list(modules['ext'].values()):

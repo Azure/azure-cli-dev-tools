@@ -103,6 +103,7 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
 
 def _extract_module_name(path):
+    # TODO: Update this for flattened modules
     mod_name_regex = re.compile(r'azure-cli-([^/\\]+)[/\\]azure[/\\]cli')
     ext_name_regex = re.compile(r'.*(azext_[^/\\]+).*')
 
@@ -219,7 +220,7 @@ def _discover_tests(profile):
         mod_data = {
             'alt_name': short_name,
             'filepath': os.path.join(
-                mod_path, 'azure', 'cli', 'command_modules', short_name, 'tests', profile_namespace),
+                mod_path, 'tests', profile_namespace),
             'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(short_name, profile_namespace),
             'files': {}
         }

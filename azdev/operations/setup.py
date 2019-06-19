@@ -38,31 +38,6 @@ def _check_repo(path):
         raise CLIError("'{}' is not a valid git repository.".format(path))
 
 
-def _install_modules():
-
-    all_modules = list(get_path_table()['mod'].items())
-
-    failures = []
-    mod_num = 1
-    total_mods = len(all_modules)
-    for name, path in all_modules:
-        try:
-            result = pip_cmd("install -q -e {}".format(path),
-                             "Installing module `{}` ({}/{})...".format(name, mod_num, total_mods))
-            if 'ERROR' in str(result.result):
-                failures.append('Failed to install {}. {}'.format(name, str(result.result)))
-                continue
-            mod_num += 1
-        except CalledProcessError as err:
-            # exit code is not zero
-            failures.append("Failed to install {}. Error message: {}".format(name, err.output))
-
-    for f in failures:
-        display(f)
-
-    return not any(failures)
-
-
 def _install_extensions(ext_paths):
     # clear pre-existing dev extensions
     try:
@@ -116,7 +91,6 @@ def _install_cli(cli_path):
         "install -q -e {}/src/azure-cli-core".format(cli_path),
         "Installing `azure-cli-core`..."
     )
-    _install_modules()
 
     # azure cli has dependencies on the above packages so install this one last
     pip_cmd("install -q -e {}/src/azure-cli".format(cli_path), "Installing `azure-cli`...")
