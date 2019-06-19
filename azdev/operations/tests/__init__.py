@@ -103,15 +103,16 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
 
 def _extract_module_name(path):
-    # TODO: Update this for flattened modules
-    mod_name_regex = re.compile(r'azure-cli-([^/\\]+)[/\\]azure[/\\]cli')
-    ext_name_regex = re.compile(r'.*(azext_[^/\\]+).*')
+    core_name_regex = re.compile(r'azure-cli-(?P<name>[^/\\]+)[/\\]azure[/\\]cli')
+    mod_name_regex = re.compile(r'azure-cli[/\\]azure[/\\]cli[/\\]command_modules[/\\](?P<name>[^/\\]+)')
+    ext_name_regex = re.compile(r'.*(?P<name>azext_[^/\\]+).*')
 
-    try:
-        return re.search(mod_name_regex, path).group(1)
-    except AttributeError:
-        return re.search(ext_name_regex, path).group(1)
-
+    for expression in [mod_name_regex, core_name_regex, ext_name_regex]:
+        match = re.search(expression, path)
+        if not match:
+            continue
+        return match.groupdict().get('name')
+    raise CLIError('unexpected error: unable to extract name from path: {}'.format(path))
 
 def _get_profile(profile):
     import colorama
@@ -204,6 +205,7 @@ def _discover_tests(profile):
         filepath = mod_path
         for comp in mod_name.split('-'):
             filepath = os.path.join(filepath, comp)
+
         mod_data = {
             'alt_name': 'main' if mod_name == 'azure-cli' else mod_name.replace(COMMAND_MODULE_PREFIX, ''),
             'filepath': os.path.join(filepath, 'tests'),
@@ -216,12 +218,13 @@ def _discover_tests(profile):
 
     logger.info('\nCommand Modules: %s', ', '.join([name for name, _ in command_modules]))
     for mod_name, mod_path in command_modules:
-        short_name = mod_name.replace(COMMAND_MODULE_PREFIX, '')
         mod_data = {
-            'alt_name': short_name,
+            # Modules don't technically have azure-cli-foo moniker anymore, but preserving
+            # for consistency.
+            'alt_name': '{}{}'.format(COMMAND_MODULE_PREFIX, mod_name),
             'filepath': os.path.join(
                 mod_path, 'tests', profile_namespace),
-            'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(short_name, profile_namespace),
+            'base_path': 'azure.cli.command_modules.{}.tests.{}'.format(mod_name, profile_namespace),
             'files': {}
         }
         tests = _discover_module_tests(mod_name, mod_data)
