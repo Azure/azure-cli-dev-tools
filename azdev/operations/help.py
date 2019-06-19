@@ -13,8 +13,7 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     display, heading, subheading,
-    get_cli_repo_path, get_path_table,
-    COMMAND_MODULE_PREFIX
+    get_cli_repo_path, get_path_table
 )
 
 DOC_MAP_NAME = 'doc_source_map.json'

@@ -114,6 +114,7 @@ def _extract_module_name(path):
         return match.groupdict().get('name')
     raise CLIError('unexpected error: unable to extract name from path: {}'.format(path))
 
+
 def _get_profile(profile):
     import colorama
     colorama.init(autoreset=True)
