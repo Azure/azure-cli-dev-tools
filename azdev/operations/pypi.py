@@ -31,11 +31,11 @@ EXCLUDED_MODULES = ['azure-cli-testsdk']
 
 
 # region verify History Headings
-def check_history(modules=None):
+def check_history():
 
     # TODO: Does not work with extensions
-    path_table = get_path_table(include_only=modules)
-    selected_modules = list(path_table['core'].items()) + list(path_table['mod'].items())
+    path_table = get_path_table()
+    selected_modules = list(path_table['core'].items())
 
     heading('Verify History')
 
@@ -126,47 +126,17 @@ def _check_readme_render(mod_path):
 # endregion
 
 
-def update_setup_py(pin=False):
-    require_azure_cli()
-
-    heading('Update azure-cli setup.py')
-
-    path_table = get_path_table()
-    azure_cli_path = path_table['core']['azure-cli']
-    azure_cli_setup_path = find_files(azure_cli_path, SETUP_PY_NAME)[0]
-
-    modules = list(path_table['core'].items()) + list(path_table['mod'].items())
-    modules = [x for x in modules if x[0] not in EXCLUDED_MODULES]
-
-    results = {mod[0]: {} for mod in modules}
-
-    results = _get_module_versions(results, modules)
-    _update_setup_py(results, azure_cli_setup_path, pin)
-
-    display('OK!')
-
-
 # region verify PyPI versions
-def verify_versions(modules=None, update=False, pin=False):
+def verify_versions():
     import tempfile
     import shutil
 
     require_azure_cli()
 
-    heading('Verify CLI Module Versions')
+    heading('Verify CLI Versions')
 
-    usage_err = CLIError('usage error: <MODULES> | --update [--pin]')
-    if modules and (update or pin):
-        raise usage_err
-    if not modules and pin and not update:
-        raise usage_err
-
-    if modules:
-        update = None
-        pin = None
-
-    path_table = get_path_table(include_only=modules)
-    modules = list(path_table['core'].items()) + list(path_table['mod'].items())
+    path_table = get_path_table()
+    modules = list(path_table['core'].items())
     modules = [x for x in modules if x[0] not in EXCLUDED_MODULES]
 
     if not modules:
@@ -187,14 +157,11 @@ def verify_versions(modules=None, update=False, pin=False):
     shutil.rmtree(temp_dir)
     os.chdir(original_cwd)
 
-    results = _check_setup_py(results, update, pin)
-
     logger.info('Module'.ljust(40) + 'Local Version'.rjust(20) + 'Public Version'.rjust(20))  # pylint: disable=logging-not-lazy
     for mod, data in results.items():
         logger.info(mod.ljust(40) + data['local_version'].rjust(20) + data['public_version'].rjust(20))
 
     bump_mods = {k: v for k, v in results.items() if v['status'] == 'BUMP'}
-    mismatch_mods = {k: v for k, v in results.items() if v['status'] == 'MISMATCH'}
     subheading('RESULTS')
     if bump_mods:
         logger.error('The following modules need their versions bumped. '
@@ -203,11 +170,6 @@ def verify_versions(modules=None, update=False, pin=False):
                        'running `git clean` to remove untracked files from your repo. '
                        'Files that were once tracked but removed from the source may '
                        'still be on your machine, resuling in false positives.')
-        sys.exit(1)
-    elif mismatch_mods and not update:
-        logger.error('The following modules have a mismatch between the module version '
-                     'and the version in azure-cli\'s setup.py file. '
-                     'Scroll up for details: %s', ', '.join(mismatch_mods.keys()))
         sys.exit(1)
     else:
         display('OK!')
@@ -229,91 +191,6 @@ def _get_module_versions(results, modules):
                     local_version = version_pattern.match(line).group('ver')
                     break
             results[mod]['local_version'] = local_version
-    return results
-
-
-def _update_setup_py(results, azure_cli_setup_path, pin):
-
-    # update azure-cli's setup.py file with the collected versions
-    if pin:
-        logger.warning('\nUpdating azure-cli setup.py with collected module versions...')
-    else:
-        logger.warning('\nUpdating azure-cli setup.py with collected modules...')
-
-    old_lines = []
-    with open(azure_cli_setup_path, 'r') as f:
-        old_lines = f.readlines()
-
-    with open(azure_cli_setup_path, 'w') as f:
-        start_line = 'DEPENDENCIES = ['
-        end_line = ']'
-        write_versions = False
-
-        for line in old_lines:
-            if line.strip() == start_line:
-                write_versions = True
-                f.write(line)
-                version_strings = []
-                for mod, data in sorted(results.items()):
-                    if mod == 'azure-cli' or data['local_version'] == 'Unavailable':
-                        continue
-                    if pin:
-                        version_strings.append("    '{}=={}'".format(mod, data['local_version']))
-                    else:
-                        version_strings.append("    '{}'".format(mod))
-                f.write(',\n'.join(version_strings))
-                f.write('\n')
-                continue
-            elif line.strip() == end_line:
-                write_versions = False
-            elif write_versions:
-                # stop writing lines until the end bracket is found
-                continue
-            f.write(line)
-
-
-def _check_setup_py(results, update, pin):
-    # only audit or update setup.py when all modules are being considered
-    # otherwise, edge cases could arise
-    if update is None:
-        return results
-
-    # retrieve current versions from azure-cli's setup.py file
-    azure_cli_path = get_path_table(include_only='azure-cli')['core']['azure-cli']
-    azure_cli_setup_path = find_files(azure_cli_path, SETUP_PY_NAME)[0]
-    with open(azure_cli_setup_path, 'r') as f:
-        setup_py_version_regex = re.compile(r"(?P<quote>[\"'])(?P<mod>[^'=]*)(==(?P<ver>[\d.]*))?(?P=quote)")
-        for line in f.readlines():
-            if line.strip().startswith("'azure-cli-"):
-                match = setup_py_version_regex.match(line.strip())
-                mod = match.group('mod')
-                if mod == 'azure-cli-command-modules-nspkg':
-                    mod = 'azure-cli-command_modules-nspkg'
-                try:
-                    results[mod]['setup_version'] = match.group('ver')
-                except KeyError:
-                    # something that is in setup.py but isn't module is
-                    # inherently a mismatch
-                    results[mod] = {
-                        'local_version': 'Unavailable',
-                        'public_version': 'Unknown',
-                        'setup_version': match.group('ver'),
-                        'status': 'MISMATCH'
-                    }
-
-    if update:
-        _update_setup_py(results, azure_cli_setup_path, pin)
-    else:
-        display('\nAuditing azure-cli setup.py against local module versions...')
-        for mod, data in results.items():
-            if mod == 'azure-cli':
-                continue
-            setup_version = data['setup_version']
-            if not setup_version:
-                logger.warning('The azure-cli setup.py file is not using pinned versions. Aborting audit.')
-                break
-            elif setup_version != data['local_version']:
-                data['status'] = 'MISMATCH'
     return results
 
 

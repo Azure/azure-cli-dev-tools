@@ -157,7 +157,7 @@ def remove_extension_repo(repos):
     for repo in repos:
         try:
             dev_sources.remove(os.path.abspath(repo))
-        except ValueError:
+        except CLIError:
             logger.warning("Repo '%s' was not found in the list of repositories to search.", os.path.abspath(repo))
     az_config.set_value('extension', 'dev_sources', ','.join(dev_sources))
     env_config.set_value('ext', 'repo_paths', ','.join(dev_sources))
@@ -189,7 +189,7 @@ def update_extension_index(extensions):
     for extension in extensions:
         # Get extension WHL from URL
         if not extension.endswith('.whl') or not extension.startswith('https:'):
-            raise ValueError('usage error: only URL to a WHL file currently supported.')
+            raise CLIError('usage error: only URL to a WHL file currently supported.')
 
         # TODO: extend to consider other options
         ext_path = extension
@@ -199,7 +199,7 @@ def update_extension_index(extensions):
             extension_name = re.findall(NAME_REGEX, ext_path)[0]
             extension_name = extension_name.replace('_', '-')
         except IndexError:
-            raise ValueError('unable to parse extension name')
+            raise CLIError('unable to parse extension name')
 
         # TODO: Update this!
         extensions_dir = tempfile.mkdtemp()

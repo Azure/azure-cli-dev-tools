@@ -5,7 +5,6 @@
 # -----------------------------------------------------------------------------
 
 import os
-from subprocess import CalledProcessError
 from shutil import copytree, rmtree
 import time
 
@@ -16,7 +15,7 @@ from azdev.operations.extensions import (
     list_extensions, add_extension_repo, remove_extension)
 from azdev.params import Flag
 from azdev.utilities import (
-    display, heading, subheading, pip_cmd, find_file, get_path_table,
+    display, heading, subheading, pip_cmd, find_file,
     get_azdev_config_dir, get_azdev_config, require_virtual_env, get_azure_config)
 
 logger = get_logger(__name__)

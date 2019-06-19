@@ -30,7 +30,6 @@ def load_command_table(self, _):
 
     with CommandGroup(self, 'cli', operation_group('pypi')) as g:
         g.command('check-versions', 'verify_versions')
-        g.command('update-setup', 'update_setup_py')
 
     with CommandGroup(self, '', operation_group('code_gen')) as g:
         g.command('cli create', 'create_module')

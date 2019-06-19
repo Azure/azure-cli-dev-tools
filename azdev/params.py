@@ -49,10 +49,6 @@ def load_arguments(self, _):
         c.argument('pylint', action='store_true', help='Run pylint.')
         c.argument('pep8', action='store_true', help='Run flake8 to check PEP8.')
 
-    for scope in ['history', 'version']:
-        with ArgumentsContext(self, 'verify {}'.format(scope)) as c:
-            c.positional('modules', nargs='*', help='Space-separated list of modules to check.')
-
     with ArgumentsContext(self, 'cli check-versions') as c:
         c.argument('update', action='store_true', help='If provided, the command will update the versions in azure-cli\'s setup.py file.')
         c.argument('pin', action='store_true', help='If provided and used with --update, will pin the module versions in azure-cli\'s setup.py file.')
@@ -90,9 +86,6 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'extension update-index') as c:
         c.positional('extensions', nargs='+', metavar='URL', help='Space-separated list of URLs to extension WHL files.')
-
-    with ArgumentsContext(self, 'cli check-versions') as c:
-        c.positional('modules', nargs='*', help='Space-separated list of modules to check.')
 
     with ArgumentsContext(self, 'cli create') as c:
         c.positional('mod_name', help='Name of the module to create.')
