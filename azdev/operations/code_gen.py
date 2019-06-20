@@ -20,6 +20,8 @@ from azdev.utilities import (
 
 logger = get_logger(__name__)
 
+_MODULE_ROOT_PATH = os.path.join('src', 'azure-cli', 'azure', 'cli', 'command_modules')
+
 
 def _ensure_dir(path):
     if not os.path.exists(path):
@@ -44,7 +46,7 @@ def _generate_files(env, generation_kwargs, file_list, dest_path):
 def create_module(mod_name='test', display_name=None, display_name_plural=None, required_sdk=None,
                   client_name=None, operation_name=None, sdk_property=None, not_preview=False, github_alias=None,
                   local_sdk=None):
-    repo_path = os.path.join(get_cli_repo_path(), 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
+    repo_path = os.path.join(get_cli_repo_path(), _MODULE_ROOT_PATH)
     _create_package('', repo_path, False, mod_name, display_name, display_name_plural,
                     required_sdk, client_name, operation_name, sdk_property, not_preview, local_sdk)
     _add_to_codeowners(get_cli_repo_path(), '', mod_name, github_alias)
@@ -151,7 +153,8 @@ def _add_to_codeowners(repo_path, prefix, name, github_alias):
     if prefix == EXTENSION_PREFIX:
         new_line = '/src/{}{}/ {}'.format(prefix, name, github_alias)
     else:
-        new_line = '/src/azure-cli/azure/cli/command_modules/{}/ {}'.format(name, github_alias)
+        # ensure Linux-style separators when run on Windows
+        new_line = '/{} {}'.format(os.path.join('', _MODULE_ROOT_PATH, name, ''), github_alias).replace('\\', '/')
 
     with open(codeowners, 'a') as f:
         f.write(new_line)
@@ -167,7 +170,8 @@ def _add_to_doc_map(repo_path, name):
     with open(doc_source_file, 'r') as f:
         doc_source = json.loads(f.read())
 
-    doc_source[name] = 'src/azure-cli/azure/cli/command_modules/{0}/_help.py'.format(name)
+    # ensure Linux-style separators when run on Windows
+    doc_source[name] = str(os.path.join(_MODULE_ROOT_PATH, name, '_help.py')).replace('\\', '/')
     with open(doc_source_file, 'w') as f:
         f.write(json.dumps(doc_source, indent=4))
 

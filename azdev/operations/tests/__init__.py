@@ -25,6 +25,10 @@ from azdev.utilities import (
 
 logger = get_logger(__name__)
 
+_CORE_NAME_REGEX = re.compile(r'azure-cli-(?P<name>[^/\\]+)[/\\]azure[/\\]cli')
+_MOD_NAME_REGEX = re.compile(r'azure-cli[/\\]azure[/\\]cli[/\\]command_modules[/\\](?P<name>[^/\\]+)')
+_EXT_NAME_REGEX = re.compile(r'.*(?P<name>azext_[^/\\]+).*')
+
 
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None):
@@ -103,11 +107,8 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
 
 def _extract_module_name(path):
-    core_name_regex = re.compile(r'azure-cli-(?P<name>[^/\\]+)[/\\]azure[/\\]cli')
-    mod_name_regex = re.compile(r'azure-cli[/\\]azure[/\\]cli[/\\]command_modules[/\\](?P<name>[^/\\]+)')
-    ext_name_regex = re.compile(r'.*(?P<name>azext_[^/\\]+).*')
 
-    for expression in [mod_name_regex, core_name_regex, ext_name_regex]:
+    for expression in [_MOD_NAME_REGEX, _CORE_NAME_REGEX, _EXT_NAME_REGEX]:
         match = re.search(expression, path)
         if not match:
             continue
