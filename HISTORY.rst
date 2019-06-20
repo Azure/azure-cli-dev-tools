@@ -3,6 +3,13 @@
 Release History
 ===============
 
+0.1.0
++++++
+* Update for compatability with azure-cli 2.0.68's new package structure.
+* BREAKING CHANGE: Removed `azdev cli update-setup`. Package changes to azure-cli no longer require this.
+* BREAKING CHANGE: `azdev verify history` and `azdev cli check-versions` no longer accept any arguments. Since there are
+  now far fewer modules, these were deemed unnecessary.
+
 0.0.6
 +++++
 * Added new commands `azdev cli create` and `azdev extension create` to scaffold new modules/extensions.

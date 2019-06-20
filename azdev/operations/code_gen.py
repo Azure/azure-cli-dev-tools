@@ -9,7 +9,6 @@ from __future__ import print_function
 import json
 import os
 import re
-from subprocess import CalledProcessError
 
 from knack.log import get_logger
 from knack.prompting import prompt_y_n, prompt
@@ -20,6 +19,8 @@ from azdev.utilities import (
     find_files)
 
 logger = get_logger(__name__)
+
+_MODULE_ROOT_PATH = os.path.join('src', 'azure-cli', 'azure', 'cli', 'command_modules')
 
 
 def _ensure_dir(path):
@@ -45,11 +46,10 @@ def _generate_files(env, generation_kwargs, file_list, dest_path):
 def create_module(mod_name='test', display_name=None, display_name_plural=None, required_sdk=None,
                   client_name=None, operation_name=None, sdk_property=None, not_preview=False, github_alias=None,
                   local_sdk=None):
-    repo_path = os.path.join(get_cli_repo_path(), 'src', 'command_modules')
-    _create_package(COMMAND_MODULE_PREFIX, repo_path, False, mod_name, display_name, display_name_plural,
+    repo_path = os.path.join(get_cli_repo_path(), _MODULE_ROOT_PATH)
+    _create_package('', repo_path, False, mod_name, display_name, display_name_plural,
                     required_sdk, client_name, operation_name, sdk_property, not_preview, local_sdk)
-    _add_to_codeowners(get_cli_repo_path(), COMMAND_MODULE_PREFIX, mod_name, github_alias)
-    _add_to_setup_py(get_cli_repo_path(), mod_name)
+    _add_to_codeowners(get_cli_repo_path(), '', mod_name, github_alias)
     _add_to_doc_map(get_cli_repo_path(), mod_name)
 
     _display_success_message(COMMAND_MODULE_PREFIX + mod_name, mod_name)
@@ -150,40 +150,15 @@ def _add_to_codeowners(repo_path, prefix, name, github_alias):
     except IndexError:
         raise CLIError('unexpected error: unable to find CODEOWNERS file.')
 
-    if prefix == COMMAND_MODULE_PREFIX:
-        new_line = '/src/command_modules/{}{}/ {}'.format(prefix, name, github_alias)
-    else:
+    if prefix == EXTENSION_PREFIX:
         new_line = '/src/{}{}/ {}'.format(prefix, name, github_alias)
+    else:
+        # ensure Linux-style separators when run on Windows
+        new_line = '/{} {}'.format(os.path.join('', _MODULE_ROOT_PATH, name, ''), github_alias).replace('\\', '/')
 
     with open(codeowners, 'a') as f:
         f.write(new_line)
         f.write('\n')
-
-
-def _add_to_setup_py(repo_path, name):
-    try:
-        setup_file = find_files(repo_path, os.path.join('azure-cli', 'setup.py'))[0]
-    except IndexError:
-        raise CLIError('unexpected error: unable to find azure-cli\'s setup.py file.')
-
-    old_lines = []
-    with open(setup_file, 'r') as f:
-        old_lines = f.readlines()
-
-    # TODO: finish this!
-    with open(setup_file, 'w') as f:
-        start_line = 'DEPENDENCIES = ['
-        end_line = ']'
-        start_found = False
-
-        for line in old_lines:
-            if line.strip() == start_line:
-                start_found = True
-
-            if line.strip() == end_line and start_found:
-                f.write("    'azure-cli-{}',\n".format(name))
-                start_found = False
-            f.write(line)
 
 
 def _add_to_doc_map(repo_path, name):
@@ -195,8 +170,8 @@ def _add_to_doc_map(repo_path, name):
     with open(doc_source_file, 'r') as f:
         doc_source = json.loads(f.read())
 
-    # TODO: Fix format!
-    doc_source[name] = 'src/command_modules/azure-cli-{0}/azure/cli/command_modules/{0}/_help.py'.format(name)
+    # ensure Linux-style separators when run on Windows
+    doc_source[name] = str(os.path.join(_MODULE_ROOT_PATH, name, '_help.py')).replace('\\', '/')
     with open(doc_source_file, 'w') as f:
         f.write(json.dumps(doc_source, indent=4))
 
@@ -245,7 +220,7 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
         _ensure_dir(os.path.join(new_package_path, ext_folder, 'tests', 'latest'))
         _ensure_dir(os.path.join(new_package_path, ext_folder, 'vendored_sdks'))
     else:
-        _ensure_dir(os.path.join(new_package_path, 'azure', 'cli', 'command_modules', name, 'tests', 'latest'))
+        _ensure_dir(os.path.join(new_package_path, 'tests', 'latest'))
     env = Environment(loader=PackageLoader('azdev', 'mod_templates'))
 
     # determine dependencies
@@ -298,18 +273,7 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
         root_files.append('azure_bdist_wheel.py')
     _generate_files(env, kwargs, root_files, dest_path)
 
-    if not is_ext:
-        dest_path = os.path.join(dest_path, 'azure')
-        pkg_init = {'name': '__init__.py', 'template': 'pkg_declare__init__.py'}
-        _generate_files(env, kwargs, pkg_init, dest_path)
-
-        dest_path = os.path.join(dest_path, 'cli')
-        _generate_files(env, kwargs, pkg_init, dest_path)
-
-        dest_path = os.path.join(dest_path, 'command_modules')
-        _generate_files(env, kwargs, pkg_init, dest_path)
-
-    dest_path = os.path.join(dest_path, ext_folder if is_ext else name)
+    dest_path = dest_path if not is_ext else os.path.join(dest_path, ext_folder)
     module_files = [
         {'name': '__init__.py', 'template': 'module__init__.py'},
         '_client_factory.py',
@@ -334,21 +298,7 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
     ]
     _generate_files(env, kwargs, test_files, dest_path)
 
-    if not is_ext:
-        # install the newly created module
-        try:
-            result = pip_cmd("install -q -e {}".format(new_package_path), "Installing `{}{}`...".format(prefix, name))
-            if 'ERROR' in str(result.result):
-                raise CLIError('Failed to install. {}'.format(str(result.result)))
-        except CalledProcessError as err:
-            # exit code is not zero
-            raise CLIError("Failed to install. Error message: {}".format(err.output))
-        finally:
-            # Ensure that the site package's azure/__init__.py has the old style namespace
-            # package declaration by installing the old namespace package
-            pip_cmd("install -q -I azure-nspkg==1.0.0", "Installing `azure-nspkg`...")
-            pip_cmd("install -q -I azure-mgmt-nspkg==1.0.0", "Installing `azure-mgmt-nspkg`...")
-    else:
+    if is_ext:
         result = pip_cmd('install -e {}'.format(new_package_path), "Installing `{}{}`...".format(prefix, name))
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type

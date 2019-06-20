@@ -33,9 +33,8 @@ def check_license_headers():
 
         file_itr = (os.path.join(current_dir, p) for p in files if p.endswith('.py') and p != 'azure_bdist_wheel.py')
         for python_file in file_itr:
-            with open(python_file, 'r') as f:
+            with open(python_file, 'r', encoding='utf-8') as f:
                 file_text = f.read()
-
                 if file_text and LICENSE_HEADER not in file_text:
                     files_without_header.append(os.path.join(current_dir, python_file))
 

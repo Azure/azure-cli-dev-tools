@@ -34,15 +34,12 @@ helps['cli'] = """
 """
 
 helps['cli check-versions'] = """
-    short-summary: Verify package versions against those hosted on PyPI and/or in the azure-cli setup.py file.
+    short-summary: Verify package versions against those hosted on PyPI.
     long-summary: >
         This is used to ensure the correct module versions are bumped prior to release.
     examples:
-        - name: Verify all versions and audit them against azure-cli's setup.py ONLY.
+        - name: Verify all versions and audit them against PyPI.
           text: azdev cli check-versions
-
-        - name: Verify all versions and update azure-cli's setup.py with each module's verison.
-          text: azdev cli check-versions --update --pin
 """
 
 helps['cli create'] = """
@@ -54,16 +51,6 @@ helps['cli create'] = """
           text: >
             azdev cli create contoso --required-sdk azure-mgmt-contoso==0.1.0 --operation-name ContosoOperations
             --client-name ContosoManagementClient --sdk-property contoso_name
-"""
-
-helps['cli update-setup'] = """
-    short-summary: Update the azure-cli setup.py file.
-    examples:
-        - name: Update azure-cli's setup.py with unpinned module verions.
-          text: azdev cli update-setup
-
-        - name: Update azure-cli's setup.py with pinned module versions.
-          text: azdev cli update-setup --pin
 """
 
 
