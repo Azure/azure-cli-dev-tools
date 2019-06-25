@@ -138,7 +138,7 @@ def get_path_table(include_only=None):
     # unified azure-cli package (2.0.68 and later)
     new_paths = os.path.normcase(
         os.path.join(
-            cli_repo_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules', '*', 'commands.py'
+            cli_repo_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules', '*', '__init__.py'
         )
     )
     modules_paths = glob(old_paths) + glob(new_paths)
