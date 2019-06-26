@@ -1,5 +1,8 @@
 # Microsoft Azure CLI Dev Tools (azdev)
 
+[![Python](https://img.shields.io/pypi/pyversions/azure-cli.svg?maxAge=2592000)](https://pypi.python.org/pypi/azdev)
+[![Build Status](https://dev.azure.com/azure-sdk/public/_apis/build/status/cli/Azure.azure-cli-dev-tools?branchName=master)](https://dev.azure.com/azure-sdk/public/_build/latest?definitionId=604&branchName=master)
+
 The `azdev` tool is designed to aid new and experienced developers in contributing to Azure CLI command modules and extensions.
 
 ## Setting up your development environment
