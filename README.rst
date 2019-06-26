@@ -38,7 +38,7 @@ Setting up your development environment
 
     Windows CMD.exe:
 
-    :
+    ::
 
         env\scripts\activate.bat
 
