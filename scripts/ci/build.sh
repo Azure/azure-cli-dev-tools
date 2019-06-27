@@ -3,7 +3,7 @@
 set -ev
 
 : "${BUILD_STAGINGDIRECTORY:?BUILD_STAGINGDIRECTORY environment variable not set}"
-: "${BUILD_SOURCESDIRECTORY:=`cd $(dirname $0); cd ../../../; pwd`}"
+: "${BUILD_SOURCESDIRECTORY:="$(dirname ${BASH_SOURCE[0]})/../../.."}"
 
 cd $BUILD_SOURCESDIRECTORY
 

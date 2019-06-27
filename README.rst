@@ -49,7 +49,7 @@ Setting up your development environment
         env\scripts\activate.ps1
 
 
-    OSX/Ubuntu (bash):
+    OSX/Linux (bash):
 
     ::
 

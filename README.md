@@ -40,7 +40,7 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     env\scripts\activate.ps1
     ```
 
-    OSX/Ubuntu (bash):
+    OSX/Linux (bash):
     ```Shell
     source env/bin/activate
     ```
