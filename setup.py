@@ -19,7 +19,7 @@ with open(os.path.join(azdev_path, 'azdev', '__init__.py'), 'r') as version_file
     __VERSION__ = re.search(r'^__VERSION__\s*=\s*[\'"]([^\'"]*)[\'"]',
                             version_file.read(), re.MULTILINE).group(1)
 
-with open('README.md', 'r', encoding='utf-8') as f:
+with open('README.rst', 'r', encoding='utf-8') as f:
     README = f.read()
 with open('HISTORY.rst', 'r', encoding='utf-8') as f:
     HISTORY = f.read()
@@ -28,7 +28,7 @@ setup(
     name='azdev',
     version=__VERSION__,
     description='Microsoft Azure CLI Developer Tools',
-    long_description=README + '\n\n' + HISTORY,
+    long_description=README+ '\n\n' + HISTORY,
     url='https://github.com/Azure/azure-cli-dev-tools',
     author='Microsoft Corporation',
     author_email='azpycli@microsoft.com',
