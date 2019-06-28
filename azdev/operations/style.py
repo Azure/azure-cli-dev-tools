@@ -104,7 +104,17 @@ def _combine_command_result(cli_result, ext_result):
 
 def _run_pylint(modules):
 
-    cli_paths = list(modules['core'].values()) + list(modules['mod'].values())
+    def get_core_module_paths(modules):
+        core_paths = []
+        for p in modules['core'].values():
+            head, tail = os.path.split(p)
+            core_path = os.path.join(head, tail)
+            for x in str(tail).split('-'):
+                core_path = os.path.join(core_path, x)
+            core_paths.append(core_path)
+        return core_paths
+
+    cli_paths = get_core_module_paths(modules) + list(modules['mod'].values())
 
     ext_paths = []
     for path in list(modules['ext'].values()):
