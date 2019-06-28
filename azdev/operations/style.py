@@ -107,11 +107,10 @@ def _run_pylint(modules):
     def get_core_module_paths(modules):
         core_paths = []
         for p in modules['core'].values():
-            head, tail = os.path.split(p)
-            core_path = os.path.join(head, tail)
+            _, tail = os.path.split(p)
             for x in str(tail).split('-'):
-                core_path = os.path.join(core_path, x)
-            core_paths.append(core_path)
+                p = os.path.join(p, x)
+            core_paths.append(p)
         return core_paths
 
     cli_paths = get_core_module_paths(modules) + list(modules['mod'].values())
