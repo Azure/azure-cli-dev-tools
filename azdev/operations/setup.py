@@ -85,7 +85,7 @@ def _install_cli(cli_path):
         requirements_file = "{}/src/azure-cli/requirements.py{}.Darwin.txt".format(cli_path, python_major_version)
     elif sys.platform.startswith('win32'):
         requirements_file = "{}/src/azure-cli/requirements.py{}.Windows.txt".format(cli_path, python_major_version)
-    elif sys.platform.startwith('linux'):
+    elif sys.platform.startswith('linux'):
         requirements_file = "{}/src/azure-cli/requirements.py{}.Linux.txt".format(cli_path, python_major_version)
 
     if requirements_file:
