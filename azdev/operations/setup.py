@@ -77,7 +77,7 @@ def _install_cli(cli_path):
     local_distributables = ' '.join(
         root
         for root, dirs, files in os.walk(src_path)
-        if 'setup.py' in files and os.path.basename(root) in ['azure-cli'])
+        if 'setup.py' in files)
 
     python_major_version = sys.version_info[0]
 
