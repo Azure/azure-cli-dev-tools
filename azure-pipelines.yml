@@ -120,3 +120,107 @@ jobs:
     inputs:
       TargetPath: $(Build.ArtifactStagingDirectory)
       ArtifactName: pypi
+
+- job: TestAzdevSetup
+  displayName: 'Test azdev setup'
+  dependsOn: BuildPythonWheel
+  condition: succeeded()
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - task: DownloadPipelineArtifact@1
+    displayName: 'Download Build'
+    inputs:
+      TargetPath: '$(Build.ArtifactStagingDirectory)/pypi'
+      artifactName: pypi
+
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7'
+    inputs:
+      versionSpec: 3.7
+
+  - bash: |
+      #!/usr/bin/env bash
+      set -ev
+      . scripts/ci/install.sh
+      # verify azdev setup worked
+      az -h
+    displayName: 'Test azdev setup'
+
+- job: TestAzdevTest
+  displayName: 'Test azdev test'
+  dependsOn: BuildPythonWheel
+  condition: succeeded()
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - task: DownloadPipelineArtifact@1
+    displayName: 'Download Build'
+    inputs:
+      TargetPath: '$(Build.ArtifactStagingDirectory)/pypi'
+      artifactName: pypi
+
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7'
+    inputs:
+      versionSpec: 3.7
+
+  - bash: |
+      #!/usr/bin/env bash
+      set -ev
+      . scripts/ci/install.sh
+      # verify azdev test works
+      azdev test redis
+    displayName: 'Test azdev test'
+
+- job: TestAzdevLinter
+  displayName: 'Test azdev linter'
+  dependsOn: BuildPythonWheel
+  condition: succeeded()
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - task: DownloadPipelineArtifact@1
+    displayName: 'Download Build'
+    inputs:
+      TargetPath: '$(Build.ArtifactStagingDirectory)/pypi'
+      artifactName: pypi
+
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7'
+    inputs:
+      versionSpec: 3.7
+
+  - bash: |
+      #!/usr/bin/env bash
+      set -ev
+      . scripts/ci/install.sh
+      # verify azdev linter works
+      azdev linter redis
+    displayName: 'Test azdev linter'
+
+- job: TestAzdevStyle
+  displayName: 'Test azdev style'
+  dependsOn: BuildPythonWheel
+  condition: succeeded()
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - task: DownloadPipelineArtifact@1
+    displayName: 'Download Build'
+    inputs:
+      TargetPath: '$(Build.ArtifactStagingDirectory)/pypi'
+      artifactName: pypi
+
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.7'
+    inputs:
+      versionSpec: 3.7
+
+  - bash: |
+      #!/usr/bin/env bash
+      set -ev
+      . scripts/ci/install.sh
+      # verify azdev style works
+      azdev style redis
+    displayName: 'Test azdev style'
