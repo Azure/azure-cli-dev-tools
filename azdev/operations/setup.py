@@ -7,8 +7,6 @@
 import os
 from shutil import copytree, rmtree
 import time
-import sys
-import warnings
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -73,37 +71,37 @@ def _install_cli(cli_path):
         )
         pip_cmd("install -q {}".format(whl_list), "Installing private whl files...")
 
-    src_path = '{}/src/'.format(cli_path)
-    local_distributables = ' '.join(
-        root
-        for root, dirs, files in os.walk(src_path)
-        if 'setup.py' in files)
+    # install general requirements
+    pip_cmd(
+        "install -q -r {}/requirements.txt".format(cli_path),
+        "Installing `requirements.txt`..."
+    )
 
-    python_major_version = sys.version_info[0]
+    # command modules have dependency on azure-cli-core so install this first
+    pip_cmd(
+        "install -q -e {}/src/azure-cli-nspkg".format(cli_path),
+        "Installing `azure-cli-nspkg`..."
+    )
+    pip_cmd(
+        "install -q -e {}/src/azure-cli-telemetry".format(cli_path),
+        "Installing `azure-cli-telemetry`..."
+    )
+    pip_cmd(
+        "install -q -e {}/src/azure-cli-core".format(cli_path),
+        "Installing `azure-cli-core`..."
+    )
 
-    if sys.platform.startswith('darwin'):
-        requirements_file = "{}/src/azure-cli/requirements.py{}.Darwin.txt".format(cli_path, python_major_version)
-    elif sys.platform.startswith('win32'):
-        requirements_file = "{}/src/azure-cli/requirements.py{}.Windows.txt".format(cli_path, python_major_version)
-    elif sys.platform.startswith('linux'):
-        requirements_file = "{}/src/azure-cli/requirements.py{}.Linux.txt".format(cli_path, python_major_version)
+    # azure cli has dependencies on the above packages so install this one last
+    pip_cmd("install -q -e {}/src/azure-cli".format(cli_path), "Installing `azure-cli`...")
+    pip_cmd(
+        "install -q -e {}/src/azure-cli-testsdk".format(cli_path),
+        "Installing `azure-cli-testsdk`..."
+    )
 
-    if requirements_file:
-        pip_cmd(
-            "install -q --no-deps -e {}".format(local_distributables),
-            "Installing packages found in this repository..."
-        )
-
-        pip_cmd(
-            "install -q -r {}".format(requirements_file),
-            "Installing external dependencies...",
-        )
-    else:
-        warnings.warn('platform {} does not have pinned dependencies, using latest compatible from PyPI.')
-        pip_cmd(
-            "install -q -e {}".format(local_distributables),
-            "Installing all packages...",
-        )
+    # Ensure that the site package's azure/__init__.py has the old style namespace
+    # package declaration by installing the old namespace package
+    pip_cmd("install -q -I azure-nspkg==1.0.0", "Installing `azure-nspkg`...")
+    pip_cmd("install -q -I azure-mgmt-nspkg==1.0.0", "Installing `azure-mgmt-nspkg`...")
 
 
 def _copy_config_files():
