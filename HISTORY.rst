@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.2
+++++++
+* `azdev setup`: Fix regression where azure.cli could not be run after installation.
+
 0.1.1
 ++++++
 * `azdev cli/extension create`: Fix issue where supporting files were not included. Adjust generation logic.
