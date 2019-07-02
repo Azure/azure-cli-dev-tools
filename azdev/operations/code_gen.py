@@ -262,16 +262,14 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
 
     # generate code for root level
     dest_path = new_package_path
-    root_files = [
-        'HISTORY.rst',
-        'MANIFEST.in',
-        'README.rst',
-        'setup.cfg',
-        'setup.py'
-    ]
-    if not is_ext:
-        root_files.append('azure_bdist_wheel.py')
-    _generate_files(env, kwargs, root_files, dest_path)
+    if is_ext:
+        root_files = [
+            'HISTORY.rst',
+            'README.rst',
+            'setup.cfg',
+            'setup.py'
+        ]
+        _generate_files(env, kwargs, root_files, dest_path)
 
     dest_path = dest_path if not is_ext else os.path.join(dest_path, ext_folder)
     module_files = [

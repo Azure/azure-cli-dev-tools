@@ -10,3 +10,5 @@ azdev.egg-info/
 .tox/
 *.idea
 pip-wheel-metadata/*
+build/
+dist/

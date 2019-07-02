@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.1
+++++++
+* `azdev cli/extension create`: Fix issue where supporting files were not included. Adjust generation logic.
+
 0.1.0
 ++++++
 * Update for compatability with azure-cli 2.0.68's new package structure.
