@@ -3,3 +3,4 @@ include HISTORY.rst
 include README.md
 recursive-include azdev/config *
 recursive-include azdev/mod_templates *
+recursive-include azdev/operations/linter/rules *

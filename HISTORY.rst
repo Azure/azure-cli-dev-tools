@@ -3,6 +3,11 @@
 Release History
 ===============
 
+0.1.3
+++++++
+* `azdev linter`: Fix issue where certain installations would fail on `ci_exclusions.yml` not found.
+
+
 0.1.2
 ++++++
 * `azdev setup`: Fix regression where azure.cli could not be run after installation.
