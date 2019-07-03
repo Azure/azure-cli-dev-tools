@@ -57,10 +57,8 @@ def load_command_table(self, _):
         g.command('remove', 'remove_extension_repo')
         g.command('list', 'list_extension_repos')
 
-    # TODO: implement
-    # with CommandGroup(self, operation_group('help')) as g:
-    #     g.command('generate', 'generate_help_xml')
-    #     g.command('convert', 'convert_help_to_yaml')
+    with CommandGroup(self, '', operation_group('help')) as g:
+        g.command('generate-ref-docs', 'generate_doc')
 
     # TODO: implement
     # with CommandGroup(self, 'coverage', command_path) as g:
