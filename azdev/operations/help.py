@@ -65,7 +65,7 @@ def _help_files_not_in_map(cli_repo, help_files_in_map):
     not_in_map = []
     for _, path in get_path_table()['mod'].items():
         help_path = os.path.join(path, HELP_FILE_NAME)
-        help_path = help_path.replace(cli_repo.lower() + '\\', '')
+        help_path = help_path.replace(cli_repo.lower() + os.sep, '')
         if help_path in help_files_in_map:
             continue
         not_in_map.append(help_path)
