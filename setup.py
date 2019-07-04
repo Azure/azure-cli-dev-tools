@@ -68,7 +68,7 @@ setup(
         'pytest-xdist',
         'pyyaml',
         'requests',
-        'sphinx==1.6.7'
+        'sphinx==1.6.7',
         'tox',
         'wheel==0.30.0'
     ],
