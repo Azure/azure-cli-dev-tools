@@ -241,3 +241,8 @@ helps['extension repo list'] = """
     short-summary: >
         List the repositories that will be searched for in-development extensions.
 """
+
+helps['generate-docs'] = """
+    short-summary: >
+       Generate reference docs for CLI commands.
+"""

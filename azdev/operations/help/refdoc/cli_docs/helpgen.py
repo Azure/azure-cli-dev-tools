@@ -6,15 +6,18 @@
 import os
 import json
 
+from azdev.utilities import get_cli_repo_path
+from azdev.operations.help import DOC_SOURCE_MAP_PATH
 from azdev.operations.help.refdoc.common.directives import AbstractHelpGenDirective
 from azdev.operations.help.refdoc.common.directives import setup_common_directives
 
 from azure.cli.core._help import CliCommandHelpFile
 from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args, get_all_help
 
-class CoreHelpGenDirective(AbstractHelpGenDirective):
-    """ Core CLI Sphinx Directive
-        The Core CLI has a doc source map to determine help text source for commands
+class HelpGenDirective(AbstractHelpGenDirective):
+    """ General CLI Sphinx Directive
+        The Core CLI has a doc source map to determine help text source for core cli commands. Extension help processed
+        here will have no doc source
     """
 
     def _get_help_files(self, az_cli):
@@ -22,8 +25,10 @@ class CoreHelpGenDirective(AbstractHelpGenDirective):
         return get_all_help(az_cli)
 
     def _load_doc_source_map(self):
-        doc_source_map_dir = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(doc_source_map_dir, 'doc_source_map.json')) as open_file:
+        return {}
+        # todo: get_cli_repo_path() is failing for some reason.
+        map_path = os.path.join(get_cli_repo_path(), DOC_SOURCE_MAP_PATH)
+        with open(map_path) as open_file:
             return json.load(open_file)
 
     def _yield_doc_source(self, doc_source_map, help_file):
@@ -44,5 +49,5 @@ def setup(app):
     :param app: The sphinx app
     :return:
     """
-    app.add_directive('corehelpgen', CoreHelpGenDirective)
+    app.add_directive('corehelpgen', HelpGenDirective)
     setup_common_directives(app)

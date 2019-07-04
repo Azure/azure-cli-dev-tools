@@ -13,8 +13,8 @@
 # ones.
 
 extensions = [
-    'core_docs.helpgen',
-    'extensions_docs.helpgen'
+    'azdev.operations.help.refdoc.cli_docs.helpgen',
+    'azdev.operations.help.refdoc.extension_docs.helpgen'
 ]
 
 # The file name extension for the sphinx source files.
@@ -36,4 +36,3 @@ language = None
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # Disable smartquotes to keep the document just the same as that in _help.py
-smartquotes = False

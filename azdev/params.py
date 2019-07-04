@@ -13,6 +13,7 @@ from azdev.completer import get_test_completion
 
 
 class Flag(object):
+    """ Place holder to be used for optionals that take 0 or more arguments """
     pass
 
 
@@ -108,3 +109,13 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'cli create') as c:
         c.ignore('local_sdk')
+
+    with ArgumentsContext(self, 'generate-docs') as c:
+        c.argument('generate_for_extensions', options_list=['--extensions-only', '-e'], action='store_true',
+                   help='Generate docs for each of the publicly available extensions. '
+                        'Before running this command please ensure that no extensions are installed, '
+                        'as the publicly available extensions would have to be temporarily installed.')
+        c.argument('output_dir', help='Directory to place the generated docs in. Defaults to a temporary directory. '
+                                      'If the base directory does not exist, it will be created')
+        c.argument('output_type', choices=['xml, html, text, man, latex'], default="xml",
+                   help='Output type of the generated docs.')

@@ -58,7 +58,7 @@ def load_command_table(self, _):
         g.command('list', 'list_extension_repos')
 
     with CommandGroup(self, '', operation_group('help')) as g:
-        g.command('generate-ref-docs', 'generate_doc')
+        g.command('generate-docs', 'generate_ref_docs')
 
     # TODO: implement
     # with CommandGroup(self, 'coverage', command_path) as g:
