@@ -3,6 +3,12 @@
 Release History
 ===============
 
+0.1.4
+++++++
+* `azdev linter`: Fix issue with help example rule.
+* `azdev style`: Omit namespace packages from core modules.
+* `azdev verify document-map`: Updates to work correctly on Linux.
+
 0.1.3
 ++++++
 * `azdev linter`: Fix issue where certain installations would fail on `ci_exclusions.yml` not found.

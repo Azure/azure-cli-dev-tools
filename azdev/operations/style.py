@@ -25,6 +25,11 @@ def check_style(modules=None, pylint=False, pep8=False):
     heading('Style Check')
 
     selected_modules = get_path_table(include_only=modules)
+
+    # remove these two non-modules
+    selected_modules['core'].pop('azure-cli-nspkg', None)
+    selected_modules['core'].pop('azure-cli-command_modules-nspkg', None)
+
     pep8_result = None
     pylint_result = None
 

@@ -11,7 +11,20 @@ reports=no
 # chained-comparison: Does not provide guidance on what would be better and arguably these are fine.
 # useless-import-alias: Removing the alias often breaks the import, so it isn't really useless after all.
 # useless-suppression: Depends on the Python version and the pylint version...
-disable=missing-docstring,locally-disabled,fixme,cyclic-import,too-many-arguments,invalid-name,duplicate-code,useless-object-inheritance,chained-comparison,useless-import-alias,useless-suppression
+# wrong-import-order: Pylint keeps changing its mind...
+disable=
+    missing-docstring,
+    locally-disabled,
+    fixme,
+    cyclic-import,
+    too-many-arguments,
+    invalid-name,
+    duplicate-code,
+    useless-object-inheritance,
+    chained-comparison,
+    useless-import-alias,
+    useless-suppression,
+    wrong-import-order
 
 [FORMAT]
 max-line-length=120

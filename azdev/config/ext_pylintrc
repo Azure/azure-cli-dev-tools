@@ -11,11 +11,20 @@ reports=no
 # chained-comparison: Does not provide guidance on what would be better and arguably these are fine.
 # useless-import-alias: Removing the alias often breaks the import, so it isn't really useless after all.
 # useless-suppression: Depends on the Python version and the pylint version...
-disable=missing-docstring,locally-disabled,fixme,cyclic-import,too-many-arguments,invalid-name,duplicate-code,useless-object-inheritance,chained-comparison,useless-import-alias,useless-suppression
-
-[TYPECHECK]
-# For Azure CLI extensions, we ignore some import errors as they'll be available in the environment of the CLI
-ignored-modules=azure,azure.cli,azure.cli.core,azure.cli.core.commands,knack,msrestazure,argcomplete 
+# wrong-import-order: Pylint keeps changing its mind...
+disable=
+    missing-docstring,
+    locally-disabled,
+    fixme,
+    cyclic-import,
+    too-many-arguments,
+    invalid-name,
+    duplicate-code,
+    useless-object-inheritance,
+    chained-comparison,
+    useless-import-alias,
+    useless-suppression,
+    wrong-import-order
 
 [FORMAT]
 max-line-length=120
@@ -50,3 +59,7 @@ function-name-hint=lower_case_with_underscores
 argument-name-hint=lower_case_with_underscores
 variable-name-hint=lower_case_with_underscores
 inlinevar-name-hint=lower_case_with_underscores (short is OK)
+
+[TYPECHECK]
+# For Azure CLI extensions, we ignore some import errors as they'll be available in the environment of the CLI
+ignored-modules=azure,azure.cli,azure.cli.core,azure.cli.core.commands,knack,msrestazure,argcomplete 
