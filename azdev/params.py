@@ -117,5 +117,5 @@ def load_arguments(self, _):
                         'as the publicly available extensions would have to be temporarily installed.')
         c.argument('output_dir', help='Directory to place the generated docs in. Defaults to a temporary directory. '
                                       'If the base directory does not exist, it will be created')
-        c.argument('output_type', choices=['xml, html, text, man, latex'], default="xml",
+        c.argument('output_type', choices=['xml', 'html', 'text', 'man', 'latex'], default="xml",
                    help='Output type of the generated docs.')

@@ -28,7 +28,7 @@ class ExtensionHelpGenDirective(AbstractHelpGenDirective):
         # no doc source map for extensions
         pass
 
-    def _yield_doc_source(self, doc_source_map, help_file):
+    def _get_doc_source_content(self, doc_source_map, help_file):
         # no doc source map for extensions
         pass
 

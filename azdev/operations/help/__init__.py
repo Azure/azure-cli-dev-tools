@@ -7,7 +7,13 @@
 from __future__ import print_function
 
 import os
+import sys
+import copy
 import json
+import shutil
+import tempfile
+
+from subprocess import check_call, CalledProcessError
 
 from knack.util import CLIError
 from knack.log import get_logger
@@ -18,7 +24,7 @@ from azdev.utilities import (
 )
 
 from azdev.utilities.tools import require_azure_cli
-from azure.cli.core.extension.operations import add_extension, remove_extension, list_available_extensions
+from azure.cli.core.extension.operations import list_available_extensions
 
 DOC_MAP_NAME = 'doc_source_map.json'
 HELP_FILE_NAME = '_help.py'
@@ -77,9 +83,8 @@ def _help_files_not_in_map(cli_repo, help_files_in_map):
         not_in_map.append(help_path)
     return not_in_map
 
-def generate_ref_docs(generate_for_extensions=None, output_dir=None, output_type=None):
-    import tempfile
 
+def generate_ref_docs(generate_for_extensions=None, output_dir=None, output_type=None):
     heading('Generate Reference Docs')
 
     # require that azure cli installed
@@ -104,25 +109,58 @@ def generate_ref_docs(generate_for_extensions=None, output_dir=None, output_type
     display("Docs will be placed in {}.".format(output_dir))
 
     if generate_for_extensions:
-        public_extensions = list_available_extensions()
-        if not public_extensions:
-            raise CLIError("Failed to retrieve public extensions.")
-
-        for extension in public_extensions:
-            add_extension()
-            # generate documentation for installed extensions
-            _call_sphinx_build(output_type, output_dir, for_extensions_alone=True)
+        _generate_ref_docs_for_public_exts(output_type, output_dir)
 
     else:
         # Generate documentation for all comamnds
         _call_sphinx_build(output_type, output_dir)
-        display("Reference docs have been generated in {}".format(output_dir))
+
+    display("\nThe {} files are in {}".format(output_type, output_dir))
 
 
-def _call_sphinx_build(builder_name, output_dir, for_extensions_alone=False):
-    import sys
-    from subprocess import check_call, CalledProcessError
+def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
+    ENV_KEY_AZURE_EXTENSION_DIR = 'AZURE_EXTENSION_DIR'
 
+    extensions_url_tups = _get_available_extension_urls()
+    if not extensions_url_tups:
+        raise CLIError("Failed to retrieve public extensions.")
+
+    temp_dir = tempfile.mkdtemp(prefix="temp_whl_ext_dir")
+    _logger.debug("Created temp directory to store downloaded whl files: {}".format(temp_dir))
+
+    try:
+        for name, file_name, download_url in extensions_url_tups:
+        # for every compatible public extensions
+            # download the whl file
+            whl_file_name = _get_whl_from_url(download_url, file_name, temp_dir)
+
+            # install the whl file in a new temp directory
+            installed_ext_dir = tempfile.mkdtemp(prefix="temp_extension_dir_", dir=temp_dir)
+            _logger.debug("Created temp directory to use as extension dir for {} extension: {}"
+                          .format(name, installed_ext_dir))
+            pip_cmd = [sys.executable, '-m', 'pip', 'install', '--target',
+                       os.path.join(installed_ext_dir, 'extension'),
+                       whl_file_name, '--disable-pip-version-check', '--no-cache-dir']
+            display('Executing "{}"'.format(' '.join(pip_cmd)))
+            check_call(pip_cmd)
+
+            # set the directory as the extension directory in the environment used to call sphinx-build
+            env = copy.copy(os.environ)
+            env[ENV_KEY_AZURE_EXTENSION_DIR] = installed_ext_dir
+            # generate documentation for installed extensions
+
+            ext_output_dir = os.path.join(base_output_dir, name)
+            os.makedirs(ext_output_dir)
+            _call_sphinx_build(output_type, ext_output_dir, for_extensions_alone=True, call_env=env,
+                               msg="\nGenerating ref docs for {}".format(name))
+
+    finally:
+        # finally delete the temp dir
+        shutil.rmtree(temp_dir)
+        _logger.debug("Deleted temp whl extension directory: {}".format(temp_dir))
+
+
+def _call_sphinx_build(builder_name, output_dir, for_extensions_alone=False, call_env=None, msg=""):
     conf_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'refdoc')
 
     if for_extensions_alone:
@@ -131,8 +169,52 @@ def _call_sphinx_build(builder_name, output_dir, for_extensions_alone=False):
         source_dir = os.path.abspath(os.path.join(conf_dir, 'cli_docs'))
 
     try:
-        sphinx_cmd = ['sphinx-build', '-b', builder_name, '-c', conf_dir, source_dir, output_dir]
+        sphinx_cmd = ['sphinx-build', '-E', '-b', builder_name, '-c', conf_dir, source_dir, output_dir]
         _logger.info("sphinx cmd: %s", " ".join(sphinx_cmd))
-        check_call(sphinx_cmd, stdout=sys.stdout, stderr=sys.stderr)
+        display(msg)
+        check_call(sphinx_cmd, stdout=sys.stdout, stderr=sys.stderr, env=call_env)
     except CalledProcessError:
         raise CLIError("Doc generation failed.")
+
+
+# Todo, this would be unnecessary if list_available_extensions has a switch for including download urls....
+def _get_available_extension_urls():
+    """ Get download urls for all the CLI extensions compatible with the installed development CLI.
+
+    :return: list of 3-tuples in the form of '(extension_name, extension_file_name, extensions_download_url)'
+    """
+    all_pub_extensions = list_available_extensions(show_details=True)
+    compatible_extensions = list_available_extensions()
+
+    name_url_tups = []
+
+    for ext in compatible_extensions:
+        old_length = len(name_url_tups)
+        ext_name, ext_version = ext["name"], ext["version"]
+
+        for ext_info in all_pub_extensions[ext_name]:
+            if ext_version == ext_info["metadata"]["version"]:
+                name_url_tups.append((ext_name, ext_info["filename"], ext_info["downloadUrl"]))
+                break
+
+        if old_length == len(name_url_tups):
+            _logger.warning("'{}' has no versions compatible with the installed CLI's version".format(ext_name))
+
+    return name_url_tups
+
+
+def _get_whl_from_url(url, filename, tmp_dir, whl_cache=None):
+    if not whl_cache:
+        whl_cache = {}
+    if url in whl_cache:
+        return whl_cache[url]
+    import requests
+    r = requests.get(url, stream=True)
+    assert r.status_code == 200, "Request to {} failed with {}".format(url, r.status_code)
+    ext_file = os.path.join(tmp_dir, filename)
+    with open(ext_file, 'wb') as f:
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk:  # ignore keep-alive new chunks
+                f.write(chunk)
+    whl_cache[url] = ext_file
+    return ext_file

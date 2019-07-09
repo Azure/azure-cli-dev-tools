@@ -118,7 +118,9 @@ class AbstractHelpGenDirective(Directive):
             yield '{}:description: {}'.format(self._INDENT, help_file.long_summary)
             if help_file.deprecate_info:
                 yield '{}:deprecated: {}'.format(self._INDENT, help_file.deprecate_info._get_message(help_file.deprecate_info))
-            self._yield_doc_source(doc_source_map, help_file)
+            doc_source_content = self._get_doc_source_content(doc_source_map, help_file)
+            if doc_source_content:
+                yield doc_source_content
             yield ''
 
             if is_command and help_file.parameters:
@@ -180,7 +182,7 @@ class AbstractHelpGenDirective(Directive):
     def _load_doc_source_map(self):
         raise NotImplementedError()
 
-    def _yield_doc_source(self, doc_source_map, help_file):
+    def _get_doc_source_content(self, doc_source_map, help_file):
         raise NotImplementedError()
 
     def _get_param_value_sources(self, param):
