@@ -65,22 +65,6 @@ helps['configure'] = """
 """
 
 
-helps['coverage'] = """
-    short-summary: Test coverage statistics and reports.
-"""
-
-
-helps['coverage code'] = """
-    short-summary: Run CLI tests with code coverage.
-"""
-
-
-helps['coverage command'] = """
-    short-summary: Analyze CLI test run data for command and argument coverage.
-    long-summary: This does not run any tests!
-"""
-
-
 helps['verify'] = """
     short-summary: Verify CLI product features.
 """
@@ -113,6 +97,9 @@ helps['verify history'] = """
 
 helps['style'] = """
     short-summary: Check code style (pylint and PEP8).
+    examples:
+        - name: Check style for only those modules which have changed based on a git diff.
+          text: azdev style --repo azure-cli --tgt upstream/master --src upstream/dev
 """
 
 
@@ -134,11 +121,17 @@ helps['test'] = """
 
         - name: Run tests for a module but run the tests that failed last time first.
           text: azdev test {mod} -a --ff
+
+        - name: Run tests for only those modules which have changed based on a git diff.
+          text: azdev test --repo azure-cli --tgt upstream/master --src upstream/dev
 """
 
 
 helps['linter'] = """
     short-summary: Static code checks of the CLI command table.
+    examples:
+        - name: Check linter rules for only those modules which have changed based on a git diff.
+          text: azdev linter --repo azure-cli --tgt upstream/master --src upstream/dev
 """
 
 
@@ -149,16 +142,6 @@ helps['perf'] = """
 
 helps['perf load-times'] = """
     short-summary: Verify that all modules load within an acceptable timeframe.
-"""
-
-
-helps['sdk'] = """
-    short-summary: Perform quick Python SDK operations.
-"""
-
-
-helps['sdk draft'] = """
-    short-summary: Install draft packages from the Python SDK repo.
 """
 
 

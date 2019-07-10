@@ -12,6 +12,22 @@ from knack.util import CLIError
 from .const import COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, ENV_VAR_VIRTUAL_ENV
 
 
+def extract_module_name(path):
+
+    import re
+
+    _CORE_NAME_REGEX = re.compile(r'azure-cli-(?P<name>[^/\\]+)[/\\]azure[/\\]cli')
+    _MOD_NAME_REGEX = re.compile(r'azure-cli[/\\]azure[/\\]cli[/\\]command_modules[/\\](?P<name>[^/\\]+)')
+    _EXT_NAME_REGEX = re.compile(r'.*(?P<name>azext_[^/\\]+).*')
+
+    for expression in [_MOD_NAME_REGEX, _CORE_NAME_REGEX, _EXT_NAME_REGEX]:
+        match = re.search(expression, path)
+        if not match:
+            continue
+        return match.groupdict().get('name')
+    raise CLIError('unexpected error: unable to extract name from path: {}'.format(path))
+
+
 def get_env_path():
     """ Returns the path to the current virtual environment.
 
@@ -101,9 +117,8 @@ def make_dirs(path):
 
 
 def get_path_table(include_only=None):
-    """ Gets a table which contains the long and short names of different modules and extensions and the path to them.
+    """ Returns a table containing the long and short names of different modules and extensions and the path to them.
         The structure looks like:
-
     {
         'core': {
             NAME: PATH,
@@ -143,7 +158,7 @@ def get_path_table(include_only=None):
     )
     modules_paths = glob(old_paths) + glob(new_paths)
     core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
-    ext_paths = find_files(ext_repo_paths, '*.*-info')
+    ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
 
     def _update_table(paths, key):
         if key not in table:

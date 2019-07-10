@@ -14,15 +14,22 @@ from knack.util import CLIError, CommandResultItem
 
 from azdev.utilities import (
     display, heading, subheading, py_cmd, get_path_table, EXTENSION_PREFIX,
-    get_azdev_config_dir, require_azure_cli)
+    get_azdev_config_dir, require_azure_cli, filter_by_git_diff)
 
 
 logger = get_logger(__name__)
 
 
-def check_style(modules=None, pylint=False, pep8=False):
+# pylint: disable=too-many-statements
+def check_style(modules=None, pylint=False, pep8=False, git_source=None, git_target=None, git_repo=None):
 
     heading('Style Check')
+
+    # allow user to run only on CLI or extensions
+    cli_only = modules == ['CLI']
+    ext_only = modules == ['EXT']
+    if cli_only or ext_only:
+        modules = None
 
     selected_modules = get_path_table(include_only=modules)
 
@@ -39,11 +46,23 @@ def check_style(modules=None, pylint=False, pep8=False):
         except CLIError:
             raise CLIError('usage error: --pylint requires Azure CLI to be installed.')
 
-    if not selected_modules:
+    if cli_only:
+        ext_names = None
+        selected_modules['ext'] = {}
+    if ext_only:
+        mod_names = None
+        selected_modules['mod'] = {}
+        selected_modules['core'] = {}
+
+    # filter down to only modules that have changed based on git diff
+    selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
+
+    if not any((selected_modules[x] for x in selected_modules)):
         raise CLIError('No modules selected.')
 
     mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys())
     ext_names = list(selected_modules['ext'].keys())
+
     if mod_names:
         display('Modules: {}\n'.format(', '.join(mod_names)))
     if ext_names:
@@ -94,9 +113,13 @@ def _combine_command_result(cli_result, ext_result):
             final_result.exit_code += item.exit_code
             if item.error:
                 if final_result.error:
-                    final_result.error.message += item.error.message
+                    try:
+                        final_result.error.message += item.error.message
+                    except AttributeError:
+                        final_result.error.message += str(item.error)
                 else:
                     final_result.error = item.error
+                    setattr(final_result.error, 'message', '')
             if item.result:
                 if final_result.result:
                     final_result.result += item.result

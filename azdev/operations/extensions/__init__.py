@@ -26,16 +26,19 @@ def add_extension(extensions):
     ext_paths = get_ext_repo_paths()
     all_extensions = find_files(ext_paths, 'setup.py')
 
-    paths_to_add = []
-    for path in all_extensions:
-        folder = os.path.dirname(path)
-        long_name = os.path.basename(folder)
-        if long_name in extensions:
-            paths_to_add.append(folder)
-            extensions.remove(long_name)
-    # raise error if any extension wasn't found
-    if extensions:
-        raise CLIError('extension(s) not found: {}'.format(' '.join(extensions)))
+    if extensions == ['*']:
+        paths_to_add = [os.path.dirname(path) for path in all_extensions]
+    else:
+        paths_to_add = []
+        for path in all_extensions:
+            folder = os.path.dirname(path)
+            long_name = os.path.basename(folder)
+            if long_name in extensions:
+                paths_to_add.append(folder)
+                extensions.remove(long_name)
+        # raise error if any extension wasn't found
+        if extensions:
+            raise CLIError('extension(s) not found: {}'.format(' '.join(extensions)))
 
     for path in paths_to_add:
         result = pip_cmd('install -e {}'.format(path), "Adding extension '{}'...".format(path))
@@ -49,16 +52,20 @@ def remove_extension(extensions):
     installed_paths = find_files(ext_paths, '*.*-info')
     paths_to_remove = []
     names_to_remove = []
-    for path in installed_paths:
-        folder = os.path.dirname(path)
-        long_name = os.path.basename(folder)
-        if long_name in extensions:
-            paths_to_remove.append(folder)
-            names_to_remove.append(long_name)
-            extensions.remove(long_name)
-    # raise error if any extension not installed
-    if extensions:
-        raise CLIError('extension(s) not installed: {}'.format(' '.join(extensions)))
+    if extensions == ['*']:
+        paths_to_remove = [os.path.dirname(path) for path in installed_paths]
+        names_to_remove = [os.path.basename(os.path.dirname(path)) for path in installed_paths]
+    else:
+        for path in installed_paths:
+            folder = os.path.dirname(path)
+            long_name = os.path.basename(folder)
+            if long_name in extensions:
+                paths_to_remove.append(folder)
+                names_to_remove.append(long_name)
+                extensions.remove(long_name)
+        # raise error if any extension not installed
+        if extensions:
+            raise CLIError('extension(s) not installed: {}'.format(' '.join(extensions)))
 
     # removes any links that may have been added to site-packages.
     for ext in names_to_remove:
@@ -113,12 +120,17 @@ def list_extensions():
         except IndexError:
             continue
 
+        # ignore anything in site-packages folder
+        if 'site-packages' in ext_path:
+            continue
+
         folder = os.path.dirname(ext_path)
         long_name = os.path.basename(folder)
         if long_name not in installed_names:
             results.append({'name': long_name, 'install': '', 'path': folder})
         else:
             results.append({'name': long_name, 'install': 'Installed', 'path': folder})
+
     return results
 
 

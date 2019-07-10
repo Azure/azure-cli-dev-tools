@@ -8,6 +8,7 @@ import sys
 
 COMMAND_MODULE_PREFIX = 'azure-cli-'
 EXTENSION_PREFIX = 'azext_'
+EXT_REPO_NAME = 'azure-cli-extensions'
 IS_WINDOWS = sys.platform.lower() in ['windows', 'win32']
 
 ENV_VAR_TEST_MODULES = 'AZDEV_TEST_TESTS'               # comma-separated list of modules to test

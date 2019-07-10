@@ -16,7 +16,7 @@ from knack.log import get_logger
 from knack.util import CLIError
 
 from azdev.utilities import (
-    heading, subheading, display, get_path_table, require_azure_cli)
+    heading, subheading, display, get_path_table, require_azure_cli, filter_by_git_diff)
 
 from .linter import LinterManager, LinterScope, RuleError
 from .util import filter_modules
@@ -26,7 +26,8 @@ logger = get_logger(__name__)
 
 
 # pylint:disable=too-many-locals
-def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None):
+def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
+               git_source=None, git_target=None, git_repo=None):
 
     require_azure_cli()
 
@@ -36,12 +37,27 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None):
 
     heading('CLI Linter')
 
+    # allow user to run only on CLI or extensions
+    cli_only = modules == ['CLI']
+    ext_only = modules == ['EXT']
+    if cli_only or ext_only:
+        modules = None
+
     # needed to remove helps from azdev
     azdev_helps = helps.copy()
     exclusions = {}
     selected_modules = get_path_table(include_only=modules)
 
-    if not selected_modules:
+    if cli_only:
+        selected_modules['ext'] = {}
+    if ext_only:
+        selected_modules['mod'] = {}
+        selected_modules['core'] = {}
+
+    # filter down to only modules that have changed based on git diff
+    selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
+
+    if not any((selected_modules[x] for x in selected_modules)):
         raise CLIError('No modules selected.')
 
     selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \

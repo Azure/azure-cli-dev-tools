@@ -62,13 +62,3 @@ def load_command_table(self, _):
 
     with CommandGroup(self, 'extension', operation_group('help')) as g:
         g.command('generate-docs', 'generate_extension_ref_docs')
-
-    # TODO: implement
-    # with CommandGroup(self, 'coverage', command_path) as g:
-    #    g.command('command', 'command_coverage')
-    #    g.command('code', 'code_coverage')
-
-    # TODO: implement
-    # with CommandGroup(self, 'verify', command_path) as g:
-    #    g.command('package', 'verify_packages')
-    #    g.command('dependencies', 'verify_dependencies')
