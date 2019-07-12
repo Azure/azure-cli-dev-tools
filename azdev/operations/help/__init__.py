@@ -84,17 +84,38 @@ def _help_files_not_in_map(cli_repo, help_files_in_map):
     return not_in_map
 
 
-def generate_ref_docs(generate_for_extensions=None, output_dir=None, output_type=None):
-    heading('Generate Reference Docs')
-
+def generate_cli_ref_docs(output_dir=None, output_type=None):
     # require that azure cli installed
     require_azure_cli()
+    output_dir = _process_ref_doc_output_dir(output_dir)
 
+    heading('Generate CLI Reference Docs')
+    display("Docs will be placed in {}.".format(output_dir))
+
+    # Generate documentation for all comamnds
+    _call_sphinx_build(output_type, output_dir)
+
+    display("\nThe {} files are in {}".format(output_type, output_dir))
+
+
+def generate_extension_ref_docs(output_dir=None, output_type=None):
+    # require that azure cli installed
+    require_azure_cli()
+    output_dir = _process_ref_doc_output_dir(output_dir)
+
+    heading('Generate CLI Extensions Reference Docs')
+    display("Docs will be placed in {}.".format(output_dir))
+
+    _generate_ref_docs_for_public_exts(output_type, output_dir)
+
+    display("\nThe {} files are in {}".format(output_type, output_dir))
+
+
+def _process_ref_doc_output_dir(output_dir):
     # handle output_dir
     # if non specified, store in "_build" in the current working directory
     if not output_dir:
         output_dir = tempfile.mkdtemp(prefix="doc_output_")
-
     # ensure output_dir exists otherwise create it
     output_dir = os.path.abspath(output_dir)
     if not os.path.exists(output_dir):
@@ -105,17 +126,7 @@ def generate_ref_docs(generate_for_extensions=None, output_dir=None, output_type
                            .format(base_dir, existing_path))
 
         os.mkdir(output_dir)
-
-    display("Docs will be placed in {}.".format(output_dir))
-
-    if generate_for_extensions:
-        _generate_ref_docs_for_public_exts(output_type, output_dir)
-
-    else:
-        # Generate documentation for all comamnds
-        _call_sphinx_build(output_type, output_dir)
-
-    display("\nThe {} files are in {}".format(output_type, output_dir))
+    return output_dir
 
 
 def _generate_ref_docs_for_public_exts(output_type, base_output_dir):

@@ -91,6 +91,9 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'cli create') as c:
         c.positional('mod_name', help='Name of the module to create.')
 
+    with ArgumentsContext(self, 'cli create') as c:
+        c.ignore('local_sdk')
+
     with ArgumentsContext(self, 'extension create') as c:
         c.positional('ext_name', help='Name of the extension to create.')
 
@@ -107,15 +110,16 @@ def load_arguments(self, _):
             c.argument('display_name', arg_group='Help', help='Description to display in help text.')
             c.argument('display_name_plural', arg_group='Help', help='Description to display in help text when plural.')
 
-    with ArgumentsContext(self, 'cli create') as c:
-        c.ignore('local_sdk')
-
-    with ArgumentsContext(self, 'generate-docs') as c:
+    with ArgumentsContext(self, 'extension generate-docs'.format(scope)) as c:
         c.argument('generate_for_extensions', options_list=['--extensions-only', '-e'], action='store_true',
                    help='Generate docs for each of the publicly available extensions. '
                         'Before running this command please ensure that no extensions are installed, '
                         'as the publicly available extensions would have to be temporarily installed.')
-        c.argument('output_dir', help='Directory to place the generated docs in. Defaults to a temporary directory. '
-                                      'If the base directory does not exist, it will be created')
-        c.argument('output_type', choices=['xml', 'html', 'text', 'man', 'latex'], default="xml",
-                   help='Output type of the generated docs.')
+
+    for scope in ['cli', 'extension']:
+        with ArgumentsContext(self, '{} generate-docs'.format(scope)) as c:
+
+            c.argument('output_dir', help='Directory to place the generated docs in. Defaults to a temporary directory. '
+                                          'If the base directory does not exist, it will be created')
+            c.argument('output_type', choices=['xml', 'html', 'text', 'man', 'latex'], default="xml",
+                       help='Output type of the generated docs.')

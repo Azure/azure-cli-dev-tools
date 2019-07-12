@@ -54,6 +54,12 @@ helps['cli create'] = """
 """
 
 
+helps['cli generate-docs'] = """
+    short-summary: >
+       Generate reference docs for CLI commands.
+"""
+
+
 helps['configure'] = """
     short-summary: Configure azdev for use without installing anything.
 """
@@ -242,7 +248,7 @@ helps['extension repo list'] = """
         List the repositories that will be searched for in-development extensions.
 """
 
-helps['generate-docs'] = """
+helps['extensions generate-docs'] = """
     short-summary: >
-       Generate reference docs for CLI commands.
+       Generate reference docs for CLI extensions commands.
 """
