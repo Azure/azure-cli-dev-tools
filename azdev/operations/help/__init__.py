@@ -170,6 +170,10 @@ def _call_sphinx_build(builder_name, output_dir, for_extensions_alone=False, cal
 
     try:
         sphinx_cmd = ['sphinx-build', '-E', '-b', builder_name, '-c', conf_dir, source_dir, output_dir]
+        if for_extensions_alone:
+            # apparently the configuration in extensions and core CLI differed in this way.
+            # This should be moved into conf.py
+            sphinx_cmd.append("-D smartquotes=False")
         _logger.info("sphinx cmd: %s", " ".join(sphinx_cmd))
         display(msg)
         check_call(sphinx_cmd, stdout=sys.stdout, stderr=sys.stderr, env=call_env)

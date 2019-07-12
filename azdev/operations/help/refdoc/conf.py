@@ -36,3 +36,6 @@ language = None
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 pygments_style = 'sphinx'
+
+# The below configuration is in extensions repo conf.py but not in Core cli conf.py
+# smartquotes = False
