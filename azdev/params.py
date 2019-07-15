@@ -110,12 +110,6 @@ def load_arguments(self, _):
             c.argument('display_name', arg_group='Help', help='Description to display in help text.')
             c.argument('display_name_plural', arg_group='Help', help='Description to display in help text when plural.')
 
-    with ArgumentsContext(self, 'extension generate-docs'.format(scope)) as c:
-        c.argument('generate_for_extensions', options_list=['--extensions-only', '-e'], action='store_true',
-                   help='Generate docs for each of the publicly available extensions. '
-                        'Before running this command please ensure that no extensions are installed, '
-                        'as the publicly available extensions would have to be temporarily installed.')
-
     for scope in ['cli', 'extension']:
         with ArgumentsContext(self, '{} generate-docs'.format(scope)) as c:
 

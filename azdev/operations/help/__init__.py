@@ -106,6 +106,7 @@ def generate_extension_ref_docs(output_dir=None, output_type=None):
     heading('Generate CLI Extensions Reference Docs')
     display("Docs will be placed in {}.".format(output_dir))
 
+    display("Generating Docs for public extensions. Installed extensions will not be affected...")
     _generate_ref_docs_for_public_exts(output_type, output_dir)
 
     display("\nThe {} files are in {}".format(output_type, output_dir))
@@ -130,6 +131,7 @@ def _process_ref_doc_output_dir(output_dir):
 
 
 def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
+    # TODO: this shouldn't define the env key, but should reference it from the cli repo.
     ENV_KEY_AZURE_EXTENSION_DIR = 'AZURE_EXTENSION_DIR'
 
     extensions_url_tups = _get_available_extension_urls()
@@ -164,7 +166,6 @@ def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
             os.makedirs(ext_output_dir)
             _call_sphinx_build(output_type, ext_output_dir, for_extensions_alone=True, call_env=env,
                                msg="\nGenerating ref docs for {}".format(name))
-
     finally:
         # finally delete the temp dir
         shutil.rmtree(temp_dir)

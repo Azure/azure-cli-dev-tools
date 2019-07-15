@@ -248,7 +248,9 @@ helps['extension repo list'] = """
         List the repositories that will be searched for in-development extensions.
 """
 
-helps['extensions generate-docs'] = """
+helps['extension generate-docs'] = """
     short-summary: >
        Generate reference docs for CLI extensions commands.
+    long-summary: >
+        This commands installs the extensions in a temporary directory and sets it as the extensions dir when generating reference docs.
 """
