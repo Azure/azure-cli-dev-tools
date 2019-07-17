@@ -24,7 +24,7 @@ from azdev.utilities import (
 )
 
 from azdev.utilities.tools import require_azure_cli
-from azure.cli.core.extension.operations import list_available_extensions
+from azure.cli.core.extension.operations import list_available_extensions  # pylint: disable=import-error
 
 DOC_MAP_NAME = 'doc_source_map.json'
 HELP_FILE_NAME = '_help.py'
@@ -139,7 +139,7 @@ def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
         raise CLIError("Failed to retrieve public extensions.")
 
     temp_dir = tempfile.mkdtemp(prefix="temp_whl_ext_dir")
-    _logger.debug("Created temp directory to store downloaded whl files: {}".format(temp_dir))
+    _logger.debug("Created temp directory to store downloaded whl files: %s", temp_dir)
 
     try:
         for name, file_name, download_url in extensions_url_tups:
@@ -149,8 +149,8 @@ def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
 
             # install the whl file in a new temp directory
             installed_ext_dir = tempfile.mkdtemp(prefix="temp_extension_dir_", dir=temp_dir)
-            _logger.debug("Created temp directory to use as extension dir for {} extension: {}"
-                          .format(name, installed_ext_dir))
+            _logger.debug("Created temp directory %s to use as the extension installation dir for %s extension.",
+                          installed_ext_dir, name)
             pip_cmd = [sys.executable, '-m', 'pip', 'install', '--target',
                        os.path.join(installed_ext_dir, 'extension'),
                        whl_file_name, '--disable-pip-version-check', '--no-cache-dir']
@@ -158,7 +158,7 @@ def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
             check_call(pip_cmd)
 
             # set the directory as the extension directory in the environment used to call sphinx-build
-            env = copy.copy(os.environ)
+            env = os.environ.copy()
             env[ENV_KEY_AZURE_EXTENSION_DIR] = installed_ext_dir
             # generate documentation for installed extensions
 
@@ -169,7 +169,7 @@ def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
     finally:
         # finally delete the temp dir
         shutil.rmtree(temp_dir)
-        _logger.debug("Deleted temp whl extension directory: {}".format(temp_dir))
+        _logger.debug("Deleted temp whl extension directory: %s", temp_dir)
 
 
 def _call_sphinx_build(builder_name, output_dir, for_extensions_alone=False, call_env=None, msg=""):
@@ -214,7 +214,7 @@ def _get_available_extension_urls():
                 break
 
         if old_length == len(name_url_tups):
-            _logger.warning("'{}' has no versions compatible with the installed CLI's version".format(ext_name))
+            _logger.warning("'%s' has no versions compatible with the installed CLI's version", ext_name)
 
     return name_url_tups
 

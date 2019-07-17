@@ -3,15 +3,15 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
-from azdev.operations.help.refdoc.common.directives import AbstractHelpGenDirective
-from azdev.operations.help.refdoc.common.directives import setup_common_directives
-
 from knack.log import get_logger
 from knack.help import GroupHelpFile
 
-from azure.cli.core.file_util import _store_parsers, _is_group
-from azure.cli.core.commands import ExtensionCommandSource
-from azure.cli.core._help import CliCommandHelpFile
+from azure.cli.core.file_util import _store_parsers, _is_group  # pylint: disable=import-error
+from azure.cli.core.commands import ExtensionCommandSource  # pylint: disable=import-error
+from azure.cli.core._help import CliCommandHelpFile  # pylint: disable=import-error
+
+from azdev.operations.help.refdoc.common.directives import AbstractHelpGenDirective
+from azdev.operations.help.refdoc.common.directives import setup_common_directives
 
 logger = get_logger(__name__)
 
@@ -51,7 +51,7 @@ def get_extension_help_files(cli_ctx):
     #   filter the command table to only get commands from extensions
     cmd_table = {k: v for k, v in cmd_table.items() if isinstance(v.command_source, ExtensionCommandSource)}
     invoker.commands_loader.command_table = cmd_table
-    logger.warning('Found {} command(s) from the extension.\n'.format(len(cmd_table)))
+    logger.warning('Found %s command(s) from the extension.\n', len(cmd_table))
 
     for cmd_name in cmd_table:
         invoker.commands_loader.load_arguments(cmd_name)
@@ -76,10 +76,10 @@ def get_extension_help_files(cli_ctx):
                 else CliCommandHelpFile(help_ctx, cmd, parser)
             help_file.load(parser)
             help_files.append(help_file)
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             print("Skipped '{}' due to '{}'".format(cmd, ex))
     help_files = sorted(help_files, key=lambda x: x.command)
-    logger.warning('Generated {} help objects from the extension.\n'.format(len(help_files)))
+    logger.warning('Generated %s help objects from the extension.\n', len(help_files))
     return help_files
 
 def setup(app):

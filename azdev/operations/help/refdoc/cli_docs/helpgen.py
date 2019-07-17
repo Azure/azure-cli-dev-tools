@@ -11,8 +11,8 @@ from azdev.operations.help import DOC_SOURCE_MAP_PATH
 from azdev.operations.help.refdoc.common.directives import AbstractHelpGenDirective
 from azdev.operations.help.refdoc.common.directives import setup_common_directives
 
-from azure.cli.core._help import CliCommandHelpFile
-from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args, get_all_help
+from azure.cli.core._help import CliCommandHelpFile  # pylint: disable=import-error
+from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args, get_all_help  # pylint: disable=import-error
 
 class HelpGenDirective(AbstractHelpGenDirective):
     """ General CLI Sphinx Directive
@@ -31,15 +31,16 @@ class HelpGenDirective(AbstractHelpGenDirective):
 
     def _get_doc_source_content(self, doc_source_map, help_file):
         is_command = isinstance(help_file, CliCommandHelpFile)
+        result = None
         if not is_command:
             top_group_name = help_file.command.split()[0] if help_file.command else 'az'
-            return '{}:docsource: {}'.format(self._INDENT,
-                                            doc_source_map[top_group_name] if top_group_name in doc_source_map else '')
+            doc_source_value = doc_source_map[top_group_name] if top_group_name in doc_source_map else ''
+            result = '{}:docsource: {}'.format(self._INDENT, doc_source_value)
         else:
             top_command_name = help_file.command.split()[0] if help_file.command else ''
             if top_command_name in doc_source_map:
-                return '{}:docsource: {}'.format(self._INDENT, doc_source_map[top_command_name])
-        return None
+                result = '{}:docsource: {}'.format(self._INDENT, doc_source_map[top_command_name])
+        return result
 
 def setup(app):
     """ Setup sphinx app with help generation directive. This is called by sphinx.
