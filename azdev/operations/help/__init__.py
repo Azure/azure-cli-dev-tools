@@ -143,7 +143,7 @@ def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
 
     try:
         for name, file_name, download_url in extensions_url_tups:
-        # for every compatible public extensions
+            # for every compatible public extensions
             # download the whl file
             whl_file_name = _get_whl_from_url(download_url, file_name, temp_dir)
 

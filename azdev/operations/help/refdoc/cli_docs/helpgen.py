@@ -14,6 +14,7 @@ from azdev.operations.help.refdoc.common.directives import setup_common_directiv
 from azure.cli.core._help import CliCommandHelpFile  # pylint: disable=import-error
 from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args, get_all_help  # pylint: disable=import-error
 
+
 class HelpGenDirective(AbstractHelpGenDirective):
     """ General CLI Sphinx Directive
         The Core CLI has a doc source map to determine help text source for core cli commands. Extension help processed
@@ -41,6 +42,7 @@ class HelpGenDirective(AbstractHelpGenDirective):
             if top_command_name in doc_source_map:
                 result = '{}:docsource: {}'.format(self._INDENT, doc_source_map[top_command_name])
         return result
+
 
 def setup(app):
     """ Setup sphinx app with help generation directive. This is called by sphinx.

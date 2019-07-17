@@ -15,6 +15,7 @@ from azdev.operations.help.refdoc.common.directives import setup_common_directiv
 
 logger = get_logger(__name__)
 
+
 class ExtensionHelpGenDirective(AbstractHelpGenDirective):
     """
         CLI Extensions Sphinx Directive
@@ -31,6 +32,7 @@ class ExtensionHelpGenDirective(AbstractHelpGenDirective):
     def _get_doc_source_content(self, doc_source_map, help_file):
         # no doc source map for extensions
         pass
+
 
 # TODO: move this into core
 def get_extension_help_files(cli_ctx):
@@ -81,6 +83,7 @@ def get_extension_help_files(cli_ctx):
     help_files = sorted(help_files, key=lambda x: x.command)
     logger.warning('Generated %s help objects from the extension.\n', len(help_files))
     return help_files
+
 
 def setup(app):
     """ Setup sphinx app with help generation directive. This is called by sphinx.

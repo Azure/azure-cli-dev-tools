@@ -12,9 +12,8 @@ from knack.arguments import ArgumentsContext
 from azdev.completer import get_test_completion
 
 
-class Flag(object): # pylint: disable=unnecessary-pass
+class Flag(object):
     """ Place holder to be used for optionals that take 0 or more arguments """
-    pass
 
 
 # pylint: disable=too-many-statements

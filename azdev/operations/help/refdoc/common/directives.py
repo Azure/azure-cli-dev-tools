@@ -131,14 +131,14 @@ class AbstractHelpGenDirective(Directive):
                 group_registry = ArgumentGroupRegistry(
                     [p.group_name for p in help_file.parameters if p.group_name])
 
-                parameter_cmp = lambda p: group_registry.get_group_priority(p.group_name) + str(not p.required) + p.name
-                for arg in sorted(help_file.parameters, key=parameter_cmp):
+                for arg in sorted(help_file.parameters, key=lambda p: group_registry.get_group_priority(p.group_name) + str(not p.required) + p.name):  # pylint: disable=line-too-long
                     yield '{}.. cliarg:: {}'.format(self._INDENT, arg.name)
                     yield ''
                     yield '{}:required: {}'.format(self._DOUBLE_INDENT, arg.required)
                     if arg.deprecate_info:
                         yield '{}:deprecated: {}'.format(self._DOUBLE_INDENT,
-                                                         arg.deprecate_info._get_message(arg.deprecate_info))  # pylint: disable=protected-access
+                                                         arg.deprecate_info._get_message(  # pylint: disable=protected-access
+                                                             arg.deprecate_info))
                     short_summary = arg.short_summary or ''
                     possible_values_index = short_summary.find(' Possible values include')
                     short_summary_end_idx = possible_values_index if possible_values_index >= 0 else len(short_summary)
