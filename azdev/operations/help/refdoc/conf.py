@@ -37,5 +37,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 pygments_style = 'sphinx'
 
-# The below configuration is in extensions repo conf.py but not in Core cli conf.py
-# smartquotes = False
+# Smart quotes is true by default, however the previous doc gen in the extensions repo sets it to false.
+# So, the extension doc-generation command overrides this and sets smartquotes to false via sphinx-build's `-D` option
+# Doing this makes it to compare the behavior of azdev to existing doc gen scripts. This setting is not necessary.
+smartquotes = True

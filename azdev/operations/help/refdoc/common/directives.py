@@ -7,7 +7,6 @@ import argparse
 from os.path import expanduser
 from mock import patch
 
-# Directive not in latest release of sphinx, need to pip install sphinx==1.6.7
 from docutils import nodes
 from docutils.statemachine import ViewList
 from docutils.parsers.rst import directives
