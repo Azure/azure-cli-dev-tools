@@ -131,7 +131,7 @@ def _process_ref_doc_output_dir(output_dir):
 
 
 def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
-    # TODO: this shouldn't define the env key, but should reference it from the cli repo.
+    # TODO: this shouldn't define the env key, but should reference it from a central place in the cli repo.
     ENV_KEY_AZURE_EXTENSION_DIR = 'AZURE_EXTENSION_DIR'
 
     extensions_url_tups = _get_available_extension_urls()

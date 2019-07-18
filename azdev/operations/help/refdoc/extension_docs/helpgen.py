@@ -79,7 +79,7 @@ def get_extension_help_files(cli_ctx):
             help_file.load(parser)
             help_files.append(help_file)
         except Exception as ex:  # pylint: disable=broad-except
-            print("Skipped '{}' due to '{}'".format(cmd, ex))
+            logger.warning("Skipped '%s' due to '%s'", cmd, ex)
     help_files = sorted(help_files, key=lambda x: x.command)
     logger.warning('Generated %s help objects from the extension.\n', len(help_files))
     return help_files
