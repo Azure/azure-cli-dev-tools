@@ -13,7 +13,7 @@ from azdev.completer import get_test_completion
 
 
 class Flag(object):
-    pass
+    """ Place holder to be used for optionals that take 0 or more arguments """
 
 
 # pylint: disable=too-many-statements
@@ -90,6 +90,9 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'cli create') as c:
         c.positional('mod_name', help='Name of the module to create.')
 
+    with ArgumentsContext(self, 'cli create') as c:
+        c.ignore('local_sdk')
+
     with ArgumentsContext(self, 'extension create') as c:
         c.positional('ext_name', help='Name of the extension to create.')
 
@@ -106,5 +109,10 @@ def load_arguments(self, _):
             c.argument('display_name', arg_group='Help', help='Description to display in help text.')
             c.argument('display_name_plural', arg_group='Help', help='Description to display in help text when plural.')
 
-    with ArgumentsContext(self, 'cli create') as c:
-        c.ignore('local_sdk')
+    for scope in ['cli', 'extension']:
+        with ArgumentsContext(self, '{} generate-docs'.format(scope)) as c:
+
+            c.argument('output_dir', help='Directory to place the generated docs in. Defaults to a temporary directory. '
+                                          'If the base directory does not exist, it will be created')
+            c.argument('output_type', choices=['xml', 'html', 'text', 'man', 'latex'], default="xml",
+                       help='Output type of the generated docs.')
