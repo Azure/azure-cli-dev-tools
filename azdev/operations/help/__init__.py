@@ -165,6 +165,7 @@ def _generate_ref_docs_for_all_profiles(output_type, base_output_dir):
         # still re-raise the error.
         raise e
 
+
 def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
     # TODO: this shouldn't define the env key, but should reference it from a central place in the cli repo.
     ENV_KEY_AZURE_EXTENSION_DIR = 'AZURE_EXTENSION_DIR'
@@ -267,6 +268,7 @@ def _warn_if_exts_installed():
             "One or more CLI Extensions are installed in development mode and will be included in ref doc output.")
     if cli_extensions or dev_cli_extensions:
         _logger.warning("Please uninstall the extension(s) if you want to generate Core CLI docs solely.")
+
 
 # Todo, this would be unnecessary if list_available_extensions has a switch for including download urls....
 def _get_available_extension_urls():
