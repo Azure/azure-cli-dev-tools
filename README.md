@@ -5,6 +5,20 @@
 
 The `azdev` tool is designed to aid new and experienced developers in contributing to Azure CLI command modules and extensions.
 
+## Getting Started Videos
+
+[1. Cloning Repos](https://azurecliprod.blob.core.windows.net/videos/01%20-%20CloningRepos.mp4)
+
+[2. Setup with `azdev setup`](https://azurecliprod.blob.core.windows.net/videos/02%20-%20AzdevSetup.mp4)
+
+[3. Basics with `azdev style/test/linter`](https://azurecliprod.blob.core.windows.net/videos/03%20-%20AzdevBasics.mp4)
+
+[4. Creating modules with `azdev cli create`](https://azurecliprod.blob.core.windows.net/videos/04%20-%20AzdevCliCreate.mp4)
+
+[5. Create extensions with `azdev extension create`](https://azurecliprod.blob.core.windows.net/videos/05%20-%20AzdevExtensionCreate.mp4)
+
+[6. Publishing extensions with `azdev extension publish`](https://azurecliprod.blob.core.windows.net/videos/06%20-%20AzdevExtensionPublish.mp4)
+
 ## Setting up your development environment
 
 1. Install Python 3.5+ or 2.7+ from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7.
