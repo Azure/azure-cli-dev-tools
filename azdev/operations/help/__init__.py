@@ -245,7 +245,8 @@ def _set_profile(profile):
         _logger.warning("Setting the CLI profile to '%s'", profile)
         check_call(['az', 'cloud', 'update', '--profile', profile])
     except CalledProcessError as e:
-        raise CLIError("Failed to set profile {} due to err:\n{}\nPlease check that your profile is set to the expected value.".format(profile, e))
+        raise CLIError("Failed to set profile {} due to err:\n{}\n"
+                       "Please check that your profile is set to the expected value.".format(profile, e))
 
 
 def _get_profiles():
