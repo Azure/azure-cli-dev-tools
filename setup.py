@@ -77,6 +77,7 @@ setup(
     ],
     extras_require={
         ":python_version<'3.0'": ['pylint==1.9.2', 'futures'],
+        ":python_version<'3.4'": ['enum34'],
         ":python_version>='3.0'": ['pylint==2.3.0']
     },
     package_data={

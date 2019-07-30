@@ -9,8 +9,6 @@ import sys
 import time
 import yaml
 
-from knack.arguments import ignore_type, ArgumentsContext
-from knack import events
 from knack.help_files import helps
 from knack.log import get_logger
 from knack.util import CLIError
@@ -18,7 +16,7 @@ from knack.util import CLIError
 from azdev.utilities import (
     heading, subheading, display, get_path_table, require_azure_cli, filter_by_git_diff)
 
-from .linter import LinterManager, LinterScope, RuleError
+from .linter import LinterManager, LinterScope, RuleError, LinterSeverity
 from .util import filter_modules
 
 
@@ -27,7 +25,8 @@ logger = get_logger(__name__)
 
 # pylint:disable=too-many-locals
 def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
-               git_source=None, git_target=None, git_repo=None, include_whl_extensions=False):
+               git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
+               severity=None):
 
     require_azure_cli()
 
@@ -37,11 +36,21 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
 
     heading('CLI Linter')
 
+
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
     ext_only = modules == ['EXT']
     if cli_only or ext_only:
         modules = None
+
+    # process severity option
+    if severity:
+        try:
+            severity = LinterSeverity.get_linter_severity(severity)
+        except ValueError:
+            valid_choices = linter_severity_choices()
+            raise CLIError("Please specify a valid linter severity. It should be one of: {}"
+                           .format(", ".join(valid_choices)))
 
     # needed to remove helps from azdev
     azdev_helps = helps.copy()
@@ -113,7 +122,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                                    loaded_help=loaded_help,
                                    exclusions=exclusions,
                                    rule_inclusions=rules,
-                                   use_ci_exclusions=ci_exclusions)
+                                   use_ci_exclusions=ci_exclusions, severity=severity)
 
     subheading('Results')
     logger.info('Running linter: %i commands, %i help entries',
@@ -124,3 +133,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         run_command_groups=not rule_types or 'command_groups'in rule_types,
         run_help_files_entries=not rule_types or 'help_entries' in rule_types)
     sys.exit(exit_code)
+
+
+def linter_severity_choices():
+    return [str(severity.name).lower() for severity in LinterSeverity]
