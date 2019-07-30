@@ -16,8 +16,8 @@ def filter_by_git_diff(selected_modules, git_source, git_target, git_repo):
     if not any([git_source, git_target, git_repo]):
         return selected_modules
 
-    if not all([git_source, git_target, git_repo]):
-        raise CLIError('usage error: --src NAME --tgt NAME --repo PATH')
+    if not all([git_target, git_repo]):
+        raise CLIError('usage error: [--src NAME]  --tgt NAME --repo PATH')
 
     files_changed = diff_branches(git_repo, git_target, git_source)
     mods_changed = _summarize_changed_mods(files_changed)
@@ -26,9 +26,9 @@ def filter_by_git_diff(selected_modules, git_source, git_target, git_repo):
     to_remove = {'mod': [], 'core': [], 'ext': []}
     for key in selected_modules:
         for name, path in selected_modules[key].items():
+            path = path.lower()
             if path.startswith(repo_path):
                 if name in mods_changed:
-
                     # has changed, so do not filter out
                     continue
             # if not in the repo or has not changed, filter out
@@ -38,10 +38,6 @@ def filter_by_git_diff(selected_modules, git_source, git_target, git_repo):
     for key in to_remove:
         for name in to_remove[key]:
             selected_modules[key].pop(name)
-
-    logger.info('Filtering down to modules which have changed based on:')
-    logger.info('cd %s', git_repo)
-    logger.info('git --no-pager diff %s..%s --files-only -- .\n', git_target, git_source)
     logger.info('Filtered out: %s', to_remove)
 
     return selected_modules
@@ -73,18 +69,26 @@ def diff_branches(repo, target, source):
 
     from git import Repo
     try:
-        repo = Repo(repo)
+        git_repo = Repo(repo)
     except (git_exc.NoSuchPathError, git_exc.InvalidGitRepositoryError):
         raise CLIError('invalid git repo: {}'.format(repo))
 
     def get_commit(branch):
         try:
-            return repo.commit(branch)
+            return git_repo.commit(branch)
         except gitdb.exc.BadName:
             raise CLIError('usage error, invalid branch: {}'.format(branch))
 
-    source_commit = get_commit(source)
+    if source:
+        source_commit = get_commit(source)
+    else:
+        source_commit = git_repo.head.commit
     target_commit = get_commit(target)
+
+    logger.info('Filtering down to modules which have changed based on:')
+    logger.info('cd %s', repo)
+    logger.info('git --no-pager diff %s..%s --name-only -- .\n', target_commit, source_commit)
+
     diff_index = target_commit.diff(source_commit)
 
     return [diff.b_path for diff in diff_index]

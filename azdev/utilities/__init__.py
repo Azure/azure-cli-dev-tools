@@ -44,7 +44,8 @@ from .path import (
     get_azdev_repo_path,
     get_cli_repo_path,
     get_ext_repo_paths,
-    get_path_table
+    get_path_table,
+    get_name_index
 )
 from .testing import test_cmd
 from .tools import (
@@ -85,6 +86,7 @@ __all__ = [
     'get_cli_repo_path',
     'get_ext_repo_paths',
     'get_path_table',
+    'get_name_index',
     'require_virtual_env',
     'require_azure_cli'
 ]

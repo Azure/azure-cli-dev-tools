@@ -21,7 +21,7 @@ from azdev.utilities import (
     ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
-    get_path_table, require_virtual_env)
+    get_path_table, require_virtual_env, get_name_index)
 
 
 logger = get_logger(__name__)
@@ -115,22 +115,24 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
 def _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo):
     from azdev.utilities import diff_branches, extract_module_name
+    from azdev.utilities.git_util import _summarize_changed_mods
 
     if not any([git_source, git_target, git_repo]):
         return tests
 
-    if not all([git_source, git_target, git_repo]):
-        raise CLIError('usage error: --src NAME --tgt NAME --repo PATH')
+    if not all([git_target, git_repo]):
+        raise CLIError('usage error: [--src NAME]  --tgt NAME --repo PATH')
 
     files_changed = diff_branches(git_repo, git_target, git_source)
+    mods_changed = _summarize_changed_mods(files_changed)
 
     repo_path = str(os.path.abspath(git_repo)).lower()
     to_remove = []
     for key in tests:
         test_path = test_index.get(key, None)
-        if test_path and test_path.startswith(repo_path):
+        if test_path and test_path.lower().startswith(repo_path):
             mod_name = extract_module_name(test_path)
-            if next((x for x in files_changed if mod_name in x), None):
+            if next((x for x in mods_changed if mod_name in x), None):
                 # has changed, so do not filter out
                 continue
         # in not in the repo or has not changed, filter out
@@ -138,9 +140,6 @@ def _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo):
     # remove the unchanged modules
     tests = [t for t in tests if t not in to_remove]
 
-    logger.info('Filtering down to modules which have changed based on:')
-    logger.info('cd %s', git_repo)
-    logger.info('git --no-pager diff %s..%s --files-only -- .\n', git_target, git_source)
     logger.info('Filtered out: %s', to_remove)
 
     return tests
@@ -229,6 +228,7 @@ def _discover_tests(profile):
     core_modules = path_table['core'].items()
     command_modules = path_table['mod'].items()
     extensions = path_table['ext'].items()
+    inverse_name_table = get_name_index(invert=True)
 
     module_data = {}
 
@@ -273,7 +273,7 @@ def _discover_tests(profile):
             continue
         import_name = os.path.basename(filepath)
         mod_data = {
-            'alt_name': os.path.split(filepath)[1],
+            'alt_name': inverse_name_table[mod_name],
             'filepath': os.path.join(filepath, 'tests', profile_namespace),
             'base_path': '{}.tests.{}'.format(import_name, profile_namespace),
             'files': {}

@@ -116,6 +116,56 @@ def make_dirs(path):
             raise
 
 
+def get_name_index(invert=False):
+    """ Returns a dictionary containing the long and short names of modules and extensions is {SHORT:LONG} format or
+        {LONG:SHORT} format when invert=True. """
+
+    table = {}
+    cli_repo_path = get_cli_repo_path()
+    ext_repo_paths = get_ext_repo_paths()
+
+    # unified azure-cli package (2.0.68 and later)
+    paths = os.path.normcase(
+        os.path.join(
+            cli_repo_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules', '*', '__init__.py'
+        )
+    )
+    modules_paths = glob(paths)
+    core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
+    ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
+
+    def _update_table(paths, key):
+        folder = None
+        long_name = None
+        short_name = None
+        for path in paths:
+            folder = os.path.dirname(path)
+            base_name = os.path.basename(folder)
+            # determine long-names
+            if key == 'ext':
+                short_name = base_name
+                for item in os.listdir(folder):
+                    if item.startswith(EXTENSION_PREFIX):
+                        long_name = item
+                        break
+            elif base_name.startswith(COMMAND_MODULE_PREFIX):
+                long_name = base_name
+                short_name = base_name.replace(COMMAND_MODULE_PREFIX, '') or '__main__'
+            else:
+                short_name = base_name
+                long_name = '{}{}'.format(COMMAND_MODULE_PREFIX, base_name)
+            if not invert:
+                table[short_name] = long_name
+            else:
+                table[long_name] = short_name
+
+    _update_table(modules_paths, 'mod')
+    _update_table(core_paths, 'core')
+    _update_table(ext_paths, 'ext')
+
+    return table
+
+
 def get_path_table(include_only=None):
     """ Returns a table containing the long and short names of different modules and extensions and the path to them.
         The structure looks like:
@@ -144,19 +194,12 @@ def get_path_table(include_only=None):
     cli_repo_path = get_cli_repo_path()
     ext_repo_paths = get_ext_repo_paths()
 
-    # older azure-cli package with individual modules (2.0.67 and earlier)
-    old_paths = os.path.normcase(
-        os.path.join(
-            cli_repo_path, 'src', 'command_modules', '{}*'.format(COMMAND_MODULE_PREFIX), 'setup.py'
-        )
-    )
-    # unified azure-cli package (2.0.68 and later)
-    new_paths = os.path.normcase(
+    paths = os.path.normcase(
         os.path.join(
             cli_repo_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules', '*', '__init__.py'
         )
     )
-    modules_paths = glob(old_paths) + glob(new_paths)
+    modules_paths = glob(paths)
     core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
     ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
 
@@ -168,18 +211,23 @@ def get_path_table(include_only=None):
         short_name = None
         for path in paths:
             folder = os.path.dirname(path)
-            long_name = os.path.basename(folder)
-            # determine short-names
+            base_name = os.path.basename(folder)
+            # determine long-names
             if key == 'ext':
+                short_name = base_name
                 for item in os.listdir(folder):
                     if item.startswith(EXTENSION_PREFIX):
-                        short_name = item
+                        long_name = item
                         break
+            elif base_name.startswith(COMMAND_MODULE_PREFIX):
+                long_name = base_name
+                short_name = base_name.replace(COMMAND_MODULE_PREFIX, '') or '__main__'
             else:
-                short_name = long_name[len(COMMAND_MODULE_PREFIX):] or '__main__'
+                short_name = base_name
+                long_name = '{}{}'.format(COMMAND_MODULE_PREFIX, base_name)
 
             if get_all:
-                table[key][long_name] = folder
+                table[key][long_name if key == 'ext' else short_name] = folder
                 continue
             elif not include_only:
                 # nothing left to filter
