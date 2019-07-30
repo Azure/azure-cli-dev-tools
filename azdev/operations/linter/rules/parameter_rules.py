@@ -6,6 +6,7 @@
 
 from ..rule_decorators import ParameterRule
 from ..linter import RuleError, LinterSeverity
+from knack.deprecation import Deprecated
 
 
 @ParameterRule(LinterSeverity.HIGH)
@@ -29,7 +30,6 @@ def expired_option(linter, command_name, parameter_name):
 
 @ParameterRule(LinterSeverity.HIGH)
 def bad_short_option(linter, command_name, parameter_name):
-    from knack.deprecation import Deprecated
     bad_options = []
     for option in linter.get_parameter_options(command_name, parameter_name):
         if isinstance(option, Deprecated):
@@ -42,3 +42,35 @@ def bad_short_option(linter, command_name, parameter_name):
     if bad_options:
         raise RuleError('Found multi-character short options: {}. Use a single character or '
                         'convert to a long-option.'.format(' | '.join(bad_options)))
+
+
+@ParameterRule(LinterSeverity.HIGH)
+def parameter_ends_in_resource_group(linter, command_name, parameter_name):
+    parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
+    options_list = parameter.get('options_list', [])
+    bad_options = []
+
+    for opt in options_list:
+        if isinstance(opt, Deprecated):
+            # we don't care if deprecated options are "bad options" since this is the
+            # mechanism by which we get rid of them
+            continue
+        if any([opt.endswith('resource-group'), opt.endswith('resourcegroup')]) and opt != "--resource-group":
+            bad_options.append(opt)
+
+    if bad_options:
+        bad_options_str = ' | '.join(bad_options)
+        raise RuleError("A command should only have '--resource-group' as its resource group parameter. "
+                        "However options '{}' in command '{}' end with 'resource-group' or similar."
+                        .format(bad_options_str, command_name))
+
+
+@ParameterRule(LinterSeverity.HIGH)
+def no_positional_parameters(linter, command_name, parameter_name):
+    parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
+    options_list = parameter.get('options_list', [])
+
+    if not options_list:
+        raise RuleError("CLI commands should have optional parameters instead of positional parameters "
+                        "However parameter '{}' in command '{}' is a positional."
+                        .format(parameter_name, command_name))
