@@ -4,30 +4,30 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-from ..rule_decorators import parameter_rule
-from ..linter import RuleError
+from ..rule_decorators import ParameterRule
+from ..linter import RuleError, LinterSeverity
 
 
-@parameter_rule
+@ParameterRule(LinterSeverity.HIGH)
 def missing_parameter_help(linter, command_name, parameter_name):
     if not linter.get_parameter_help(command_name, parameter_name) and not linter.command_expired(command_name):
         raise RuleError('Missing help')
 
 
-@parameter_rule
+@ParameterRule(LinterSeverity.HIGH)
 def expired_parameter(linter, command_name, parameter_name):
     if linter.parameter_expired(command_name, parameter_name):
         raise RuleError('Deprecated parameter is expired and should be removed.')
 
 
-@parameter_rule
+@ParameterRule(LinterSeverity.HIGH)
 def expired_option(linter, command_name, parameter_name):
     expired_options = linter.option_expired(command_name, parameter_name)
     if expired_options:
         raise RuleError("Deprecated options '{}' are expired and should be removed.".format(', '.join(expired_options)))
 
 
-@parameter_rule
+@ParameterRule(LinterSeverity.HIGH)
 def bad_short_option(linter, command_name, parameter_name):
     from knack.deprecation import Deprecated
     bad_options = []
