@@ -7,6 +7,7 @@
 from ..rule_decorators import CommandRule
 from ..linter import RuleError, LinterSeverity
 
+
 @CommandRule(LinterSeverity.HIGH)
 def missing_command_help(linter, command_name):
     if not linter.get_command_help(command_name) and not linter.command_expired(command_name):
