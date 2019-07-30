@@ -15,8 +15,9 @@ class AbstractRule(object):
     def __init__(self, severity):
         if severity not in LinterSeverity:
             raise CLIError("A {} rule has an invalid severity. Received {}; expected one of: {}"
-                           .format(str(self.__class__), severity,list(LinterSeverity)))
+                           .format(str(self.__class__), severity, list(LinterSeverity)))
         self.severity = severity
+
 
 # help_file_entry_rule
 class HelpFileEntryRule(AbstractRule):
@@ -24,11 +25,13 @@ class HelpFileEntryRule(AbstractRule):
     def __call__(self, func):
         return _get_decorator(func, 'help_file_entries', 'Help-Entry: `{}`', self.severity)
 
+
 # command_rule
 class CommandRule(AbstractRule):
 
     def __call__(self, func):
         return _get_decorator(func, 'commands', 'Command: `{}`', self.severity)
+
 
 # command_group_rule
 class CommandGroupRule(AbstractRule):
@@ -93,6 +96,6 @@ def _create_violation_msg(ex, format_string, *format_args):
 def _linter_severity_is_applicable(linter_severity, rule_severity, rule_name):
     if linter_severity.value > rule_severity.value:
         _logger.info("Skipping rule %s, because its severity '%s' is lower than the linter's severity '%s'.",
-        rule_name, rule_severity.name, linter_severity)
+                     rule_name, rule_severity.name, linter_severity)
         return False
     return True

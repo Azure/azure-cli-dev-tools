@@ -25,15 +25,10 @@ class LinterSeverity(Enum):
     LOW = 0
 
     @staticmethod
-    def get_linter_severity(severity_name_or_value):
+    def get_linter_severity(severity_name):
         for severity in LinterSeverity:
-            if severity_name_or_value.lower() == severity.name.lower():
+            if severity_name.lower() == severity.name.lower():
                 return severity
-            try:
-                if int(severity_name_or_value) == severity.value:
-                    return severity
-            except ValueError:
-                continue
         raise ValueError("Severity must be a valid linter severity name or value.")
 
     @staticmethod
