@@ -45,7 +45,7 @@ def bad_short_option(linter, command_name, parameter_name):
 
 
 @ParameterRule(LinterSeverity.HIGH)
-def parameter_ends_in_resource_group(linter, command_name, parameter_name):
+def parameter_should_not_end_in_resource_group(linter, command_name, parameter_name):
     parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
     options_list = parameter.get('options_list', [])
     bad_options = []
