@@ -24,3 +24,13 @@ def no_ids_for_list_commands(linter, command_name):
 def expired_command(linter, command_name):
     if linter.command_expired(command_name):
         raise RuleError('Deprecated command is expired and should be removed.')
+
+@CommandRule(LinterSeverity.HIGH)
+def update_commands_support_generic_update(linter, command_name):
+    if command_name.split()[-1].lower() == "update":
+        gen_update_params_set = {'properties_to_set', 'properties_to_add', 'properties_to_remove', 'force_string'}
+
+        all_params_set = set(linter._command_loader.command_table[command_name].keys())
+
+        if not gen_update_params_set <= all_params_set:
+            raise RuleError("Update command does not have generic update arguments.")
