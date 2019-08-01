@@ -4,10 +4,8 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-from knack.log import get_logger
 from knack.util import CLIError
 from .linter import RuleError, LinterSeverity
-_logger = get_logger(__name__)
 
 
 class AbstractRule(object):
@@ -47,20 +45,18 @@ class ParameterRule(AbstractRule):
         def add_to_linter(linter_manager):
             def wrapper():
                 linter = linter_manager.linter
-                linter_severity = linter_manager.severity
 
-                if _linter_severity_is_applicable(linter_severity, self.severity, func.__name__):
-                    for command_name in linter.commands:
-                        for parameter_name in linter.get_command_parameters(command_name):
-                            exclusion_parameters = linter_manager.exclusions.get(command_name, {}).get('parameters', {})
-                            exclusions = exclusion_parameters.get(parameter_name, {}).get('rule_exclusions', [])
-                            if func.__name__ not in exclusions:
-                                try:
-                                    func(linter, command_name, parameter_name)
-                                except RuleError as ex:
-                                    linter_manager.mark_rule_failure()
-                                    yield _create_violation_msg(ex, 'Parameter: {}, `{}`',
-                                                                command_name, parameter_name)
+                for command_name in linter.commands:
+                    for parameter_name in linter.get_command_parameters(command_name):
+                        exclusion_parameters = linter_manager.exclusions.get(command_name, {}).get('parameters', {})
+                        exclusions = exclusion_parameters.get(parameter_name, {}).get('rule_exclusions', [])
+                        if func.__name__ not in exclusions:
+                            try:
+                                func(linter, command_name, parameter_name)
+                            except RuleError as ex:
+                                linter_manager.mark_rule_failure()
+                                yield _create_violation_msg(ex, 'Parameter: {}, `{}`',
+                                                            command_name, parameter_name)
 
             linter_manager.add_rule('params', func.__name__, wrapper, self.severity)
         add_to_linter.linter_rule = True
@@ -71,17 +67,15 @@ def _get_decorator(func, rule_group, print_format, severity):
     def add_to_linter(linter_manager):
         def wrapper():
             linter = linter_manager.linter
-            linter_severity = linter_manager.severity
 
-            if _linter_severity_is_applicable(linter_severity, severity, func.__name__):
-                for iter_entity in getattr(linter, rule_group):
-                    exclusions = linter_manager.exclusions.get(iter_entity, {}).get('rule_exclusions', [])
-                    if func.__name__ not in exclusions:
-                        try:
-                            func(linter, iter_entity)
-                        except RuleError as ex:
-                            linter_manager.mark_rule_failure()
-                            yield _create_violation_msg(ex, print_format, iter_entity)
+            for iter_entity in getattr(linter, rule_group):
+                exclusions = linter_manager.exclusions.get(iter_entity, {}).get('rule_exclusions', [])
+                if func.__name__ not in exclusions:
+                    try:
+                        func(linter, iter_entity)
+                    except RuleError as ex:
+                        linter_manager.mark_rule_failure()
+                        yield _create_violation_msg(ex, print_format, iter_entity)
 
         linter_manager.add_rule(rule_group, func.__name__, wrapper, severity)
     add_to_linter.linter_rule = True
@@ -92,10 +86,3 @@ def _create_violation_msg(ex, format_string, *format_args):
     violation_string = format_string.format(*format_args)
     return '    {} - {}'.format(violation_string, ex)
 
-
-def _linter_severity_is_applicable(linter_severity, rule_severity, rule_name):
-    if linter_severity.value > rule_severity.value:
-        _logger.info("Skipping rule %s, because its severity '%s' is lower than the linter's severity '%s'.",
-                     rule_name, rule_severity.name, linter_severity)
-        return False
-    return True
