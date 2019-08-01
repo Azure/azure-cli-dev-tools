@@ -55,7 +55,9 @@ def parameter_should_not_end_in_resource_group(linter, command_name, parameter_n
             # we don't care if deprecated options are "bad options" since this is the
             # mechanism by which we get rid of them
             continue
-        if any([opt.endswith('resource-group'), opt.endswith('resourcegroup')]) and opt != "--resource-group":
+
+        bad_opts = [opt.endswith('resource-group'), opt.endswith('resourcegroup'), opt.endswith("resource-group-name")]
+        if any(bad_opts) and opt != "--resource-group":
             bad_options.append(opt)
 
     if bad_options:
@@ -74,3 +76,14 @@ def no_positional_parameters(linter, command_name, parameter_name):
         raise RuleError("CLI commands should have optional parameters instead of positional parameters "
                         "However parameter '{}' in command '{}' is a positional."
                         .format(parameter_name, command_name))
+
+
+
+@ParameterRule(LinterSeverity.HIGH)
+def no_parameter_defaults_for_update_commands(linter, command_name, parameter_name):
+    if command_name.split()[-1].lower() == "update":
+        parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
+        default_val = parameter.get('default')
+        if default_val:
+            raise RuleError("Update commands should not have parameters with default values. \n\t{} in {} has a "
+                            "default value of '{}'".format(parameter_name, command_name, default_val))
