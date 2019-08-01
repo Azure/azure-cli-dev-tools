@@ -27,7 +27,7 @@ logger = get_logger(__name__)
 
 # pylint:disable=too-many-locals
 def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
-               git_source=None, git_target=None, git_repo=None):
+               git_source=None, git_target=None, git_repo=None, include_whl_extensions=False):
 
     require_azure_cli()
 
@@ -46,7 +46,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
     # needed to remove helps from azdev
     azdev_helps = helps.copy()
     exclusions = {}
-    selected_modules = get_path_table(include_only=modules)
+    selected_modules = get_path_table(include_only=modules, include_whl_extensions=include_whl_extensions)
 
     if cli_only:
         selected_modules['ext'] = {}
@@ -102,7 +102,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
 
     # trim command table and help to just selected_modules
     command_loader, help_file_entries = filter_modules(
-        command_loader, help_file_entries, modules=selected_mod_names)
+        command_loader, help_file_entries, modules=selected_mod_names, include_whl_extensions=include_whl_extensions)
 
     if not command_loader.command_table:
         raise CLIError('No commands selected to check.')

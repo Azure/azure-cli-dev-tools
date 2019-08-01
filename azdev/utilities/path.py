@@ -116,7 +116,7 @@ def make_dirs(path):
             raise
 
 
-def get_name_index(invert=False):
+def get_name_index(invert=False, include_whl_extensions=False):
     """ Returns a dictionary containing the long and short names of modules and extensions is {SHORT:LONG} format or
         {LONG:SHORT} format when invert=True. """
 
@@ -133,6 +133,10 @@ def get_name_index(invert=False):
     modules_paths = glob(paths)
     core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
     ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
+    whl_ext_paths = []
+    if include_whl_extensions:
+        from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
+        whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
 
     def _update_table(paths, key):
         folder = None
@@ -162,11 +166,13 @@ def get_name_index(invert=False):
     _update_table(modules_paths, 'mod')
     _update_table(core_paths, 'core')
     _update_table(ext_paths, 'ext')
+    _update_table(whl_ext_paths, 'ext')
 
     return table
 
 
-def get_path_table(include_only=None):
+# pylint: disable=too-many-statements
+def get_path_table(include_only=None, include_whl_extensions=False):
     """ Returns a table containing the long and short names of different modules and extensions and the path to them.
         The structure looks like:
     {
@@ -202,6 +208,10 @@ def get_path_table(include_only=None):
     modules_paths = glob(paths)
     core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
     ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
+    whl_ext_paths = []
+    if include_whl_extensions:
+        from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
+        whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
 
     def _update_table(paths, key):
         if key not in table:
@@ -246,6 +256,7 @@ def get_path_table(include_only=None):
     _update_table(modules_paths, 'mod')
     _update_table(core_paths, 'core')
     _update_table(ext_paths, 'ext')
+    _update_table(whl_ext_paths, 'ext')
 
     if include_only:
         raise CLIError('unrecognized names: {}'.format(' '.join(include_only)))

@@ -27,7 +27,7 @@ def add_extension(extensions):
     all_extensions = find_files(ext_paths, 'setup.py')
 
     if extensions == ['*']:
-        paths_to_add = [os.path.dirname(path) for path in all_extensions]
+        paths_to_add = [os.path.dirname(path) for path in all_extensions if 'site-packages' not in path]
     else:
         paths_to_add = []
         for path in all_extensions:

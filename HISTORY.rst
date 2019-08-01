@@ -12,6 +12,8 @@ Release History
 * `azdev style/test/linter`: Add special names CLI and EXT to allow running on just CLI modules or just extensions.
                              Add new argument group `--tgt`, `--src`, `--repo` to allow checking only modules or
                              extensions which have changed based on a git diff.
+* `azdev linter`: Added `--include-whl-extensions` flag to permit running the linter on extensions installed using
+                  the `az extension add` command.
 * `azdev verify license`: Command will not check any dev-installed CLI and extension repos. Previously, it only
                           checked the CLI repo.
 * Added new commands `azdev cli/extension generate-docs` to generate sphinx documentation.

@@ -65,6 +65,8 @@ def _install_cli(cli_path):
         # install the public edge build
         pip_cmd('install --pre azure-cli --extra-index-url https://azurecliprod.blob.core.windows.net/edge',
                 "Installing `azure-cli` edge build...")
+        pip_cmd('install git+https://github.com/Azure/azure-cli@master#subdirectory=src/azure-cli-testsdk',
+                "Installing `azure-cli-testsdk`...")
         return
 
     # otherwise editable install from source
