@@ -14,9 +14,11 @@ from enum import Enum
 import yaml
 import colorama
 from .util import share_element, exclude_commands, LinterError
+from knack.log import get_logger
 
 
 PACKAGE_NAME = 'azdev.operations.linter'
+_logger = get_logger(__name__)
 
 
 class LinterSeverity(Enum):
@@ -253,23 +255,32 @@ class LinterManager(object):
             severity_str = severity.name
             # use new linter if needed
             with LinterScope(self, linter_callable):
-                violations = sorted(rule_func()) or []
-                if violations:
-                    if severity == LinterSeverity.HIGH:
-                        sev_color = Fore.RED
-                    elif severity == LinterSeverity.MEDIUM:
-                        sev_color = Fore.YELLOW
+                # if the rule's severity is lower than the linter's severity skip it.
+                if self._linter_severity_is_applicable(severity, rule_name):
+                    violations = sorted(rule_func()) or []
+                    if violations:
+                        if severity == LinterSeverity.HIGH:
+                            sev_color = Fore.RED
+                        elif severity == LinterSeverity.MEDIUM:
+                            sev_color = Fore.YELLOW
+                        else:
+                            sev_color = Fore.CYAN
+
+                        print('- {} FAIL{} - {}{}{} severity: {}'.format(Fore.RED, Fore.RESET, sev_color,
+                                                                         severity_str, Fore.RESET, rule_name,))
+                        for violation_msg in violations:
+                            print(violation_msg)
+                        print()
                     else:
-                        sev_color = Fore.CYAN
+                        print('- {} pass{}: {} '.format(Fore.GREEN, Fore.RESET, rule_name))
 
-                    print('- {} FAIL{} - {}{}{} severity: {}'.format(Fore.RED, Fore.RESET, sev_color,
-                                                                     severity_str, Fore.RESET, rule_name,))
-                    for violation_msg in violations:
-                        print(violation_msg)
-                    print()
-                else:
-                    print('- {} pass{}: {} '.format(Fore.GREEN, Fore.RESET, rule_name))
 
+    def _linter_severity_is_applicable(self, rule_severity, rule_name):
+        if self.severity.value > rule_severity.value:
+            _logger.info("Skipping rule %s, because its severity '%s' is lower than the linter's severity '%s'.",
+                         rule_name, rule_severity.name, self.severity.value)
+            return False
+        return True
 
 class RuleError(Exception):
     """

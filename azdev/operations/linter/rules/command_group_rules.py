@@ -42,3 +42,24 @@ def command_loader_has_no_resource_type(linter, command_group_name):
             cls_str = loader.__class__.__name__
             raise RuleError("Every command loader must have an associated 'resource_type'. {} does not. "
                             "For more information see the 'authoring_commands.md' doc in the CLI repo.".format(cls_str))
+
+
+@CommandGroupRule(LinterSeverity.MEDIUM)
+def require_wait_command_if_no_wait(linter, command_group_name):
+    # If any command within a command group or subgroup exposes the --no-wait parameter,
+    # the wait command should be exposed.
+
+    # find commands under this group. A command in this group has one more token than the group name.
+    group_command_names = [cmd for cmd in linter.commands if cmd.startswith(command_group_name) and
+                      len(cmd.split()) == len(command_group_name.split()) + 1]
+
+    # if one of the commands in this group ends with wait we are good
+    for cmd in group_command_names:
+        cmds = cmd.split()
+        if cmds[-1].lower() == "wait":
+            return
+
+    # otherwise there is no wait command. If a command in this group has --no-wait, then error out.
+    for cmd in group_command_names:
+        if linter._command_loader.command_table[cmd].supports_no_wait:
+            raise RuleError("Group does not have a 'wait' command, yet {} exposes '--no-wait'".format(cmd))
