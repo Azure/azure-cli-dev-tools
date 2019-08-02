@@ -34,3 +34,13 @@ def update_commands_support_generic_update(linter, command_name):
 
         if not gen_update_params_set <= all_params_set:
             raise RuleError("Update command does not have generic update arguments.")
+
+
+@CommandRule(LinterSeverity.LOW)
+def group_delete_commands_should_confirm(linter, command_name):
+    # We cannot detect from cmd table etc whether a delete command deletes a collection, group or set of resources.
+    # so warn users for every delete command.
+
+    if command_name.split()[-1].lower() == "delete":
+        if 'yes' not in linter._parameters[command_name]:
+            raise RuleError("If this command deletes a collection, or group of resources. Please make sure to ask for confirmation.")

@@ -62,7 +62,7 @@ def load_arguments(self, _):
         c.argument('rules', options_list=['--rules', '-r'], nargs='+', help='Space-separated list of rules to run. Omit to run all rules.')
         c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries'], help='Space-separated list of rule types to run. Omit to run all.')
         c.argument('ci_exclusions', action='store_true', help='Force application of CI exclusions list when run locally.')
-        c.argument('severity', choices=linter_severity_choices(),
+        c.argument('min_severity', choices=linter_severity_choices(),
                    help='The minimum severity level to run the linter on. For example, specifying "medium" runs linter rules that have "high" or "medium" severity. However, specifying "low" runs the linter on every rule, regardless of severity. Defaults to "high".')
 
     with ArgumentsContext(self, 'perf') as c:
