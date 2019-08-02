@@ -73,7 +73,7 @@ def no_positional_parameters(linter, command_name, parameter_name):
     options_list = parameter.get('options_list', [])
 
     if not options_list:
-        raise RuleError("CLI commands should have optional parameters instead of positional parameters "
+        raise RuleError("CLI commands should have optional parameters instead of positional parameters. "
                         "However parameter '{}' in command '{}' is a positional."
                         .format(parameter_name, command_name))
 
@@ -85,5 +85,59 @@ def no_parameter_defaults_for_update_commands(linter, command_name, parameter_na
         parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
         default_val = parameter.get('default')
         if default_val:
-            raise RuleError("Update commands should not have parameters with default values. \n\t{} in {} has a "
+            raise RuleError("Update commands should not have parameters with default values. {} in {} has a "
                             "default value of '{}'".format(parameter_name, command_name, default_val))
+
+
+@ParameterRule(LinterSeverity.MEDIUM)
+def no_required_location_param(linter, command_name, parameter_name):
+    # Location parameters should not be required
+
+    has_resource_group = "resource_group_name" in linter._parameters[command_name]
+    is_location_param = (parameter_name.lower() == "location" or parameter_name.endswith("location"))
+
+    if has_resource_group and is_location_param:
+        parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
+        is_required = parameter.get('required')
+
+        if is_required:
+            raise RuleError("Location parameters should not be required. However, {} in {} should is required. "
+                            "Please make it optional and default to the location of the resource group."
+                            .format(parameter_name, command_name))
+
+
+@ParameterRule(LinterSeverity.LOW)
+def id_params_only_for_guid(linter, command_name, parameter_name):
+    # Check if the parameter is an id param, except for '--ids'. If so, attempt to figure out if
+    # it is a resource id parametere. This check can lead to false positives, which is why it is a low severity check.
+    # Its aim is to guide reviewers and developers.
+
+    def _help_contains_queries(help_strings, queries):
+        a_query_is_in_a_str = next((True for help_str in help_strings
+                                    for query in queries if query.lower() in help_str.lower()), False)
+        return a_query_is_in_a_str
+
+    parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
+    options_list = parameter.get('options_list', [])
+    queries = ["resource id", "arm id"]
+    is_id_param = False
+
+    # first find out if an option ends with id.
+    for opt in options_list:
+        if isinstance(opt, Deprecated):
+            return
+
+        id_opts = [opt.endswith('-id'), opt.endswith('-ids')]
+
+        if any(id_opts) and opt != "--ids":
+            is_id_param = True
+
+    # if an option is an id param, check if the help text makes reference to 'resource id' etc. This could lead to fa
+    if is_id_param:
+        help_obj = linter._loaded_help[command_name]
+        help_param = next((help_param_obj for help_param_obj in help_obj.parameters
+                               if help_param_obj == " ".join(options_list)), None)
+
+        if help_param and _help_contains_queries([help_param.short_summary, help_param.long_summary], queries):
+            raise RuleError("An option {} ends with '-id'. Arguments ending with '-id' "
+                            "must be guids/uuids and not resource ids.", options_list)

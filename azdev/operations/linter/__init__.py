@@ -26,7 +26,7 @@ logger = get_logger(__name__)
 # pylint:disable=too-many-locals
 def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
-               severity=None):
+               min_severity=None):
 
     require_azure_cli()
 
@@ -44,9 +44,9 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         modules = None
 
     # process severity option
-    if severity:
+    if min_severity:
         try:
-            severity = LinterSeverity.get_linter_severity(severity)
+            min_severity = LinterSeverity.get_linter_severity(min_severity)
         except ValueError:
             valid_choices = linter_severity_choices()
             raise CLIError("Please specify a valid linter severity. It should be one of: {}"
@@ -122,7 +122,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                                    loaded_help=loaded_help,
                                    exclusions=exclusions,
                                    rule_inclusions=rules,
-                                   use_ci_exclusions=ci_exclusions, severity=severity)
+                                   use_ci_exclusions=ci_exclusions, min_severity=min_severity)
 
     subheading('Results')
     logger.info('Running linter: %i commands, %i help entries',

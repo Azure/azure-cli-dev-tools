@@ -167,9 +167,9 @@ class LinterManager(object):
     _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params'}
 
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, exclusions=None,
-                 rule_inclusions=None, use_ci_exclusions=None, severity=None):
+                 rule_inclusions=None, use_ci_exclusions=None, min_severity=None):
         # default to running only rules of the highest severity
-        self.severity = severity or LinterSeverity.get_ordered_members()[-1]
+        self.min_severity = min_severity or LinterSeverity.get_ordered_members()[-1]
         self.linter = Linter(command_loader=command_loader, help_file_entries=help_file_entries,
                              loaded_help=loaded_help)
         self._exclusions = exclusions or {}
@@ -182,7 +182,7 @@ class LinterManager(object):
         self._exit_code = 0
         self._ci = use_ci_exclusions if use_ci_exclusions is not None else os.environ.get('CI', False)
 
-    def add_rule(self, rule_type, rule_name, rule_callable, severity):
+    def add_rule(self, rule_type, rule_name, rule_callable, rule_severity):
         include_rule = not self._rule_inclusions or rule_name in self._rule_inclusions
         if rule_type in self._rules and include_rule:
             def get_linter():
@@ -198,7 +198,7 @@ class LinterManager(object):
                                   loaded_help=self._loaded_help)
                 return self.linter
 
-            self._rules[rule_type][rule_name] = rule_callable, get_linter, severity
+            self._rules[rule_type][rule_name] = rule_callable, get_linter, rule_severity
 
     def mark_rule_failure(self):
         self._exit_code = 1
@@ -251,17 +251,17 @@ class LinterManager(object):
 
     def _run_rules(self, rule_group):
         from colorama import Fore
-        for rule_name, (rule_func, linter_callable, severity) in self._rules.get(rule_group).items():
-            severity_str = severity.name
+        for rule_name, (rule_func, linter_callable, rule_severity) in self._rules.get(rule_group).items():
+            severity_str = rule_severity.name
             # use new linter if needed
             with LinterScope(self, linter_callable):
                 # if the rule's severity is lower than the linter's severity skip it.
-                if self._linter_severity_is_applicable(severity, rule_name):
+                if self._linter_severity_is_applicable(rule_severity, rule_name):
                     violations = sorted(rule_func()) or []
                     if violations:
-                        if severity == LinterSeverity.HIGH:
+                        if rule_severity == LinterSeverity.HIGH:
                             sev_color = Fore.RED
-                        elif severity == LinterSeverity.MEDIUM:
+                        elif rule_severity == LinterSeverity.MEDIUM:
                             sev_color = Fore.YELLOW
                         else:
                             sev_color = Fore.CYAN
@@ -276,9 +276,9 @@ class LinterManager(object):
 
 
     def _linter_severity_is_applicable(self, rule_severity, rule_name):
-        if self.severity.value > rule_severity.value:
-            _logger.info("Skipping rule %s, because its severity '%s' is lower than the linter's severity '%s'.",
-                         rule_name, rule_severity.name, self.severity.value)
+        if self.min_severity.value > rule_severity.value:
+            _logger.info("Skipping rule %s, because its severity '%s' is lower than the linter's min severity of '%s'.",
+                         rule_name, rule_severity.name, self.min_severity.value)
             return False
         return True
 

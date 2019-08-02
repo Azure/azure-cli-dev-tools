@@ -78,11 +78,11 @@ def load_arguments(self, _):
         c.argument('include_whl_extensions',
                    action='store_true',
                    help="Allow running linter on extensions installed by `az extension add`.")
-
-        c.argument('severity', choices=linter_severity_choices(),
-                   help='The minimum severity level to run the linter on. For example, '
-                        'specifying "medium" runs linter rules that have "high" or "medium" severity. '
-                        'However, specifying "low" runs the linter on every rule, regardless of severity. Defaults to "high".')
+        c.argument('min_severity', choices=linter_severity_choices(),
+                   help='The minimum severity level to run the linter on. '
+                        'For example, specifying "medium" runs linter rules that have "high" or "medium" severity. '
+                        'However, specifying "low" runs the linter on every rule, regardless of severity. '
+                        'Defaults to "high".')
     # endregion
 
     with ArgumentsContext(self, 'perf') as c:

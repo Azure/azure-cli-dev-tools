@@ -2,6 +2,13 @@
 
 Release History
 ===============
+0.1.14
+++++++
+* Linter Rule Severity: Rules now have an associated severity level. Only high severity rules should be run in CI. All previous rules are annotated as HIGH severity.
+
+   * Note: HIGH severity rules are egregious and should generally be fixed, not excluded. LOW severity rules tend to be informational, and might raise false positives. Exclude them via `linter_exclusions.yml` in the CLI.
+
+* `azdev linter`: Expose `--min-severity` to support idea of rule severity. New HIGH, MEDIUM and LOW severity rules have also been added.
 
 0.1.13
 ++++++
