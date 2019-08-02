@@ -20,7 +20,7 @@ def expired_command_group(linter, command_group_name):
     if linter.command_group_expired(command_group_name):
         raise RuleError("Deprecated command group is expired and should be removed.")
 
-@CommandGroupRule(LinterSeverity.HIGH)
+@CommandGroupRule(LinterSeverity.MEDIUM)
 def command_loader_has_no_resource_type(linter, command_group_name):
     # This is a group rule because command loaders apply to multiple commands in one or more groups.
     # Detecting violations per group is less verbose in the case of a rule violation, instead of per command.
