@@ -13,8 +13,9 @@ from pkgutil import iter_modules
 from enum import Enum
 import yaml
 import colorama
-from .util import share_element, exclude_commands, LinterError
 from knack.log import get_logger
+
+from .util import share_element, exclude_commands, LinterError
 
 
 PACKAGE_NAME = 'azdev.operations.linter'
@@ -38,7 +39,7 @@ class LinterSeverity(Enum):
         return sorted(LinterSeverity, key=lambda sev: sev.value)
 
 
-class Linter(object):
+class Linter(object):  # pylint: disable=too-many-public-methods
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None):
         self._all_yaml_help = help_file_entries
         self._loaded_help = loaded_help
@@ -67,6 +68,10 @@ class Linter(object):
     @property
     def command_parser(self):
         return self._command_parser
+
+    @property
+    def command_loader_map(self):
+        return self._command_loader.cmd_to_loader_map
 
     def get_command_metadata(self, command_name):
         try:
@@ -119,6 +124,9 @@ class Linter(object):
             command_args = self._command_loader.command_table.get(command_name).arguments
             return command_args.get(parameter_name).type.settings.get('help')
         return param_help.short_summary or param_help.long_summary
+
+    def get_parameter_settings(self, command_name, parameter_name):
+        return self.get_command_metadata(command_name).arguments.get(parameter_name).type.settings
 
     def command_expired(self, command_name):
         deprecate_info = self._command_loader.command_table[command_name].deprecate_info
@@ -274,13 +282,13 @@ class LinterManager(object):
                     else:
                         print('- {} pass{}: {} '.format(Fore.GREEN, Fore.RESET, rule_name))
 
-
     def _linter_severity_is_applicable(self, rule_severity, rule_name):
         if self.min_severity.value > rule_severity.value:
             _logger.info("Skipping rule %s, because its severity '%s' is lower than the linter's min severity of '%s'.",
                          rule_name, rule_severity.name, self.min_severity.value)
             return False
         return True
+
 
 class RuleError(Exception):
     """

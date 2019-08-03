@@ -20,13 +20,14 @@ def expired_command_group(linter, command_group_name):
     if linter.command_group_expired(command_group_name):
         raise RuleError("Deprecated command group is expired and should be removed.")
 
+
 @CommandGroupRule(LinterSeverity.MEDIUM)
 def command_loader_has_no_resource_type(linter, command_group_name):
     # This is a group rule because command loaders apply to multiple commands in one or more groups.
     # Detecting violations per group is less verbose in the case of a rule violation, instead of per command.
 
     # first find all commands under this group and their loaders.
-    cmd_loaders = {cmd: loaders for cmd, loaders in linter._command_loader.cmd_to_loader_map.items()
+    cmd_loaders = {cmd: loaders for cmd, loaders in linter.command_loader_map.items()
                    if cmd.startswith(command_group_name)}
 
     # ensure that every command has a single associated loader.
@@ -51,7 +52,7 @@ def require_wait_command_if_no_wait(linter, command_group_name):
 
     # find commands under this group. A command in this group has one more token than the group name.
     group_command_names = [cmd for cmd in linter.commands if cmd.startswith(command_group_name) and
-                      len(cmd.split()) == len(command_group_name.split()) + 1]
+                           len(cmd.split()) == len(command_group_name.split()) + 1]
 
     # if one of the commands in this group ends with wait we are good
     for cmd in group_command_names:
@@ -61,5 +62,5 @@ def require_wait_command_if_no_wait(linter, command_group_name):
 
     # otherwise there is no wait command. If a command in this group has --no-wait, then error out.
     for cmd in group_command_names:
-        if linter._command_loader.command_table[cmd].supports_no_wait:
+        if linter.get_command_metadata(cmd).supports_no_wait:
             raise RuleError("Group does not have a 'wait' command, yet '{}' exposes '--no-wait'".format(cmd))

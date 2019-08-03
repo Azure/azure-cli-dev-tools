@@ -85,4 +85,3 @@ def _get_decorator(func, rule_group, print_format, severity):
 def _create_violation_msg(ex, format_string, *format_args):
     violation_string = format_string.format(*format_args)
     return '    {} - {}'.format(violation_string, ex)
-

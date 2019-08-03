@@ -4,9 +4,10 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+from knack.deprecation import Deprecated
+
 from ..rule_decorators import ParameterRule
 from ..linter import RuleError, LinterSeverity
-from knack.deprecation import Deprecated
 
 
 @ParameterRule(LinterSeverity.HIGH)
@@ -46,8 +47,7 @@ def bad_short_option(linter, command_name, parameter_name):
 
 @ParameterRule(LinterSeverity.HIGH)
 def parameter_should_not_end_in_resource_group(linter, command_name, parameter_name):
-    parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
-    options_list = parameter.get('options_list', [])
+    options_list = linter.get_parameter_options(command_name, parameter_name)
     bad_options = []
 
     for opt in options_list:
@@ -69,8 +69,7 @@ def parameter_should_not_end_in_resource_group(linter, command_name, parameter_n
 
 @ParameterRule(LinterSeverity.HIGH)
 def no_positional_parameters(linter, command_name, parameter_name):
-    parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
-    options_list = parameter.get('options_list', [])
+    options_list = linter.get_parameter_options(command_name, parameter_name)
 
     if not options_list:
         raise RuleError("CLI commands should have optional parameters instead of positional parameters. "
@@ -78,32 +77,35 @@ def no_positional_parameters(linter, command_name, parameter_name):
                         .format(parameter_name, command_name))
 
 
-
 @ParameterRule(LinterSeverity.HIGH)
 def no_parameter_defaults_for_update_commands(linter, command_name, parameter_name):
-    if command_name.split()[-1].lower() == "update":
-        parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
-        default_val = parameter.get('default')
-        if default_val:
-            raise RuleError("Update commands should not have parameters with default values. {} in {} has a "
-                            "default value of '{}'".format(parameter_name, command_name, default_val))
+    is_update_command = command_name.split()[-1].lower() == "update"
+    default_val = linter.get_parameter_settings(command_name, parameter_name).get('default')
+
+    if is_update_command and default_val:
+        raise RuleError("Update commands should not have parameters with default values. '{}' in '{}' has a "
+                        "default value of '{}'".format(parameter_name, command_name, default_val))
 
 
 @ParameterRule(LinterSeverity.MEDIUM)
 def no_required_location_param(linter, command_name, parameter_name):
-    # Location parameters should not be required
+    # Location parameters should typically not be required.
+    # If there is a resource group, one can default to the its location.
 
-    has_resource_group = "resource_group_name" in linter._parameters[command_name]
+    has_resource_group = "resource_group_name" in linter.get_command_parameters(command_name)
     is_location_param = (parameter_name.lower() == "location" or parameter_name.endswith("location"))
 
     if has_resource_group and is_location_param:
-        parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
+        parameter = linter.get_parameter_settings(command_name, parameter_name)
         is_required = parameter.get('required')
 
         if is_required:
-            raise RuleError("Location parameters should not be required. However, {} in {} should is required. "
+            location_params = linter.get_parameter_options(command_name, parameter_name)
+            location_params = location_params or "'{}'".format(parameter_name)
+
+            raise RuleError("Location parameters should not be required. However, {} in '{}' should is required. "
                             "Please make it optional and default to the location of the resource group."
-                            .format(parameter_name, command_name))
+                            .format(location_params, command_name))
 
 
 @ParameterRule(LinterSeverity.LOW)
@@ -112,13 +114,11 @@ def id_params_only_for_guid(linter, command_name, parameter_name):
     # it is a resource id parametere. This check can lead to false positives, which is why it is a low severity check.
     # Its aim is to guide reviewers and developers.
 
-    def _help_contains_queries(help_strings, queries):
-        a_query_is_in_a_str = next((True for help_str in help_strings
-                                    for query in queries if query.lower() in help_str.lower()), False)
+    def _help_contains_queries(help_str, queries):
+        a_query_is_in_a_str = next((True for query in queries if query.lower() in help_str.lower()), False)
         return a_query_is_in_a_str
 
-    parameter = linter._command_loader.command_table[command_name].arguments[parameter_name].type.settings
-    options_list = parameter.get('options_list', [])
+    options_list = linter.get_parameter_options(command_name, parameter_name) or []
     queries = ["resource id", "arm id"]
     is_id_param = False
 
@@ -134,10 +134,8 @@ def id_params_only_for_guid(linter, command_name, parameter_name):
 
     # if an option is an id param, check if the help text makes reference to 'resource id' etc. This could lead to fa
     if is_id_param:
-        help_obj = linter._loaded_help[command_name]
-        help_param = next((help_param_obj for help_param_obj in help_obj.parameters
-                               if help_param_obj == " ".join(options_list)), None)
+        param_help = linter.get_parameter_help(command_name, parameter_name)
 
-        if help_param and _help_contains_queries([help_param.short_summary, help_param.long_summary], queries):
+        if param_help and _help_contains_queries(param_help, queries):
             raise RuleError("An option {} ends with '-id'. Arguments ending with '-id' "
-                            "must be guids/uuids and not resource ids.", options_list)
+                            "must be guids/uuids and not resource ids.".format(options_list))
