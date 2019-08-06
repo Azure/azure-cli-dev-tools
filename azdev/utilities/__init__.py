@@ -22,7 +22,8 @@ from .const import (
     IS_WINDOWS,
     ENV_VAR_TEST_MODULES,
     ENV_VAR_TEST_LIVE,
-    ENV_VAR_VIRTUAL_ENV
+    ENV_VAR_VIRTUAL_ENV,
+    EXT_REPO_NAME
 )
 from .display import (
     display,
@@ -30,7 +31,12 @@ from .display import (
     heading,
     subheading
 )
+from .git_util import (
+    diff_branches,
+    filter_by_git_diff
+)
 from .path import (
+    extract_module_name,
     find_file,
     find_files,
     make_dirs,
@@ -38,7 +44,8 @@ from .path import (
     get_azdev_repo_path,
     get_cli_repo_path,
     get_ext_repo_paths,
-    get_path_table
+    get_path_table,
+    get_name_index
 )
 from .testing import test_cmd
 from .tools import (
@@ -54,6 +61,8 @@ __all__ = [
     'output',
     'heading',
     'subheading',
+    'diff_branches',
+    'filter_by_git_diff',
     'call',
     'cmd',
     'py_cmd',
@@ -67,7 +76,9 @@ __all__ = [
     'ENV_VAR_TEST_MODULES',
     'ENV_VAR_TEST_LIVE',
     'ENV_VAR_VIRTUAL_ENV',
+    'EXT_REPO_NAME',
     'IS_WINDOWS',
+    'extract_module_name',
     'find_file',
     'find_files',
     'make_dirs',
@@ -75,6 +86,7 @@ __all__ = [
     'get_cli_repo_path',
     'get_ext_repo_paths',
     'get_path_table',
+    'get_name_index',
     'require_virtual_env',
     'require_azure_cli'
 ]

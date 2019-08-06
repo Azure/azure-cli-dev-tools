@@ -9,7 +9,7 @@ import os
 from knack.util import CLIError
 
 from azdev.utilities import (
-    display, heading, subheading, get_cli_repo_path)
+    display, heading, subheading, get_cli_repo_path, get_ext_repo_paths)
 
 
 LICENSE_HEADER = """# --------------------------------------------------------------------------------------------
@@ -18,25 +18,32 @@ LICENSE_HEADER = """# ----------------------------------------------------------
 # --------------------------------------------------------------------------------------------
 """
 
+_IGNORE_SUBDIRS = ['__pycache__', 'vendored_sdks', 'site-packages', 'env']
+
 
 def check_license_headers():
 
     heading('Verify License Headers')
 
     cli_path = get_cli_repo_path()
-    env_path = os.path.join(cli_path, 'env')
+    all_paths = [cli_path]
+    for path in get_ext_repo_paths():
+        all_paths.append(path)
 
     files_without_header = []
-    for current_dir, _, files in os.walk(cli_path):
-        if current_dir.startswith(env_path):
-            continue
+    for path in all_paths:
+        for current_dir, subdirs, files in os.walk(path):
+            for i, x in enumerate(subdirs):
+                if x in _IGNORE_SUBDIRS or x.startswith('.'):
+                    del subdirs[i]
 
-        file_itr = (os.path.join(current_dir, p) for p in files if p.endswith('.py') and p != 'azure_bdist_wheel.py')
-        for python_file in file_itr:
-            with open(python_file, 'r', encoding='utf-8') as f:
-                file_text = f.read()
-                if file_text and LICENSE_HEADER not in file_text:
-                    files_without_header.append(os.path.join(current_dir, python_file))
+            # pylint: disable=line-too-long
+            file_itr = (os.path.join(current_dir, p) for p in files if p.endswith('.py') and p != 'azure_bdist_wheel.py')
+            for python_file in file_itr:
+                with open(python_file, 'r', encoding='utf-8') as f:
+                    file_text = f.read()
+                    if file_text and LICENSE_HEADER not in file_text:
+                        files_without_header.append(os.path.join(current_dir, python_file))
 
     subheading('Results')
     if files_without_header:

@@ -55,9 +55,16 @@ def _install_extensions(ext_paths):
 
 def _install_cli(cli_path):
 
-    # install public CLI off PyPI if no repo found
     if not cli_path:
+        # install public CLI off PyPI if no repo found
         pip_cmd('install --upgrade azure-cli', "Installing `azure-cli`...")
+        pip_cmd('install git+https://github.com/Azure/azure-cli@master#subdirectory=src/azure-cli-testsdk',
+                "Installing `azure-cli-testsdk`...")
+        return
+    if cli_path == 'EDGE':
+        # install the public edge build
+        pip_cmd('install --pre azure-cli --extra-index-url https://azurecliprod.blob.core.windows.net/edge',
+                "Installing `azure-cli` edge build...")
         pip_cmd('install git+https://github.com/Azure/azure-cli@master#subdirectory=src/azure-cli-testsdk',
                 "Installing `azure-cli-testsdk`...")
         return
@@ -130,8 +137,9 @@ def _interactive_setup():
 
         # CLI Installation
         if prompt_y_n('Do you plan to develop CLI modules?'):
-            display('\nGreat! Please enter the path to your azure-cli repo or press '
-                    'RETURN and we will attempt to find it for you.')
+            display("\nGreat! Please enter the path to your azure-cli repo, 'EDGE' to install "
+                    "the latest developer edge build or simply press "
+                    "RETURN and we will attempt to find your repo for you.")
             while True:
                 cli_path = prompt('\nPath (RETURN to auto-find): ', None)
                 cli_path = os.path.abspath(os.path.expanduser(cli_path)) if cli_path else None
@@ -145,7 +153,8 @@ def _interactive_setup():
                                    '\n    If you run with `-c` to autodetect, ensure you are running '
                                    'this command from a folder upstream of the repo.')
                 try:
-                    cli_path = _check_path(cli_path, CLI_SENTINEL)
+                    if cli_path != 'EDGE':
+                        cli_path = _check_path(cli_path, CLI_SENTINEL)
                     display('Found: {}'.format(cli_path))
                     break
                 except CLIError as ex:
@@ -190,11 +199,15 @@ def _interactive_setup():
         if ext_repos:
             if prompt_y_n('\nWould you like to install certain extensions by default? '):
                 display('\nGreat! Input the names of the extensions you wish to install, one per '
-                        'line. You can add as many repos as you like. Press RETURN to continue to the next step.')
+                        'line. You can add as many repos as you like. Use * to install all extensions. '
+                        'Press RETURN to continue to the next step.')
                 available_extensions = [x['name'] for x in list_extensions()]
                 while True:
                     ext_name = prompt('\nName (RETURN to continue): ', None)
                     if not ext_name:
+                        break
+                    if ext_name == '*':
+                        exts = [x['path'] for x in list_extensions()]
                         break
                     if ext_name not in available_extensions:
                         logger.error("Extension '%s' not found. Check the spelling, and make "
@@ -237,7 +250,8 @@ def setup(cli_path=None, ext_repo_path=None, ext=None):
                                '\n    Specify the path explicitly with `-c PATH`. '
                                '\n    If you run with `-c` to autodetect, ensure you are running '
                                'this command from a folder upstream of the repo.')
-            cli_path = _check_path(cli_path, CLI_SENTINEL)
+            if cli_path != 'EDGE':
+                cli_path = _check_path(cli_path, CLI_SENTINEL)
             display('Azure CLI:\n    {}\n'.format(cli_path))
         else:
             display('Azure CLI:\n    PyPI\n')
@@ -253,7 +267,9 @@ def setup(cli_path=None, ext_repo_path=None, ext=None):
             display('Azure CLI extension repos:\n    {}'.format(
                 '\n    '.join([os.path.abspath(x) for x in ext_repo_path])))
 
-        if ext:
+        if ext == ['*']:
+            ext_to_install = [x['path'] for x in list_extensions()]
+        elif ext:
             # add extension(s)
             available_extensions = [x['name'] for x in list_extensions()]
             not_found = [x for x in ext if x not in available_extensions]

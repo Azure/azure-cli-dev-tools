@@ -21,17 +21,16 @@ from azdev.utilities import (
     ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
-    get_path_table, require_virtual_env)
+    get_path_table, require_virtual_env, get_name_index)
+
 
 logger = get_logger(__name__)
 
-_CORE_NAME_REGEX = re.compile(r'azure-cli-(?P<name>[^/\\]+)[/\\]azure[/\\]cli')
-_MOD_NAME_REGEX = re.compile(r'azure-cli[/\\]azure[/\\]cli[/\\]command_modules[/\\](?P<name>[^/\\]+)')
-_EXT_NAME_REGEX = re.compile(r'.*(?P<name>azext_[^/\\]+).*')
 
-
+# pylint: disable=too-many-statements
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
-              run_live=False, profile=None, last_failed=False, pytest_args=None):
+              run_live=False, profile=None, last_failed=False, pytest_args=None,
+              git_source=None, git_target=None, git_repo=None):
 
     require_virtual_env()
 
@@ -47,7 +46,15 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
         profile = original_profile
     path_table = get_path_table()
     test_index = _get_test_index(profile, discover)
-    tests = tests or list(path_table['mod'].keys()) + list(path_table['core'].keys())
+    if not tests:
+        tests = list(path_table['mod'].keys()) + list(path_table['core'].keys()) + list(path_table['ext'].keys())
+    if tests == ['CLI']:
+        tests = list(path_table['mod'].keys()) + list(path_table['core'].keys())
+    elif tests == ['EXT']:
+        tests = list(path_table['ext'].keys())
+
+    # filter out tests whose modules haven't changed
+    tests = _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo)
 
     if tests:
         display('\nTESTS: {}\n'.format(', '.join(tests)))
@@ -106,14 +113,36 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     sys.exit(0 if not exit_code else 1)
 
 
-def _extract_module_name(path):
+def _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo):
+    from azdev.utilities import diff_branches, extract_module_name
+    from azdev.utilities.git_util import _summarize_changed_mods
 
-    for expression in [_MOD_NAME_REGEX, _CORE_NAME_REGEX, _EXT_NAME_REGEX]:
-        match = re.search(expression, path)
-        if not match:
-            continue
-        return match.groupdict().get('name')
-    raise CLIError('unexpected error: unable to extract name from path: {}'.format(path))
+    if not any([git_source, git_target, git_repo]):
+        return tests
+
+    if not all([git_target, git_repo]):
+        raise CLIError('usage error: [--src NAME]  --tgt NAME --repo PATH')
+
+    files_changed = diff_branches(git_repo, git_target, git_source)
+    mods_changed = _summarize_changed_mods(files_changed)
+
+    repo_path = str(os.path.abspath(git_repo)).lower()
+    to_remove = []
+    for key in tests:
+        test_path = test_index.get(key, None)
+        if test_path and test_path.lower().startswith(repo_path):
+            mod_name = extract_module_name(test_path)
+            if next((x for x in mods_changed if mod_name in x), None):
+                # has changed, so do not filter out
+                continue
+        # in not in the repo or has not changed, filter out
+        to_remove.append(key)
+    # remove the unchanged modules
+    tests = [t for t in tests if t not in to_remove]
+
+    logger.info('Filtered out: %s', to_remove)
+
+    return tests
 
 
 def _get_profile(profile):
@@ -199,6 +228,7 @@ def _discover_tests(profile):
     core_modules = path_table['core'].items()
     command_modules = path_table['mod'].items()
     extensions = path_table['ext'].items()
+    inverse_name_table = get_name_index(invert=True)
 
     module_data = {}
 
@@ -243,7 +273,7 @@ def _discover_tests(profile):
             continue
         import_name = os.path.basename(filepath)
         mod_data = {
-            'alt_name': os.path.split(filepath)[1],
+            'alt_name': inverse_name_table[mod_name],
             'filepath': os.path.join(filepath, 'tests', profile_namespace),
             'base_path': '{}.tests.{}'.format(import_name, profile_namespace),
             'files': {}
@@ -256,13 +286,14 @@ def _discover_tests(profile):
     conflicted_keys = []
 
     def add_to_index(key, path):
+        from azdev.utilities import extract_module_name
 
         key = key or mod_name
         if key in test_index:
             if key not in conflicted_keys:
                 conflicted_keys.append(key)
-            mod1 = _extract_module_name(path)
-            mod2 = _extract_module_name(test_index[key])
+            mod1 = extract_module_name(path)
+            mod2 = extract_module_name(test_index[key])
             if mod1 != mod2:
                 # resolve conflicted keys by prefixing with the module name and a dot (.)
                 logger.warning("'%s' exists in both '%s' and '%s'. Resolve using `%s.%s` or `%s.%s`",
