@@ -8,12 +8,11 @@ from __future__ import print_function
 
 import os
 import sys
-import copy
 import json
 import shutil
 import tempfile
 
-from subprocess import check_call, CalledProcessError
+from subprocess import check_call, check_output, CalledProcessError
 
 from knack.util import CLIError
 from knack.log import get_logger
@@ -24,7 +23,8 @@ from azdev.utilities import (
 )
 
 from azdev.utilities.tools import require_azure_cli
-from azure.cli.core.extension.operations import list_available_extensions  # pylint: disable=import-error
+from azdev.operations.extensions import list_extensions as list_dev_cli_extensions
+from azure.cli.core.extension.operations import list_available_extensions, list_extensions as list_cli_extensions  # pylint: disable=import-error
 
 DOC_MAP_NAME = 'doc_source_map.json'
 HELP_FILE_NAME = '_help.py'
@@ -84,16 +84,22 @@ def _help_files_not_in_map(cli_repo, help_files_in_map):
     return not_in_map
 
 
-def generate_cli_ref_docs(output_dir=None, output_type=None):
-    # require that azure cli installed
+def generate_cli_ref_docs(output_dir=None, output_type=None, all_profiles=None):
+    # require that azure cli installed and warn the users if extensions are installed.
     require_azure_cli()
     output_dir = _process_ref_doc_output_dir(output_dir)
+
+    _warn_if_exts_installed()
 
     heading('Generate CLI Reference Docs')
     display("Docs will be placed in {}.".format(output_dir))
 
-    # Generate documentation for all comamnds
-    _call_sphinx_build(output_type, output_dir)
+    if all_profiles:
+        # Generate documentation for all commands and for all CLI profiles
+        _generate_ref_docs_for_all_profiles(output_type, output_dir)
+    else:
+        # Generate documentation for all comamnds
+        _call_sphinx_build(output_type, output_dir)
 
     display("\nThe {} files are in {}".format(output_type, output_dir))
 
@@ -116,6 +122,7 @@ def _process_ref_doc_output_dir(output_dir):
     # handle output_dir
     # if non specified, store in "_build" in the current working directory
     if not output_dir:
+        _logger.warning("No output directory was specified. Will use a temporary directory to store reference docs.")
         output_dir = tempfile.mkdtemp(prefix="doc_output_")
     # ensure output_dir exists otherwise create it
     output_dir = os.path.abspath(output_dir)
@@ -128,6 +135,35 @@ def _process_ref_doc_output_dir(output_dir):
 
         os.mkdir(output_dir)
     return output_dir
+
+
+def _generate_ref_docs_for_all_profiles(output_type, base_output_dir):
+    original_profile = None
+    profile = ""
+    try:
+        # store original profile and get all profiles.
+        original_profile = _get_current_profile()
+        profiles = _get_profiles()
+        _logger.info("Original Profile: %s", original_profile)
+
+        for profile in profiles:
+            # set profile and call sphinx build cmd
+            profile_output_dir = os.path.join(base_output_dir, profile)
+            _set_profile(profile)
+            _call_sphinx_build(output_type, profile_output_dir)
+
+            display("\nFinished generating files for profile {} in dir {}\n".format(output_type, profile_output_dir))
+
+        # always set the profile back to the original profile after generating all docs.
+        _set_profile(original_profile)
+
+    except (CLIError, KeyboardInterrupt, SystemExit) as e:
+        _logger.error("Error when attempting to generate docs for profile %s.\n\t%s", profile, e)
+        if original_profile:
+            _logger.error("Will try to set the CLI's profile back to the original value: '%s'", original_profile)
+            _set_profile(original_profile)
+        # still re-raise the error.
+        raise e
 
 
 def _generate_ref_docs_for_public_exts(output_type, base_output_dir):
@@ -196,6 +232,42 @@ def _call_sphinx_build(builder_name, output_dir, for_extensions_alone=False, cal
 
     except CalledProcessError:
         raise CLIError("Doc generation failed.")
+
+
+def _get_current_profile():
+    try:
+        return check_output(['az', 'cloud', 'show', '--query', '"profile"', '-otsv']).decode('utf-8').strip()
+    except CalledProcessError as e:
+        raise CLIError("Failed to get current profile due to err: {}".format(e))
+
+
+def _set_profile(profile):
+    try:
+        _logger.warning("Setting the CLI profile to '%s'", profile)
+        check_call(['az', 'cloud', 'update', '--profile', profile])
+    except CalledProcessError as e:
+        raise CLIError("Failed to set profile {} due to err:\n{}\n"
+                       "Please check that your profile is set to the expected value.".format(profile, e))
+
+
+def _get_profiles():
+    try:
+        profiles_str = check_output(["az", "cloud", "list-profiles", "-o", "tsv"]).decode('utf-8').strip()
+    except CalledProcessError as e:
+        raise CLIError("Failed to get profiles due to err: {}".format(e))
+
+    return profiles_str.splitlines()
+
+
+def _warn_if_exts_installed():
+    cli_extensions, dev_cli_extensions = list_cli_extensions(), list_dev_cli_extensions()
+    if cli_extensions:
+        _logger.warning("One or more CLI Extensions are installed and will be included in ref doc output.")
+    if dev_cli_extensions:
+        _logger.warning(
+            "One or more CLI Extensions are installed in development mode and will be included in ref doc output.")
+    if cli_extensions or dev_cli_extensions:
+        _logger.warning("Please uninstall the extension(s) if you want to generate Core CLI docs solely.")
 
 
 # Todo, this would be unnecessary if list_available_extensions has a switch for including download urls....

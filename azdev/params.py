@@ -119,6 +119,11 @@ def load_arguments(self, _):
             c.argument('display_name', arg_group='Help', help='Description to display in help text.')
             c.argument('display_name_plural', arg_group='Help', help='Description to display in help text when plural.')
 
+    with ArgumentsContext(self, 'cli generate-docs') as c:
+        c.argument('all_profiles', action='store_true',
+                   help="If specified, generate docs for all CLI profiles. NOTE: this command updates the current CLI profile and will attempt to reset it to its original value. "
+                        "Please check the CLI's profile after running this command.")
+
     for scope in ['cli', 'extension']:
         with ArgumentsContext(self, '{} generate-docs'.format(scope)) as c:
 
