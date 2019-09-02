@@ -239,7 +239,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None):
     if not any([cli_path, ext_repo_path, ext]):
         cli_path, ext_repo_path, ext_to_install = _interactive_setup()
     else:
-        if cli_path == "pypi"
+        if cli_path == "pypi":
             cli_path = None
         # otherwise assume programmatic setup
         if cli_path:
