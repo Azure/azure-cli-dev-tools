@@ -28,7 +28,7 @@ setup(
     name='azdev',
     version=__VERSION__,
     description='Microsoft Azure CLI Developer Tools',
-    long_description=README+ '\n\n' + HISTORY,
+    long_description=README + '\n\n' + HISTORY,
     url='https://github.com/Azure/azure-cli-dev-tools',
     author='Microsoft Corporation',
     author_email='azpycli@microsoft.com',
