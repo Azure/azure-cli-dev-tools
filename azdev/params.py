@@ -19,7 +19,10 @@ class Flag(object):
 # pylint: disable=too-many-statements
 def load_arguments(self, _):
 
-    modules_type = CLIArgumentType(nargs='*', help="Space-separated list of modules or extensions to check. Omit to check all or use 'CLI' or 'EXT' to check only CLI modules or extensions respectively.")
+    modules_type = CLIArgumentType(nargs='*',
+                                   help="Space-separated list of modules or extensions (dev mode) to check. "
+                                        "Use 'CLI' to check built-in modules or 'EXT' to check extensions. "
+                                        "Omit to check all. ")
 
     with ArgumentsContext(self, '') as c:
         c.argument('private', action='store_true', help='Target the private repo.')
@@ -65,12 +68,16 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'cli update-setup') as c:
         c.argument('pin', action='store_true', help='Pin the module versions in azure-cli\'s setup.py file.')
 
+    # region linter
     with ArgumentsContext(self, 'linter') as c:
         c.positional('modules', modules_type)
         c.argument('rules', options_list=['--rules', '-r'], nargs='+', help='Space-separated list of rules to run. Omit to run all rules.')
         c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries'], help='Space-separated list of rule types to run. Omit to run all.')
         c.argument('ci_exclusions', action='store_true', help='Force application of CI exclusions list when run locally.')
-        c.argument('include_whl_extensions', action='store_true', help='Allow running the linter on non-dev extensions (those installed using `az extension add ...`).')
+        c.argument('include_whl_extensions',
+                   action='store_true',
+                   help="Allow running linter on extensions installed by `az extension add`.")
+    # endregion
 
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')
