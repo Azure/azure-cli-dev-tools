@@ -6,7 +6,6 @@
 
 import os
 from glob import glob
-from collections import defaultdict
 
 from knack.util import CLIError
 
@@ -198,7 +197,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
         include_only = [include_only]
     get_all = not include_only
 
-    table = defaultdict(dict)
+    table = {}
     cli_repo_path = get_cli_repo_path()
     ext_repo_paths = get_ext_repo_paths()
 
@@ -213,8 +212,8 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
 
     def _update_table(package_paths, key):
-        if not include_only:    # nothing left to filter
-            return
+        if key not in table:
+            table[key] = {}
 
         for path in package_paths:
             folder = os.path.dirname(path)
@@ -232,7 +231,8 @@ def get_path_table(include_only=None, include_whl_extensions=False):
 
             if get_all:
                 table[key][long_name if key == 'ext' else short_name] = folder
-                continue
+            elif not include_only:
+                return  # nothing left to filter
             else:
                 # check and update filter
                 if short_name in include_only:
@@ -253,8 +253,8 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     if include_only:
         whl_extensions = [mod for whl_ext_path in whl_ext_paths for mod in include_only if mod in whl_ext_path]
         if whl_extensions:
-            err = 'extension installed from a wheel (`az extension add`) ' \
-                  'cannot linter without --include-whl-extensions: [ {} ]'.format(', '.join(whl_extensions))
+            err = 'extension(s): [ {} ] installed from a wheel may need --include-whl-extensions option'.format(
+                ', '.join(whl_extensions))
             raise CLIError(err)
 
         raise CLIError('unrecognized modules: [ {} ]'.format(', '.join(include_only)))
