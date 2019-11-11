@@ -10,7 +10,6 @@ from collections import defaultdict
 
 from knack.util import CLIError
 
-from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
 from .const import COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, ENV_VAR_VIRTUAL_ENV
 
 
@@ -121,6 +120,7 @@ def make_dirs(path):
 def get_name_index(invert=False, include_whl_extensions=False):
     """ Returns a dictionary containing the long and short names of modules and extensions is {SHORT:LONG} format or
         {LONG:SHORT} format when invert=True. """
+    from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
 
     table = {}
     cli_repo_path = get_cli_repo_path()
@@ -191,6 +191,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
         }
     }
     """
+    from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
 
     # determine whether the call will filter or return all
     if isinstance(include_only, str):
