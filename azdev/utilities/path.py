@@ -119,6 +119,7 @@ def make_dirs(path):
 def get_name_index(invert=False, include_whl_extensions=False):
     """ Returns a dictionary containing the long and short names of modules and extensions is {SHORT:LONG} format or
         {LONG:SHORT} format when invert=True. """
+    from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
 
     table = {}
     cli_repo_path = get_cli_repo_path()
@@ -135,7 +136,6 @@ def get_name_index(invert=False, include_whl_extensions=False):
     ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
     whl_ext_paths = []
     if include_whl_extensions:
-        from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
         whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
 
     def _update_table(paths, key):
@@ -190,6 +190,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
         }
     }
     """
+    from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
 
     # determine whether the call will filter or return all
     if isinstance(include_only, str):
@@ -208,40 +209,30 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     modules_paths = glob(paths)
     core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
     ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
-    whl_ext_paths = []
-    if include_whl_extensions:
-        from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
-        whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
+    whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
 
-    def _update_table(paths, key):
+    def _update_table(package_paths, key):
         if key not in table:
             table[key] = {}
-        folder = None
-        long_name = None
-        short_name = None
-        for path in paths:
+
+        for path in package_paths:
             folder = os.path.dirname(path)
             base_name = os.path.basename(folder)
-            # determine long-names
+
             if key == 'ext':
                 short_name = base_name
-                for item in os.listdir(folder):
-                    if item.startswith(EXTENSION_PREFIX):
-                        long_name = item
-                        break
+                long_name = next((item for item in os.listdir(folder) if item.startswith(EXTENSION_PREFIX)), None)
             elif base_name.startswith(COMMAND_MODULE_PREFIX):
-                long_name = base_name
                 short_name = base_name.replace(COMMAND_MODULE_PREFIX, '') or '__main__'
+                long_name = base_name
             else:
                 short_name = base_name
                 long_name = '{}{}'.format(COMMAND_MODULE_PREFIX, base_name)
 
             if get_all:
                 table[key][long_name if key == 'ext' else short_name] = folder
-                continue
             elif not include_only:
-                # nothing left to filter
-                return
+                return  # nothing left to filter
             else:
                 # check and update filter
                 if short_name in include_only:
@@ -256,9 +247,16 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     _update_table(modules_paths, 'mod')
     _update_table(core_paths, 'core')
     _update_table(ext_paths, 'ext')
-    _update_table(whl_ext_paths, 'ext')
+    if include_whl_extensions:
+        _update_table(whl_ext_paths, 'ext')
 
     if include_only:
-        raise CLIError('unrecognized names: {}'.format(' '.join(include_only)))
+        whl_extensions = [mod for whl_ext_path in whl_ext_paths for mod in include_only if mod in whl_ext_path]
+        if whl_extensions:
+            err = 'extension(s): [ {} ] installed from a wheel may need --include-whl-extensions option'.format(
+                ', '.join(whl_extensions))
+            raise CLIError(err)
+
+        raise CLIError('unrecognized modules: [ {} ]'.format(', '.join(include_only)))
 
     return table
