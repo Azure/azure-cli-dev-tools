@@ -51,6 +51,8 @@ setup(
         'azdev.config',
         'azdev.operations',
         'azdev.mod_templates',
+        'azdev.operations.help',
+        'azdev.operations.help.refdoc',
         'azdev.operations.linter',
         'azdev.operations.linter.rules',
         'azdev.operations.tests',
