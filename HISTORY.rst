@@ -9,21 +9,21 @@ Release History
 
 0.1.5
 ++++++
-- `azdev extension add/remove`:
+- azdev extension add/remove:
     - Add ability to supply wildcard (*) to install all available dev extensions.
-    - Remove all installed dev extensions.
-- `azdev setup`:
+    - Add ability to remove all installed dev extensions.
+- azdev setup:
     - Add ability to install all extensions using `--ext/-e *`.
     - Add ability to install CLI edge build with `--cli/-c EDGE`.
-- `azdev style/test/linter`:
+- azdev style/test/linter:
     - Add special names CLI and EXT to allow running on just CLI modules or just extensions.
       extensions which have changed based on a git diff.
-- `azdev linter`:
+- azdev linter:
     - Added `--include-whl-extensions` flag to permit running the linter on extensions installed using
       the `az extension add` command.
-- `azdev verify license`:
+- azdev verify license:
     - Command will not check any dev-installed CLI and extension repos. Previously, it only checked the CLI repo.
-- `New Commands`:
+- New Command:
     - `azdev cli/extension generate-docs` to generate sphinx documentation.
 
 0.1.4
