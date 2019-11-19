@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.6
+++++++
+* Fix bug: azdev==0.1.5 help commands' error
+
 0.1.5
 ++++++
 * `azdev extension add/remove`: Added ability to supply wildcard (*) to install all available dev extensions
