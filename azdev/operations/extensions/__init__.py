@@ -204,29 +204,29 @@ def update_extension_index(extensions):
             raise CLIError('usage error: only URL to a WHL file currently supported.')
 
         # TODO: extend to consider other options
-        ext_path = extension
+        ext_url = extension
 
         # Extract the extension name
         try:
-            extension_name = re.findall(NAME_REGEX, ext_path)[0]
+            extension_name = re.findall(NAME_REGEX, ext_url)[0]
             extension_name = extension_name.replace('_', '-')
         except IndexError:
-            raise CLIError('Unable to parse extension name from path [ {} ]'.format(ext_path))
+            raise CLIError('Unable to parse extension name from path [ {} ]'.format(ext_url))
 
         # TODO: Update this!
         extensions_dir = tempfile.mkdtemp()
         ext_dir = tempfile.mkdtemp(dir=extensions_dir)
         whl_cache_dir = tempfile.mkdtemp()
         whl_cache = {}
-        ext_file = get_whl_from_url(ext_path, extension_name, whl_cache_dir, whl_cache)
+        ext_file = get_whl_from_url(ext_url, extension_name, whl_cache_dir, whl_cache)
 
         with open(index_path, 'r') as infile:
             curr_index = json.loads(infile.read())
 
         entry = {
-            'downloadUrl': ext_path,
+            'downloadUrl': ext_url,
             'sha256Digest': _get_sha256sum(ext_file),
-            'filename': ext_path.split('/')[-1],
+            'filename': ext_url.split('/')[-1],
             'metadata': get_ext_metadata(ext_dir, ext_file, extension_name)
         }
 
@@ -238,7 +238,7 @@ def update_extension_index(extensions):
             curr_index['extensions'][extension_name].append(entry)
 
         # update index and write back to file
-        with open(os.path.join(index_path), 'w') as outfile:
+        with open(index_path, 'w') as outfile:
             outfile.write(json.dumps(curr_index, indent=4, sort_keys=True))
 
 

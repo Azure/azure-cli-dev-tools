@@ -83,5 +83,7 @@ def get_whl_from_url(url, filename, tmp_dir, whl_cache=None):
         for chunk in r.iter_content(chunk_size=1024):
             if chunk:  # ignore keep-alive new chunks
                 f.write(chunk)
+
     whl_cache[url] = ext_file
+
     return ext_file
