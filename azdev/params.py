@@ -102,7 +102,8 @@ def load_arguments(self, _):
             c.positional('repos', metavar='PATH', nargs='+', help='Space-separated list of paths to Git repositories.')
 
     with ArgumentsContext(self, 'extension update-index') as c:
-        c.positional('extensions', nargs='+', metavar='URL', help='Space-separated list of URLs to extension WHL files.')
+        c.positional('extensions', nargs='+', metavar='URLs',
+                     help='Space-separated list of URLs to extension WHL files.')
 
     with ArgumentsContext(self, 'cli create') as c:
         c.positional('mod_name', help='Name of the module to create.')

@@ -192,9 +192,9 @@ def update_extension_index(extensions):
     ext_repos = get_ext_repo_paths()
     index_path = next((x for x in find_files(ext_repos, 'index.json') if 'azure-cli-extensions' in x), None)
     if not index_path:
-        raise CLIError("Unable to find 'index.json' in your extension repos. Have "
-                       "you cloned 'azure-cli-extensions' and added it to you repo "
-                       "sources with `azdev extension repo add`?")
+        raise CLIError("Unable to find 'index.json' in your extension repos. "
+                       "Have you cloned 'azure-cli-extensions'?"
+                       "Then setup or add you repo source with 'azdev extension repo add'?")
 
     NAME_REGEX = r'.*/([^/]*)-\d+.\d+.\d+'
 
