@@ -196,8 +196,6 @@ def update_extension_index(extensions):
                        "Have you cloned 'azure-cli-extensions'?"
                        "Then setup or add you repo source with 'azdev extension repo add'?")
 
-    NAME_REGEX = r'.*/([^/]*)-\d+.\d+.\d+'
-
     for extension in extensions:
         # Get extension WHL from URL
         if not extension.endswith('.whl') or not extension.startswith('https:'):
@@ -208,17 +206,14 @@ def update_extension_index(extensions):
 
         # Extract the extension name
         try:
-            extension_name = re.findall(NAME_REGEX, ext_url)[0]
+            extension_name = re.findall(r'.*/([^/]*)-\d+.\d+.\d+', ext_url)[0]
             extension_name = extension_name.replace('_', '-')
         except IndexError:
             raise CLIError('Unable to parse extension name from path [ {} ]'.format(ext_url))
 
-        # TODO: Update this!
-        extensions_dir = tempfile.mkdtemp()
-        ext_dir = tempfile.mkdtemp(dir=extensions_dir)
-        whl_cache_dir = tempfile.mkdtemp()
-        whl_cache = {}
-        ext_file = get_whl_from_url(ext_url, extension_name, whl_cache_dir, whl_cache)
+        tmp_dir = tempfile.mkdtemp()
+
+        ext_file = get_whl_from_url(ext_url, extension_name, tmp_dir)
 
         with open(index_path, 'r') as infile:
             curr_index = json.loads(infile.read())
@@ -227,7 +222,7 @@ def update_extension_index(extensions):
             'downloadUrl': ext_url,
             'sha256Digest': _get_sha256sum(ext_file),
             'filename': ext_url.split('/')[-1],
-            'metadata': get_ext_metadata(ext_dir, ext_file, extension_name)
+            'metadata': get_ext_metadata(tmp_dir, ext_file, extension_name)
         }
 
         if extension_name not in curr_index['extensions'].keys():
