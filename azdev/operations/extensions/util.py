@@ -69,12 +69,15 @@ def get_whl_from_url(url, filename, tmp_dir, whl_cache=None):
         whl_cache = {}
     if url in whl_cache:
         return whl_cache[url]
+
     import requests
+
     r = requests.get(url, stream=True)
     try:
-        assert r.status_code == 200, "Request to {} failed with {}".format(url, r.status_code)
-    except AssertionError:
-        raise CLIError("unable to download (status code {}): {}".format(r.status_code, url))
+        r.raise_for_status()
+    except Exception:
+        raise CLIError("Unable to download (status code {}): {}".format(r.status_code, url))
+
     ext_file = os.path.join(tmp_dir, filename)
     with open(ext_file, 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024):

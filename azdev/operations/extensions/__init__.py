@@ -211,7 +211,7 @@ def update_extension_index(extensions):
             extension_name = re.findall(NAME_REGEX, ext_path)[0]
             extension_name = extension_name.replace('_', '-')
         except IndexError:
-            raise CLIError('unable to parse extension name')
+            raise CLIError('Unable to parse extension name from path [ {} ]'.format(ext_path))
 
         # TODO: Update this!
         extensions_dir = tempfile.mkdtemp()
