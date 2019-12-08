@@ -166,8 +166,8 @@ def _interactive_setup():
         def add_ext_repo(path):
             try:
                 _check_repo(path)
-            except CLIError as ex:
-                logger.error(ex)
+            except CLIError as e:
+                logger.error(e)
                 return False
             ext_repos.append(path)
             display('Repo {} OK.'.format(path))
@@ -262,17 +262,20 @@ def setup(cli_path=None, ext_repo_path=None, ext=None):
         if ext and not ext_repo_path:
             raise CLIError('usage error: --repo EXT_REPO [EXT_REPO ...] [--ext EXT_NAME ...]')
 
-        get_azure_config().set_value('extension', 'dev_sources', '')
-        if ext_repo_path:
-            # add extension repo(s)
+        # add extension repo(s)
+        if ext_repo_path is None:
+            # This is weird, knack will fill a default value even though ext_repo_path is None.
+            # Have to clear it manually.
+            get_azure_config().set_value('extension', 'dev_sources', '')
+        else:
             add_extension_repo(ext_repo_path)
             display('Azure CLI extension repos:\n    {}'.format(
                 '\n    '.join([os.path.abspath(x) for x in ext_repo_path])))
 
+        # add extension(s)
         if ext == ['*']:
             ext_to_install = [x['path'] for x in list_extensions()]
         elif ext:
-            # add extension(s)
             available_extensions = [x['name'] for x in list_extensions()]
             not_found = [x for x in ext if x not in available_extensions]
             if not_found:
@@ -287,8 +290,9 @@ def setup(cli_path=None, ext_repo_path=None, ext=None):
 
     # save data to config files
     config = get_azdev_config()
-    config.set_value('ext', 'repo_paths', dev_sources if dev_sources else '_NONE_')
-    config.set_value('cli', 'repo_path', cli_path if cli_path else '_NONE_')
+    if dev_sources and dev_sources != '':
+        config.set_value('ext', 'repo_paths', dev_sources)
+    config.set_value('cli', 'repo_path', cli_path)
 
     # install packages
     subheading('Installing packages')
@@ -297,7 +301,10 @@ def setup(cli_path=None, ext_repo_path=None, ext=None):
     pip_cmd('install --upgrade pip -q', 'Upgrading pip...')
 
     _install_cli(cli_path)
-    _install_extensions(ext_to_install)
+
+    if ext_to_install:
+        _install_extensions(ext_to_install)
+
     _copy_config_files()
 
     end = time.time()

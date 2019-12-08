@@ -75,7 +75,8 @@ def get_ext_repo_paths():
     try:
         return get_azdev_config().get('ext', 'repo_paths').split(',')
     except NoSectionError:
-        raise CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup`.')
+        raise CLIError('Unable to retrieve extensions repo path from config. '
+                       'Please run `azdev setup` with -r to specify path to your azure-cli-extensions repo.')
 
 
 def find_file(file_name):
