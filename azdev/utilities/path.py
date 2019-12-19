@@ -222,9 +222,6 @@ def get_path_table(include_only=None, include_whl_extensions=False):
             if key == 'ext':
                 short_name = base_name
                 long_name = next((item for item in os.listdir(folder) if item.startswith(EXTENSION_PREFIX)), None)
-            elif base_name.startswith(COMMAND_MODULE_PREFIX):
-                short_name = base_name.replace(COMMAND_MODULE_PREFIX, '') or '__main__'
-                long_name = base_name
             else:
                 short_name = base_name
                 long_name = '{}{}'.format(COMMAND_MODULE_PREFIX, base_name)
