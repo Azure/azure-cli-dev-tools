@@ -140,6 +140,9 @@ jobs:
     - bash: |
         set -ev
 
+        python -m venv env
+        . env/bin/activate
+
         # install azdev from source code
         python setup.py install
 
@@ -147,6 +150,8 @@ jobs:
         git clone --quiet https://github.com/Azure/azure-cli.git
         git clone --quiet https://github.com/Azure/azure-cli-extensions.git
         azdev setup -c ./ -r azure-cli-extensions
+
+        azdev --version
 
         # unittest
         python -m unittest -v
