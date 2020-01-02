@@ -121,7 +121,7 @@ jobs:
       TargetPath: $(Build.ArtifactStagingDirectory)
       ArtifactName: pypi
 
-- job: UnitTest
+- job: Unittest
   timeoutInMinutes: 10
 
   pool:
