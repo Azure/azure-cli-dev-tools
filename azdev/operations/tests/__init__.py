@@ -42,8 +42,8 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     heading('Run Tests')
 
     original_profile = _get_profile(profile)
-    profile = original_profile if profile is None else profile
-
+    if not profile:
+        profile = original_profile
     path_table = get_path_table()
     test_index = _get_test_index(profile, discover)
     if not tests:
