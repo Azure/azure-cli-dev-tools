@@ -134,9 +134,9 @@ jobs:
         python.version: '3.8'
   steps:
     - task: UsePythonVersion@0
-        displayName: 'Use Python $(python.version)'
-        inputs:
-          versionSpec: '$(python.version)'
+      displayName: 'Use Python $(python.version)'
+      inputs:
+        versionSpec: '$(python.version)'
     - bash: |
         # install azdev from source code
         python setup.py install
