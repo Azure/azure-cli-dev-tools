@@ -121,6 +121,43 @@ jobs:
       TargetPath: $(Build.ArtifactStagingDirectory)
       ArtifactName: pypi
 
+- job: Unittest
+  timeoutInMinutes: 10
+
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python38:
+        python.version: '3.8'
+  steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python $(python.version)'
+      inputs:
+        versionSpec: '$(python.version)'
+    - bash: |
+        set -ev
+
+        python -m venv env
+        . env/bin/activate
+
+        # install azdev from source code
+        python setup.py install
+
+        # azdev setup
+        git clone --quiet https://github.com/Azure/azure-cli.git
+        git clone --quiet https://github.com/Azure/azure-cli-extensions.git
+        azdev setup -c ./azure-cli -r ./azure-cli-extensions
+
+        azdev --version
+
+        # unittest
+        python -m unittest -v
+      displayName: 'Run Unittest'
+
+
 - job: TestAzdevSetup
   displayName: 'Test azdev setup'
   dependsOn: BuildPythonWheel

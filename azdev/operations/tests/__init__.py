@@ -234,13 +234,13 @@ def _discover_tests(profile):
 
     logger.info('\nCore Modules: %s', ', '.join([name for name, _ in core_modules]))
     for mod_name, mod_path in core_modules:
-        filepath = mod_path
+        file_path = mod_path
         for comp in mod_name.split('-'):
-            filepath = os.path.join(filepath, comp)
+            file_path = os.path.join(file_path, comp)
 
         mod_data = {
             'alt_name': 'main' if mod_name == 'azure-cli' else mod_name.replace(COMMAND_MODULE_PREFIX, ''),
-            'filepath': os.path.join(filepath, 'tests'),
+            'filepath': os.path.join(file_path, 'tests'),
             'base_path': '{}.tests'.format(mod_name).replace('-', '.'),
             'files': {}
         }
@@ -267,14 +267,14 @@ def _discover_tests(profile):
     for mod_name, mod_path in extensions:
         glob_pattern = os.path.normcase(os.path.join('{}*'.format(EXTENSION_PREFIX)))
         try:
-            filepath = glob.glob(os.path.join(mod_path, glob_pattern))[0]
+            file_path = glob.glob(os.path.join(mod_path, glob_pattern))[0]
         except IndexError:
             logger.debug("No extension found at: %s", os.path.join(mod_path, glob_pattern))
             continue
-        import_name = os.path.basename(filepath)
+        import_name = os.path.basename(file_path)
         mod_data = {
             'alt_name': inverse_name_table[mod_name],
-            'filepath': os.path.join(filepath, 'tests', profile_namespace),
+            'filepath': os.path.join(file_path, 'tests', profile_namespace),
             'base_path': '{}.tests.{}'.format(import_name, profile_namespace),
             'files': {}
         }
