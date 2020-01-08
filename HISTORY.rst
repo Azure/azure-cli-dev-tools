@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.7
+++++++
+* fix: azdev test cannot find core tests
+
 0.1.6
 ++++++
 * Fix bug: azdev==0.1.5 help commands' error
