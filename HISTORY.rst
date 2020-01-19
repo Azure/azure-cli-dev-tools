@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.8
+++++++
+* fix: azdev test cannot be used in python 3.8.1 or later
+
 0.1.7
 ++++++
 * fix: azdev test cannot find core tests

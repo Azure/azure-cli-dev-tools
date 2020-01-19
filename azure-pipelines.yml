@@ -77,6 +77,24 @@ jobs:
     inputs:
       targetType: 'filePath'
       filePath: scripts/ci/run_tox.sh
+      
+- job: Tox38
+  displayName: 'Tox: Python 3.8'
+  condition: succeeded()
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.8'
+    inputs:
+      versionSpec: 3.8
+  - task: Bash@3
+    displayName: 'Run Tox'
+    env:
+      TOXENV: py38
+    inputs:
+      targetType: 'filePath'
+      filePath: scripts/ci/run_tox.sh
 
 - job: ExtractMetadata
   displayName: 'Extract Metadata'
@@ -164,6 +182,12 @@ jobs:
   condition: succeeded()
   pool:
     vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.7'
+      Python38:
+        python.version: '3.8'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -172,9 +196,9 @@ jobs:
       artifactName: pypi
 
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.7'
+    displayName: 'Use Python $(python.version)'
     inputs:
-      versionSpec: 3.7
+      versionSpec: '$(python.version)'
 
   - bash: |
       #!/usr/bin/env bash
@@ -190,6 +214,12 @@ jobs:
   condition: succeeded()
   pool:
     vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.7'
+      Python38:
+        python.version: '3.8'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -198,9 +228,9 @@ jobs:
       artifactName: pypi
 
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.7'
+    displayName: 'Use Python $(python.version)'
     inputs:
-      versionSpec: 3.7
+      versionSpec: '$(python.version)'
 
   - bash: |
       #!/usr/bin/env bash
@@ -216,6 +246,12 @@ jobs:
   condition: succeeded()
   pool:
     vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.7'
+      Python38:
+        python.version: '3.8'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -224,9 +260,9 @@ jobs:
       artifactName: pypi
 
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.7'
+    displayName: 'Use Python $(python.version)'
     inputs:
-      versionSpec: 3.7
+      versionSpec: '$(python.version)'
 
   - bash: |
       #!/usr/bin/env bash
@@ -242,6 +278,12 @@ jobs:
   condition: succeeded()
   pool:
     vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.7'
+      Python38:
+        python.version: '3.8'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -250,9 +292,9 @@ jobs:
       artifactName: pypi
 
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.7'
+    displayName: 'Use Python $(python.version)'
     inputs:
-      versionSpec: 3.7
+      versionSpec: '$(python.version)'
 
   - bash: |
       #!/usr/bin/env bash
