@@ -270,7 +270,7 @@ def build_extensions(extensions, dist_dir='dist'):
     os.chdir(original_cwd)
 
 
-def publish_extensions(extensions, storage_subscription, storage_account, storage_container,
+def publish_extensions(extensions, storage_subscription, storage_account, storage_account_key, storage_container,
                        dist_dir='dist', update_index=False, yes=False):
 
     heading('Publish Extensions')
@@ -293,11 +293,10 @@ def publish_extensions(extensions, storage_subscription, storage_account, storag
         whl_file = os.path.split(whl_path)[-1]
         # check if extension already exists unless user opted not to
         if not yes:
-            command = 'az storage blob exists --subscription {} --account-name {} -c {} -n {}'.format(
-                storage_subscription, storage_account, storage_container, whl_file)
-            # Retrieve just the JSON result
-            result = cmd(command).result
-            exists = json.loads(result[result.index('{'):])['exists']
+            command = 'az storage blob exists --subscription {} --account-name {} --account-key {} -c {} -n {}'.format(
+                      storage_subscription, storage_account, storage_account_key, storage_container, whl_file)
+            exists = json.loads(cmd(command).result)['exists']
+
             if exists:
                 if not prompt_y_n(
                         "{} already exists. You may need to bump the extension version. Replace?".format(whl_file),
