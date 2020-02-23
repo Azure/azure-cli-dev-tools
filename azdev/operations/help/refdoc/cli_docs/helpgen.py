@@ -6,13 +6,14 @@
 import os
 import json
 
+from azure.cli.core._help import CliCommandHelpFile  # pylint: disable=import-error
+from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args, get_all_help  # pylint: disable=import-error
+
 from azdev.utilities import get_cli_repo_path
 from azdev.operations.help import DOC_SOURCE_MAP_PATH
 from azdev.operations.help.refdoc.common.directives import AbstractHelpGenDirective
 from azdev.operations.help.refdoc.common.directives import setup_common_directives
 
-from azure.cli.core._help import CliCommandHelpFile  # pylint: disable=import-error
-from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args, get_all_help  # pylint: disable=import-error
 
 
 class HelpGenDirective(AbstractHelpGenDirective):

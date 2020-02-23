@@ -17,6 +17,7 @@ from subprocess import check_call, check_output, CalledProcessError
 from knack.util import CLIError
 from knack.log import get_logger
 
+from azure.cli.core.extension.operations import list_available_extensions, list_extensions as list_cli_extensions  # pylint: disable=import-error
 from azdev.utilities import (
     display, heading, subheading,
     get_cli_repo_path, get_path_table
@@ -24,7 +25,6 @@ from azdev.utilities import (
 
 from azdev.utilities.tools import require_azure_cli
 from azdev.operations.extensions import list_extensions as list_dev_cli_extensions
-from azure.cli.core.extension.operations import list_available_extensions, list_extensions as list_cli_extensions  # pylint: disable=import-error
 
 DOC_MAP_NAME = 'doc_source_map.json'
 HELP_FILE_NAME = '_help.py'
