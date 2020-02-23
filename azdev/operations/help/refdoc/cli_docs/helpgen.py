@@ -15,7 +15,6 @@ from azdev.operations.help.refdoc.common.directives import AbstractHelpGenDirect
 from azdev.operations.help.refdoc.common.directives import setup_common_directives
 
 
-
 class HelpGenDirective(AbstractHelpGenDirective):
     """ General CLI Sphinx Directive
         The Core CLI has a doc source map to determine help text source for core cli commands. Extension help processed
