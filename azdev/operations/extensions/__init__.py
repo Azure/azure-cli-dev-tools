@@ -199,6 +199,8 @@ def update_extension_index(extensions):
     NAME_REGEX = r'.*/([^/]*)-\d+.\d+.\d+'
 
     for extension in extensions:
+        # Get the URL
+        extension = extension[extension.index('https'):]
         # Get extension WHL from URL
         if not extension.endswith('.whl') or not extension.startswith('https:'):
             raise CLIError('usage error: only URL to a WHL file currently supported.')
@@ -293,7 +295,9 @@ def publish_extensions(extensions, storage_subscription, storage_account, storag
         if not yes:
             command = 'az storage blob exists --subscription {} --account-name {} -c {} -n {}'.format(
                 storage_subscription, storage_account, storage_container, whl_file)
-            exists = json.loads(cmd(command).result)['exists']
+            # Retrieve just the JSON result
+            result = cmd(command).result
+            exists = json.loads(result[result.index('{'):])['exists']
             if exists:
                 if not prompt_y_n(
                         "{} already exists. You may need to bump the extension version. Replace?".format(whl_file),
