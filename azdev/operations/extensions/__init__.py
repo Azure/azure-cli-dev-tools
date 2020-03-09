@@ -270,7 +270,7 @@ def build_extensions(extensions, dist_dir='dist'):
     os.chdir(original_cwd)
 
 
-def publish_extensions(extensions, storage_subscription, storage_account, storage_account_key, storage_container,
+def publish_extensions(extensions, storage_account, storage_account_key, storage_container,
                        dist_dir='dist', update_index=False, yes=False):
 
     heading('Publish Extensions')

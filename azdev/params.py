@@ -91,7 +91,6 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'extension publish') as c:
         c.argument('storage_account', help='Name of the storage account to publish to. Environment variable: AZDEV_DEFAULTS_STORAGE_ACCOUNT.', arg_group='Storage', configured_default='storage_account')
         c.argument('storage_container', help='Name of the storage container to publish to. Environment variable: AZDEV_DEFAULTS_STORAGE_CONTAINER.', arg_group='Storage', configured_default='storage_container')
-        c.argument('storage_subscription', help='Subscription ID of the storage account. Environment variable: AZDEV_DEFAULTS_STORAGE_SUBSCRIPTION.', arg_group='Storage', configured_default='storage_subscription')
         c.argument('storage_account_key', help='Key of the storage account to publish to. ', arg_group='Storage',
                    configured_default='storage_account')
 
