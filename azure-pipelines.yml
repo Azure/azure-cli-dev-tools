@@ -171,6 +171,10 @@ jobs:
 
         azdev --version
 
+        az --version
+
+        az extension list
+
         # unittest
         python -m unittest -v
       displayName: 'Run Unittest'
