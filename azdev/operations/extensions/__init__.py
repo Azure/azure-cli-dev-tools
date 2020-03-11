@@ -270,7 +270,7 @@ def build_extensions(extensions, dist_dir='dist'):
     os.chdir(original_cwd)
 
 
-def publish_extensions(extensions, storage_subscription, storage_account, storage_container,
+def publish_extensions(extensions, storage_account, storage_account_key, storage_container,
                        dist_dir='dist', update_index=False, yes=False):
 
     heading('Publish Extensions')
@@ -293,11 +293,10 @@ def publish_extensions(extensions, storage_subscription, storage_account, storag
         whl_file = os.path.split(whl_path)[-1]
         # check if extension already exists unless user opted not to
         if not yes:
-            command = 'az storage blob exists --subscription {} --account-name {} -c {} -n {}'.format(
-                storage_subscription, storage_account, storage_container, whl_file)
-            # Retrieve just the JSON result
-            result = cmd(command).result
-            exists = json.loads(result[result.index('{'):])['exists']
+            from azure.storage.blob import BlockBlobService
+            client = BlockBlobService(account_name=storage_account, account_key=storage_account_key)
+            exists = client.exists(container_name=storage_container, blob_name=whl_file)
+
             if exists:
                 if not prompt_y_n(
                         "{} already exists. You may need to bump the extension version. Replace?".format(whl_file),
@@ -305,12 +304,10 @@ def publish_extensions(extensions, storage_subscription, storage_account, storag
                     logger.warning("Skipping '%s'...", whl_file)
                     continue
         # upload the WHL file
-        command = 'az storage blob upload --subscription {} --account-name {} -c {} -n {} -f {}'.format(
-            storage_subscription, storage_account, storage_container, whl_file, os.path.abspath(whl_path))
-        cmd(command, "Uploading '{}'...".format(whl_file))
-        command = 'az storage blob url --subscription {} --account-name {} -c {} -n {} -otsv'.format(
-            storage_subscription, storage_account, storage_container, whl_file)
-        url = cmd(command).result
+        client.create_blob_from_path(container_name=storage_container, blob_name=whl_file,
+                                     file_path=os.path.abspath(whl_path))
+        url = client.make_blob_url(container_name=storage_container, blob_name=whl_file)
+
         logger.info(url)
         uploaded_urls.append(url)
 
