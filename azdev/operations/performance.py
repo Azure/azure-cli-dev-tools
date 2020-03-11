@@ -15,7 +15,7 @@ from azdev.utilities import (
 logger = get_logger(__name__)
 
 TOTAL = 'ALL'
-TOTAL_THRESHOLD = 300
+TOTAL_THRESHOLD = 400   # temporary increase to 400 for CDN
 DEFAULT_THRESHOLD = 10
 THRESHOLDS = {
     # threshold value: num of exceptions allowed
