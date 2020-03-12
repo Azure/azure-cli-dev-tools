@@ -7,7 +7,6 @@ Release History
 ++++++
 * azdev extension publish: add --storage-acocunt-key and remove --storage-subscription
 * azdev extension update-index: fix waring
-* azdev extension update-index: remove limit on path name must contain string "azure-cli-extensions"
 * CI: use `pip install -e` instead in ADO to fix fix import bug
 
 0.1.8
