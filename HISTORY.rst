@@ -3,6 +3,12 @@
 Release History
 ===============
 
+0.1.9
+++++++
+* azdev extension publish: add --storage-account-key and remove --storage-subscription
+* azdev extension update-index: remove unnecessary warning that will fail this command
+* CI: use `pip install -e` instead in ADO to fix fix import bug
+
 0.1.8
 ++++++
 * fix: azdev test cannot be used in python 3.8.1 or later
