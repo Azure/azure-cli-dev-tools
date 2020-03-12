@@ -190,7 +190,7 @@ def update_extension_index(extensions):
     from .util import get_ext_metadata, get_whl_from_url
 
     ext_repos = get_ext_repo_paths()
-    index_path = next((x for x in find_files(ext_repos, 'index.json') if 'azure-cli-extensions' in x), None)
+    index_path = next((x for x in find_files(ext_repos, 'index.json')), None)
     if not index_path:
         raise CLIError("Unable to find 'index.json' in your extension repos. Have "
                        "you cloned 'azure-cli-extensions' and added it to you repo "
