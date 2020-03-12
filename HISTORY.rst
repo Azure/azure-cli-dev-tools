@@ -6,7 +6,7 @@ Release History
 0.1.9
 ++++++
 * azdev extension publish: add --storage-account-key and remove --storage-subscription
-* azdev extension update-index: fix waring
+* azdev extension update-index: remove unnecessary warning that will fail this command
 * CI: use `pip install -e` instead in ADO to fix fix import bug
 
 0.1.8
