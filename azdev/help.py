@@ -190,8 +190,7 @@ helps['extension publish'] = """
     examples:
         - name: Publish the contoso extension to a storage account and update the index. This will then be ready for a PR.
           text: >
-            azdev extension publish contoso --update-index --storage-account mystorage --storage-container extensions
-            --storage-subscription {subscriptionId}
+            azdev extension publish contoso --update-index --storage-account mystorage --storage-account-key 0000-0000 --storage-container extensions
 """
 
 
