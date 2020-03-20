@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.10
+++++++
+* relex version limit of microsoft/Knack
+
 0.1.9
 ++++++
 * azdev extension publish: add --storage-account-key and remove --storage-subscription
