@@ -3,9 +3,13 @@
 Release History
 ===============
 
+0.1.11
+++++++
+* azdev extension build: remove --universal when to respect setup.cfg
+
 0.1.10
 ++++++
-* relex version limit of microsoft/Knack
+* relax version limit of microsoft/Knack
 
 0.1.9
 ++++++
