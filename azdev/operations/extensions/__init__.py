@@ -263,7 +263,7 @@ def build_extensions(extensions, dist_dir='dist'):
     dist_dir = os.path.join(original_cwd, dist_dir)
     for path in paths_to_build:
         os.chdir(path)
-        command = 'setup.py bdist_wheel -b bdist -d {} --universal'.format(dist_dir)
+        command = 'setup.py bdist_wheel -b bdist -d {}'.format(dist_dir)
         result = py_cmd(command, "Building extension '{}'...".format(path), is_module=False)
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
