@@ -18,12 +18,9 @@ LICENSE_HEADER = """# ----------------------------------------------------------
 # --------------------------------------------------------------------------------------------
 """
 
-WRAPPED_LICENSE_HEADER = """# -----------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
+WRAPPED_LICENSE_HEADER = """# Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
-# -----------------------------------------------------------------------------
-
 """
 
 CODEGEN_LICENSE_HEADER = """# --------------------------------------------------------------------------
@@ -66,9 +63,9 @@ def check_license_headers():
                         continue
 
                     test_results = [
-                        LICENSE_HEADER not in file_text,
-                        WRAPPED_LICENSE_HEADER not in file_text,
-                        CODEGEN_LICENSE_HEADER not in file_text
+                        LICENSE_HEADER in file_text,
+                        WRAPPED_LICENSE_HEADER in file_text,
+                        CODEGEN_LICENSE_HEADER in file_text
                     ]
                     if not any(test_results):
                         files_without_header.append(os.path.join(current_dir, python_file))
