@@ -37,11 +37,6 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     python3 -m venv env
     ```
 
-    Python 3.6+ (all platforms)
-    ```Shell
-    python -m virtualenv env
-    ```
-
 4. Activate the env virtual environment by running:
 
     Windows CMD.exe:
