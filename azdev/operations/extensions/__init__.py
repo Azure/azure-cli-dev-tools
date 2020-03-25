@@ -272,6 +272,7 @@ def build_extensions(extensions, dist_dir='dist'):
 
 def publish_extensions(extensions, storage_account, storage_account_key, storage_container,
                        dist_dir='dist', update_index=False, yes=False):
+    from azure.storage.blob import BlockBlobService
 
     heading('Publish Extensions')
 
@@ -291,7 +292,7 @@ def publish_extensions(extensions, storage_account, storage_account_key, storage
     subheading('Uploading WHLs')
     for whl_path in whl_files:
         whl_file = os.path.split(whl_path)[-1]
-        from azure.storage.blob import BlockBlobService
+
         client = BlockBlobService(account_name=storage_account, account_key=storage_account_key)
         exists = client.exists(container_name=storage_container, blob_name=whl_file)
 
