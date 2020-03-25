@@ -6,7 +6,7 @@ The ``azdev`` tool is designed to aid new and experienced developers in contribu
 Setting up your development environment
 +++++++++++++++++++++++++++++++++++++++
 
-1. Install Python 3.5+ or 2.7+ from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7.
+1. Install Python 3.6+ from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7.
 
 2. Fork and clone the repository or repositories you wish to develop for.
     - For Azure CLI: https://github.com/Azure/azure-cli
@@ -15,7 +15,7 @@ Setting up your development environment
 
 3. Create a new virtual environment for Python in the root of your clone. You can do this by running:
 
-    Python 3.5+ (all platforms):
+    Python 3.6+ (all platforms):
 
     ::
 
@@ -26,12 +26,6 @@ Setting up your development environment
     ::
 
         python3 -m venv env
-
-    Python 2.7+ (all platforms):
-
-    ::
-
-        python -m virtualenv env
 
 
 4. Activate the env virtual environment by running:

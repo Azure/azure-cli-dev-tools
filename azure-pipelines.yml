@@ -6,42 +6,6 @@ trigger:
     include:
     - '*'
 jobs:
-- job: Tox27
-  displayName: 'Tox: Python 2.7'
-  condition: succeeded()
-  pool:
-    vmImage: 'ubuntu-16.04'
-  steps:
-  - task: UsePythonVersion@0
-    displayName: 'Use Python 2.7'
-    inputs:
-      versionSpec: 2.7
-  - task: Bash@3
-    displayName: 'Run Tox'
-    env:
-      TOXENV: py27
-    inputs:
-      targetType: 'filePath'
-      filePath: scripts/ci/run_tox.sh
-
-- job: Tox35
-  displayName: 'Tox: Python 3.5'
-  condition: succeeded()
-  pool:
-    vmImage: 'ubuntu-16.04'
-  steps:
-  - task: UsePythonVersion@0
-    displayName: 'Use Python 3.5'
-    inputs:
-      versionSpec: 3.5
-  - task: Bash@3
-    displayName: 'Run Tox'
-    env:
-      TOXENV: py35
-    inputs:
-      targetType: 'filePath'
-      filePath: scripts/ci/run_tox.sh
-
 - job: Tox36
   displayName: 'Tox: Python 3.6'
   condition: succeeded()
