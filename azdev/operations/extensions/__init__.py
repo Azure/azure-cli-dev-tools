@@ -272,6 +272,7 @@ def build_extensions(extensions, dist_dir='dist'):
 
 def publish_extensions(extensions, storage_account, storage_account_key, storage_container,
                        dist_dir='dist', update_index=False, yes=False):
+    from azure.storage.blob import BlockBlobService
 
     heading('Publish Extensions')
 
@@ -291,12 +292,12 @@ def publish_extensions(extensions, storage_account, storage_account_key, storage
     subheading('Uploading WHLs')
     for whl_path in whl_files:
         whl_file = os.path.split(whl_path)[-1]
+
+        client = BlockBlobService(account_name=storage_account, account_key=storage_account_key)
+        exists = client.exists(container_name=storage_container, blob_name=whl_file)
+
         # check if extension already exists unless user opted not to
         if not yes:
-            from azure.storage.blob import BlockBlobService
-            client = BlockBlobService(account_name=storage_account, account_key=storage_account_key)
-            exists = client.exists(container_name=storage_container, blob_name=whl_file)
-
             if exists:
                 if not prompt_y_n(
                         "{} already exists. You may need to bump the extension version. Replace?".format(whl_file),
