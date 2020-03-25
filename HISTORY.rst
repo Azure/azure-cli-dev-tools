@@ -3,6 +3,12 @@
 Release History
 ===============
 
+0.1.12
+++++++
+* azdev extension publish: fix issue when --yes if not provided
+* azdev verify license: support CodeGen generated License
+* Drop Python 2 and Python 3.5 support
+
 0.1.11
 ++++++
 * azdev extension build: remove --universal to respect setup.cfg
