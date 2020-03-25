@@ -15,7 +15,7 @@ Setting up your development environment
 
 3. Create a new virtual environment for Python in the root of your clone. You can do this by running:
 
-    Python 3.5+ (all platforms):
+    Python 3.6+ (all platforms):
 
     ::
 
