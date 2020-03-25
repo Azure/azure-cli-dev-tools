@@ -46,12 +46,12 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
 
     Windows CMD.exe:
     ```BatchFile
-    env\scripts\activate.bat
+    env\Scripts\activate.bat
     ```
 
     Windows Powershell:
     ```
-    env\scripts\activate.ps1
+    env\Scripts\activate.ps1
     ```
 
     OSX/Linux (bash):
