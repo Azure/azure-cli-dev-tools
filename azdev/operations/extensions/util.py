@@ -58,9 +58,9 @@ def get_ext_metadata(ext_dir, ext_file):
 
         t = vars(ext_wheel)
         del t['filename']
-        del t['description']    # del as line too long
+        del t['description']    # del as description is trivial
 
-        metadata.update(vars(ext_wheel))
+        metadata.update(t)
     except ValueError:
         raise CLIError('{} is not a valid wheel'.format(ext_file))
 
@@ -68,8 +68,6 @@ def get_ext_metadata(ext_dir, ext_file):
 
 
 def get_whl_from_url(url, filename, tmp_dir, whl_cache=None):
-    print('-' * 20, 'get_whl_from_url', '-' * 20)
-    print(filename)
 
     if not whl_cache:
         whl_cache = {}
