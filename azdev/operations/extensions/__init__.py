@@ -220,7 +220,7 @@ def update_extension_index(extensions):
         ext_dir = tempfile.mkdtemp(dir=extensions_dir)
         whl_cache_dir = tempfile.mkdtemp()
         whl_cache = {}
-        ext_file = get_whl_from_url(ext_path, extension_name, whl_cache_dir, whl_cache)
+        ext_file = get_whl_from_url(ext_path, extension_name + '.whl', whl_cache_dir, whl_cache)
 
         with open(index_path, 'r') as infile:
             curr_index = json.loads(infile.read())
@@ -229,7 +229,7 @@ def update_extension_index(extensions):
             'downloadUrl': ext_path,
             'sha256Digest': _get_sha256sum(ext_file),
             'filename': ext_path.split('/')[-1],
-            'metadata': get_ext_metadata(ext_dir, ext_file, extension_name)
+            'metadata': get_ext_metadata(ext_dir, ext_file)
         }
 
         if extension_name not in curr_index['extensions'].keys():

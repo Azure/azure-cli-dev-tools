@@ -9,6 +9,7 @@ import json
 import re
 import zipfile
 
+from pkginfo import Wheel
 from knack.util import CLIError
 
 from azdev.utilities import EXTENSION_PREFIX
@@ -43,28 +44,33 @@ def _get_azext_metadata(ext_dir):
     return azext_metadata
 
 
-def get_ext_metadata(ext_dir, ext_file, ext_name):
-    # Modification of https://github.com/Azure/azure-cli/blob/dev/src/azure-cli-core/azure/cli/core/extension.py#L89
-    WHL_METADATA_FILENAME = 'metadata.json'
+def get_ext_metadata(ext_dir, ext_file):
     zip_ref = zipfile.ZipFile(ext_file, 'r')
     zip_ref.extractall(ext_dir)
     zip_ref.close()
     metadata = {}
-    dist_info_dirs = [f for f in os.listdir(ext_dir) if f.endswith('.dist-info')]
     azext_metadata = _get_azext_metadata(ext_dir)
     if azext_metadata:
         metadata.update(azext_metadata)
-    for dist_info_dirname in dist_info_dirs:
-        parsed_dist_info_dir = WHEEL_INFO_RE(dist_info_dirname)
-        if parsed_dist_info_dir and parsed_dist_info_dir.groupdict().get('name') == ext_name.replace('-', '_'):
-            whl_metadata_filepath = os.path.join(ext_dir, dist_info_dirname, WHL_METADATA_FILENAME)
-            if os.path.isfile(whl_metadata_filepath):
-                with open(whl_metadata_filepath) as f:
-                    metadata.update(json.load(f))
+
+    try:
+        ext_wheel = Wheel(ext_file)
+
+        t = vars(ext_wheel)
+        del t['filename']
+        del t['description']    # del as line too long
+
+        metadata.update(vars(ext_wheel))
+    except ValueError:
+        raise CLIError('{} is not a valid wheel'.format(ext_file))
+
     return metadata
 
 
 def get_whl_from_url(url, filename, tmp_dir, whl_cache=None):
+    print('-' * 20, 'get_whl_from_url', '-' * 20)
+    print(filename)
+
     if not whl_cache:
         whl_cache = {}
     if url in whl_cache:

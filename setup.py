@@ -72,8 +72,9 @@ setup(
         'requests',
         'sphinx==1.6.7',
         'tox',
-        'wheel==0.30.0',
+        'wheel>=0.30.0',
         'azure-storage-blob>=1.3.1,<2.0.0',
+        'pkginfo>=1.5.0.1',
     ],
     extras_require={
         ":python_version<'3.0'": ['pylint==1.9.2', 'futures'],
