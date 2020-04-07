@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.13
+++++++
+* azdev verify license: fix bug that license verification will omit files while checking extensions
+
 0.1.12
 ++++++
 * azdev extension publish: fix issue when --yes if not provided
