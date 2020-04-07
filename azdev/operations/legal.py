@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import os
+import pathlib
 
 from knack.util import CLIError
 
@@ -48,15 +49,19 @@ def check_license_headers():
 
     files_without_header = []
     for path in all_paths:
-        for current_dir, subdirs, files in os.walk(path):
-            for i, x in enumerate(subdirs):
-                if x in _IGNORE_SUBDIRS or x.startswith('.'):
-                    del subdirs[i]
+        py_files = pathlib.Path(path).glob('**' + os.path.sep + '*.py')
 
-            # pylint: disable=line-too-long
-            file_itr = (os.path.join(current_dir, p) for p in files if p.endswith('.py') and p != 'azure_bdist_wheel.py')
-            for python_file in file_itr:
-                with open(python_file, 'r', encoding='utf-8') as f:
+        for py_file in py_files:
+            py_file = str(py_file)
+
+            if py_file.endswith('azure_bdist_wheel.py'):
+                continue
+
+            for ignore_token in _IGNORE_SUBDIRS:
+                if ignore_token in py_file:
+                    break
+            else:
+                with open(str(py_file), 'r', encoding='utf-8') as f:
                     file_text = f.read()
 
                     if not file_text:
@@ -68,7 +73,7 @@ def check_license_headers():
                         CODEGEN_LICENSE_HEADER in file_text
                     ]
                     if not any(test_results):
-                        files_without_header.append(os.path.join(current_dir, python_file))
+                        files_without_header.append(py_file)
 
     subheading('Results')
     if files_without_header:
