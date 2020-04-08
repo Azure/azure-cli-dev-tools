@@ -288,24 +288,13 @@ jobs:
       inputs:
         versionSpec: '$(python.version)'
     - bash: |
-        # clone azure-cli
-        git clone -q --single-branch -b dev https://github.com/Azure/azure-cli.git ../azure-cli
-
-      displayName: Prepare CLI
-    - bash: |
         set -ev
 
-        python -m venv env
-        chmod +x ./env/bin/activate
-        source ./env/bin/activate
+        . scripts/ci/install.sh
 
-        # install azdev
-        pip install .
-
-        azdev setup -c ../azure-cli
+        az --version
 
         azdev --version
-        az --version
 
         azdev test --repo ../azure-cli --src=dev --tgt=HEAD~2
 

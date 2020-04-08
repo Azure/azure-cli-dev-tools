@@ -46,16 +46,15 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
     test_index = _get_test_index(profile, discover)
 
-    mods_abbr = []
     if not tests:
-        mods_abbr = list(path_table['mod'].keys()) + list(path_table['core'].keys()) + list(path_table['ext'].keys())
+        tests = list(path_table['mod'].keys()) + list(path_table['core'].keys()) + list(path_table['ext'].keys())
     if tests == ['CLI']:
-        mods_abbr = list(path_table['mod'].keys()) + list(path_table['core'].keys())
+        tests = list(path_table['mod'].keys()) + list(path_table['core'].keys())
     elif tests == ['EXT']:
-        mods_abbr = list(path_table['ext'].keys())
+        tests = list(path_table['ext'].keys())
 
     # filter out tests whose modules haven't changed
-    modified_mods = _filter_by_git_diff(mods_abbr, test_index, git_source, git_target, git_repo)
+    modified_mods = _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo)
 
     if modified_mods:
         display('\nTest on modules: {}\n'.format(', '.join(modified_mods)))
