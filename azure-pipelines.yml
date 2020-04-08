@@ -295,8 +295,8 @@ jobs:
         set -ev
 
         python -m venv env
-        chmod +x ./env/bin/active
-        source ./env/bin/active
+        chmod +x ./env/bin/activate
+        . env/bin/activate
 
         # install azdev
         pip install .
