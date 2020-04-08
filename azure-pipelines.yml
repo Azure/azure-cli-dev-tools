@@ -289,14 +289,22 @@ jobs:
       inputs:
         versionSpec: '$(python.version)'
     - bash: |
+        # clone azure-cli
+        git clone -q --single-branch -b dev https://github.com/Azure/azure-cli.git ../azure-cli
+    - bash: |
         set -ev
 
-        . scripts/ci/install.sh
+        python -m venv env
+        chmod +x ./env/bin/active
+        source ./env/bin/active
 
+        # install azdev
+        pip install .
+
+        # setup
+        azdev setup -c ../azure-cli
+        azdev --version
         az --version
 
-        azdev --version
-
         azdev test --repo ../azure-cli --src=dev --tgt=HEAD~2
-
       displayName: Run Automation Test on CLI
