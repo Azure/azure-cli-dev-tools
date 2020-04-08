@@ -88,7 +88,7 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
     # lookup test paths from index
     test_paths = []
-    for t in tests:
+    for t in modified_mods:
         try:
             test_path = os.path.normpath(_find_test(test_index, t))
             test_paths.append(test_path)
