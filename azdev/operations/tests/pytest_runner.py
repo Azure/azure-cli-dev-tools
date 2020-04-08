@@ -4,8 +4,9 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-from azdev.utilities import call
 from knack.log import get_logger
+
+from azdev.utilities import call
 
 
 def get_test_runner(parallel, log_path, last_failed):
