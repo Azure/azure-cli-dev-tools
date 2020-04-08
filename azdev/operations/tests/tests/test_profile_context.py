@@ -18,7 +18,7 @@ class TestProfileContext(unittest.TestCase):
 
         for profile in target_profiles:
             with ProfileContext(profile):
-                pass
+                self.assertEqual(1, 1)
 
     def test_unsupported_profile(self):
         unknown_profile = 'unknown-profile'

@@ -23,7 +23,6 @@ from azdev.utilities import (
     make_dirs, get_azdev_config_dir,
     get_path_table, require_virtual_env, get_name_index)
 from .pytest_runner import get_test_runner
-from .profile_context import ProfileContext
 
 logger = get_logger(__name__)
 
@@ -34,11 +33,6 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
               git_source=None, git_target=None, git_repo=None):
 
     require_virtual_env()
-
-    from .profile_context import ProfileContext
-
-    with ProfileContext('latest'):
-        raise CLIError('the hell?!?')
 
     DEFAULT_RESULT_FILE = 'test_results.xml'
     DEFAULT_RESULT_PATH = os.path.join(get_azdev_config_dir(), DEFAULT_RESULT_FILE)
