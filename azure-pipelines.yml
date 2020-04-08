@@ -41,7 +41,7 @@ jobs:
     inputs:
       targetType: 'filePath'
       filePath: scripts/ci/run_tox.sh
-      
+
 - job: Tox38
   displayName: 'Tox: Python 3.8'
   condition: succeeded()
@@ -269,6 +269,7 @@ jobs:
     displayName: 'Test azdev style'
 
 - job: CLIAutomationTest
+  dependsOn: BuildPythonWheel
   condition: succeeded()
   timeoutInMinutes: 20
 
