@@ -267,3 +267,47 @@ jobs:
       # verify azdev style works
       azdev style redis
     displayName: 'Test azdev style'
+
+- job: CLIAutomationTest
+  condition: succeeded()
+  timeoutInMinutes: 20
+
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+      Python38:
+        python.version: '3.8'
+  steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python $(python.version)'
+      inputs:
+        versionSpec: '$(python.version)'
+    - bash: |
+        # clone azure-cli
+        git clone -q --single-branch -b dev https://github.com/Azure/azure-cli.git ../azure-cli
+
+      displayName: Prepare CLI
+    - bash: |
+        set -ev
+
+        python -m venv env
+        chmod +x ./env/bin/active
+        source ./env/bin/active
+
+
+        # install azdev
+        pip install .
+
+        azdev setup -c ../azure-cli
+
+        azdev --version
+        az --version
+
+        azdev test --repo ../azure-cli --src=dev --tgt=HEAD~2
+
+      displayName: Run Automation Test on CLI

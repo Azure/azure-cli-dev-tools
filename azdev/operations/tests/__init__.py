@@ -22,7 +22,7 @@ from azdev.utilities import (
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
     get_path_table, require_virtual_env, get_name_index)
-
+from .pytest_runner import get_test_runner
 
 logger = get_logger(__name__)
 
@@ -37,27 +37,28 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     DEFAULT_RESULT_FILE = 'test_results.xml'
     DEFAULT_RESULT_PATH = os.path.join(get_azdev_config_dir(), DEFAULT_RESULT_FILE)
 
-    from .pytest_runner import get_test_runner
-
     heading('Run Tests')
 
     original_profile = _get_profile(profile)
     if not profile:
         profile = original_profile
     path_table = get_path_table()
+
     test_index = _get_test_index(profile, discover)
+
+    mods_abbr = []
     if not tests:
-        tests = list(path_table['mod'].keys()) + list(path_table['core'].keys()) + list(path_table['ext'].keys())
+        mods_abbr = list(path_table['mod'].keys()) + list(path_table['core'].keys()) + list(path_table['ext'].keys())
     if tests == ['CLI']:
-        tests = list(path_table['mod'].keys()) + list(path_table['core'].keys())
+        mods_abbr = list(path_table['mod'].keys()) + list(path_table['core'].keys())
     elif tests == ['EXT']:
-        tests = list(path_table['ext'].keys())
+        mods_abbr = list(path_table['ext'].keys())
 
     # filter out tests whose modules haven't changed
-    tests = _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo)
+    modified_mods = _filter_by_git_diff(mods_abbr, test_index, git_source, git_target, git_repo)
 
-    if tests:
-        display('\nTESTS: {}\n'.format(', '.join(tests)))
+    if modified_mods:
+        display('\nTest on modules: {}\n'.format(', '.join(modified_mods)))
 
     # resolve the path at which to dump the XML results
     xml_path = xml_path or DEFAULT_RESULT_PATH

@@ -66,7 +66,7 @@ setup(
         'jinja2',
         'knack',
         'mock',
-        'pytest~=4.4.0',
+        'pytest>=4.4.0',
         'pytest-xdist',
         'pyyaml',
         'requests',

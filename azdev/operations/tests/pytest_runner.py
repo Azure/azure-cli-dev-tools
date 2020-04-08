@@ -4,16 +4,17 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+from azdev.utilities import call
+from knack.log import get_logger
+
 
 def get_test_runner(parallel, log_path, last_failed):
     """Create a pytest execution method"""
     def _run(test_paths, pytest_args):
-        from azdev.utilities import call
-        from knack.log import get_logger
 
         logger = get_logger(__name__)
 
-        arguments = ['-p', 'no:warnings', '--no-print-logs', '--junit-xml', log_path]
+        arguments = ['-v', '--junit-xml', log_path]
         arguments.extend(test_paths)
         if parallel:
             arguments += ['-n', 'auto']
