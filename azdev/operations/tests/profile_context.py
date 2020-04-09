@@ -23,7 +23,7 @@ class ProfileContext:
         self.origin_profile = cmd('az cloud show --query profile -otsv', show_stderr=False).result
 
     def __enter__(self):
-        if self.target_profile is not None and self.target_profile == self.origin_profile:
+        if self.target_profile is None or self.target_profile == self.origin_profile:
             display('The tests are set to run against current profile "{}"'.format(self.origin_profile))
         else:
             result = cmd('az cloud update --profile {}'.format(self.target_profile),
