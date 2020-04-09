@@ -39,3 +39,7 @@ class ProfileContext:
         if exc_tb:
             display('')
             traceback.print_exception(exc_type, exc_val, exc_tb)
+
+
+def current_profile():
+    return cmd('az cloud show --query profile -otsv', show_stderr=False).result

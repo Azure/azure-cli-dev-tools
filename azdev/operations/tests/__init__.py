@@ -23,6 +23,7 @@ from azdev.utilities import (
     make_dirs, get_azdev_config_dir,
     get_path_table, require_virtual_env, get_name_index)
 from .pytest_runner import get_test_runner
+from .profile_management import ProfileContext, current_profile
 
 logger = get_logger(__name__)
 
@@ -30,7 +31,8 @@ logger = get_logger(__name__)
 # pylint: disable=too-many-statements
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None,
-              git_source=None, git_target=None, git_repo=None):
+              git_source=None, git_target=None, git_repo=None,
+              cli_ci=False, ext_ci=False):
 
     require_virtual_env()
 
@@ -39,12 +41,9 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
     heading('Run Tests')
 
-    original_profile = _get_profile(profile)
-    if not profile:
-        profile = original_profile
     path_table = get_path_table()
 
-    test_index = _get_test_index(profile, discover)
+    test_index = _get_test_index(profile or current_profile(), discover)
 
     if not tests:
         tests = list(path_table['mod'].keys()) + list(path_table['core'].keys()) + list(path_table['ext'].keys())
@@ -73,6 +72,7 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
         name_comps = name.split('.')
         num_comps = len(name_comps)
         key_error = KeyError()
+
         for i in range(num_comps):
             check_name = '.'.join(name_comps[(-1 - i):])
             try:
@@ -99,16 +99,10 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     if not test_paths:
         raise CLIError('No tests selected to run.')
 
-    runner = get_test_runner(parallel=not in_series, log_path=xml_path, last_failed=last_failed)
-    exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
-    _summarize_test_results(xml_path)
-
-    # attempt to restore the original profile
-    if profile != original_profile:
-        result = raw_cmd('az cloud update --profile {}'.format(original_profile),
-                         "Restoring profile '{}'.".format(original_profile))
-        if result.exit_code != 0:
-            logger.warning("Failed to restore profile '%s'.", original_profile)
+    exit_code = 0
+    with ProfileContext(profile):
+        runner = get_test_runner(parallel=not in_series, log_path=xml_path, last_failed=last_failed)
+        exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
 
     sys.exit(0 if not exit_code else 1)
 
@@ -353,32 +347,3 @@ def _get_test_index(profile, discover):
             f.write(json.dumps(test_index))
         display('\ntest index created: {}'.format(test_index_path))
     return test_index
-
-
-def _summarize_test_results(xml_path):
-    import xml.etree.ElementTree as ElementTree
-
-    subheading('Results')
-
-    root = ElementTree.parse(xml_path).getroot()
-    summary = {
-        'time': root.get('time'),
-        'tests': root.get('tests'),
-        'skips': root.get('skips'),
-        'failures': root.get('failures'),
-        'errors': root.get('errors')
-    }
-    display('Time: {time} sec\tTests: {tests}\tSkipped: {skips}\tFailures: {failures}\tErrors: {errors}'.format(
-        **summary))
-
-    failed = []
-    for item in root.findall('testcase'):
-        if item.findall('failure'):
-            file_and_class = '.'.join(item.get('classname').split('.')[-2:])
-            failed.append('{}.{}'.format(file_and_class, item.get('name')))
-
-    if failed:
-        subheading('FAILURES')
-        for name in failed:
-            display(name)
-    display('')

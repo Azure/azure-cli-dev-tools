@@ -41,7 +41,7 @@ jobs:
     inputs:
       targetType: 'filePath'
       filePath: scripts/ci/run_tox.sh
-      
+
 - job: Tox38
   displayName: 'Tox: Python 3.8'
   condition: succeeded()
@@ -306,5 +306,5 @@ jobs:
         azdev --version
         az --version
 
-        azdev test --repo ../azure-cli --src=dev --tgt=HEAD~2
+        azdev test --repo ../azure-cli --src=dev --tgt=HEAD~2 --series
       displayName: Run Automation Test on CLI
