@@ -306,5 +306,5 @@ jobs:
         azdev --version
         az --version
 
-        azdev test --repo ../azure-cli --src=dev --tgt=HEAD~2 --series
+        azdev test --repo ../azure-cli --src=dev --tgt=HEAD~100 --series
       displayName: Run Automation Test on CLI
