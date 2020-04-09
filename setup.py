@@ -61,7 +61,7 @@ setup(
     ],
     install_requires=[
         'docutils',
-        'wrapt',
+        'wrapt==1.11.*',    # align with pylint==2.3.0
         'flake8',
         'gitpython',
         'jinja2',
