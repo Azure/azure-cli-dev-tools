@@ -23,7 +23,7 @@ from azdev.utilities import (
     make_dirs, get_azdev_config_dir,
     get_path_table, require_virtual_env, get_name_index)
 from .pytest_runner import get_test_runner
-from .profile_management import ProfileContext, current_profile
+from .profile_context import ProfileContext, current_profile
 from .incremental_strategy import CLIAzureDevOpsContext
 
 logger = get_logger(__name__)
@@ -91,24 +91,24 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
                 continue
         raise key_error
 
-    # # lookup test paths from index
-    # test_paths = []
-    # for t in modified_mods:
-    #     try:
-    #         test_path = os.path.normpath(_find_test(test_index, t))
-    #         test_paths.append(test_path)
-    #     except KeyError:
-    #         logger.warning("'%s' not found. If newly added, re-run with --discover", t)
-    #         continue
+    # lookup test paths from index
+    test_paths = []
+    for t in modified_mods:
+        try:
+            test_path = os.path.normpath(_find_test(test_index, t))
+            test_paths.append(test_path)
+        except KeyError:
+            logger.warning("'%s' not found. If newly added, re-run with --discover", t)
+            continue
 
-    # # Tests have been collected. Now run them.
-    # if not test_paths:
-    #     raise CLIError('No tests selected to run.')
+    # Tests have been collected. Now run them.
+    if not test_paths:
+        raise CLIError('No tests selected to run.')
 
     exit_code = 0
-    # with ProfileContext(profile):
-    #     runner = get_test_runner(parallel=not in_series, log_path=xml_path, last_failed=last_failed)
-    #     exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
+    with ProfileContext(profile):
+        runner = get_test_runner(parallel=not in_series, log_path=xml_path, last_failed=last_failed)
+        exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
 
     sys.exit(0 if not exit_code else 1)
 
