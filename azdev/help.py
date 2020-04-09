@@ -110,9 +110,6 @@ helps['test'] = """
           populator-commands:
             - pytest -h
     examples:
-        - name: Run all tests.
-          text: azdev test --ci
-
         - name: Run tests for specific modules.
           text: azdev test {mod1} {mod2}
 

@@ -51,6 +51,16 @@ def load_arguments(self, _):
         c.argument('pytest_args', nargs=argparse.REMAINDER, options_list=['--pytest-args', '-a'], help='Denotes the remaining args will be passed to pytest.')
         c.argument('last_failed', options_list='--lf', action='store_true', help='Re-run the last tests that failed.')
 
+        # CI parameters
+        c.argument('cli_ci',
+                   action='store_true',
+                   arg_group='Continuous Integration',
+                   help='Apply incremental test strategy to Azure CLI on Azure DevOps')
+        c.argument('ext_ci',
+                   action='store_true',
+                   arg_group='Continuous Integration',
+                   help='Apply incremental test strategy to Azure CLI Extension CI on Azure DevOps')
+
     with ArgumentsContext(self, 'coverage') as c:
         c.argument('prefix', type=str, help='Filter analysis by command prefix.')
         c.argument('report', action='store_true', help='Display results as a report.')

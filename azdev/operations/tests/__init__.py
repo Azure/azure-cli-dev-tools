@@ -24,6 +24,7 @@ from azdev.utilities import (
     get_path_table, require_virtual_env, get_name_index)
 from .pytest_runner import get_test_runner
 from .profile_management import ProfileContext, current_profile
+from .incremental_strategy import CLIAzureDevOpsContext
 
 logger = get_logger(__name__)
 
@@ -43,6 +44,8 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
     path_table = get_path_table()
 
+    from pprint import pprint
+
     test_index = _get_test_index(profile or current_profile(), discover)
 
     if not tests:
@@ -54,9 +57,14 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
     # filter out tests whose modules haven't changed
     modified_mods = _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo)
-
     if modified_mods:
         display('\nTest on modules: {}\n'.format(', '.join(modified_mods)))
+
+    if cli_ci is True:
+        ctx = CLIAzureDevOpsContext(git_repo, git_source, git_target)
+        modified_mods = ctx.filter(test_index)
+    if ext_ci is True:
+        pass
 
     # resolve the path at which to dump the XML results
     xml_path = xml_path or DEFAULT_RESULT_PATH
@@ -85,31 +93,31 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
                 continue
         raise key_error
 
-    # lookup test paths from index
-    test_paths = []
-    for t in modified_mods:
-        try:
-            test_path = os.path.normpath(_find_test(test_index, t))
-            test_paths.append(test_path)
-        except KeyError:
-            logger.warning("'%s' not found. If newly added, re-run with --discover", t)
-            continue
+    # # lookup test paths from index
+    # test_paths = []
+    # for t in modified_mods:
+    #     try:
+    #         test_path = os.path.normpath(_find_test(test_index, t))
+    #         test_paths.append(test_path)
+    #     except KeyError:
+    #         logger.warning("'%s' not found. If newly added, re-run with --discover", t)
+    #         continue
 
-    # Tests have been collected. Now run them.
-    if not test_paths:
-        raise CLIError('No tests selected to run.')
+    # # Tests have been collected. Now run them.
+    # if not test_paths:
+    #     raise CLIError('No tests selected to run.')
 
     exit_code = 0
-    with ProfileContext(profile):
-        runner = get_test_runner(parallel=not in_series, log_path=xml_path, last_failed=last_failed)
-        exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
+    # with ProfileContext(profile):
+    #     runner = get_test_runner(parallel=not in_series, log_path=xml_path, last_failed=last_failed)
+    #     exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
 
     sys.exit(0 if not exit_code else 1)
 
 
 def _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo):
     from azdev.utilities import diff_branches, extract_module_name
-    from azdev.utilities.git_util import _summarize_changed_mods
+    from azdev.utilities.git_util import summarize_changed_mods
 
     if not any([git_source, git_target, git_repo]):
         return tests
@@ -118,7 +126,7 @@ def _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo):
         raise CLIError('usage error: [--src NAME]  --tgt NAME --repo PATH')
 
     files_changed = diff_branches(git_repo, git_target, git_source)
-    mods_changed = _summarize_changed_mods(files_changed)
+    mods_changed = summarize_changed_mods(files_changed)
 
     repo_path = str(os.path.abspath(git_repo)).lower()
     to_remove = []
@@ -137,30 +145,6 @@ def _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo):
     logger.info('Filtered out: %s', to_remove)
 
     return tests
-
-
-def _get_profile(profile):
-    import colorama
-    colorama.init(autoreset=True)
-    try:
-        fore_red = colorama.Fore.RED if not IS_WINDOWS else ''
-        fore_reset = colorama.Fore.RESET if not IS_WINDOWS else ''
-        original_profile = raw_cmd('az cloud show --query profile -otsv', show_stderr=False).result
-        if not profile or original_profile == profile:
-            profile = original_profile
-            display('The tests are set to run against current profile {}.'
-                    .format(fore_red + original_profile + fore_reset))
-        elif original_profile != profile:
-            display('The tests are set to run against profile {} but the current az cloud profile is {}.'
-                    .format(fore_red + profile + fore_reset, fore_red + original_profile + fore_reset))
-            result = raw_cmd('az cloud update --profile {}'.format(profile),
-                             'SWITCHING TO PROFILE {}.'.format(fore_red + profile + fore_reset))
-            if result.exit_code != 0:
-                raise CLIError(result.error.output)
-        # returns the original profile so we can switch back if need be
-        return original_profile
-    except CalledProcessError:
-        raise CLIError('Failed to retrieve current az profile')
 
 
 def _discover_module_tests(mod_name, mod_data):
