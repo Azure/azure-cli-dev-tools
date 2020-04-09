@@ -44,8 +44,6 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
     path_table = get_path_table()
 
-    from pprint import pprint
-
     test_index = _get_test_index(profile or current_profile(), discover)
 
     if not tests:

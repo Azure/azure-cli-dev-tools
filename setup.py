@@ -61,6 +61,7 @@ setup(
     ],
     install_requires=[
         'docutils',
+        'wrapt',
         'flake8',
         'gitpython',
         'jinja2',
@@ -73,7 +74,6 @@ setup(
         'sphinx==1.6.7',
         'tox',
         'wheel==0.30.0',
-        'wrapt',
         'azure-storage-blob>=1.3.1,<2.0.0',
     ],
     extras_require={
