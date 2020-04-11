@@ -152,6 +152,8 @@ def _get_profile(profile):
         fore_red = colorama.Fore.RED if not IS_WINDOWS else ''
         fore_reset = colorama.Fore.RESET if not IS_WINDOWS else ''
         original_profile = raw_cmd('az cloud show --query profile -otsv', show_stderr=False).result
+        if original_profile:
+            original_profile = original_profile.split('\r\n')[0]
         if not profile or original_profile == profile:
             profile = original_profile
             display('The tests are set to run against current profile {}.'
