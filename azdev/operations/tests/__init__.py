@@ -33,7 +33,7 @@ logger = get_logger(__name__)
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None,
               git_source=None, git_target=None, git_repo=None,
-              cli_ci=False, ext_ci=False):
+              cli_ci=False):
 
     require_virtual_env()
 
@@ -61,8 +61,8 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     if cli_ci is True:
         ctx = CLIAzureDevOpsContext(git_repo, git_source, git_target)
         modified_mods = ctx.filter(test_index)
-    if ext_ci is True:
-        pass
+    # if ext_ci is True:
+    #     pass
 
     # resolve the path at which to dump the XML results
     xml_path = xml_path or DEFAULT_RESULT_PATH

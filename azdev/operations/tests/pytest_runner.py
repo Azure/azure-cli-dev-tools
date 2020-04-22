@@ -15,7 +15,8 @@ def get_test_runner(parallel, log_path, last_failed):
 
         logger = get_logger(__name__)
 
-        arguments = ['-x', '-v', '--junit-xml', log_path]
+        # arguments = ['-x', '-v', '--junit-xml', log_path]
+        arguments = ['-x', '-v', '--boxed', '-p no:warnings', '--log-level=WARN']
         arguments.extend(test_paths)
         if parallel:
             arguments += ['-n', 'auto']

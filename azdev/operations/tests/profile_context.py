@@ -20,7 +20,7 @@ class ProfileContext:
     def __init__(self, profile_name=None):
         self.target_profile = profile_name
 
-        self.origin_profile = cmd('az cloud show --query profile -otsv', show_stderr=False).result
+        self.origin_profile = current_profile()
 
     def __enter__(self):
         if self.target_profile is None or self.target_profile == self.origin_profile:
