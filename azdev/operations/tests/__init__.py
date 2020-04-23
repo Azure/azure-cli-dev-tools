@@ -32,8 +32,7 @@ logger = get_logger(__name__)
 # pylint: disable=too-many-statements
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None,
-              git_source=None, git_target=None, git_repo=None,
-              cli_ci=False):
+              git_source=None, git_target=None, git_repo=None):
 
     require_virtual_env()
 
