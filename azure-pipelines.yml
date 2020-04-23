@@ -305,7 +305,7 @@ jobs:
         . env/bin/activate
 
         # install azdev
-        pip install .
+        pip install -q .
 
         # setup
         azdev setup -c ../azure-cli
