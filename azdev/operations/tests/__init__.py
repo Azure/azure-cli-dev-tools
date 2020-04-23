@@ -57,12 +57,6 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     if modified_mods:
         display('\nTest on modules: {}\n'.format(', '.join(modified_mods)))
 
-    if cli_ci is True:
-        ctx = CLIAzureDevOpsContext(git_repo, git_source, git_target)
-        modified_mods = ctx.filter(test_index)
-    # if ext_ci is True:
-    #     pass
-
     # resolve the path at which to dump the XML results
     xml_path = xml_path or DEFAULT_RESULT_PATH
     if not xml_path.endswith('.xml'):

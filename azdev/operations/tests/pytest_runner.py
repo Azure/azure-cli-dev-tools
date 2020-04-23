@@ -4,6 +4,8 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+import os
+
 from knack.log import get_logger
 
 from azdev.utilities import call
@@ -15,8 +17,11 @@ def get_test_runner(parallel, log_path, last_failed):
 
         logger = get_logger(__name__)
 
-        # arguments = ['-x', '-v', '--junit-xml', log_path]
-        arguments = ['-x', '-v', '--boxed', '-p no:warnings', '--log-level=WARN']
+        if os.name == 'posix':
+            arguments = ['-x', '-v', '--boxed', '-p no:warnings', '--log-level=WARN', '--junit-xml', log_path]
+        else:
+            arguments = ['-x', '-v', '-p no:warnings', '--log-level=WARN', '--junit-xml', log_path]
+
         arguments.extend(test_paths)
         if parallel:
             arguments += ['-n', 'auto']
