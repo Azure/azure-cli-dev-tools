@@ -297,9 +297,6 @@ jobs:
         cd ../azure-cli
 
         git fetch origin release
-        git branch -v
-        git status
-        git checkout -b release origin/release
     - bash: |
         set -ev
 
