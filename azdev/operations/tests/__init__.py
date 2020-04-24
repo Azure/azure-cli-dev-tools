@@ -32,7 +32,8 @@ logger = get_logger(__name__)
 # pylint: disable=too-many-statements
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None,
-              git_source=None, git_target=None, git_repo=None):
+              git_source=None, git_target=None, git_repo=None,
+              cli_ci=False):
 
     require_virtual_env()
 
@@ -56,6 +57,10 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     modified_mods = _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo)
     if modified_mods:
         display('\nTest on modules: {}\n'.format(', '.join(modified_mods)))
+
+    if cli_ci is True:
+        ctx = CLIAzureDevOpsContext(git_repo, git_source, git_target)
+        modified_mods = ctx.filter(test_index)
 
     # resolve the path at which to dump the XML results
     xml_path = xml_path or DEFAULT_RESULT_PATH
