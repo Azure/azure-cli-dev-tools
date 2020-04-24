@@ -3,6 +3,9 @@
 Release History
 ===============
 
+0.1.15
+++++++
+* `sys.exit(0)` when no tests need to run instead of raising CLIError
 
 0.1.14
 ++++++

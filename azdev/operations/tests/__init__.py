@@ -99,9 +99,12 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
             logger.warning("'%s' not found. If newly added, re-run with --discover", t)
             continue
 
+    exit_code = 0
+
     # Tests have been collected. Now run them.
     if not test_paths:
-        raise CLIError('No tests selected to run.')
+        logger.warning('No tests selected to run.')
+        sys.exit(exit_code)
 
     exit_code = 0
     with ProfileContext(profile):
