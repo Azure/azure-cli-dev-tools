@@ -3,6 +3,14 @@
 Release History
 ===============
 
+
+0.1.14
+++++++
+* Refine the logic of testing against different profiles with `ProfileContext`
+* pytest version limit change to pytest>=4.4.0
+* Use `AzureDevOpsContext` to apply incremental test strategy
+* Refine the main flow of azdev test to be more compact and clean
+
 0.1.13
 ++++++
 * azdev verify license: fix bug that license verification will omit files while checking extensions
