@@ -20,7 +20,7 @@ def filter_by_git_diff(selected_modules, git_source, git_target, git_repo):
         raise CLIError('usage error: [--src NAME]  --tgt NAME --repo PATH')
 
     files_changed = diff_branches(git_repo, git_target, git_source)
-    mods_changed = _summarize_changed_mods(files_changed)
+    mods_changed = summarize_changed_mods(files_changed)
 
     repo_path = str(os.path.abspath(git_repo)).lower()
     to_remove = {'mod': [], 'core': [], 'ext': []}
@@ -43,7 +43,7 @@ def filter_by_git_diff(selected_modules, git_source, git_target, git_repo):
     return selected_modules
 
 
-def _summarize_changed_mods(files_changed):
+def summarize_changed_mods(files_changed):
     from azdev.utilities import extract_module_name
 
     mod_set = set()
