@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.16
+++++++
+* `azdev test`: Add option --no-exit-first to disable pytest exit once failure is detected
+
 0.1.15
 ++++++
 * `sys.exit(0)` when no tests need to run instead of raising CLIError
