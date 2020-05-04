@@ -33,7 +33,8 @@ def _check_path(path, file_name):
 
 
 def _check_repo(path):
-    if not os.path.isdir(os.path.join(path, '.git')):
+    full_path = os.path.join(path, '.git')
+    if not (os.path.isdir(full_path) or os.path.isfile(full_path)):
         raise CLIError("'{}' is not a valid git repository.".format(path))
 
 
