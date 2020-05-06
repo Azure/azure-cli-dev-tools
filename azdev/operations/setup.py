@@ -53,7 +53,7 @@ def _install_extensions(ext_paths):
             raise result.error  # pylint: disable=raising-bad-type
 
 
-def _install_cli(cli_path):
+def _install_cli(cli_path, deps=None):
 
     if not cli_path:
         # install public CLI off PyPI if no repo found
@@ -83,27 +83,55 @@ def _install_cli(cli_path):
         "install -q -r {}/requirements.txt".format(cli_path),
         "Installing `requirements.txt`..."
     )
+    if deps == 'setup':
+        # command modules have dependency on azure-cli-core so install this first
+        pip_cmd(
+            "install -q -e {}/src/azure-cli-nspkg".format(cli_path),
+            "Installing `azure-cli-nspkg`..."
+        )
+        pip_cmd(
+            "install -q -e {}/src/azure-cli-telemetry".format(cli_path),
+            "Installing `azure-cli-telemetry`..."
+        )
+        pip_cmd(
+            "install -q -e {}/src/azure-cli-core".format(cli_path),
+            "Installing `azure-cli-core`..."
+        )
 
-    # command modules have dependency on azure-cli-core so install this first
-    pip_cmd(
-        "install -q -e {}/src/azure-cli-nspkg".format(cli_path),
-        "Installing `azure-cli-nspkg`..."
-    )
-    pip_cmd(
-        "install -q -e {}/src/azure-cli-telemetry".format(cli_path),
-        "Installing `azure-cli-telemetry`..."
-    )
-    pip_cmd(
-        "install -q -e {}/src/azure-cli-core".format(cli_path),
-        "Installing `azure-cli-core`..."
-    )
+        # azure cli has dependencies on the above packages so install this one last
+        pip_cmd("install -q -e {}/src/azure-cli".format(cli_path), "Installing `azure-cli`...")
+        pip_cmd(
+            "install -q -e {}/src/azure-cli-testsdk".format(cli_path),
+            "Installing `azure-cli-testsdk`..."
+        )
+    else:
+        # command modules have dependency on azure-cli-core so install this first
+        pip_cmd(
+            "install -e {}/src/azure-cli-nspkg --no-deps".format(cli_path),
+            "Installing `azure-cli-nspkg`..."
+        )
+        pip_cmd(
+            "install -e {}/src/azure-cli-telemetry --no-deps".format(cli_path),
+            "Installing `azure-cli-telemetry`..."
+        )
+        pip_cmd(
+            "install -e {}/src/azure-cli-core --no-deps".format(cli_path),
+            "Installing `azure-cli-core`..."
+        )
 
-    # azure cli has dependencies on the above packages so install this one last
-    pip_cmd("install -q -e {}/src/azure-cli".format(cli_path), "Installing `azure-cli`...")
-    pip_cmd(
-        "install -q -e {}/src/azure-cli-testsdk".format(cli_path),
-        "Installing `azure-cli-testsdk`..."
-    )
+        # azure cli has dependencies on the above packages so install this one last
+        pip_cmd("install -e {}/src/azure-cli --no-deps".format(cli_path), "Installing `azure-cli`...")
+        pip_cmd(
+            "install -e {}/src/azure-cli-testsdk --no-deps".format(cli_path),
+            "Installing `azure-cli-testsdk`..."
+        )
+        import platform
+        system = platform.system()
+        if system == 'Windows':
+            system = system.lower()
+        req_file = 'requirements.py3.{}.txt'.format(system)
+        pip_cmd("install -r {}/src/azure-cli/{}".format(cli_path, req_file),
+                "Installing `{}`...".format(req_file))
 
     # Ensure that the site package's azure/__init__.py has the old style namespace
     # package declaration by installing the old namespace package
@@ -227,7 +255,7 @@ def _interactive_setup():
         raise CLIError('Installation aborted.')
 
 
-def setup(cli_path=None, ext_repo_path=None, ext=None):
+def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
 
     require_virtual_env()
 
@@ -296,7 +324,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None):
     # upgrade to latest pip
     pip_cmd('install --upgrade pip -q', 'Upgrading pip...')
 
-    _install_cli(cli_path)
+    _install_cli(cli_path, deps=deps)
     _install_extensions(ext_to_install)
     _copy_config_files()
 
