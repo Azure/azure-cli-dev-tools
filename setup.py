@@ -61,7 +61,7 @@ setup(
     ],
     install_requires=[
         'docutils',
-        'flake8',
+        'flake8==3.7.9',
         'gitpython',
         'jinja2',
         'knack',
