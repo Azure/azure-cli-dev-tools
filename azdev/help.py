@@ -28,7 +28,7 @@ helps['setup'] = """
           text: azdev setup -c -r azure-cli-extensions -e alias
 
         - name: Install only the CLI in dev mode and resolve dependencies from setup.py.
-          text: azdev setup -c -d setup
+          text: azdev setup -c -d setup.py
 """
 
 

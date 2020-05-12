@@ -83,7 +83,7 @@ def _install_cli(cli_path, deps=None):
         "install -q -r {}/requirements.txt".format(cli_path),
         "Installing `requirements.txt`..."
     )
-    if deps == 'setup':
+    if deps == 'setup.py':
         # command modules have dependency on azure-cli-core so install this first
         pip_cmd(
             "install -q -e {}/src/azure-cli-nspkg".format(cli_path),
@@ -127,8 +127,6 @@ def _install_cli(cli_path, deps=None):
         )
         import platform
         system = platform.system()
-        if system == 'Windows':
-            system = system.lower()
         req_file = 'requirements.py3.{}.txt'.format(system)
         pip_cmd("install -r {}/src/azure-cli/{}".format(cli_path, req_file),
                 "Installing `{}`...".format(req_file))
