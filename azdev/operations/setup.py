@@ -84,6 +84,7 @@ def _install_cli(cli_path, deps=None):
         "Installing `requirements.txt`..."
     )
     if deps == 'setup.py':
+        # Resolve dependencies from setup.py files.
         # command modules have dependency on azure-cli-core so install this first
         pip_cmd(
             "install -q -e {}/src/azure-cli-nspkg".format(cli_path),
@@ -105,7 +106,8 @@ def _install_cli(cli_path, deps=None):
             "Installing `azure-cli-testsdk`..."
         )
     else:
-        # command modules have dependency on azure-cli-core so install this first
+        # First install packages without dependencies,
+        # then resolve dependencies from requirements.*.txt file.
         pip_cmd(
             "install -e {}/src/azure-cli-nspkg --no-deps".format(cli_path),
             "Installing `azure-cli-nspkg`..."
@@ -119,7 +121,6 @@ def _install_cli(cli_path, deps=None):
             "Installing `azure-cli-core`..."
         )
 
-        # azure cli has dependencies on the above packages so install this one last
         pip_cmd("install -e {}/src/azure-cli --no-deps".format(cli_path), "Installing `azure-cli`...")
         pip_cmd(
             "install -e {}/src/azure-cli-testsdk --no-deps".format(cli_path),
