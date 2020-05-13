@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.17
+++++++
+* `azdev setup`: Add option --deps-from to allow resolving dependencies from requirements.txt or setup.py. The default changes to requirements.txt.
+
 0.1.16
 ++++++
 * `azdev test`: Add option --no-exit-first to disable pytest exit once failure is detected
