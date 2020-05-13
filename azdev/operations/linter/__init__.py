@@ -121,6 +121,6 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
     exit_code = linter_manager.run(
         run_params=not rule_types or 'params' in rule_types,
         run_commands=not rule_types or 'commands' in rule_types,
-        run_command_groups=not rule_types or 'command_groups'in rule_types,
+        run_command_groups=not rule_types or 'command_groups' in rule_types,
         run_help_files_entries=not rule_types or 'help_entries' in rule_types)
     sys.exit(exit_code)
