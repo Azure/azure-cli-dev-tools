@@ -26,17 +26,6 @@ def expired_command(linter, command_name):
         raise RuleError('Deprecated command is expired and should be removed.')
 
 
-@CommandRule(LinterSeverity.HIGH)
-def update_commands_support_generic_update(linter, command_name):
-    if command_name.split()[-1].lower() == "update":
-        gen_update_params_set = {'properties_to_set', 'properties_to_add', 'properties_to_remove', 'force_string'}
-
-        all_params_set = set(linter.get_command_metadata(command_name).arguments.keys())
-
-        if not gen_update_params_set <= all_params_set:
-            raise RuleError("Update command does not have generic update arguments.")
-
-
 @CommandRule(LinterSeverity.LOW)
 def group_delete_commands_should_confirm(linter, command_name):
     # We cannot detect from cmd table etc whether a delete command deletes a collection, group or set of resources.
