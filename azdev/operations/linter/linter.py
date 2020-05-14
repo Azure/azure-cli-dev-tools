@@ -16,6 +16,7 @@ import colorama
 from knack.log import get_logger
 
 from .util import share_element, exclude_commands, LinterError
+from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 
 
 PACKAGE_NAME = 'azdev.operations.linter'
@@ -175,7 +176,7 @@ class LinterManager(object):
     _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params'}
 
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, exclusions=None,
-                 rule_inclusions=None, use_ci_exclusions=None, min_severity=None):
+                 rule_inclusions=None, use_ci_exclusions=None, min_severity=None, update_global_exclusion=None):
         # default to running only rules of the highest severity
         self.min_severity = min_severity or LinterSeverity.get_ordered_members()[-1]
         self.linter = Linter(command_loader=command_loader, help_file_entries=help_file_entries,
@@ -189,6 +190,8 @@ class LinterManager(object):
         self._help_file_entries = help_file_entries
         self._exit_code = 0
         self._ci = use_ci_exclusions if use_ci_exclusions is not None else os.environ.get('CI', False)
+        self._violiations = {}
+        self._update_global_exclusion = update_global_exclusion
 
     def add_rule(self, rule_type, rule_name, rule_callable, rule_severity):
         include_rule = not self._rule_inclusions or rule_name in self._rule_inclusions
@@ -254,6 +257,21 @@ class LinterManager(object):
 
         if not self.exit_code:
             print(os.linesep + 'No violations found.')
+
+        if self._update_global_exclusion is not None:
+            repo_paths = None
+            if self._update_global_exclusion == 'main':
+                repo_paths = [get_cli_repo_path()]
+            else:
+                repo_paths = get_ext_repo_paths()
+            exclusion_paths = [os.path.join(repo_path, 'linter_exclusions.yml') for repo_path in repo_paths]
+            for exclusion_path in exclusion_paths:
+                if not os.path.isfile(exclusion_path):
+                    open(exclusion_path, 'a').close()
+                exclusions = yaml.safe_load(open(exclusion_path)) or {}
+                exclusions.update(self._violiations)
+                yaml.safe_dump(exclusions, open(exclusion_path, 'w'))
+
         colorama.deinit()
         return self.exit_code
 
@@ -276,8 +294,9 @@ class LinterManager(object):
 
                         print('- {} FAIL{} - {}{}{} severity: {}'.format(Fore.RED, Fore.RESET, sev_color,
                                                                          severity_str, Fore.RESET, rule_name,))
-                        for violation_msg in violations:
+                        for violation_msg, entity_name, rule_name in violations:
                             print(violation_msg)
+                            self._save_violations(entity_name, rule_name)
                         print()
                     else:
                         print('- {} pass{}: {} '.format(Fore.GREEN, Fore.RESET, rule_name))
@@ -289,6 +308,13 @@ class LinterManager(object):
             return False
         return True
 
+    def _save_violations(self, entity_name, rule_name):
+        if isinstance(entity_name, str):
+            command_name = entity_name
+            self._violiations.setdefault(command_name, {}).setdefault('rule_exclusions', []).append(rule_name)
+        else:
+            command_name, param_name = entity_name
+            self._violiations.setdefault(command_name, {}).setdefault('parameters', {}).setdefault(param_name, {}).setdefault('rule_exclusions', []).append(rule_name)
 
 class RuleError(Exception):
     """

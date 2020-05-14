@@ -15,9 +15,10 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     heading, subheading, display, get_path_table, require_azure_cli, filter_by_git_diff)
+from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 
 from .linter import LinterManager, LinterScope, RuleError, LinterSeverity
-from .util import filter_modules
+from .util import filter_modules, merge_exclusion
 
 
 logger = get_logger(__name__)
@@ -26,7 +27,7 @@ logger = get_logger(__name__)
 # pylint:disable=too-many-locals
 def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
-               min_severity=None):
+               min_severity=None, save_global_exclusion=False):
 
     require_azure_cli()
 
@@ -63,6 +64,19 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         selected_modules['mod'] = {}
         selected_modules['core'] = {}
 
+    # used to upsert global exclusion
+    update_global_exclusion = None
+    if save_global_exclusion and (cli_only or ext_only):
+        if cli_only:
+            update_global_exclusion = 'main'
+            if os.path.exists(os.path.join(get_cli_repo_path(), 'linter_exclusions.yml')):
+                os.remove(os.path.join(get_cli_repo_path(), 'linter_exclusions.yml'))
+        else:
+            update_global_exclusion = 'cli'
+            for ext_path in get_ext_repo_paths():
+                if os.path.exists(os.path.join(ext_path, 'linter_exclusions.yml')):
+                    os.remove(os.path.join(ext_path, 'linter_exclusions.yml'))
+
     # filter down to only modules that have changed based on git diff
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
 
@@ -82,7 +96,14 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         exclusion_path = os.path.join(path, 'linter_exclusions.yml')
         if os.path.isfile(exclusion_path):
             mod_exclusions = yaml.safe_load(open(exclusion_path))
-            exclusions.update(mod_exclusions)
+            merge_exclusion(exclusions, mod_exclusions or {})
+
+    global_exclusion_paths = [os.path.join(get_cli_repo_path(), 'linter_exclusions.yml')]
+    global_exclusion_paths.extend([os.path.join(path, 'linter_exclusions.yml') for path in get_ext_repo_paths()])
+    for path in global_exclusion_paths:
+        if os.path.isfile(path):
+            mod_exclusions = yaml.safe_load(open(path))
+            merge_exclusion(exclusions, mod_exclusions or {})
 
     start = time.time()
     display('Initializing linter with command table and help files...')
@@ -122,7 +143,9 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                                    loaded_help=loaded_help,
                                    exclusions=exclusions,
                                    rule_inclusions=rules,
-                                   use_ci_exclusions=ci_exclusions, min_severity=min_severity)
+                                   use_ci_exclusions=ci_exclusions,
+                                   min_severity=min_severity,
+                                   update_global_exclusion=update_global_exclusion)
 
     subheading('Results')
     logger.info('Running linter: %i commands, %i help entries',
