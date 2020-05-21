@@ -10,6 +10,25 @@ Release History
 
 * `azdev linter`: Expose `--min-severity` to support idea of rule severity. New HIGH, MEDIUM and LOW severity rules have also been added.
 
+0.1.17
+++++++
+* `azdev setup`: Add option --deps-from to allow resolving dependencies from requirements.txt or setup.py. The default changes to requirements.txt.
+
+0.1.16
+++++++
+* `azdev test`: Add option --no-exit-first to disable pytest exit once failure is detected
+
+0.1.15
+++++++
+* `sys.exit(0)` when no tests need to run instead of raising CLIError
+
+0.1.14
+++++++
+* Refine the logic of testing against different profiles with `ProfileContext`
+* pytest version limit change to pytest>=4.4.0
+* Use `AzureDevOpsContext` to apply incremental test strategy
+* Refine the main flow of azdev test to be more compact and clean
+
 0.1.13
 ++++++
 * azdev verify license: fix bug that license verification will omit files while checking extensions

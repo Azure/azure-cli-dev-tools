@@ -37,6 +37,7 @@ def load_arguments(self, _):
         c.argument('cli_path', options_list=['--cli', '-c'], nargs='?', const=Flag, help="Path to an existing Azure CLI repo. Omit value to search for the repo or use special value 'EDGE' to install the latest developer edge build.")
         c.argument('ext_repo_path', options_list=['--repo', '-r'], nargs='+', help='Space-separated list of paths to existing Azure CLI extensions repos.')
         c.argument('ext', options_list=['--ext', '-e'], nargs='+', help="Space-separated list of extensions to install initially. Use '*' to install all extensions.")
+        c.argument('deps', options_list=['--deps-from', '-d'], choices=['requirements.txt', 'setup.py'], default='requirements.txt', help="Choose the file to resolve dependencies.")
 
     with ArgumentsContext(self, 'test') as c:
         c.argument('discover', options_list='--discover', action='store_true', help='Build an index of test names so that you don\'t need to specify fully qualified test paths.')
@@ -51,6 +52,13 @@ def load_arguments(self, _):
         c.argument('profile', options_list='--profile', help='Run automation against a specific profile. If omit, the tests will run against current profile.')
         c.argument('pytest_args', nargs=argparse.REMAINDER, options_list=['--pytest-args', '-a'], help='Denotes the remaining args will be passed to pytest.')
         c.argument('last_failed', options_list='--lf', action='store_true', help='Re-run the last tests that failed.')
+        c.argument('no_exit_first', options_list='--no-exitfirst', action='store_true', help='Do not exit on first error or failed test')
+
+        # CI parameters
+        c.argument('cli_ci',
+                   action='store_true',
+                   arg_group='Continuous Integration',
+                   help='Apply incremental test strategy to Azure CLI on Azure DevOps')
 
     with ArgumentsContext(self, 'coverage') as c:
         c.argument('prefix', type=str, help='Filter analysis by command prefix.')

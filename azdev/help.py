@@ -26,6 +26,9 @@ helps['setup'] = """
 
         - name: Install CLI in dev mode, along with the extensions repo. Auto-find the CLI repo and install the `alias` extension in dev mode.
           text: azdev setup -c -r azure-cli-extensions -e alias
+
+        - name: Install only the CLI in dev mode and resolve dependencies from setup.py.
+          text: azdev setup -c -d setup.py
 """
 
 
@@ -110,9 +113,6 @@ helps['test'] = """
           populator-commands:
             - pytest -h
     examples:
-        - name: Run all tests.
-          text: azdev test --ci
-
         - name: Run tests for specific modules.
           text: azdev test {mod1} {mod2}
 
