@@ -19,7 +19,6 @@ from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 from .util import share_element, exclude_commands, LinterError
 
 
-
 PACKAGE_NAME = 'azdev.operations.linter'
 _logger = get_logger(__name__)
 
@@ -317,6 +316,7 @@ class LinterManager(object):
         else:
             command_name, param_name = entity_name
             self._violiations.setdefault(command_name, {}).setdefault('parameters', {}).setdefault(param_name, {}).setdefault('rule_exclusions', []).append(rule_name)
+
 
 class RuleError(Exception):
     """

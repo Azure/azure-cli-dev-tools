@@ -37,7 +37,6 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
 
     heading('CLI Linter')
 
-
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
     ext_only = modules == ['EXT']

@@ -96,6 +96,7 @@ def _get_command_source(command_name, command_table):
     # command is from module
     return command.command_source, False
 
+
 # pylint: disable=line-too-long
 def merge_exclusion(left_exclusion, right_exclusion):
     for command_name, value in right_exclusion.items():
