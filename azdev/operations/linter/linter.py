@@ -15,8 +15,9 @@ import yaml
 import colorama
 from knack.log import get_logger
 
-from .util import share_element, exclude_commands, LinterError
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
+from .util import share_element, exclude_commands, LinterError
+
 
 
 PACKAGE_NAME = 'azdev.operations.linter'
@@ -294,9 +295,9 @@ class LinterManager(object):
 
                         print('- {} FAIL{} - {}{}{} severity: {}'.format(Fore.RED, Fore.RESET, sev_color,
                                                                          severity_str, Fore.RESET, rule_name,))
-                        for violation_msg, entity_name, rule_name in violations:
+                        for violation_msg, entity_name, name in violations:
                             print(violation_msg)
-                            self._save_violations(entity_name, rule_name)
+                            self._save_violations(entity_name, name)
                         print()
                     else:
                         print('- {} pass{}: {} '.format(Fore.GREEN, Fore.RESET, rule_name))
@@ -308,6 +309,7 @@ class LinterManager(object):
             return False
         return True
 
+    # pylint: disable=line-too-long
     def _save_violations(self, entity_name, rule_name):
         if isinstance(entity_name, str):
             command_name = entity_name
