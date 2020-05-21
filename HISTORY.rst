@@ -2,7 +2,7 @@
 
 Release History
 ===============
-0.1.14
+0.1.18
 ++++++
 * Linter Rule Severity: Rules now have an associated severity level. Only high severity rules should be run in CI. All previous rules are annotated as HIGH severity.
 
