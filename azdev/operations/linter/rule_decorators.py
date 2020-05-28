@@ -8,7 +8,7 @@ from knack.util import CLIError
 from .linter import RuleError, LinterSeverity
 
 
-class AbstractRule(object):
+class BaseRule(object):
 
     def __init__(self, severity):
         if severity not in LinterSeverity:
@@ -18,28 +18,28 @@ class AbstractRule(object):
 
 
 # help_file_entry_rule
-class HelpFileEntryRule(AbstractRule):
+class HelpFileEntryRule(BaseRule):
 
     def __call__(self, func):
         return _get_decorator(func, 'help_file_entries', 'Help-Entry: `{}`', self.severity)
 
 
 # command_rule
-class CommandRule(AbstractRule):
+class CommandRule(BaseRule):
 
     def __call__(self, func):
         return _get_decorator(func, 'commands', 'Command: `{}`', self.severity)
 
 
 # command_group_rule
-class CommandGroupRule(AbstractRule):
+class CommandGroupRule(BaseRule):
 
     def __call__(self, func):
         return _get_decorator(func, 'command_groups', 'Command-Group: `{}`', self.severity)
 
 
 # parameter_rule
-class ParameterRule(AbstractRule):
+class ParameterRule(BaseRule):
 
     def __call__(self, func):
         def add_to_linter(linter_manager):

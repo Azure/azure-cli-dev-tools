@@ -259,8 +259,7 @@ class LinterManager(object):
             print(os.linesep + 'No violations found.')
 
         if self._update_global_exclusion is not None:
-            repo_paths = None
-            if self._update_global_exclusion == 'main':
+            if self._update_global_exclusion == 'CLI':
                 repo_paths = [get_cli_repo_path()]
             else:
                 repo_paths = get_ext_repo_paths()

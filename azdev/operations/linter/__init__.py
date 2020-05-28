@@ -67,11 +67,11 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
     update_global_exclusion = None
     if save_global_exclusion and (cli_only or ext_only):
         if cli_only:
-            update_global_exclusion = 'main'
+            update_global_exclusion = 'CLI'
             if os.path.exists(os.path.join(get_cli_repo_path(), 'linter_exclusions.yml')):
                 os.remove(os.path.join(get_cli_repo_path(), 'linter_exclusions.yml'))
-        else:
-            update_global_exclusion = 'cli'
+        elif ext_only:
+            update_global_exclusion = 'EXT'
             for ext_path in get_ext_repo_paths():
                 if os.path.exists(os.path.join(ext_path, 'linter_exclusions.yml')):
                     os.remove(os.path.join(ext_path, 'linter_exclusions.yml'))
@@ -98,7 +98,10 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
             merge_exclusion(exclusions, mod_exclusions or {})
 
     global_exclusion_paths = [os.path.join(get_cli_repo_path(), 'linter_exclusions.yml')]
-    global_exclusion_paths.extend([os.path.join(path, 'linter_exclusions.yml') for path in get_ext_repo_paths()])
+    try:
+        global_exclusion_paths.extend([os.path.join(path, 'linter_exclusions.yml') for path in (get_ext_repo_paths() or [])])
+    except CLIError:
+        pass
     for path in global_exclusion_paths:
         if os.path.isfile(path):
             mod_exclusions = yaml.safe_load(open(path))
