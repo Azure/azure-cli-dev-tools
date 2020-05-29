@@ -4,45 +4,71 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-from .linter import RuleError
+from knack.util import CLIError
+from .linter import RuleError, LinterSeverity
 
 
-def help_file_entry_rule(func):
-    return _get_decorator(func, 'help_file_entries', 'Help-Entry: `{}`')
+class BaseRule(object):
+
+    def __init__(self, severity):
+        if severity not in LinterSeverity:
+            raise CLIError("A {} rule has an invalid severity. Received {}; expected one of: {}"
+                           .format(str(self.__class__), severity, list(LinterSeverity)))
+        self.severity = severity
 
 
-def command_rule(func):
-    return _get_decorator(func, 'commands', 'Command: `{}`')
+# help_file_entry_rule
+class HelpFileEntryRule(BaseRule):
+
+    def __call__(self, func):
+        return _get_decorator(func, 'help_file_entries', 'Help-Entry: `{}`', self.severity)
 
 
-def command_group_rule(func):
-    return _get_decorator(func, 'command_groups', 'Command-Group: `{}`')
+# command_rule
+class CommandRule(BaseRule):
+
+    def __call__(self, func):
+        return _get_decorator(func, 'commands', 'Command: `{}`', self.severity)
 
 
-def parameter_rule(func):
+# command_group_rule
+class CommandGroupRule(BaseRule):
+
+    def __call__(self, func):
+        return _get_decorator(func, 'command_groups', 'Command-Group: `{}`', self.severity)
+
+
+# parameter_rule
+class ParameterRule(BaseRule):
+
+    def __call__(self, func):
+        def add_to_linter(linter_manager):
+            def wrapper():
+                linter = linter_manager.linter
+
+                for command_name in linter.commands:
+                    for parameter_name in linter.get_command_parameters(command_name):
+                        exclusion_parameters = linter_manager.exclusions.get(command_name, {}).get('parameters', {})
+                        exclusions = exclusion_parameters.get(parameter_name, {}).get('rule_exclusions', [])
+                        if func.__name__ not in exclusions:
+                            try:
+                                func(linter, command_name, parameter_name)
+                            except RuleError as ex:
+                                linter_manager.mark_rule_failure()
+                                yield (_create_violation_msg(ex, 'Parameter: {}, `{}`', command_name, parameter_name),
+                                       (command_name, parameter_name),
+                                       func.__name__)
+
+            linter_manager.add_rule('params', func.__name__, wrapper, self.severity)
+        add_to_linter.linter_rule = True
+        return add_to_linter
+
+
+def _get_decorator(func, rule_group, print_format, severity):
     def add_to_linter(linter_manager):
         def wrapper():
             linter = linter_manager.linter
-            for command_name in linter.commands:
-                for parameter_name in linter.get_command_parameters(command_name):
-                    exclusion_parameters = linter_manager.exclusions.get(command_name, {}).get('parameters', {})
-                    exclusions = exclusion_parameters.get(parameter_name, {}).get('rule_exclusions', [])
-                    if func.__name__ not in exclusions:
-                        try:
-                            func(linter, command_name, parameter_name)
-                        except RuleError as ex:
-                            linter_manager.mark_rule_failure()
-                            yield _create_violation_msg(ex, 'Parameter: {}, `{}`',
-                                                        command_name, parameter_name)
-        linter_manager.add_rule('params', func.__name__, wrapper)
-    add_to_linter.linter_rule = True
-    return add_to_linter
 
-
-def _get_decorator(func, rule_group, print_format):
-    def add_to_linter(linter_manager):
-        def wrapper():
-            linter = linter_manager.linter
             for iter_entity in getattr(linter, rule_group):
                 exclusions = linter_manager.exclusions.get(iter_entity, {}).get('rule_exclusions', [])
                 if func.__name__ not in exclusions:
@@ -50,8 +76,9 @@ def _get_decorator(func, rule_group, print_format):
                         func(linter, iter_entity)
                     except RuleError as ex:
                         linter_manager.mark_rule_failure()
-                        yield _create_violation_msg(ex, print_format, iter_entity)
-        linter_manager.add_rule(rule_group, func.__name__, wrapper)
+                        yield (_create_violation_msg(ex, print_format, iter_entity), iter_entity, func.__name__)
+
+        linter_manager.add_rule(rule_group, func.__name__, wrapper, severity)
     add_to_linter.linter_rule = True
     return add_to_linter
 

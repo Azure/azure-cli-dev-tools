@@ -97,6 +97,16 @@ def _get_command_source(command_name, command_table):
     return command.command_source, False
 
 
+# pylint: disable=line-too-long
+def merge_exclusion(left_exclusion, right_exclusion):
+    for command_name, value in right_exclusion.items():
+        for rule_name in value.get('rule_exclusions', []):
+            left_exclusion.setdefault(command_name, {}).setdefault('rule_exclusions', []).append(rule_name)
+        for param_name in value.get('parameters', {}):
+            for rule_name in value.get('parameters', {}).get(param_name, {}).get('rule_exclusions', []):
+                left_exclusion.setdefault(command_name, {}).setdefault('parameters', {}).setdefault(param_name, {}).setdefault('rule_exclusions', []).append(rule_name)
+
+
 class LinterError(Exception):
     """
     Exception thrown by linter for non rule violation reasons
