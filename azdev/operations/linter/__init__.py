@@ -24,7 +24,7 @@ from .util import filter_modules, merge_exclusion
 logger = get_logger(__name__)
 
 
-# pylint:disable=too-many-locals, too-many-statements
+# pylint:disable=too-many-locals, too-many-statements, too-many-branches
 def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
                min_severity=None, save_global_exclusion=False):
@@ -99,7 +99,8 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
 
     global_exclusion_paths = [os.path.join(get_cli_repo_path(), 'linter_exclusions.yml')]
     try:
-        global_exclusion_paths.extend([os.path.join(path, 'linter_exclusions.yml') for path in (get_ext_repo_paths() or [])])
+        global_exclusion_paths.extend([os.path.join(path, 'linter_exclusions.yml')
+                                       for path in (get_ext_repo_paths() or [])])
     except CLIError:
         pass
     for path in global_exclusion_paths:
