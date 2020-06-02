@@ -162,13 +162,9 @@ def _discover_module_tests(mod_name, mod_data):
             x[:-len('.py')]: {} for x in contents if x.startswith('test_') and x.endswith('.py')
         }
         total_files = len(test_files)
-    except (OSError, IOError) as ex:
-        err_string = str(ex)
-        if 'system cannot find the path' in err_string or 'No such file or directory' in err_string:
-            # skip modules that don't have tests
-            logger.info('  No test files found.')
-            return None
-        raise
+    except FileNotFoundError:
+        logger.info('  No test files found.')
+        return None
 
     for file_name in test_files:
         mod_data['files'][file_name] = {}
