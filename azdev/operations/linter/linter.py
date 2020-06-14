@@ -12,7 +12,7 @@ from importlib import import_module
 from pkgutil import iter_modules
 from enum import Enum
 import yaml
-import colorama
+from colorama import deinit, Fore, init
 from knack.log import get_logger
 
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
@@ -241,7 +241,7 @@ class LinterManager(object):
                     found_rules.add(rule_name)
                     add_to_linter_func(self)
 
-        colorama.init()
+        init()
         # run all rule-checks
         if run_help_files_entries and self._rules.get('help_file_entries'):
             self._run_rules('help_file_entries')
@@ -271,11 +271,10 @@ class LinterManager(object):
                 exclusions.update(self._violiations)
                 yaml.safe_dump(exclusions, open(exclusion_path, 'w'))
 
-        colorama.deinit()
+        deinit()
         return self.exit_code
 
     def _run_rules(self, rule_group):
-        from colorama import Fore
         for rule_name, (rule_func, linter_callable, rule_severity) in self._rules.get(rule_group).items():
             severity_str = rule_severity.name
             # use new linter if needed
