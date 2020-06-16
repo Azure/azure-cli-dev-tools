@@ -1,3 +1,4 @@
+
 # -----------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for
@@ -5,15 +6,20 @@
 # -----------------------------------------------------------------------------
 
 import os
+import subprocess
 from shutil import copytree, rmtree
 import time
 
 from knack.log import get_logger
 from knack.util import CLIError
+import shutil
+import shlex
 
 from azdev.operations.extensions import (
     list_extensions, add_extension_repo, remove_extension)
 from azdev.params import Flag
+import azdev.utilities.const as const
+import azdev.utilities.venv as venv
 from azdev.utilities import (
     display, heading, subheading, pip_cmd, find_file,
     get_azdev_config_dir, get_azdev_config, require_virtual_env, get_azure_config)
@@ -254,20 +260,61 @@ def _interactive_setup():
         raise CLIError('Installation aborted.')
 
 
-def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
-
-    require_virtual_env()
+def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_evn=None, copy=None, use_global=None):
+    if not set_evn:
+        require_virtual_env()
 
     start = time.time()
 
     heading('Azure CLI Dev Setup')
 
-    ext_to_install = []
+    if not any([cli_path, ext_repo_path, ext]) or cli_path == "pypi":
+        return _handle_legacy(cli_path, ext_repo_path, ext, start)
+    if copy and use_global:
+        raise CLIError("copy and use global are mutally exlcusive")
+
+    if set_evn:
+        subprocess.call(shlex.split((const.VENV_CMD if const.IS_WINDOWS else const.VENV_CMD3) + set_evn),
+                        shell=False)
+        azure_config_path = os.path.join(os.path.abspath(os.getcwd()), set_evn)
+    else:
+        azure_config_path = os.environ.get(const.VIRTUAL_ENV)
+
+    dot_azure_config = os.path.join(azure_config_path, '.azure')
+    if os.path.isdir(dot_azure_config):
+        shutil.rmtree(dot_azure_config)
+    global_az_config = os.path.expanduser(os.path.join('~', '.azure'))
+    config_path = os.path.join(dot_azure_config, const.CONFIG_NAME)
+    if os.path.isdir(global_az_config) and copy:
+        shutil.copytree(global_az_config, dot_azure_config)
+    elif not use_global:
+        os.mkdir(dot_azure_config)
+        file = open(config_path, "w")
+        file.close()
+        os.environ['AZDEV_CONFIG_DIR'] = dot_azure_config
+    elif os.path.isdir(global_az_config):
+        dot_azure_config = global_az_config
+        config_path = os.path.join(dot_azure_config, const.CONFIG_NAME)
+    else:
+        raise RuntimeError(
+            "Global AZ config is not set up, yet it was specified to be used.")
+    config = get_azure_config()
+    if not config.get(const.CLOUD_SECTION, 'name', None):
+        config.set_value(const.CLOUD_SECTION, 'name', ext_repo_path)
+    path_to_cli_extension_repo = os.path.abspath(ext_repo_path)
+    config.set_value(const.EXT_SECTION, const.AZ_DEV_SRC, path_to_cli_extension_repo)
+    venv.edit_activate(azure_config_path, dot_azure_config)
+    if cli_path:
+        config.set_value(const.CLI_SECTION, const.AZ_DEV_SRC, os.path.abspath(cli_path))
+        venv.install_cli(os.path.abspath(cli_path), azure_config_path)
+
+
+def _handle_legacy(cli_path, ext_repo_path, ext, start):
+
     if not any([cli_path, ext_repo_path, ext]):
         cli_path, ext_repo_path, ext_to_install = _interactive_setup()
-    else:
-        if cli_path == "pypi":
-            cli_path = None
+    elif cli_path == "pypi":
+        cli_path = None
         # otherwise assume programmatic setup
         if cli_path:
             CLI_SENTINEL = 'azure-cli.pyproj'
@@ -333,3 +380,4 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
     display('\nElapsed time: {} min {} sec'.format(elapsed_min, elapsed_sec))
 
     subheading('Finished dev setup!')
+    

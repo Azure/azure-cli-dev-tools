@@ -37,6 +37,9 @@ def load_arguments(self, _):
         c.argument('ext_repo_path', options_list=['--repo', '-r'], nargs='+', help='Space-separated list of paths to existing Azure CLI extensions repos.')
         c.argument('ext', options_list=['--ext', '-e'], nargs='+', help="Space-separated list of extensions to install initially. Use '*' to install all extensions.")
         c.argument('deps', options_list=['--deps-from', '-d'], choices=['requirements.txt', 'setup.py'], default='requirements.txt', help="Choose the file to resolve dependencies.")
+        c.argument('set_evn', options_list=['--set-env', '-s'], type=str, help="Will create a virtual enviroment with the given evn name")
+        c.argument('copy', options_list='--copy', action='store_true', help="Will copy entire global .azure diretory to the newly created virtual enviroment .azure direcotry if it exist")
+        c.argument('use_global', options_list=['--use-global', '-g'], action='store_true', help="Will use the default global system .azure config")                
 
     with ArgumentsContext(self, 'test') as c:
         c.argument('discover', options_list='--discover', action='store_true', help='Build an index of test names so that you don\'t need to specify fully qualified test paths.')
