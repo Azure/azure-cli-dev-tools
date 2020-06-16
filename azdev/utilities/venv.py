@@ -14,15 +14,15 @@ def validate_env():
             "The Azure config file does not exist. please rerun setup")
 
 
-def edit_activate(azure_config_path, dot_azure_config):
+def edit_activate(azure_config_path, dot_azure_config, dot_azdev_config):
     if const.IS_WINDOWS:
-        ps1_edit(azure_config_path, dot_azure_config)
-        bat_edit(azure_config_path, dot_azure_config)
+        ps1_edit(azure_config_path, dot_azure_config, dot_azdev_config)
+        bat_edit(azure_config_path, dot_azure_config, dot_azdev_config)
     else:
-        unix_edit(azure_config_path, dot_azure_config)
+        unix_edit(azure_config_path, dot_azure_config, dot_azdev_config)
 
 
-def unix_edit(azure_config_path, dot_azure_config):
+def unix_edit(azure_config_path, dot_azure_config, dot_azdev_config):
     activate_path = os.path.join(azure_config_path, const.UN_BIN,
                                  const.UN_ACTIVATE)
     content = open(activate_path, "r").readlines()
@@ -30,23 +30,27 @@ def unix_edit(azure_config_path, dot_azure_config):
     # check if already ran setup before
     if const.AZ_CONFIG_DIR not in content[0]:
         content = [const.AZ_CONFIG_DIR + '=' + dot_azure_config + '\n',
-                   const.UN_EXPORT + ' ' + const.AZ_CONFIG_DIR + '\n'] + content
+                   const.UN_EXPORT + ' ' + const.AZ_CONFIG_DIR + '\n',
+                   const.AZ_AZDEV_DIR + '=' + dot_azdev_config + '\n',
+                   const.UN_EXPORT + ' ' + const.AZ_AZDEV_DIR] + content
         with open(activate_path, "w") as file:
             file.writelines(content)
 
 
-def bat_edit(azure_config_path, dot_azure_config):
+def bat_edit(azure_config_path, dot_azure_config, dot_azdev_config):
     activate_path = os.path.join(azure_config_path, const.SCRIPTS,
                                  const.BAT_ACTIVATE)
     content = open(activate_path, "r").readlines()
     if const.AZ_CONFIG_DIR not in content[1]:
         content = content[0:1] + ['set ' + const.AZ_CONFIG_DIR +
-                                  '=' + dot_azure_config + '\n'] + content[1::]
+                                  '=' + dot_azure_config + '\n',
+                                  'set ' + const.AZ_AZDEV_DIR + 
+                                  '=' + dot_azdev_config] + content[1::]
         with open(activate_path, "w") as file:
             file.writelines(content)
 
 
-def ps1_edit(azure_config_path, dot_azure_config):
+def ps1_edit(azure_config_path, dot_azure_config, dot_azdev_config):
     activate_path = os.path.join(azure_config_path, const.SCRIPTS,
                                  const.ACTIVATE_PS)
     content = open(activate_path, "r").read()
@@ -57,6 +61,8 @@ def ps1_edit(azure_config_path, dot_azure_config):
     if content.find(const.EVN_AZ_CONFIG) < 0:
         content = content[:idx] + const.EVN_AZ_CONFIG + " = " + \
             "\"" + dot_azure_config + "\"; " + \
+            const.EVN_AZ_DEV_CONFIG + " = " + \
+            "\"" + dot_azdev_config + "\"; " + \
             content[idx:]
     with open(activate_path, "w") as file:
         file.write(content)
