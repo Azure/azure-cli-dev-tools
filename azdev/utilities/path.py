@@ -6,7 +6,7 @@
 
 import os
 from glob import glob
-
+import sys
 from knack.util import CLIError
 
 from .const import COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, ENV_VAR_VIRTUAL_ENV
@@ -38,7 +38,7 @@ def get_env_path():
         env_path = os.environ.get(item)
         if env_path:
             break
-    return env_path
+    return env_path if env_path else sys.executable
 
 
 def get_azdev_repo_path():

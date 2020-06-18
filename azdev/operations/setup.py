@@ -277,12 +277,12 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     if set_env:
         subprocess.call(shlex.split((const.VENV_CMD if const.IS_WINDOWS else const.VENV_CMD3) + set_env),
                         shell=False)
-        azure_config_path = os.path.join(os.path.abspath(os.getcwd()), set_env)
+        azure_path = os.path.join(os.path.abspath(os.getcwd()), set_env)
     else:
-        azure_config_path = os.environ.get(const.VIRTUAL_ENV)
+        azure_path = os.environ.get(const.VIRTUAL_ENV)
 
-    dot_azure_config = os.path.join(azure_config_path, '.azure')
-    dot_azdev_config = os.path.join(azure_config_path, '.azdev')
+    dot_azure_config = os.path.join(azure_path, '.azure')
+    dot_azdev_config = os.path.join(azure_path, '.azdev')
 
     # clean up venv dirs if they already existed
     # and this is a reinstall
@@ -321,17 +321,17 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     os.environ['AZURE_CONFIG_DIR'], os.environ['AZDEV_CONFIG_DIR'] = dot_azure_config, dot_azdev_config
     config = get_azure_config()
     if not config.get(const.CLOUD_SECTION, 'name', None):
-        config.set_value(const.CLOUD_SECTION, 'name', ext_repo_path)
-    path_to_cli_extension_repo = os.path.abspath(ext_repo_path)
-    config.set_value(const.EXT_SECTION, const.AZ_DEV_SRC, path_to_cli_extension_repo)
-    venv.edit_activate(azure_config_path, dot_azure_config, dot_azdev_config)
+        config.set_value(const.CLOUD_SECTION, 'name', const.AZ_CLOUD)
+    config.set_value(const.EXT_SECTION, const.AZ_DEV_SRC, os.path.abspath(ext_repo_path))
+    venv.edit_activate(azure_path, dot_azure_config, dot_azdev_config)
     if cli_path:
         config.set_value(const.CLI_SECTION, const.AZ_DEV_SRC, os.path.abspath(cli_path))
-        venv.install_cli(os.path.abspath(cli_path), azure_config_path)
-
+        venv.install_cli(os.path.abspath(cli_path), azure_path)
     config = get_azdev_config()
-    config.set_value('ext', 'repo_paths', ext_repo_path)
-    config.set_value('cli', 'repo_path', cli_path)
+    config.set_value('ext', 'repo_paths', os.path.abspath(ext_repo_path))
+    config.set_value('cli', 'repo_path', os.path.abspath(cli_path))
+    if ext: 
+        venv.install_extensions(azure_path, ext)
 
 
 def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):

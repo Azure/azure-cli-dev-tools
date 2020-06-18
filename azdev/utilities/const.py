@@ -20,7 +20,7 @@ VENV_CMD3 = 'python3 -m venv --system-site-packages '
 AZ_CONFIG_DIR = 'AZURE_CONFIG_DIR'
 AZ_AZDEV_DIR = 'AZDEV_CONFIG_DIR'
 AZ_DEV_SRC = 'dev_sources'
-AZ_CLOUD = {'name': 'AzureCloud'}
+AZ_CLOUD = 'AzureCloud'
 CLOUD_SECTION = 'cloud'
 EXT_SECTION = 'extension'
 CLI_SECTION = 'clipath'
@@ -42,5 +42,5 @@ GIT_SWAGGER_REPO_URL = 'https://github.com/Azure/azure-rest-api-specs.git'
 SWAGGER_REPO_NAME = 'azure-rest-api-specs'
 
 ENV_VAR_TEST_MODULES = 'AZDEV_TEST_TESTS'               # comma-separated list of modules to test
-ENV_VAR_VIRTUAL_ENV = ['VIRTUAL_ENV']   # used by system to identify virtual environment
+ENV_VAR_VIRTUAL_ENV = ['VIRTUAL_ENV', 'CONDA_PREFIX']   # used by system to identify virtual environment
 ENV_VAR_TEST_LIVE = 'AZURE_TEST_RUN_LIVE'               # denotes that tests should be run live instead of played back

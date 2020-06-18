@@ -1,6 +1,8 @@
 import azdev.utilities.const as const
 import os
 import subprocess
+import azdev.operations.extensions
+from knack.util import CLIError
 
 
 def validate_env():
@@ -44,7 +46,7 @@ def bat_edit(azure_config_path, dot_azure_config, dot_azdev_config):
     if const.AZ_CONFIG_DIR not in content[1]:
         content = content[0:1] + ['set ' + const.AZ_CONFIG_DIR +
                                   '=' + dot_azure_config + '\n',
-                                  'set ' + const.AZ_AZDEV_DIR + 
+                                  'set ' + const.AZ_AZDEV_DIR +
                                   '=' + dot_azdev_config] + content[1::]
         with open(activate_path, "w") as file:
             file.writelines(content)
@@ -77,7 +79,7 @@ def install_cli(cli_path, venv_path):
     executable = None if const.IS_WINDOWS else const.BASH_EXE
     print("\nactivate path is " + str(activate_path))
     subprocess.call(activate_path + delimiter +
-                    'pip install azure-common', shell=True, executable=executable)
+                    'pip install --ignore-installed  azure-common', shell=True, executable=executable)
     subprocess.call(activate_path + delimiter + const.PIP_E_CMD +
                     os.path.join(src_path, 'azure-cli-nspkg'), shell=True, executable=executable)
     subprocess.call(activate_path + delimiter + const.PIP_E_CMD +
@@ -88,3 +90,30 @@ def install_cli(cli_path, venv_path):
                     os.path.join(src_path, 'azure-cli'), shell=True, executable=executable)
     subprocess.call(activate_path + delimiter + const.PIP_E_CMD +
                     os.path.join(src_path, 'azure-cli-testsdk'), shell=True, executable=executable)
+
+
+def install_extensions(venv_path, extensions):
+    activate_path = os.path.join(venv_path, 'Scripts', 'activate') if const.IS_WINDOWS else 'source ' + os.path.join(
+        venv_path, const.UN_BIN, const.UN_ACTIVATE)
+    delimiter = ' && ' if const.IS_WINDOWS else '; '
+    executable = None if const.IS_WINDOWS else const.BASH_EXE
+
+    all_ext = azdev.operations.extensions.list_extensions()
+    print("\nextesions are " + str(extensions))
+    if extensions == ['*']: 
+        for i in all_ext:
+            subprocess.call(activate_path + delimiter + const.PIP_E_CMD + i['path'], shell=True, executable=executable)
+        extensions = False
+    else:
+        extensions = set(extensions)
+    k = 0
+    while k < len(all_ext) and extensions:
+        if all_ext[k]['name'] in extensions:
+            subprocess.call(activate_path + delimiter + const.PIP_E_CMD + all_ext[k]['path'], shell=True, executable=executable)
+            extensions.remove(all_ext[k]['name'])
+        k += 1
+    else:
+        if extensions:
+            print("here?")
+            raise CLIError("The following extensions were not found. Ensure you have added "
+                           "the repo using `--repo/-r PATH`.\n    {}".format('\n    '.join(extensions)))

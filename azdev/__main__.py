@@ -37,7 +37,7 @@ class AzDevCommandsLoader(CLICommandsLoader):
 def main():
     try:
         azdev = AzDevCli(cli_name='azdev', commands_loader_cls=AzDevCommandsLoader,
-                         config_dir=get_azdev_config_dir())
+                         config_dir=get_azdev_config_dir())       
         exit_code = azdev.invoke(sys.argv[1:])
         sys.exit(exit_code)
     except KeyboardInterrupt:
