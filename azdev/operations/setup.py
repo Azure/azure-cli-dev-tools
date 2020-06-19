@@ -122,8 +122,11 @@ def _install_cli(cli_path, deps=None):
         )
 
         pip_cmd("install -e {}/src/azure-cli --no-deps".format(cli_path), "Installing `azure-cli`...")
+
+        # The dependencies of testsdk are not in requirements.txt as this package is not needed by the azure-cli package for running commands.
+        # Here we need to install with dependencies for azdev test.
         pip_cmd(
-            "install -e {}/src/azure-cli-testsdk --no-deps".format(cli_path),
+            "install -e {}/src/azure-cli-testsdk".format(cli_path),
             "Installing `azure-cli-testsdk`..."
         )
         import platform
