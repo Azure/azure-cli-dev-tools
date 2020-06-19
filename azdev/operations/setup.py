@@ -211,8 +211,8 @@ def _interactive_setup():
         # repo directory. To use multiple extension repos or identify a repo outside the cwd, they must specify
         # the path.
         if prompt_y_n('\nDo you plan to develop CLI extensions?'):
-            display('\nGreat! Input the paths for the extension repos you wish to develop for, one per '
-                    'line. You can add as many repos as you like. (TIP: to quickly get started, press RETURN to '
+            display('\nGreat! Input the path for the extension repos you wish to develop for. ' 
+                    '(TIP: to quickly get started, press RETURN to '
                     'use your current working directory).')
             first_repo = True
             while True:
@@ -263,9 +263,11 @@ def _interactive_setup():
 def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None):
     if not set_env:
         require_virtual_env()
+    elif 'VIRTUAL_ENV' in os.environ:
+        raise CLIError("You are already running in a virtual enviroment, yet you want to set a new one up")
 
     start = time.time()
-
+    
     heading('Azure CLI Dev Setup')
     if copy and use_global:
         raise CLIError("copy and use global are mutally exlcusive")
@@ -330,7 +332,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     config = get_azdev_config()
     config.set_value('ext', 'repo_paths', os.path.abspath(ext_repo_path))
     config.set_value('cli', 'repo_path', os.path.abspath(cli_path))
-    if ext: 
+    if ext:
         venv.install_extensions(azure_path, ext)
 
 

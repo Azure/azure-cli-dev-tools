@@ -79,7 +79,7 @@ def install_cli(cli_path, venv_path):
     executable = None if const.IS_WINDOWS else const.BASH_EXE
     print("\nactivate path is " + str(activate_path))
     subprocess.call(activate_path + delimiter +
-                    'pip install --ignore-installed  azure-common', shell=True, executable=executable)
+                    'pip install --ignore-installed azure-common', shell=True, executable=executable)
     subprocess.call(activate_path + delimiter + const.PIP_E_CMD +
                     os.path.join(src_path, 'azure-cli-nspkg'), shell=True, executable=executable)
     subprocess.call(activate_path + delimiter + const.PIP_E_CMD +
@@ -99,7 +99,6 @@ def install_extensions(venv_path, extensions):
     executable = None if const.IS_WINDOWS else const.BASH_EXE
 
     all_ext = azdev.operations.extensions.list_extensions()
-    print("\nextesions are " + str(extensions))
     if extensions == ['*']: 
         for i in all_ext:
             subprocess.call(activate_path + delimiter + const.PIP_E_CMD + i['path'], shell=True, executable=executable)
