@@ -45,7 +45,7 @@ def bad_short_option(linter, command_name, parameter_name):
                         'convert to a long-option.'.format(' | '.join(bad_options)))
 
 
-@ParameterRule(LinterSeverity.HIGH)
+@ParameterRule(LinterSeverity.MEDIUM)
 def parameter_should_not_end_in_resource_group(linter, command_name, parameter_name):
     options_list = linter.get_parameter_options(command_name, parameter_name)
     bad_options = []
