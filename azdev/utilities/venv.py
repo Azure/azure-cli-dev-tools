@@ -3,6 +3,7 @@ import os
 import subprocess
 import azdev.operations.extensions
 from knack.util import CLIError
+from azdev.utilities import display
 
 
 def validate_env():
@@ -77,19 +78,17 @@ def install_cli(cli_path, venv_path):
         venv_path, const.UN_BIN, const.UN_ACTIVATE)
     delimiter = ' && ' if const.IS_WINDOWS else '; '
     executable = None if const.IS_WINDOWS else const.BASH_EXE
-    print("\nactivate path is " + str(activate_path))
-    subprocess.call(activate_path + delimiter +
-                    'pip install --ignore-installed azure-common', shell=True, executable=executable)
-    subprocess.call(activate_path + delimiter + const.PIP_E_CMD +
-                    os.path.join(src_path, 'azure-cli-nspkg'), shell=True, executable=executable)
-    subprocess.call(activate_path + delimiter + const.PIP_E_CMD +
-                    os.path.join(src_path, 'azure-cli-telemetry'), shell=True, executable=executable)
-    subprocess.call(activate_path + delimiter + const.PIP_E_CMD +
-                    os.path.join(src_path, 'azure-cli-core'), shell=True, executable=executable)
-    subprocess.call(activate_path + delimiter + const.PIP_E_CMD +
-                    os.path.join(src_path, 'azure-cli'), shell=True, executable=executable)
-    subprocess.call(activate_path + delimiter + const.PIP_E_CMD +
-                    os.path.join(src_path, 'azure-cli-testsdk'), shell=True, executable=executable)
+    display("\nvenv activate path is " + str(activate_path))
+    subprocess.check_call(activate_path + delimiter + 'pip install --ignore-installed azure-common', stdout=subprocess.DEVNULL, shell=True, executable=executable)
+    display("\nInstalling nspkg ")
+    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-nspkg'), stdout=subprocess.DEVNULL, shell=True, executable=executable)
+    display("\nInstalling telemetry ")
+    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-telemetry'), stdout=subprocess.DEVNULL, shell=True, executable=executable)
+    display("\nInstalling core ")
+    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-core'), stdout=subprocess.DEVNULL, shell=True, executable=executable)
+    display("\nInstalling cli ")
+    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli'), shell=True, executable=executable)
+    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-testsdk'), stdout=subprocess.DEVNULL, shell=True, executable=executable)
 
 
 def install_extensions(venv_path, extensions):
@@ -97,13 +96,14 @@ def install_extensions(venv_path, extensions):
         venv_path, const.UN_BIN, const.UN_ACTIVATE)
     delimiter = ' && ' if const.IS_WINDOWS else '; '
     executable = None if const.IS_WINDOWS else const.BASH_EXE
-
     all_ext = azdev.operations.extensions.list_extensions()
-    if extensions == ['*']: 
+    if extensions == ['*']:
+        display("\nInstalling all extensions")
         for i in all_ext:
             subprocess.call(activate_path + delimiter + const.PIP_E_CMD + i['path'], shell=True, executable=executable)
         extensions = False
     else:
+        display("\nInstalling the following extensions: " + str(extensions))
         extensions = set(extensions)
     k = 0
     while k < len(all_ext) and extensions:
@@ -113,6 +113,5 @@ def install_extensions(venv_path, extensions):
         k += 1
     else:
         if extensions:
-            print("here?")
             raise CLIError("The following extensions were not found. Ensure you have added "
                            "the repo using `--repo/-r PATH`.\n    {}".format('\n    '.join(extensions)))
