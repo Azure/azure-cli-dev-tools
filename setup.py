@@ -60,6 +60,7 @@ setup(
         'azdev.utilities',
     ],
     install_requires=[
+        'python3-venv',
         'docutils',
         'flake8',
         'gitpython',

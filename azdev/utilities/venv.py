@@ -35,7 +35,7 @@ def unix_edit(azure_config_path, dot_azure_config, dot_azdev_config):
         content = [const.AZ_CONFIG_DIR + '=' + dot_azure_config + '\n',
                    const.UN_EXPORT + ' ' + const.AZ_CONFIG_DIR + '\n',
                    const.AZ_AZDEV_DIR + '=' + dot_azdev_config + '\n',
-                   const.UN_EXPORT + ' ' + const.AZ_AZDEV_DIR] + content
+                   const.UN_EXPORT + ' ' + const.AZ_AZDEV_DIR + '\n'] + content
         with open(activate_path, "w") as file:
             file.writelines(content)
 
