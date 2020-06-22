@@ -2,6 +2,11 @@
 
 Release History
 ===============
+0.1.19
+++++++
+* Downgrade parameter_should_not_end_in_resource_group's severity to medium.
+* Fix bug that azdev test could not work on Windows with Chinese system language.
+
 0.1.18
 ++++++
 * Linter Rule Severity: Rules now have an associated severity level. Only high severity rules should be run in CI. All previous rules are annotated as HIGH severity.
