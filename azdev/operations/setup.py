@@ -305,7 +305,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
         else:
             file = open(azdev_config_path, "w")
             file.close()
-    elif not use_global:
+    elif not use_global and not copy:
         os.mkdir(dot_azure_config)
         os.mkdir(dot_azdev_config)
         file = open(azure_config_path, "w")
