@@ -316,7 +316,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
         dot_azure_config, dot_azdev_config = global_az_config, global_azdev_config
         azure_config_path = os.path.join(dot_azure_config, const.CONFIG_NAME)
     else:
-        raise RuntimeError(
+        raise CLIError(
             "Global AZ config is not set up, yet it was specified to be used.")
 
     # set env vars for get azure config and get azdev config
