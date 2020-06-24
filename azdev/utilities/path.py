@@ -5,10 +5,11 @@
 # -----------------------------------------------------------------------------
 
 import os
+import azdev.utilities.const as const
 from glob import glob
 import sys
 from knack.util import CLIError
-
+from azdev.utilities import get_azure_config
 from .const import COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, ENV_VAR_VIRTUAL_ENV
 
 
@@ -119,7 +120,11 @@ def make_dirs(path):
 def get_name_index(invert=False, include_whl_extensions=False):
     """ Returns a dictionary containing the long and short names of modules and extensions is {SHORT:LONG} format or
         {LONG:SHORT} format when invert=True. """
-    from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
+    config = get_azure_config() # pylint: disable=import-error
+    try:
+        EXTENSIONS_DIR = config.get(const.EXT_SECTION, const.AZ_DEV_SRC)
+    except:
+        raise CLIError("Could not find extensions path in the config or the path is not valid.")
 
     table = {}
     cli_repo_path = get_cli_repo_path()
@@ -190,7 +195,11 @@ def get_path_table(include_only=None, include_whl_extensions=False):
         }
     }
     """
-    from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
+    config = get_azure_config() # pylint: disable=import-error
+    try:
+        EXTENSIONS_DIR = config.get(const.EXT_SECTION, const.AZ_DEV_SRC)
+    except:
+        raise CLIError("Could not find extensions path in the config or the path is not valid.")
 
     # determine whether the call will filter or return all
     if isinstance(include_only, str):
@@ -200,6 +209,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     table = {}
     cli_repo_path = get_cli_repo_path()
     ext_repo_paths = get_ext_repo_paths()
+    os.chdir(EXTENSIONS_DIR)
 
     paths = os.path.normcase(
         os.path.join(

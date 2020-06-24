@@ -5,13 +5,12 @@
 # -----------------------------------------------------------------------------
 
 import os
-
+import subprocess
 from knack.log import get_logger
+from azdev.utilities import const, display
 
-from azdev.utilities import call
 
-
-def get_test_runner(parallel, log_path, last_failed, no_exit_first):
+def get_test_runner(parallel, log_path, last_failed, no_exit_first, clean):
     """Create a pytest execution method"""
     def _run(test_paths, pytest_args):
 
@@ -25,7 +24,7 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first):
         if no_exit_first:
             arguments.remove('-x')
 
-        arguments.extend(test_paths)
+        # arguments.extend(test_paths)
         if parallel:
             arguments += ['-n', 'auto']
         if last_failed:
@@ -33,7 +32,24 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first):
         if pytest_args:
             arguments += pytest_args
         cmd = 'python -m pytest {}'.format(' '.join(arguments))
-        logger.info('Running: %s', cmd)
-        return call(cmd)
+        failed, k = False, 0
+        while k < len(test_paths) and not failed:
+            cmd = ("python " + ('-B ' if clean else '') +
+                   "-m pytest {}").format(' '.join([test_paths[k]] + arguments))
+            print("running cmd " + str(cmd))
+            try:
+                subprocess.check_call(cmd.split(), shell=const.IS_WINDOWS)
+            except subprocess.CalledProcessError:
+                failed = True
+
+            if failed and clean:
+                display("Test failed, cleaning up recordings")
+                recordings = os.path.join(test_paths[k], 'recordings')
+                if os.path.isdir(recordings):
+                    recording_files = os.listdir(recordings)
+                    [os.remove(os.path.join(recordings, file))
+                     for file in recording_files if file.endswith(".yaml")]
+            logger.info('Running: %s', cmd)
+            k += 1
 
     return _run
