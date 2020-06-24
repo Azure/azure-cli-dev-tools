@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.20
+++++++
+* `azdev setup`: Fix missing dependencies of azure-cli-testsdk
+
 0.1.19
 ++++++
 * Downgrade parameter_should_not_end_in_resource_group's severity to medium.
