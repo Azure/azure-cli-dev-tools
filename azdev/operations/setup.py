@@ -273,7 +273,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
         raise CLIError("copy and use global are mutally exlcusive")
     if cli_path == "pypi" and any([use_global, copy, set_env]):
         raise CLIError("pypi for cli path is mutally exlcusive with global copy and set env")
-    if not any([cli_path, ext_repo_path, ext]) or cli_path == "pypi":
+    if not any([cli_path, ext_repo_path, ext]) or cli_path == "pypi" or (not cli_path and ext_repo_path):
         return _handle_legacy(cli_path, ext_repo_path, ext, deps, start)
 
     if set_env:
@@ -334,7 +334,10 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     config.set_value('cli', 'repo_path', os.path.abspath(cli_path))
     if ext:
         venv.install_extensions(azure_path, ext)
-
+    display("\n======================================================================")
+    display("The setup was successful. Please run or re-run the virtual\n" +
+          "environment activation script.\n")
+    display("======================================================================\n")
 
 def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):
 
