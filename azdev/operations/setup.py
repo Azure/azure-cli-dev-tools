@@ -334,10 +334,15 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     config.set_value('cli', 'repo_path', os.path.abspath(cli_path))
     if ext:
         venv.install_extensions(azure_path, ext)
-    display("\n======================================================================")
-    display("The setup was successful. Please run or re-run the virtual\n" +
-          "environment activation script.\n")
-    display("======================================================================\n")
+    if not set_env:
+        display("\n======================================================================")
+        display("The setup was successful. Please run or re-run the virtual\n" +
+            "environment activation script.\n")
+        display("======================================================================\n")
+    else:
+        display("\n======================================================================")
+        display("The setup was successful.")
+        display("======================================================================\n")
 
 def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):
 
