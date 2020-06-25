@@ -269,11 +269,20 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     start = time.time()
     
     heading('Azure CLI Dev Setup')
+
+    # validation
     if copy and use_global:
         raise CLIError("copy and use global are mutally exlcusive")
-    if cli_path == "pypi" and any([use_global, copy, set_env]):
-        raise CLIError("pypi for cli path is mutally exlcusive with global copy and set env")
-    if not any([cli_path, ext_repo_path, ext]) or cli_path == "pypi" or (not cli_path and ext_repo_path):
+    if not cli_path or not ext_repo_path:
+        if cli_path == "pypi" and any([use_global, copy, set_env]):
+            raise CLIError("pypi for cli path is mutally exlcusive with global copy and set env")
+        if (cli_path or ext_repo_path) and any([use_global, copy, set_env]):
+            raise CLIError("if global, copy, or set env are set then both an extensions repo and a cli repo must be specified")
+        if any([use_global, copy, set_env]):
+            raise CLIError("if global, copy, or set env are set then both an extensions repo and a cli repo must be specified")
+
+    # cases for handling legacy install
+    if not any([cli_path, ext_repo_path]) or cli_path == "pypi" or (not cli_path or not ext_repo_path):
         return _handle_legacy(cli_path, ext_repo_path, ext, deps, start)
 
     if set_env:
@@ -287,7 +296,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     dot_azdev_config = os.path.join(azure_path, '.azdev')
 
     # clean up venv dirs if they already existed
-    # and this is a reinstall
+    # and this is a reinstall/new setup
     if os.path.isdir(dot_azure_config):
         shutil.rmtree(dot_azure_config)
     if os.path.isdir(dot_azdev_config):
@@ -303,15 +312,14 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
         if os.path.isdir(global_azdev_config):
             shutil.copytree(global_azdev_config, dot_azdev_config)
         else:
+            os.mkdir(dot_azdev_config)
             file = open(azdev_config_path, "w")
             file.close()
     elif not use_global and not copy:
         os.mkdir(dot_azure_config)
         os.mkdir(dot_azdev_config)
-        file = open(azure_config_path, "w")
-        file.close()
-        file = open(azdev_config_path, "w")
-        file.close()
+        file_az, file_dev = open(azure_config_path, "w"), open(azdev_config_path, "w")
+        file_az.close(), file_dev.close
     elif os.path.isdir(global_az_config):
         dot_azure_config, dot_azdev_config = global_az_config, global_azdev_config
         azure_config_path = os.path.join(dot_azure_config, const.CONFIG_NAME)
@@ -334,15 +342,17 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     config.set_value('cli', 'repo_path', os.path.abspath(cli_path))
     if ext:
         venv.install_extensions(azure_path, ext)
+
     if not set_env:
         display("\n======================================================================")
         display("The setup was successful. Please run or re-run the virtual\n" +
-            "environment activation script.\n")
+                "environment activation script.\n")
         display("======================================================================\n")
     else:
         display("\n======================================================================")
         display("The setup was successful.")
         display("======================================================================\n")
+
 
 def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):
 

@@ -46,7 +46,7 @@ def load_arguments(self, _):
         c.argument('xml_path', options_list='--xml-path', help='Path and filename at which to store the results in XML format. If omitted, the file will be saved as `test_results.xml` in your `.azdev` directory.')
         c.argument('in_series', options_list='--series', action='store_true', help='Disable test parallelization.')
         c.argument('run_live', options_list='--live', action='store_true', help='Run all tests live.')
-        c.argument('clean', options_list='--clean', action='store_true', help='Will clean up cache always if selected and will clean recordings if live is not selected.')
+        c.argument('clean', options_list='--clean', action='store_true', help='Will clean up cache and will clean recordings for a failed test scenario.')
 
         c.positional('tests', nargs='*',
                      help="Space-separated list of tests to run. Can specify module or extension names, test filenames, class name or individual method names. "
