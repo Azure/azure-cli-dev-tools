@@ -158,14 +158,11 @@ helps['extension'] = """
 
 
 helps['extension create'] = """
-    short-summary: Create a new Azure CLI extension template.
+    short-summary: Create a new Azure CLI extension.
     examples:
-        - name: Scaffold a new CLI extension named 'contoso'.
-          text: azdev extension create contoso
-        - name: Scaffold a new CLI extension with the azure-mgmt-contoso SDK.
+        - name: Generate a new CLI extension named 'contoso'.
           text: >
-            azdev extension create contoso --local-sdk {sdkPath} --operation-name ContosoOperations
-            --client-name ContosoManagementClient --sdk-property contoso_name
+            azdev extension create contoso --azure-rest-api-specs {azure-rest-api-specs repo path}
 """
 
 
