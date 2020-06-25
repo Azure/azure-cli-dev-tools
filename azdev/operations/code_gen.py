@@ -6,9 +6,11 @@
 
 from __future__ import print_function
 
+import azdev.utilities.const as const
 import json
 import os
 import re
+import subprocess
 
 from knack.log import get_logger
 from knack.prompting import prompt_y_n, prompt
@@ -55,24 +57,41 @@ def create_module(mod_name='test', display_name=None, display_name_plural=None, 
     _display_success_message(COMMAND_MODULE_PREFIX + mod_name, mod_name)
 
 
-def create_extension(ext_name='test', repo_name='azure-cli-extensions',
-                     display_name=None, display_name_plural=None,
-                     required_sdk=None, client_name=None, operation_name=None, sdk_property=None,
-                     not_preview=False, github_alias=None, local_sdk=None):
+def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_URL):
+    import urllib.request, urllib.error
+
+    repo_name = const.EXT_REPO_NAME
     repo_path = None
     repo_paths = get_ext_repo_paths()
     repo_path = next((x for x in repo_paths if x.endswith(repo_name)), None)
-
     if not repo_path:
         raise CLIError('Unable to find `{}` repo. Have you cloned it and added '
                        'with `azdev extension repo add`?'.format(repo_name))
+    
+    swagger_readme_file_path = None
+    if azure_rest_api_specs == const.GITHUB_SWAGGER_REPO_URL:
+        swagger_readme_file_path = azure_rest_api_specs + '/blob/master/specification/' + ext_name + '/resource-manager'
+        # validate URL
+        try:
+            urllib.request.urlopen(swagger_readme_file_path)
+        except urllib.error.HTTPError as ex:
+            raise CLIError('HTTPError: {}\nThe URL {} does not exist.'.format(ex.code, swagger_readme_file_path))
+    else:
+        swagger_readme_file_path = os.path.join(azure_rest_api_specs, 'specification', ext_name, 'resource-manager')
+        if not os.path.isdir(swagger_readme_file_path):
+            raise CLIError("The path {} does not exist.".format(swagger_readme_file_path))
+    
+    heading('Start generating extension {}. '.format(ext_name))
+    # install autorest
+    subprocess.check_output('npm install -g autorest', shell=True)
+    # update autorest core
+    subprocess.check_output('autorest --latest', shell=True)
+    cmd = const.AUTO_REST_CMD + \
+        str(repo_path) + ' ' + str(swagger_readme_file_path)
+    display(cmd)
+    subprocess.call(cmd, shell=True)
 
-    _create_package(EXTENSION_PREFIX, os.path.join(repo_path, 'src'), True, ext_name, display_name,
-                    display_name_plural, required_sdk, client_name, operation_name, sdk_property, not_preview,
-                    local_sdk)
-    _add_to_codeowners(repo_path, EXTENSION_PREFIX, ext_name, github_alias)
-
-    _display_success_message(EXTENSION_PREFIX + ext_name, ext_name)
+    _display_success_message(ext_name, ext_name)
 
 
 def _display_success_message(package_name, group_name):
