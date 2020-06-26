@@ -39,8 +39,7 @@ def get_env_path():
         env_path = os.environ.get(item)
         if env_path:
             break
-    return env_path if env_path else sys.executable
-
+    return env_path
 
 def get_azdev_repo_path():
     """ Return the path to the azdev repo root.
