@@ -5,12 +5,12 @@
 # -----------------------------------------------------------------------------
 
 import os
-import azdev.utilities.const as const
+from . import const
 from glob import glob
 import sys
 from knack.util import CLIError
 from azdev.utilities import get_azure_config
-from .const import COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, ENV_VAR_VIRTUAL_ENV
+# from .const import COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, ENV_VAR_VIRTUAL_ENV
 
 
 def extract_module_name(path):
@@ -35,7 +35,7 @@ def get_env_path():
     :returns: Path (str) to the virtual env or None.
     """
     env_path = None
-    for item in ENV_VAR_VIRTUAL_ENV:
+    for item in const.ENV_VAR_VIRTUAL_ENV:
         env_path = os.environ.get(item)
         if env_path:
             break
@@ -153,15 +153,15 @@ def get_name_index(invert=False, include_whl_extensions=False):
             if key == 'ext':
                 short_name = base_name
                 for item in os.listdir(folder):
-                    if item.startswith(EXTENSION_PREFIX):
+                    if item.startswith(const.EXTENSION_PREFIX):
                         long_name = item
                         break
-            elif base_name.startswith(COMMAND_MODULE_PREFIX):
+            elif base_name.startswith(const.COMMAND_MODULE_PREFIX):
                 long_name = base_name
-                short_name = base_name.replace(COMMAND_MODULE_PREFIX, '') or '__main__'
+                short_name = base_name.replace(const.COMMAND_MODULE_PREFIX, '') or '__main__'
             else:
                 short_name = base_name
-                long_name = '{}{}'.format(COMMAND_MODULE_PREFIX, base_name)
+                long_name = '{}{}'.format(const.COMMAND_MODULE_PREFIX, base_name)
             if not invert:
                 table[short_name] = long_name
             else:
@@ -230,10 +230,10 @@ def get_path_table(include_only=None, include_whl_extensions=False):
 
             if key == 'ext':
                 short_name = base_name
-                long_name = next((item for item in os.listdir(folder) if item.startswith(EXTENSION_PREFIX)), None)
+                long_name = next((item for item in os.listdir(folder) if item.startswith(const.EXTENSION_PREFIX)), None)
             else:
                 short_name = base_name
-                long_name = '{}{}'.format(COMMAND_MODULE_PREFIX, base_name)
+                long_name = '{}{}'.format(const.COMMAND_MODULE_PREFIX, base_name)
 
             if get_all:
                 table[key][long_name if key == 'ext' else short_name] = folder
