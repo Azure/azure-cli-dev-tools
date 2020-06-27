@@ -83,7 +83,7 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
         if not os.path.isdir(swagger_readme_file_path):
             raise CLIError("The path {} does not exist.".format(swagger_readme_file_path))
     
-    heading('Start generating extension {}. '.format(ext_name))
+    heading('Start generating extension {}.'.format(ext_name))
     # install autorest
     try:
         subprocess.run('npm install -g autorest', shell=True, check=True)
@@ -98,6 +98,11 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
         subprocess.run(cmd, shell=True, check=True)
     except subprocess.CalledProcessError as ex:
         raise CLIError(ex)
+
+    new_package_path = os.path.join(repo_path, 'src', ext_name)
+    result = pip_cmd('install -e {}'.format(new_package_path), "Adding extension `{}`...".format(new_package_path))
+    if result.error:
+        raise result.error
     
     _display_success_message(ext_name, ext_name)
 

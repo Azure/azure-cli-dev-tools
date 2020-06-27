@@ -4,7 +4,6 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-import azdev.utilities.const as const
 import os
 from . import const
 from glob import glob
