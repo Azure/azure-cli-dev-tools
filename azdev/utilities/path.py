@@ -4,6 +4,7 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+import azdev.utilities.const as const
 import os
 from . import const
 from glob import glob
@@ -71,9 +72,9 @@ def get_ext_repo_paths():
     :returns: Path (str) to Azure CLI dev extension repos.
     """
     from configparser import NoSectionError
-    from .config import get_azdev_config
+    from .config import get_azure_config
     try:
-        return get_azdev_config().get('ext', 'repo_paths').split(',')
+        return get_azure_config().get(const.EXT_SECTION, const.AZ_DEV_SRC).split(',')
     except NoSectionError:
         raise CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup`.')
 
