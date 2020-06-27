@@ -85,14 +85,20 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
     
     heading('Start generating extension {}. '.format(ext_name))
     # install autorest
-    subprocess.check_output('npm install -g autorest', shell=True)
+    try:
+        subprocess.run('npm install -g autorest', shell=True, check=True)
+    except subprocess.CalledProcessError as ex:
+        raise CLIError(ex)
     # update autorest core
     subprocess.check_output('autorest --latest', shell=True)
     cmd = const.AUTO_REST_CMD + \
         str(repo_path) + ' ' + str(swagger_readme_file_path)
     display(cmd)
-    subprocess.call(cmd, shell=True)
-
+    try:
+        subprocess.run(cmd, shell=True, check=True)
+    except subprocess.CalledProcessError as ex:
+        raise CLIError(ex)
+    
     _display_success_message(ext_name, ext_name)
 
 
