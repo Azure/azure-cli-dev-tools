@@ -205,10 +205,14 @@ def _config_file_path(style_type="pylint"):
         "flake8": ".flake8",
     }
     default_config_file_mapping = {
-        "cli_pylintrc": "cli_pylintrc",
-        "ext_pylintrc": "ext_pylintrc",
-        "cli.flake8": "cli.flake8",
-        "ext.flake8": "ext.flake8",
+        "cli": {
+            "pylint": "cli_pylintrc",
+            "flake8": "cli.flake8"
+        },
+        "ext": {
+            "pylint": "ext_pylintrc",
+            "flake8": "ext.flake8"
+        }
     }
 
     if cli_repo_path:
@@ -217,7 +221,7 @@ def _config_file_path(style_type="pylint"):
         cli_config_path = os.path.join(
             get_azdev_config_dir(),
             "config_files",
-            default_config_file_mapping["cli_pylintrc"],
+            default_config_file_mapping["cli"][style_type],
         )
 
     if ext_repo_path:
@@ -226,7 +230,7 @@ def _config_file_path(style_type="pylint"):
         ext_config_path = os.path.join(
             get_azdev_config_dir(),
             "config_files",
-            default_config_file_mapping["ext_pylintrc"],
+            default_config_file_mapping["ext"][style_type],
         )
 
     return cli_config_path, ext_config_path
