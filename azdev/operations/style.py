@@ -14,7 +14,7 @@ from knack.util import CLIError, CommandResultItem
 
 from azdev.utilities import (
     display, heading, subheading, py_cmd, get_path_table, EXTENSION_PREFIX,
-    get_azdev_config_dir, require_azure_cli, filter_by_git_diff)
+    get_azdev_config, get_azdev_config_dir, require_azure_cli, filter_by_git_diff)
 
 
 logger = get_logger(__name__)
@@ -125,62 +125,108 @@ def _combine_command_result(cli_result, ext_result):
                     final_result.result += item.result
                 else:
                     final_result.result = item.result
+
     apply_result(cli_result)
     apply_result(ext_result)
     return final_result
 
 
 def _run_pylint(modules):
-
     def get_core_module_paths(modules):
         core_paths = []
-        for p in modules['core'].values():
+        for p in modules["core"].values():
             _, tail = os.path.split(p)
-            for x in str(tail).split('-'):
+            for x in str(tail).split("-"):
                 p = os.path.join(p, x)
             core_paths.append(p)
         return core_paths
 
-    cli_paths = get_core_module_paths(modules) + list(modules['mod'].values())
+    cli_paths = get_core_module_paths(modules) + list(modules["mod"].values())
 
     ext_paths = []
-    for path in list(modules['ext'].values()):
-        glob_pattern = os.path.normcase(os.path.join('{}*'.format(EXTENSION_PREFIX)))
+    for path in list(modules["ext"].values()):
+        glob_pattern = os.path.normcase(os.path.join("{}*".format(EXTENSION_PREFIX)))
         ext_paths.append(glob(os.path.join(path, glob_pattern))[0])
 
     def run(paths, rcfile, desc):
         if not paths:
             return None
-        config_path = os.path.join(get_azdev_config_dir(), 'config_files', rcfile)
-        logger.info('Using rcfile file: %s', config_path)
-        logger.info('Running on %s: %s', desc, ' '.join(paths))
-        command = 'pylint {} --ignore vendored_sdks,privates --rcfile={} -j {}'.format(
-            ' '.join(paths),
-            config_path,
-            multiprocessing.cpu_count())
-        return py_cmd(command, message='Running pylint on {}...'.format(desc))
+        logger.warning("Using rcfile file: %s", rcfile)
+        logger.warning("Running on %s: %s", desc, " ".join(paths))
+        command = "pylint {} --ignore vendored_sdks,privates --rcfile={} -j {}".format(
+            " ".join(paths), rcfile, multiprocessing.cpu_count()
+        )
+        return py_cmd(command, message="Running pylint on {}...".format(desc))
 
-    cli_result = run(cli_paths, 'cli_pylintrc', 'modules')
-    ext_result = run(ext_paths, 'ext_pylintrc', 'extensions')
+    cli_pylintrc, ext_pylintrc = _config_file_path("pylint")
+
+    cli_result = run(cli_paths, cli_pylintrc, "modules")
+    ext_result = run(ext_paths, ext_pylintrc, "extensions")
     return _combine_command_result(cli_result, ext_result)
 
 
 def _run_pep8(modules):
 
-    cli_paths = list(modules['core'].values()) + list(modules['mod'].values())
-    ext_paths = list(modules['ext'].values())
+    cli_paths = list(modules["core"].values()) + list(modules["mod"].values())
+    ext_paths = list(modules["ext"].values())
 
-    def run(paths, config_file, desc):
+    def run(paths, rcfile, desc):
         if not paths:
             return None
-        config_path = os.path.join(get_azdev_config_dir(), 'config_files', config_file)
-        logger.info('Using config file: %s', config_path)
-        logger.info('Running on %s: %s', desc, ' '.join(paths))
-        command = 'flake8 --statistics --append-config={} {}'.format(
-            config_path,
-            ' '.join(paths))
-        return py_cmd(command, message='Running flake8 on {}...'.format(desc))
+        logger.warning("Using config file: %s", rcfile)
+        logger.warning("Running on %s: %s", desc, " ".join(paths))
+        command = "flake8 --statistics --append-config={} {}".format(
+            rcfile, " ".join(paths)
+        )
+        return py_cmd(command, message="Running flake8 on {}...".format(desc))
 
-    cli_result = run(cli_paths, 'cli.flake8', 'modules')
-    ext_result = run(ext_paths, 'ext.flake8', 'extensions')
+    cli_config, ext_config = _config_file_path("flake8")
+
+    cli_result = run(cli_paths, cli_config, "modules")
+    ext_result = run(ext_paths, ext_config, "extensions")
     return _combine_command_result(cli_result, ext_result)
+
+
+def _config_file_path(style_type="pylint"):
+    cli_repo_path = get_azdev_config().get("cli", "repo_path")
+
+    ext_repo_path = list(
+        filter(
+            lambda x: "azure-cli-extension" in x,
+            get_azdev_config().get("ext", "repo_paths").split(),
+        )
+    )[0]
+
+    if style_type not in ["pylint", "flake8"]:
+        raise ValueError("style_tyle value allows only: pylint, flake8.")
+
+    config_file_mapping = {
+        "pylint": "pylintrc",
+        "flake8": ".flake8",
+    }
+    default_config_file_mapping = {
+        "cli_pylintrc": "cli_pylintrc",
+        "ext_pylintrc": "ext_pylintrc",
+        "cli.flake8": "cli.flake8",
+        "ext.flake8": "ext.flake8",
+    }
+
+    if cli_repo_path:
+        cli_config_path = os.path.join(cli_repo_path, config_file_mapping[style_type])
+    else:
+        cli_config_path = os.path.join(
+            get_azdev_config_dir(),
+            "config_files",
+            default_config_file_mapping["cli_pylintrc"],
+        )
+
+    if ext_repo_path:
+        ext_config_path = os.path.join(ext_repo_path, config_file_mapping[style_type])
+    else:
+        ext_config_path = os.path.join(
+            get_azdev_config_dir(),
+            "config_files",
+            default_config_file_mapping["ext_pylintrc"],
+        )
+
+    return cli_config_path, ext_config_path
