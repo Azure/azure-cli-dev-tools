@@ -190,12 +190,14 @@ def _run_pep8(modules):
 def _config_file_path(style_type="pylint"):
     cli_repo_path = get_azdev_config().get("cli", "repo_path")
 
-    ext_repo_path = list(
-        filter(
-            lambda x: "azure-cli-extension" in x,
-            get_azdev_config().get("ext", "repo_paths").split(),
-        )
-    )[0]
+    ext_repo_path = filter(
+        lambda x: "azure-cli-extension" in x,
+        get_azdev_config().get("ext", "repo_paths").split(),
+    )
+    try:
+        ext_repo_path = next(ext_repo_path)
+    except StopIteration:
+        ext_repo_path = []
 
     if style_type not in ["pylint", "flake8"]:
         raise ValueError("style_tyle value allows only: pylint, flake8.")
