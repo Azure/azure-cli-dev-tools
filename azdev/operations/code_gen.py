@@ -63,10 +63,12 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
     repo_name = const.EXT_REPO_NAME
     repo_path = None
     repo_paths = get_ext_repo_paths()
-    repo_path = next((x for x in repo_paths if x.endswith(repo_name)), None)
+    repo_path = next((x for x in repo_paths if x.endswith(repo_name) or x.endswith(repo_name + '\\')), None)
     if not repo_path:
         raise CLIError('Unable to find `{}` repo. Have you cloned it and added '
                        'with `azdev extension repo add`?'.format(repo_name))
+    if not os.path.isdir(repo_path):
+        raise CLIError("Invalid path {} in .azure config.".format(repo_path))
     
     swagger_readme_file_path = None
     if azure_rest_api_specs == const.GITHUB_SWAGGER_REPO_URL:
@@ -81,16 +83,39 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
         if not os.path.isdir(swagger_readme_file_path):
             raise CLIError("The path {} does not exist.".format(swagger_readme_file_path))
     
-    heading('Start generating extension {}. '.format(ext_name))
-    # install autorest
-    subprocess.check_output('npm install -g autorest', shell=True)
+    heading('Start generating extension {}.'.format(ext_name))
+    # check if npm is installed
+    try:
+        subprocess.run('npm --version', shell=True, check=True, stdout=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as ex:
+        raise CLIError(ex)
+    # check if autorest is installed
+    try:
+        subprocess.run('npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as ex:
+        display('Installing autorest.\nMay need to provide your password if you are using non-windows system.\n')
+        try:
+            if const.IS_WINDOWS:
+                subprocess.run('npm install -g autorest', shell=True, check=True)
+            else:
+                subprocess.run('sudo npm install -g autorest', shell=True, check=True)
+        except subprocess.CalledProcessError as ex:
+            raise CLIError("Failed to install autorest.\n{}".format(ex))
     # update autorest core
     subprocess.check_output('autorest --latest', shell=True)
     cmd = const.AUTO_REST_CMD + \
         str(repo_path) + ' ' + str(swagger_readme_file_path)
     display(cmd)
-    subprocess.call(cmd, shell=True)
+    try:
+        subprocess.run(cmd, shell=True, check=True)
+    except subprocess.CalledProcessError as ex:
+        raise CLIError(ex)
 
+    new_package_path = os.path.join(repo_path, 'src', ext_name)
+    result = pip_cmd('install -e {}'.format(new_package_path), "Adding extension `{}`...".format(new_package_path))
+    if result.error:
+        raise result.error
+    
     _display_success_message(ext_name, ext_name)
 
 
