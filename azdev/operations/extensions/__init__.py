@@ -143,7 +143,6 @@ def _get_sha256sum(a_file):
 
 
 def add_extension_repo(repos):
-
     from azdev.operations.setup import _check_repo
     az_config = get_azure_config()
     env_config = get_azdev_config()
@@ -156,7 +155,6 @@ def add_extension_repo(repos):
             dev_sources.append(repo)
     az_config.set_value('extension', 'dev_sources', ','.join(dev_sources))
     env_config.set_value('ext', 'repo_paths', ','.join(dev_sources))
-
     return list_extension_repos()
 
 
