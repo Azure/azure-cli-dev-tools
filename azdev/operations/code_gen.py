@@ -84,11 +84,23 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
             raise CLIError("The path {} does not exist.".format(swagger_readme_file_path))
     
     heading('Start generating extension {}.'.format(ext_name))
-    # install autorest
+    # check if npm is installed
     try:
-        subprocess.run('npm install -g autorest', shell=True, check=True)
+        subprocess.run('npm --version', shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as ex:
         raise CLIError(ex)
+    # check if autorest is installed
+    try:
+        subprocess.run('npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as ex:
+        display('Installing autorest.\nMay need to provide your password if you are using non-windows system.\n')
+        try:
+            if const.IS_WINDOWS:
+                subprocess.run('npm install -g autorest', shell=True, check=True)
+            else:
+                subprocess.run('sudo npm install -g autorest', shell=True, check=True)
+        except subprocess.CalledProcessError as ex:
+            raise CLIError("Failed to install autorest.\n{}".format(ex))
     # update autorest core
     subprocess.check_output('autorest --latest', shell=True)
     cmd = const.AUTO_REST_CMD + \
