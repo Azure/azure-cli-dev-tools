@@ -59,9 +59,9 @@ def create_module(mod_name='test', display_name=None, display_name_plural=None, 
 
 
 def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_URL, use=None):
-    require_virtual_env()
-    import urllib.request, urllib.error
+    from urllib import request, error
 
+    require_virtual_env()
     repo_name = const.EXT_REPO_NAME
     repo_path = None
     repo_paths = get_ext_repo_paths()
@@ -73,12 +73,12 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
         raise CLIError("Invalid path {} in .azure config.".format(repo_path))
     
     swagger_readme_file_path = None
-    if azure_rest_api_specs == const.GITHUB_SWAGGER_REPO_URL:
+    if azure_rest_api_specs == const.GITHUB_SWAGGER_REPO_URL or azure_rest_api_specs.startswith('https://') and azure_rest_api_specs.endswith(const.SWAGGER_REPO_NAME):
         swagger_readme_file_path = '{}/blob/master/specification/{}/resource-manager'.format(azure_rest_api_specs, ext_name)
         # validate URL
         try:
-            urllib.request.urlopen(swagger_readme_file_path)
-        except urllib.error.HTTPError as ex:
+            request.urlopen(swagger_readme_file_path)
+        except error.HTTPError as ex:
             raise CLIError('HTTPError: {}\nThe URL {} does not exist.'.format(ex.code, swagger_readme_file_path))
     else:
         swagger_readme_file_path = os.path.join(azure_rest_api_specs, 'specification', ext_name, 'resource-manager')
@@ -94,7 +94,7 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
     # check if autorest is installed
     try:
         subprocess.run('npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as ex:
+    except subprocess.CalledProcessError:
         display('Installing autorest.\n')
         try:
             if const.IS_WINDOWS:
@@ -107,9 +107,9 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
     # update autorest core
     subprocess.check_output('autorest --latest', shell=True)
     if not use:
-        cmd = const.AUTO_REST_CMD+'{} {}'.format(repo_path, swagger_readme_file_path)
+        cmd = const.AUTO_REST_CMD + '{} {}'.format(repo_path, swagger_readme_file_path)
     else:
-        cmd = const.AUTO_REST_CMD+'{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
+        cmd = const.AUTO_REST_CMD + '{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
     display(cmd)
     try:
         subprocess.run(cmd, shell=True, check=True)

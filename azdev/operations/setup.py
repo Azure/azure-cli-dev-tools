@@ -211,7 +211,7 @@ def _interactive_setup():
         # repo directory. To use multiple extension repos or identify a repo outside the cwd, they must specify
         # the path.
         if prompt_y_n('\nDo you plan to develop CLI extensions?'):
-            display('\nGreat! Input the path for the extension repos you wish to develop for. ' 
+            display('\nGreat! Input the path for the extension repos you wish to develop for. '
                     '(TIP: to quickly get started, press RETURN to '
                     'use your current working directory).')
             first_repo = True
@@ -265,7 +265,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
         try:
             require_virtual_env()
         except:
-            raise CLIError('You are not running in a virtual enviroment and have not chosen to set one up.')        
+            raise CLIError('You are not running in a virtual enviroment and have not chosen to set one up.')  
     elif 'VIRTUAL_ENV' in os.environ:
         raise CLIError("You are already running in a virtual enviroment, yet you want to set a new one up")
     
@@ -349,14 +349,9 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
         venv.install_extensions(azure_path, ext)
 
     if not set_env:
-        display("\n======================================================================")
-        display("The setup was successful. Please run or re-run the virtual\n" +
-                "environment activation script.\n")
-        display("======================================================================\n")
+        heading("The setup was successful! Please run or re-run the virtual environment activation script.")
     else:
-        display("\n======================================================================")
-        display("The setup was successful.")
-        display("======================================================================\n")
+        heading("The setup was successful!")
 
 
 def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):
@@ -392,7 +387,7 @@ def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):
             # add extension repo(s)
             add_extension_repo(ext_repo_path)
             display('Azure CLI extension repos:\n    {}'.format(
-                '\n    '.join([os.path.abspath(x) for x in ext_repo_path]))) 
+                '\n    '.join([os.path.abspath(x) for x in ext_repo_path])))
 
         if ext == ['*']:
             ext_to_install = [x['path'] for x in list_extensions()]

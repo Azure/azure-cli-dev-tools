@@ -36,8 +36,6 @@ UN_ACTIVATE = 'activate'
 UN_EXPORT = 'export'
 BAT_ACTIVATE = 'activate.bat'
 BASH_EXE = '/bin/bash'
-GIT_CLONE_CMD = 'git clone --no-checkout '
-GIT_SPARSE_CHECKOUT_CMD = 'git sparse-checkout set '
 GITHUB_SWAGGER_REPO_URL = 'https://github.com/Azure/azure-rest-api-specs'
 SWAGGER_REPO_NAME = 'azure-rest-api-specs'
 
