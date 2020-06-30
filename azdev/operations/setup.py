@@ -390,8 +390,6 @@ def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):
         get_azure_config().set_value('extension', 'dev_sources', '')
         if ext_repo_path:
             # add extension repo(s)
-            print("ext repo path ")
-            print(ext_repo_path)
             add_extension_repo(ext_repo_path)
             display('Azure CLI extension repos:\n    {}'.format(
                 '\n    '.join([os.path.abspath(x) for x in ext_repo_path]))) 

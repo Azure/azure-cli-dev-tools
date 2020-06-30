@@ -57,7 +57,7 @@ def create_module(mod_name='test', display_name=None, display_name_plural=None, 
     _display_success_message(COMMAND_MODULE_PREFIX + mod_name, mod_name)
 
 
-def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_URL):
+def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_URL, use=None):
     import urllib.request, urllib.error
 
     repo_name = const.EXT_REPO_NAME
@@ -88,23 +88,26 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
     try:
         subprocess.run('npm --version', shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as ex:
-        raise CLIError(ex)
+        raise CLIError('{}\nPlease install npm.'.format(ex))
     # check if autorest is installed
     try:
         subprocess.run('npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as ex:
-        display('Installing autorest.\nMay need to provide your password if you are using non-windows system.\n')
+        display('Installing autorest.\n')
         try:
             if const.IS_WINDOWS:
                 subprocess.run('npm install -g autorest', shell=True, check=True)
             else:
+                display('May need to provide your password.\n')
                 subprocess.run('sudo npm install -g autorest', shell=True, check=True)
         except subprocess.CalledProcessError as ex:
             raise CLIError("Failed to install autorest.\n{}".format(ex))
     # update autorest core
     subprocess.check_output('autorest --latest', shell=True)
-    cmd = const.AUTO_REST_CMD + \
-        str(repo_path) + ' ' + str(swagger_readme_file_path)
+    if not use:
+        cmd = const.AUTO_REST_CMD+'{} {}'.format(repo_path, swagger_readme_file_path)
+    else:
+        cmd = const.AUTO_REST_CMD+'{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
     display(cmd)
     try:
         subprocess.run(cmd, shell=True, check=True)

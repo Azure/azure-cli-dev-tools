@@ -160,9 +160,15 @@ helps['extension'] = """
 helps['extension create'] = """
     short-summary: Create a new Azure CLI extension.
     examples:
-        - name: Generate a new CLI extension named 'contoso'.
+        - name: Generate a new CLI extension named 'contoso' with local or remote azure-rest-api-specs repo.
           text: >
             azdev extension create contoso --azure-rest-api-specs {azure-rest-api-specs repo path}
+        - name: Generate a new CLI extension named 'contoso' with the default azure-rest-api-specs repo.
+          text: >
+            azdev extension create contoso
+        - name: Generate a new CLI extension named 'contoso' with specified autorest.az release.
+          text: >
+            azdev extension create contoso --use=https://github.com/Azure/autorest.az/releases/download/1.4.0/autorest-az-1.4.0.tgz
 """
 
 
