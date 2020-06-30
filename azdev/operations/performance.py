@@ -158,7 +158,7 @@ def benchmark(command_prefixes=None, top=20, runs=20):
 
     def _process_pool_init():
         import signal
-        def sigint_dummay_pass():
+        def sigint_dummay_pass(signal_num, frame):
             pass
         signal.signal(signal.SIGINT, sigint_dummay_pass)
 
