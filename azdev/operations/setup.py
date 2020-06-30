@@ -21,7 +21,7 @@ from azdev.params import Flag
 import azdev.utilities.const as const
 import azdev.utilities.venv as venv
 from azdev.utilities import (
-    display, heading, subheading, pip_cmd, find_file,
+    display, heading, subheading, pip_cmd, find_file, get_env_path,
     get_azdev_config_dir, get_azdev_config, require_virtual_env, get_azure_config)
 
 logger = get_logger(__name__)
@@ -262,9 +262,7 @@ def _interactive_setup():
 
 def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None):
     if not set_env:
-        try:
-            require_virtual_env()
-        except:
+        if not get_env_path():
             raise CLIError('You are not running in a virtual enviroment and have not chosen to set one up.')  
     elif 'VIRTUAL_ENV' in os.environ:
         raise CLIError("You are already running in a virtual enviroment, yet you want to set a new one up")
