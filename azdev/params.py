@@ -100,6 +100,8 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')
+        c.argument('commands', help="")
+        c.argument('top', type=int, help='Show N slowest commands. 0 for all.')
 
     with ArgumentsContext(self, 'extension') as c:
         c.argument('dist_dir', help='Name of a directory in which to save the resulting WHL files.')

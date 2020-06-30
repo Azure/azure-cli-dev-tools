@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import re
+import timeit
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -104,19 +105,23 @@ def check_load_time(runs=3):
 FAILED: Some modules failed. If values are close to the threshold, rerun. If values
 are large, check that you do not have top-level imports like azure.mgmt or msrestazure
 in any modified files.
-""")
+"""
+        )
 
-    display('== PASSED MODULES ==')
+    display("== PASSED MODULES ==")
     display_table(passed_mods)
-    display('\nPASSED: Average load time all modules: {} ms'.format(
-        int(passed_mods[TOTAL]['average'])))
+    display(
+        "\nPASSED: Average load time all modules: {} ms".format(
+            int(passed_mods[TOTAL]["average"])
+        )
+    )
 
 
 def mean(data):
     """Return the sample arithmetic mean of data."""
     n = len(data)
     if n < 1:
-        raise ValueError('len < 1')
+        raise ValueError("len < 1")
     return sum(data) / float(n)
 
 
@@ -140,3 +145,105 @@ def display_table(data):
     for key, val in data.items():
         display('{:<20} {:>12.0f} {:>12.0f} {:>12.0f} {:>25}'.format(
             key, val['average'], val['threshold'], val['stdev'], str(val['values'])))
+
+
+# require azdev setup
+def benchmark(command_prefixes=None, top=20, runs=20):
+    if runs <= 0:
+        raise CLIError("Number of runs must be greater than 0.")
+
+    import multiprocessing
+    from azure.cli.core import get_default_cli
+    from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args
+
+    def _process_pool_init():
+        import signal
+        def sigint_dummay_pass():
+            pass
+        signal.signal(signal.SIGINT, sigint_dummay_pass)
+
+    # load command table
+    az_cli = get_default_cli()
+    create_invoker_and_load_cmds_and_args(az_cli)
+    command_table = az_cli.invocation.commands_loader.command_table
+
+    line_head = "| {cmd:<35s} | {min:10s} | {max:10s} | {avg:10s} | {mid:10s} | {std:10s} | {runs:10s} |".format(
+        cmd="Command",
+        min="Min",
+        max="Max",
+        avg="Mean",
+        mid="Median",
+        std="Std",
+        runs="Runs",
+    )
+    line_tmpl = "| {cmd:<35s} | {min:10s} | {max:10s} | {avg:10s} | {mid:10s} | {std:10s} | {runs:10s} |"
+
+    logger.warning(line_head)
+    logger.warning("-" * 120)
+
+    # Measure every wanted commands
+    for raw_command in command_table:
+        cmd_tpl = "az {} -h --verbose".format(raw_command)
+
+        logger.info("Measuring %s...", raw_command)
+
+        pool = multiprocessing.Pool(multiprocessing.cpu_count(), _process_pool_init)
+        try:
+            time_series = pool.map_async(_benchmark_cmd_timer, [cmd_tpl] * runs).get(1000)
+        except multiprocessing.TimeoutError:
+            pool.terminate()
+            break
+        else:
+            pool.close()
+        pool.join()
+
+        staticstic = _benchmark_cmd_staticstic(time_series)
+
+        line_body = line_tmpl.format(
+            cmd=raw_command,
+            min=str(staticstic["min"]),
+            max=str(staticstic["max"]),
+            avg=str(staticstic["avg"]),
+            mid=str(staticstic["media"]),
+            std=str(staticstic["std"]),
+            runs=str(runs),
+        )
+        logger.warning(line_body)
+
+    logger.warning("-" * 100)
+
+
+def _benchmark_cmd_timer(cmd_tpl):
+    s = timeit.default_timer()
+    cmd(cmd_tpl)
+    e = timeit.default_timer()
+    return round(e - s, 4)
+
+
+def _benchmark_cmd_staticstic(time_series: list):
+    from math import sqrt
+
+    time_series.sort()
+
+    size = len(time_series)
+
+    if size % 2 == 0:
+        mid_time = (time_series[size // 2 - 1] + time_series[size // 2]) / 2
+    else:
+        mid_time = time_series[(size - 1) // 2]
+
+    min_time = time_series[0]
+    max_time = time_series[-1]
+    avg_time = sum(time_series) / size
+
+    std_deviation = sqrt(
+        sum([(t - avg_time) * (t - avg_time) for t in time_series]) / size
+    )
+
+    return {
+        "min": round(min_time, 4),
+        "max": round(max_time, 4),
+        "media": round(mid_time, 4),
+        "avg": round(avg_time, 4),
+        "std": round(std_deviation, 4),
+    }

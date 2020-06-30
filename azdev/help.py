@@ -144,6 +144,9 @@ helps['perf load-times'] = """
     short-summary: Verify that all modules load within an acceptable timeframe.
 """
 
+helps['perf benchmark'] = """
+    short-summary: Display benchmark staticstic of Azure CLI (Extensions) commands
+"""
 
 helps['extension'] = """
     short-summary: Control which CLI extensions are visible in the development environment.
