@@ -193,7 +193,7 @@ def benchmark(command_prefixes=None, runs=20):
     )
 
     logger.warning(line_head)
-    logger.warning("-" * (80 + len(max_len_cmd)))
+    logger.warning("-" * (85 + len(max_len_cmd)))
 
     # Measure every wanted commands
     for raw_command in command_table:
@@ -224,7 +224,7 @@ def benchmark(command_prefixes=None, runs=20):
         )
         logger.warning(line_body)
 
-    logger.warning("-" * 120)
+    logger.warning("-" * (85 + len(max_len_cmd)))
 
 
 def _benchmark_cmd_timer(cmd_tpl):
