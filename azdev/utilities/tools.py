@@ -5,8 +5,7 @@
 # -----------------------------------------------------------------------------
 
 from knack.util import CLIError
-
-import azdev.utilities.const as const
+from . import const
 import os
 
 
