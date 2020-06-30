@@ -18,7 +18,7 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     pip_cmd, display, heading, COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, get_cli_repo_path, get_ext_repo_paths,
-    find_files)
+    find_files, require_virtual_env)
 
 logger = get_logger(__name__)
 
@@ -48,6 +48,7 @@ def _generate_files(env, generation_kwargs, file_list, dest_path):
 def create_module(mod_name='test', display_name=None, display_name_plural=None, required_sdk=None,
                   client_name=None, operation_name=None, sdk_property=None, not_preview=False, github_alias=None,
                   local_sdk=None):
+    require_virtual_env()
     repo_path = os.path.join(get_cli_repo_path(), _MODULE_ROOT_PATH)
     _create_package('', repo_path, False, mod_name, display_name, display_name_plural,
                     required_sdk, client_name, operation_name, sdk_property, not_preview, local_sdk)
@@ -58,6 +59,7 @@ def create_module(mod_name='test', display_name=None, display_name_plural=None, 
 
 
 def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_URL, use=None):
+    require_virtual_env()
     import urllib.request, urllib.error
 
     repo_name = const.EXT_REPO_NAME
@@ -72,7 +74,7 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
     
     swagger_readme_file_path = None
     if azure_rest_api_specs == const.GITHUB_SWAGGER_REPO_URL:
-        swagger_readme_file_path = azure_rest_api_specs + '/blob/master/specification/' + ext_name + '/resource-manager'
+        swagger_readme_file_path = '{}/blob/master/specification/{}/resource-manager'.format(azure_rest_api_specs, ext_name)
         # validate URL
         try:
             urllib.request.urlopen(swagger_readme_file_path)

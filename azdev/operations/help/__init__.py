@@ -20,7 +20,8 @@ from knack.log import get_logger
 from azure.cli.core.extension.operations import list_available_extensions, list_extensions as list_cli_extensions  # pylint: disable=import-error
 from azdev.utilities import (
     display, heading, subheading,
-    get_cli_repo_path, get_path_table
+    get_cli_repo_path, get_path_table,
+    require_virtual_env
 )
 
 from azdev.utilities.tools import require_azure_cli
@@ -85,6 +86,7 @@ def _help_files_not_in_map(cli_repo, help_files_in_map):
 
 
 def generate_cli_ref_docs(output_dir=None, output_type=None, all_profiles=None):
+    require_virtual_env()
     # require that azure cli installed and warn the users if extensions are installed.
     require_azure_cli()
     output_dir = _process_ref_doc_output_dir(output_dir)
@@ -105,6 +107,7 @@ def generate_cli_ref_docs(output_dir=None, output_type=None, all_profiles=None):
 
 
 def generate_extension_ref_docs(output_dir=None, output_type=None):
+    require_virtual_env()
     # require that azure cli installed
     require_azure_cli()
     output_dir = _process_ref_doc_output_dir(output_dir)

@@ -16,13 +16,14 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     cmd, py_cmd, pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_azdev_config,
-    require_azure_cli, heading, subheading, EXTENSION_PREFIX)
+    require_azure_cli, require_virtual_env, heading, subheading, EXTENSION_PREFIX)
 
 logger = get_logger(__name__)
 
 
 def add_extension(extensions):
-
+    
+    require_virtual_env()
     ext_paths = get_ext_repo_paths()
     all_extensions = find_files(ext_paths, 'setup.py')
 
@@ -48,6 +49,7 @@ def add_extension(extensions):
 
 def remove_extension(extensions):
 
+    require_virtual_env()
     ext_paths = get_ext_repo_paths()
     installed_paths = find_files(ext_paths, '*.*-info')
     paths_to_remove = []
@@ -104,6 +106,7 @@ def _get_installed_dev_extensions(dev_sources):
 def list_extensions():
     from glob import glob
 
+    require_virtual_env()
     azure_config = get_azure_config()
     dev_sources = azure_config.get('extension', 'dev_sources', None)
     dev_sources = dev_sources.split(',') if dev_sources else []
@@ -144,6 +147,8 @@ def _get_sha256sum(a_file):
 
 def add_extension_repo(repos):
     from azdev.operations.setup import _check_repo
+    
+    require_virtual_env()
     az_config = get_azure_config()
     env_config = get_azdev_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
@@ -160,6 +165,7 @@ def add_extension_repo(repos):
 
 def remove_extension_repo(repos):
 
+    require_virtual_env()
     az_config = get_azure_config()
     env_config = get_azdev_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
@@ -176,6 +182,7 @@ def remove_extension_repo(repos):
 
 def list_extension_repos():
 
+    require_virtual_env()
     az_config = get_azure_config()
     dev_sources = az_config.get('extension', 'dev_sources', None)
     return dev_sources.split(',') if dev_sources else dev_sources
@@ -187,6 +194,7 @@ def update_extension_index(extensions):
 
     from .util import get_ext_metadata, get_whl_from_url
 
+    require_virtual_env()
     ext_repos = get_ext_repo_paths()
     index_path = next((x for x in find_files(ext_repos, 'index.json') if 'azure-cli-extensions' in x), None)
     if not index_path:
@@ -243,6 +251,9 @@ def update_extension_index(extensions):
 
 
 def build_extensions(extensions, dist_dir='dist'):
+    
+    require_virtual_env()
+
     ext_paths = get_ext_repo_paths()
     all_extensions = find_files(ext_paths, 'setup.py')
 
@@ -272,6 +283,7 @@ def publish_extensions(extensions, storage_account, storage_account_key, storage
                        dist_dir='dist', update_index=False, yes=False):
     from azure.storage.blob import BlockBlobService
 
+    require_virtual_env()
     heading('Publish Extensions')
 
     require_azure_cli()
