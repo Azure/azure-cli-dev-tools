@@ -145,7 +145,7 @@ helps['perf load-times'] = """
 """
 
 helps['perf benchmark'] = """
-    short-summary: Display benchmark staticstic of Azure CLI (Extensions) commands
+    short-summary: Display benchmark staticstic of Azure CLI (Extensions) commands via execute it with -h.
 """
 
 helps['extension'] = """

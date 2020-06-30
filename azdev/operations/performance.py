@@ -183,7 +183,7 @@ def benchmark(command_prefixes=None, top=20, runs=20):
 
     # Measure every wanted commands
     for raw_command in command_table:
-        cmd_tpl = "az {} -h --verbose".format(raw_command)
+        cmd_tpl = "az {} -h".format(raw_command)
 
         logger.info("Measuring %s...", raw_command)
 
