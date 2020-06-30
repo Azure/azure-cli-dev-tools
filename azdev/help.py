@@ -145,7 +145,10 @@ helps['perf load-times'] = """
 """
 
 helps['perf benchmark'] = """
-    short-summary: Display benchmark staticstic of Azure CLI (Extensions) commands via execute it with -h.
+    short-summary: Display benchmark staticstic of Azure CLI (Extensions) commands via execute it with -h in a separate process.
+    examples:
+        - name: Run benchmark on "network application-gateway" and "storage account"
+          text: azdev perf benchmark --prefix "network application-gateway" --prefix "storage account"
 """
 
 helps['extension'] = """

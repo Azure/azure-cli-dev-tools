@@ -148,7 +148,7 @@ def display_table(data):
 
 
 # require azdev setup
-def benchmark(command_prefixes=None, top=20, runs=20):
+def benchmark(command_prefixes=None, runs=20):
     if runs <= 0:
         raise CLIError("Number of runs must be greater than 0.")
 
@@ -158,16 +158,31 @@ def benchmark(command_prefixes=None, top=20, runs=20):
 
     def _process_pool_init():
         import signal
+
         def sigint_dummay_pass(signal_num, frame):  # pylint: disable=unused-argument
             pass
+
         signal.signal(signal.SIGINT, sigint_dummay_pass)
 
     # load command table
     az_cli = get_default_cli()
     create_invoker_and_load_cmds_and_args(az_cli)
-    command_table = az_cli.invocation.commands_loader.command_table
+    raw_command_table = az_cli.invocation.commands_loader.command_table
 
-    line_head = "| {cmd:<35s} | {min:10s} | {max:10s} | {avg:10s} | {mid:10s} | {std:10s} | {runs:10s} |".format(
+    command_table = []
+    if command_prefixes:
+        for k in raw_command_table:
+            if any(prefix for prefix in command_prefixes if k.startswith(prefix)):
+                command_table.append(k)
+    else:
+        command_table = list(raw_command_table.keys())
+
+    max_len_cmd = max(command_table, key=len)
+
+    line_tmpl = "| {" + "cmd:" + "<" + str(len(max_len_cmd)) + "s} |"
+    line_tmpl = line_tmpl + " {min:10s} | {max:10s} | {avg:10s} | {mid:10s} | {std:10s} | {runs:10s} |"
+
+    line_head = line_tmpl.format(
         cmd="Command",
         min="Min",
         max="Max",
@@ -176,10 +191,9 @@ def benchmark(command_prefixes=None, top=20, runs=20):
         std="Std",
         runs="Runs",
     )
-    line_tmpl = "| {cmd:<35s} | {min:10s} | {max:10s} | {avg:10s} | {mid:10s} | {std:10s} | {runs:10s} |"
 
     logger.warning(line_head)
-    logger.warning("-" * 120)
+    logger.warning("-" * (80 + len(max_len_cmd)))
 
     # Measure every wanted commands
     for raw_command in command_table:
@@ -210,7 +224,7 @@ def benchmark(command_prefixes=None, top=20, runs=20):
         )
         logger.warning(line_body)
 
-    logger.warning("-" * 100)
+    logger.warning("-" * 120)
 
 
 def _benchmark_cmd_timer(cmd_tpl):

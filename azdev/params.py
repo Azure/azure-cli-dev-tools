@@ -11,6 +11,7 @@ from knack.arguments import ArgumentsContext, CLIArgumentType
 
 from azdev.completer import get_test_completion
 from azdev.operations.linter import linter_severity_choices
+from azdev.operations.actions import PerfBenchmarkCommandPrefixAction
 
 
 class Flag(object):
@@ -100,7 +101,11 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')
-        c.argument('commands', help="")
+        c.argument('command_prefixes',
+                   nargs="+",
+                   action=PerfBenchmarkCommandPrefixAction,
+                   options_list="--prefix",
+                   help="Command prefix to run benchmark")
         c.argument('top', type=int, help='Show N slowest commands. 0 for all.')
 
     with ArgumentsContext(self, 'extension') as c:
