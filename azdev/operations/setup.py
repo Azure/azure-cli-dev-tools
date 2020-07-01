@@ -295,8 +295,8 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     _check_paths(cli_path, ext_repo_path)
 
     if set_env:
-        subprocess.call(shlex.split((const.VENV_CMD if const.IS_WINDOWS else const.VENV_CMD3) + set_env),
-                        shell=False)
+        subprocess.call(shlex.split((const.VENV_CMD if const.IS_WINDOWS else const.VENV_CMD3) +
+                        set_env), shell=False)
         azure_path = os.path.join(os.path.abspath(os.getcwd()), set_env)
     else:
         azure_path = os.environ.get(const.VIRTUAL_ENV)
