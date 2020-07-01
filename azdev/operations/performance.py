@@ -105,8 +105,7 @@ def check_load_time(runs=3):
 FAILED: Some modules failed. If values are close to the threshold, rerun. If values
 are large, check that you do not have top-level imports like azure.mgmt or msrestazure
 in any modified files.
-"""
-        )
+""")
 
     display("== PASSED MODULES ==")
     display_table(passed_mods)
