@@ -6,7 +6,6 @@
 
 from __future__ import print_function
 
-import azdev.utilities.const as const
 import json
 import os
 import re
@@ -16,9 +15,12 @@ from knack.log import get_logger
 from knack.prompting import prompt_y_n, prompt
 from knack.util import CLIError
 
+import azdev.utilities.const as const
+
 from azdev.utilities import (
     pip_cmd, display, heading, COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, get_cli_repo_path, get_ext_repo_paths,
     find_files, require_virtual_env)
+
 
 logger = get_logger(__name__)
 
@@ -59,8 +61,6 @@ def create_module(mod_name='test', display_name=None, display_name_plural=None, 
 
 
 def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_URL, use=None):
-    from urllib import request, error
-
     require_virtual_env()
     repo_name = const.EXT_REPO_NAME
     repo_path = None
@@ -71,56 +71,10 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
                        'with `azdev extension repo add`?'.format(repo_name))
     if not os.path.isdir(repo_path):
         raise CLIError("Invalid path {} in .azure config.".format(repo_path))
-    
-    swagger_readme_file_path = None
-    if azure_rest_api_specs == const.GITHUB_SWAGGER_REPO_URL or azure_rest_api_specs.startswith('https://') and azure_rest_api_specs.endswith(const.SWAGGER_REPO_NAME):
-        swagger_readme_file_path = '{}/blob/master/specification/{}/resource-manager'.format(azure_rest_api_specs, ext_name)
-        # validate URL
-        try:
-            request.urlopen(swagger_readme_file_path)
-        except error.HTTPError as ex:
-            raise CLIError('HTTPError: {}\nThe URL {} does not exist.'.format(ex.code, swagger_readme_file_path))
-    else:
-        swagger_readme_file_path = os.path.join(azure_rest_api_specs, 'specification', ext_name, 'resource-manager')
-        if not os.path.isdir(swagger_readme_file_path):
-            raise CLIError("The path {} does not exist.".format(swagger_readme_file_path))
-    
-    heading('Start generating extension {}.'.format(ext_name))
-    # check if npm is installed
-    try:
-        subprocess.run('npm --version', shell=True, check=True, stdout=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as ex:
-        raise CLIError('{}\nPlease install npm.'.format(ex))
-    # check if autorest is installed
-    try:
-        subprocess.run('npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError:
-        display('Installing autorest.\n')
-        try:
-            if const.IS_WINDOWS:
-                subprocess.run('npm install -g autorest', shell=True, check=True)
-            else:
-                display('May need to provide your password.\n')
-                subprocess.run('sudo npm install -g autorest', shell=True, check=True)
-        except subprocess.CalledProcessError as ex:
-            raise CLIError("Failed to install autorest.\n{}".format(ex))
-    # update autorest core
-    subprocess.check_output('autorest --latest', shell=True)
-    if not use:
-        cmd = const.AUTO_REST_CMD + '{} {}'.format(repo_path, swagger_readme_file_path)
-    else:
-        cmd = const.AUTO_REST_CMD + '{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
-    display(cmd)
-    try:
-        subprocess.run(cmd, shell=True, check=True)
-    except subprocess.CalledProcessError as ex:
-        raise CLIError(ex)
+    swagger_readme_file_path = _get_swagger_readme_file_path(ext_name, azure_rest_api_specs)
+    _generate_extension(ext_name, repo_path, swagger_readme_file_path, use)
+    _add_extension(ext_name, repo_path)
 
-    new_package_path = os.path.join(repo_path, 'src', ext_name)
-    result = pip_cmd('install -e {}'.format(new_package_path), "Adding extension `{}`...".format(new_package_path))
-    if result.error:
-        raise result.error
-    
     _display_success_message(ext_name, ext_name)
 
 
@@ -349,3 +303,61 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
         result = pip_cmd('install -e {}'.format(new_package_path), "Installing `{}{}`...".format(prefix, name))
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
+
+def _get_swagger_readme_file_path(ext_name, swagger_repo):
+    from urllib import request, error
+
+    swagger_readme_file_path = None
+    if swagger_repo == const.GITHUB_SWAGGER_REPO_URL or \
+            (swagger_repo.startswith('https://') and swagger_repo.endswith(const.SWAGGER_REPO_NAME)):
+        swagger_readme_file_path = '{}/blob/master/specification/{}/resource-manager'.format(
+            swagger_repo, ext_name)
+        # validate URL
+        try:
+            request.urlopen(swagger_readme_file_path)
+        except error.HTTPError as ex:
+            raise CLIError('HTTPError: {}\nThe URL {} does not exist.'.format(ex.code, swagger_readme_file_path))
+    else:
+        swagger_readme_file_path = os.path.join(swagger_repo, 'specification', ext_name, 'resource-manager')
+        if not os.path.isdir(swagger_readme_file_path):
+            raise CLIError("The path {} does not exist.".format(swagger_readme_file_path))
+    return swagger_readme_file_path
+
+def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
+    heading('Start generating extension {}.'.format(ext_name))
+    # check if npm is installed
+    try:
+        subprocess.run('npm --version', shell=True, check=True, stdout=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as ex:
+        raise CLIError('{}\nPlease install npm.'.format(ex))
+    # check if autorest is installed
+    try:
+        subprocess.run('npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError:
+        display('Installing autorest.\n')
+        try:
+            if const.IS_WINDOWS:
+                subprocess.run('npm install -g autorest', shell=True, check=True)
+            else:
+                display('May need to provide your password.\n')
+                subprocess.run('sudo npm install -g autorest', shell=True, check=True)
+        except subprocess.CalledProcessError as ex:
+            raise CLIError("Failed to install autorest.\n{}".format(ex))
+    # update autorest core
+    subprocess.check_output('autorest --latest', shell=True)
+    if not use:
+        cmd = const.AUTO_REST_CMD + '{} {}'.format(repo_path, swagger_readme_file_path)
+    else:
+        cmd = const.AUTO_REST_CMD + '{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
+    display(cmd)
+    try:
+        subprocess.run(cmd, shell=True, check=True)
+    except subprocess.CalledProcessError as ex:
+        raise CLIError(ex)
+
+def _add_extension(ext_name, repo_path):
+    new_package_path = os.path.join(repo_path, 'src', ext_name)
+    result = pip_cmd('install -e {}'.format(new_package_path), "Adding extension `{}`...".format(new_package_path))
+    if result.error:
+        raise result.error

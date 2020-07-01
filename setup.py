@@ -69,7 +69,7 @@ setup(
         'knack',
         'mock',
         'pytest>=4.4.0',
-        'pytest-xdist', # depends on pytest-forked
+        'pytest-xdist',  # depends on pytest-forked
         'pyyaml',
         'requests',
         'sphinx==1.6.7',
