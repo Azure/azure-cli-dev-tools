@@ -327,7 +327,7 @@ jobs:
       displayName: 'Use Python $(python.version)'
       inputs:
         versionSpec: '$(python.version)'
-    - bash: |
+    - script: |
         set -ev
         python -m venv env
         .\venv36\Scripts\activate.bat
@@ -339,12 +339,12 @@ jobs:
 
         azdev --version
       displayName: 'Azdev Setup'
-    - bash: |
+    - script: |
         set -ev
         .\venv36\Scripts\activate.bat
         azdev perf load-times
       displayName: "Load Performance"
-    - bash: |
+    - script: |
         set -ev
         .\venv36\Scripts\activate.bat
         azdev perf benchmark "version" "network vnet -h" "rest -h" "storage account"
