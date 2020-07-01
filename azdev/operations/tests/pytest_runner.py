@@ -35,7 +35,7 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, clean):
         while k < len(test_paths) and not failed:
             cmd = ("python " + ('-B ' if clean else '') +
                    "-m pytest {}").format(' '.join([test_paths[k]] + arguments))
-            print("running cmd " + str(cmd))
+            display("running cmd " + str(cmd))
             try:
                 subprocess.check_call(cmd.split(), shell=const.IS_WINDOWS)
             except subprocess.CalledProcessError:
