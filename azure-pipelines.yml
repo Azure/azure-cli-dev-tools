@@ -280,6 +280,11 @@ jobs:
       Python38:
         python.version: '3.8'
   steps:
+    - task: DownloadPipelineArtifact@1
+      displayName: 'Download Build'
+      inputs:
+        TargetPath: '$(Build.ArtifactStagingDirectory)/pypi'
+        artifactName: pypi
     - task: UsePythonVersion@0
       displayName: 'Use Python $(python.version)'
       inputs:
@@ -288,10 +293,6 @@ jobs:
         set -ev
         . scripts/ci/install.sh
         azdev --version
-
-        git clone https://github.com/Azure/azure-cli.git
-        git clone https://github.com/Azure/azure-cli-extensions.git
-        azdev setup -c ./azure-cli -r ./azure-cli-extensions
       displayName: 'Azdev Setup'
     - bash: |
         set -ev
