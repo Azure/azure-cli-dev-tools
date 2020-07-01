@@ -147,39 +147,11 @@ def display_table(data):
 
 
 # require azdev setup
-def benchmark(command_prefixes=None, runs=20):
+def benchmark(commands, runs=20):
     if runs <= 0:
         raise CLIError("Number of runs must be greater than 0.")
 
-    import multiprocessing
-    from azure.cli.core import get_default_cli
-    from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args
-
-    def _process_pool_init():
-        import signal
-
-        def sigint_dummay_pass(signal_num, frame):  # pylint: disable=unused-argument
-            pass
-
-        signal.signal(signal.SIGINT, sigint_dummay_pass)
-
-    # load command table
-    az_cli = get_default_cli()
-    create_invoker_and_load_cmds_and_args(az_cli)
-    raw_command_table = az_cli.invocation.commands_loader.command_table
-
-    command_table = []
-    if command_prefixes:
-        for k in raw_command_table:
-            if any(prefix for prefix in command_prefixes if k.startswith(prefix)):
-                command_table.append(k)
-    else:
-        command_table = list(raw_command_table.keys())
-
-    if not command_table:
-        raise CLIError("No command could be run")
-
-    max_len_cmd = max(command_table, key=len)
+    max_len_cmd = max(commands, key=len)
 
     line_tmpl = "| {" + "cmd:" + "<" + str(len(max_len_cmd)) + "s} |"
     line_tmpl = line_tmpl + " {min:10s} | {max:10s} | {avg:10s} | {mid:10s} | {std:10s} | {runs:10s} |"
@@ -197,8 +169,18 @@ def benchmark(command_prefixes=None, runs=20):
     logger.warning(line_head)
     logger.warning("-" * (85 + len(max_len_cmd)))
 
+    import multiprocessing
+
+    def _process_pool_init():
+        import signal
+
+        def sigint_dummay_pass(signal_num, frame):  # pylint: disable=unused-argument
+            pass
+
+        signal.signal(signal.SIGINT, sigint_dummay_pass)
+
     # Measure every wanted commands
-    for raw_command in command_table:
+    for raw_command in commands:
         logger.info("Measuring %s...", raw_command)
 
         pool = multiprocessing.Pool(multiprocessing.cpu_count(), _process_pool_init)
@@ -229,7 +211,7 @@ def benchmark(command_prefixes=None, runs=20):
 
 def _benchmark_cmd_timer(raw_command):
     s = timeit.default_timer()
-    py_cmd("azure.cli {} -h".format(raw_command), is_module=True)
+    py_cmd("azure.cli {}".format(raw_command), is_module=True)
     e = timeit.default_timer()
     return round(e - s, 4)
 
