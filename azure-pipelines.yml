@@ -41,7 +41,7 @@ jobs:
     inputs:
       targetType: 'filePath'
       filePath: scripts/ci/run_tox.sh
-      
+
 - job: Tox38
   displayName: 'Tox: Python 3.8'
   condition: succeeded()
@@ -267,3 +267,42 @@ jobs:
       # verify azdev style works
       azdev style redis
     displayName: 'Test azdev style'
+
+- job: PerformanceCheck
+  displayName: "PerformanceCheck"
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python38:
+        python.version: '3.8'
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(python.version)'
+    inputs:
+      versionSpec: '$(python.version)'
+  - bash: |
+      python -m venv env
+      chmod +x env/bin/activate
+      . env/bin/activate
+
+      pip install -e .
+      azdev --version
+
+      git clone https://github.com/Azure/azure-cli.git
+      git clone https://github.com/Azure/azure-cli-extensions.git
+
+      azdev setup -c ./azure-cli -r ./azure-cli-extensions
+    displayName: 'Azdev Setup'
+  - bash: |
+      set -ev
+      . env/bin/activate
+      azdev perf load-times
+    displayName: "Load Performance"
+  - bash: |
+      set -ev
+      . env/bin/activate
+      azdev perf benchmark --prefix "version" --prefix "network vnet"
+    displayName: "Execution Performance"
