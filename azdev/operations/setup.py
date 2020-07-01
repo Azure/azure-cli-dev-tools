@@ -157,6 +157,7 @@ def _copy_config_files():
     # remove the python __init__ files
     pattern = os.path.join(dest_path, '*.py*')
     for path in glob(pattern):
+        print("removing ")
         os.remove(path)
 
 
@@ -352,6 +353,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     config = get_azdev_config()
     config.set_value('ext', 'repo_paths', os.path.abspath(ext_repo_path))
     config.set_value('cli', 'repo_path', os.path.abspath(cli_path))
+    _copy_config_files()
     if ext:
         venv.install_extensions(azure_path, ext)
 
