@@ -299,7 +299,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     if not any([cli_path, ext_repo_path]) or cli_path == "pypi" or (not cli_path or not ext_repo_path):
         return _handle_legacy(cli_path, ext_repo_path, ext, deps, time.time())
     if 'CONDA_PREFIX' in os.environ:
-        raise CLIError('CONDA virutal enviroments are not supported outside' 
+        raise CLIError('CONDA virutal enviroments are not supported outside'
                        ' of interactive mode or when -c and -r are provided')
     _check_paths(cli_path, ext_repo_path)
 
