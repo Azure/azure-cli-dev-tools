@@ -22,7 +22,7 @@ logger = get_logger(__name__)
 
 
 def add_extension(extensions):
-    
+
     require_virtual_env()
     ext_paths = get_ext_repo_paths()
     all_extensions = find_files(ext_paths, 'setup.py')
@@ -147,7 +147,7 @@ def _get_sha256sum(a_file):
 
 def add_extension_repo(repos):
     from azdev.operations.setup import _check_repo
-    
+
     require_virtual_env()
     az_config = get_azure_config()
     env_config = get_azdev_config()
@@ -251,7 +251,7 @@ def update_extension_index(extensions):
 
 
 def build_extensions(extensions, dist_dir='dist'):
-    
+
     require_virtual_env()
 
     ext_paths = get_ext_repo_paths()

@@ -40,6 +40,7 @@ def get_env_path():
             break
     return env_path
 
+
 def get_azdev_repo_path():
     """ Return the path to the azdev repo root.
 
@@ -120,7 +121,7 @@ def make_dirs(path):
 def get_name_index(invert=False, include_whl_extensions=False):
     """ Returns a dictionary containing the long and short names of modules and extensions is {SHORT:LONG} format or
         {LONG:SHORT} format when invert=True. """
-    config = get_azure_config() # pylint: disable=import-error
+    config = get_azure_config()  # pylint: disable=import-error
     try:
         EXTENSIONS_DIR = config.get(const.EXT_SECTION, const.AZ_DEV_SRC)
     except:
@@ -195,7 +196,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
         }
     }
     """
-    config = get_azure_config() # pylint: disable=import-error
+    config = get_azure_config()  # pylint: disable=import-error
     try:
         EXTENSIONS_DIR = config.get(const.EXT_SECTION, const.AZ_DEV_SRC)
     except:

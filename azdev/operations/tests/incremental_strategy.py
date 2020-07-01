@@ -41,6 +41,7 @@ class CLIAzureDevOpsContext(AzureDevOpsContext):
     """
     Assemble strategy of incremental test on Azure DevOps Environment for Azure CLI
     """
+
     def __init__(self, git_repo, git_source, git_target):
         super().__init__(git_repo, git_source, git_target)
 
