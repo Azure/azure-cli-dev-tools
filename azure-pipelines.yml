@@ -302,5 +302,5 @@ jobs:
     - bash: |
         set -ev
         . env/bin/activate
-        azdev perf benchmark --prefix "version" --prefix "network vnet "
+        azdev perf benchmark "version" "network vnet -h" "rest -h" "storage account"
       displayName: "Execution Performance"
