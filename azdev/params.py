@@ -35,7 +35,7 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'setup') as c:
         c.argument('cli_path', options_list=['--cli', '-c'], type=str, help="Path to an existing Azure CLI repo. Use special value 'EDGE' to install the latest developer edge build.")
-        c.argument('ext_repo_path', options_list=['--repo', '-r'], type=str, help='Paths to existing Azure CLI extensions repos.')
+        c.argument('ext_repo_path', options_list=['--repo', '-r'], type=str, help='Path to existing Azure CLI extensions repos.')
         c.argument('ext', options_list=['--ext', '-e'], nargs='+', help="Space-separated list of extensions to install initially. Use '*' to install all extensions.")
         c.argument('deps', options_list=['--deps-from', '-d'], choices=['requirements.txt', 'setup.py'], default='requirements.txt', help="Choose the file to resolve dependencies.")
         c.argument('set_env', options_list=['--set-env', '-s'], type=str, help="Will create a virtual enviroment with the given evn name")
