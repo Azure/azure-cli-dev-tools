@@ -304,6 +304,7 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
 
+
 def _get_swagger_readme_file_path(ext_name, swagger_repo):
     from urllib import request, error
 
@@ -323,6 +324,7 @@ def _get_swagger_readme_file_path(ext_name, swagger_repo):
             raise CLIError("The path {} does not exist.".format(swagger_readme_file_path))
     return swagger_readme_file_path
 
+
 def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
     heading('Start generating extension {}.'.format(ext_name))
     # check if npm is installed
@@ -332,8 +334,8 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
         raise CLIError('{}\nPlease install npm.'.format(ex))
     # check if autorest is installed
     try:
-        subprocess.run('npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT)
+        subprocess.run(
+            'npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError:
         display('Installing autorest.\n')
         try:
@@ -355,6 +357,7 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
         subprocess.run(cmd, shell=True, check=True)
     except subprocess.CalledProcessError as ex:
         raise CLIError(ex)
+
 
 def _add_extension(ext_name, repo_path):
     new_package_path = os.path.join(repo_path, 'src', ext_name)

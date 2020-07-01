@@ -107,16 +107,13 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
         logger.warning('No tests selected to run.')
         sys.exit(exit_code)
 
-    exit_code = 0
     with ProfileContext(profile):
         runner = get_test_runner(parallel=not in_series,
                                  log_path=xml_path,
                                  last_failed=last_failed,
                                  no_exit_first=no_exit_first,
                                  clean=clean)
-        exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
-
-    sys.exit(0 if not exit_code else 1)
+        runner(test_paths=test_paths, pytest_args=pytest_args)
 
 
 def _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo):

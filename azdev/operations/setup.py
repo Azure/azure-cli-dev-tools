@@ -273,11 +273,13 @@ def _validate_input(cli_path=None, ext_repo_path=None, set_env=None, copy=None, 
             raise CLIError("if global, copy, or set env are set then both an"
                            " extensions repo and a cli repo must be specified")
 
+
 def _check_paths(cli_path, ext_repo_path):
     if not os.path.isdir(cli_path):
         raise CLIError("The cli path is not a valid directory, please check the path")
     if not os.path.isdir(ext_repo_path):
         raise CLIError("The cli extensions path is not a valid directory, please check the path")
+
 
 def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None):
     if not set_env:
@@ -291,12 +293,12 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     # cases for handling legacy install
     if not any([cli_path, ext_repo_path]) or cli_path == "pypi" or (not cli_path or not ext_repo_path):
         return _handle_legacy(cli_path, ext_repo_path, ext, deps, time.time())
-    
+
     _check_paths(cli_path, ext_repo_path)
 
     if set_env:
         subprocess.call(shlex.split((const.VENV_CMD if const.IS_WINDOWS else const.VENV_CMD3) +
-                        set_env), shell=False)
+                                    set_env), shell=False)
         azure_path = os.path.join(os.path.abspath(os.getcwd()), set_env)
     else:
         azure_path = os.environ.get(const.VIRTUAL_ENV)
