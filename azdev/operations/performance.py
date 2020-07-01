@@ -11,7 +11,7 @@ from knack.log import get_logger
 from knack.util import CLIError
 
 from azdev.utilities import (
-    display, heading, subheading, cmd, require_azure_cli)
+    display, heading, subheading, cmd, py_cmd, require_azure_cli)
 
 logger = get_logger(__name__)
 
@@ -196,13 +196,11 @@ def benchmark(command_prefixes=None, runs=20):
 
     # Measure every wanted commands
     for raw_command in command_table:
-        cmd_tpl = "az {} -h".format(raw_command)
-
         logger.info("Measuring %s...", raw_command)
 
         pool = multiprocessing.Pool(multiprocessing.cpu_count(), _process_pool_init)
         try:
-            time_series = pool.map_async(_benchmark_cmd_timer, [cmd_tpl] * runs).get(1000)
+            time_series = pool.map_async(_benchmark_cmd_timer, [raw_command] * runs).get(1000)
         except multiprocessing.TimeoutError:
             pool.terminate()
             break
@@ -226,9 +224,9 @@ def benchmark(command_prefixes=None, runs=20):
     logger.warning("-" * (85 + len(max_len_cmd)))
 
 
-def _benchmark_cmd_timer(cmd_tpl):
+def _benchmark_cmd_timer(raw_command):
     s = timeit.default_timer()
-    cmd(cmd_tpl)
+    py_cmd("azure.cli {} -h".format(raw_command), is_module=True)
     e = timeit.default_timer()
     return round(e - s, 4)
 
