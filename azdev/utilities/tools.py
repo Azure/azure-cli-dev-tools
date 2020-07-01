@@ -4,9 +4,9 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+import os
 from knack.util import CLIError
 from . import const
-import os
 
 
 def require_virtual_env():
