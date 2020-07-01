@@ -268,11 +268,49 @@ jobs:
       azdev style redis
     displayName: 'Test azdev style'
 
-- job: PerformanceCheck
-  displayName: "PerformanceCheck"
+- job: PerformanceCheckOnLinux
+  displayName: "Performance Check on Linux"
   dependsOn: BuildPythonWheel
   pool:
     vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python38:
+        python.version: '3.8'
+  steps:
+    - task: DownloadPipelineArtifact@1
+      displayName: 'Download Build'
+      inputs:
+        TargetPath: '$(Build.ArtifactStagingDirectory)/pypi'
+        artifactName: pypi
+    - task: UsePythonVersion@0
+      displayName: 'Use Python $(python.version)'
+      inputs:
+        versionSpec: '$(python.version)'
+    - bash: |
+        set -ev
+        . scripts/ci/install.sh
+        azdev --version
+      displayName: 'Azdev Setup'
+    - bash: |
+        set -ev
+        . env/bin/activate
+        azdev perf load-times
+      displayName: "Load Performance"
+    - bash: |
+        set -ev
+        . env/bin/activate
+        azdev perf benchmark "version" "network vnet -h" "rest -h" "storage account"
+      displayName: "Execution Performance"
+
+
+- job: PerformanceCheckOnWindows
+  displayName: "Performance Check on Windows"
+  dependsOn: BuildPythonWheel
+  pool:
+    vmImage: 'vs2017-win2016'
   strategy:
     matrix:
       Python36:
