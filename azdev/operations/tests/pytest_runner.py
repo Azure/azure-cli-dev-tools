@@ -24,7 +24,6 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, clean):
         if no_exit_first:
             arguments.remove('-x')
 
-        # arguments.extend(test_paths)
         if parallel:
             arguments += ['-n', 'auto']
         if last_failed:
