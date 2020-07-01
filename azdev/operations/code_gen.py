@@ -62,13 +62,12 @@ def create_module(mod_name='test', display_name=None, display_name_plural=None, 
 
 def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_URL, use=None):
     require_virtual_env()
-    repo_name = const.EXT_REPO_NAME
-    repo_path = None
     repo_paths = get_ext_repo_paths()
-    repo_path = next((x for x in repo_paths if x.endswith(repo_name) or x.endswith(repo_name + '\\')), None)
+    repo_path = next(
+        (x for x in repo_paths if x.endswith(const.EXT_REPO_NAME) or x.endswith(const.EXT_REPO_NAME + '\\')), None)
     if not repo_path:
         raise CLIError('Unable to find `{}` repo. Have you cloned it and added '
-                       'with `azdev extension repo add`?'.format(repo_name))
+                       'with `azdev extension repo add`?'.format(const.EXT_REPO_NAME))
     if not os.path.isdir(repo_path):
         raise CLIError("Invalid path {} in .azure config.".format(repo_path))
     swagger_readme_file_path = _get_swagger_readme_file_path(ext_name, azure_rest_api_specs)
