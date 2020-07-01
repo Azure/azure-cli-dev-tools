@@ -47,8 +47,9 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, clean):
                 recordings = os.path.join(test_paths[k], 'recordings')
                 if os.path.isdir(recordings):
                     recording_files = os.listdir(recordings)
-                    [os.remove(os.path.join(recordings, file))
-                     for file in recording_files if file.endswith(".yaml")]
+                    for file in recording_files:
+                        if file.endswith(".yaml"):
+                            os.remove(os.path.join(recordings, file))
             logger.info('Running: %s', cmd)
             k += 1
 
