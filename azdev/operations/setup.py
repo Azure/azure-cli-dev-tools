@@ -161,7 +161,6 @@ def _copy_config_files():
     # remove the python __init__ files
     pattern = os.path.join(dest_path, '*.py*')
     for path in glob(pattern):
-        print("removing ")
         os.remove(path)
 
 
