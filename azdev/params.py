@@ -10,6 +10,7 @@ import argparse
 from knack.arguments import ArgumentsContext, CLIArgumentType
 
 from azdev.completer import get_test_completion
+from azdev.operations.linter import linter_severity_choices
 
 
 class Flag(object):
@@ -89,6 +90,16 @@ def load_arguments(self, _):
         c.argument('include_whl_extensions',
                    action='store_true',
                    help="Allow running linter on extensions installed by `az extension add`.")
+        c.argument('save_global_exclusion',
+                   action='store_true',
+                   options_list=['--save', '-s'],
+                   help="Allow saving global exclusion. It would take effect when modules is CLI or EXT.",
+                   deprecate_info=c.deprecate(hide=True))
+        c.argument('min_severity', choices=linter_severity_choices(),
+                   help='The minimum severity level to run the linter on. '
+                        'For example, specifying "medium" runs linter rules that have "high" or "medium" severity. '
+                        'However, specifying "low" runs the linter on every rule, regardless of severity. '
+                        'Defaults to "high".')
     # endregion
 
     with ArgumentsContext(self, 'perf') as c:

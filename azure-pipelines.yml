@@ -232,7 +232,7 @@ jobs:
       . scripts/ci/install.sh
       # verify azdev linter works
       source env/bin/activate
-      azdev linter redis
+      azdev linter CLI
     displayName: 'Test azdev linter'
 
 - job: TestAzdevStyle

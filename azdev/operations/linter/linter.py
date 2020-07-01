@@ -10,15 +10,37 @@ import os
 import inspect
 from importlib import import_module
 from pkgutil import iter_modules
+from enum import Enum
 import yaml
 import colorama
+from knack.log import get_logger
+
+from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 from .util import share_element, exclude_commands, LinterError
 
 
-PACAKGE_NAME = 'azdev.operations.linter'
+PACKAGE_NAME = 'azdev.operations.linter'
+_logger = get_logger(__name__)
 
 
-class Linter(object):
+class LinterSeverity(Enum):
+    HIGH = 2
+    MEDIUM = 1
+    LOW = 0
+
+    @staticmethod
+    def get_linter_severity(severity_name):
+        for severity in LinterSeverity:
+            if severity_name.lower() == severity.name.lower():
+                return severity
+        raise ValueError("Severity must be a valid linter severity name or value.")
+
+    @staticmethod
+    def get_ordered_members():
+        return sorted(LinterSeverity, key=lambda sev: sev.value)
+
+
+class Linter(object):  # pylint: disable=too-many-public-methods
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None):
         self._all_yaml_help = help_file_entries
         self._loaded_help = loaded_help
@@ -47,6 +69,10 @@ class Linter(object):
     @property
     def command_parser(self):
         return self._command_parser
+
+    @property
+    def command_loader_map(self):
+        return self._command_loader.cmd_to_loader_map
 
     def get_command_metadata(self, command_name):
         try:
@@ -100,6 +126,9 @@ class Linter(object):
             return command_args.get(parameter_name).type.settings.get('help')
         return param_help.short_summary or param_help.long_summary
 
+    def get_parameter_settings(self, command_name, parameter_name):
+        return self.get_command_metadata(command_name).arguments.get(parameter_name).type.settings
+
     def command_expired(self, command_name):
         deprecate_info = self._command_loader.command_table[command_name].deprecate_info
         if deprecate_info:
@@ -143,17 +172,17 @@ class Linter(object):
 
 # pylint: disable=too-many-instance-attributes
 class LinterManager(object):
+
+    _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params'}
+
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, exclusions=None,
-                 rule_inclusions=None, use_ci_exclusions=None):
+                 rule_inclusions=None, use_ci_exclusions=None, min_severity=None, update_global_exclusion=None):
+        # default to running only rules of the highest severity
+        self.min_severity = min_severity or LinterSeverity.get_ordered_members()[-1]
         self.linter = Linter(command_loader=command_loader, help_file_entries=help_file_entries,
                              loaded_help=loaded_help)
         self._exclusions = exclusions or {}
-        self._rules = {
-            'help_file_entries': {},
-            'command_groups': {},
-            'commands': {},
-            'params': {}
-        }
+        self._rules = {rule_type: {} for rule_type in LinterManager._RULE_TYPES}  # initialize empty rules
         self._ci_exclusions = {}
         self._rule_inclusions = rule_inclusions
         self._loaded_help = loaded_help
@@ -161,11 +190,15 @@ class LinterManager(object):
         self._help_file_entries = help_file_entries
         self._exit_code = 0
         self._ci = use_ci_exclusions if use_ci_exclusions is not None else os.environ.get('CI', False)
+        self._violiations = {}
+        self._update_global_exclusion = update_global_exclusion
 
-    def add_rule(self, rule_type, rule_name, rule_callable):
+    def add_rule(self, rule_type, rule_name, rule_callable, rule_severity):
         include_rule = not self._rule_inclusions or rule_name in self._rule_inclusions
         if rule_type in self._rules and include_rule:
             def get_linter():
+                # if a rule has exclusions return a linter that factors in those exclusions
+                # otherwise return the main linter.
                 if rule_name in self._ci_exclusions and self._ci:
                     mod_exclusions = self._ci_exclusions[rule_name]
                     command_loader, help_file_entries = exclude_commands(
@@ -175,7 +208,8 @@ class LinterManager(object):
                     return Linter(command_loader=command_loader, help_file_entries=help_file_entries,
                                   loaded_help=self._loaded_help)
                 return self.linter
-            self._rules[rule_type][rule_name] = rule_callable, get_linter
+
+            self._rules[rule_type][rule_name] = rule_callable, get_linter, rule_severity
 
     def mark_rule_failure(self):
         self._exit_code = 1
@@ -189,7 +223,7 @@ class LinterManager(object):
         return self._exit_code
 
     def run(self, run_params=None, run_commands=None, run_command_groups=None, run_help_files_entries=None):
-        paths = import_module('{}.rules'.format(PACAKGE_NAME)).__path__
+        paths = import_module('{}.rules'.format(PACKAGE_NAME)).__path__
 
         if paths:
             ci_exclusions_path = os.path.join(paths[0], 'ci_exclusions.yml')
@@ -198,7 +232,7 @@ class LinterManager(object):
         # find all defined rules and check for name conflicts
         found_rules = set()
         for _, name, _ in iter_modules(paths):
-            rule_module = import_module('{}.rules.{}'.format(PACAKGE_NAME, name))
+            rule_module = import_module('{}.rules.{}'.format(PACKAGE_NAME, name))
             functions = inspect.getmembers(rule_module, inspect.isfunction)
             for rule_name, add_to_linter_func in functions:
                 if hasattr(add_to_linter_func, 'linter_rule'):
@@ -223,22 +257,64 @@ class LinterManager(object):
 
         if not self.exit_code:
             print(os.linesep + 'No violations found.')
+
+        if self._update_global_exclusion is not None:
+            if self._update_global_exclusion == 'CLI':
+                repo_paths = [get_cli_repo_path()]
+            else:
+                repo_paths = get_ext_repo_paths()
+            exclusion_paths = [os.path.join(repo_path, 'linter_exclusions.yml') for repo_path in repo_paths]
+            for exclusion_path in exclusion_paths:
+                if not os.path.isfile(exclusion_path):
+                    open(exclusion_path, 'a').close()
+                exclusions = yaml.safe_load(open(exclusion_path)) or {}
+                exclusions.update(self._violiations)
+                yaml.safe_dump(exclusions, open(exclusion_path, 'w'))
+
         colorama.deinit()
         return self.exit_code
 
     def _run_rules(self, rule_group):
         from colorama import Fore
-        for rule_name, (rule_func, linter_callable) in self._rules.get(rule_group).items():
+        for rule_name, (rule_func, linter_callable, rule_severity) in self._rules.get(rule_group).items():
+            severity_str = rule_severity.name
             # use new linter if needed
             with LinterScope(self, linter_callable):
-                violations = sorted(rule_func()) or []
-                if violations:
-                    print('- {} FAIL{}: {}'.format(Fore.RED, Fore.RESET, rule_name))
-                    for violation_msg in violations:
-                        print(violation_msg)
-                    print()
-                else:
-                    print('- {} pass{}: {} '.format(Fore.GREEN, Fore.RESET, rule_name))
+                # if the rule's severity is lower than the linter's severity skip it.
+                if self._linter_severity_is_applicable(rule_severity, rule_name):
+                    violations = sorted(rule_func()) or []
+                    if violations:
+                        if rule_severity == LinterSeverity.HIGH:
+                            sev_color = Fore.RED
+                        elif rule_severity == LinterSeverity.MEDIUM:
+                            sev_color = Fore.YELLOW
+                        else:
+                            sev_color = Fore.CYAN
+
+                        print('- {} FAIL{} - {}{}{} severity: {}'.format(Fore.RED, Fore.RESET, sev_color,
+                                                                         severity_str, Fore.RESET, rule_name,))
+                        for violation_msg, entity_name, name in violations:
+                            print(violation_msg)
+                            self._save_violations(entity_name, name)
+                        print()
+                    else:
+                        print('- {} pass{}: {} '.format(Fore.GREEN, Fore.RESET, rule_name))
+
+    def _linter_severity_is_applicable(self, rule_severity, rule_name):
+        if self.min_severity.value > rule_severity.value:
+            _logger.info("Skipping rule %s, because its severity '%s' is lower than the linter's min severity of '%s'.",
+                         rule_name, rule_severity.name, self.min_severity.value)
+            return False
+        return True
+
+    # pylint: disable=line-too-long
+    def _save_violations(self, entity_name, rule_name):
+        if isinstance(entity_name, str):
+            command_name = entity_name
+            self._violiations.setdefault(command_name, {}).setdefault('rule_exclusions', []).append(rule_name)
+        else:
+            command_name, param_name = entity_name
+            self._violiations.setdefault(command_name, {}).setdefault('parameters', {}).setdefault(param_name, {}).setdefault('rule_exclusions', []).append(rule_name)
 
 
 class RuleError(Exception):
@@ -249,6 +325,10 @@ class RuleError(Exception):
 
 
 class LinterScope(object):
+    """
+    Linter Context manager. used when calling a rule function. Allows substitution of main linter for a linter
+    that takes into account any applicable exclusions, if applicable.
+    """
     def __init__(self, linter_manager, linter_callable):
         self.linter_manager = linter_manager
         self.linter = linter_callable()
