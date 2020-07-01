@@ -6,10 +6,10 @@
 
 import os
 import subprocess
-import azdev.operations.extensions
-from . import const
 from knack.util import CLIError
+import azdev.operations.extensions
 from azdev.utilities import display
+from . import const
 
 
 def edit_activate(azure_config_path, dot_azure_config, dot_azdev_config):
@@ -69,7 +69,7 @@ def ps1_edit(azure_config_path, dot_azure_config, dot_azdev_config):
 def install_cli(cli_path, venv_path):
     venv_path = os.environ[const.VIRTUAL_ENV] = venv_path
     src_path = os.path.join(cli_path, 'src')
-    activate_path = (os.path.join(venv_path, 'Scripts', 'activate') 
+    activate_path = (os.path.join(venv_path, 'Scripts', 'activate')
                      if const.IS_WINDOWS else 'source ' + os.path.join(
                      venv_path, const.UN_BIN, const.UN_ACTIVATE))
     delimiter = ' && ' if const.IS_WINDOWS else '; '
@@ -79,7 +79,7 @@ def install_cli(cli_path, venv_path):
                           stdout=subprocess.DEVNULL,
                           stderr=subprocess.DEVNULL, shell=True, executable=executable)
     display("\nInstalling nspkg ")
-    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-nspkg'), 
+    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-nspkg'),
                           stdout=subprocess.DEVNULL,
                           stderr=subprocess.DEVNULL, shell=True, executable=executable)
     display("\nInstalling telemetry ")
@@ -117,7 +117,6 @@ def install_extensions(venv_path, extensions):
                             executable=executable)
             extensions.remove(all_ext[k]['name'])
         k += 1
-    else:
-        if extensions:
-            raise CLIError("The following extensions were not found. Ensure you have added "
-                           "the repo using `--repo/-r PATH`.\n    {}".format('\n    '.join(extensions)))
+    if extensions:
+        raise CLIError("The following extensions were not found. Ensure you have added "
+                       "the repo using `--repo/-r PATH`.\n    {}".format('\n    '.join(extensions)))
