@@ -11,8 +11,8 @@ import mock
 
 from knack.log import get_logger
 
-from ..rule_decorators import help_file_entry_rule
-from ..linter import RuleError
+from ..rule_decorators import HelpFileEntryRule
+from ..linter import RuleError, LinterSeverity
 from ..util import LinterError
 
 # pylint: disable=anomalous-backslash-in-string
@@ -28,13 +28,13 @@ _CMD_SUB_2 = re.compile("`\s*" + "(" + _az_pattern + ")" + "`")  # noqa: W605
 logger = get_logger(__name__)
 
 
-@help_file_entry_rule
+@HelpFileEntryRule(LinterSeverity.HIGH)
 def unrecognized_help_entry_rule(linter, help_entry):
     if help_entry not in linter.commands and help_entry not in linter.command_groups:
         raise RuleError('Not a recognized command or command-group')
 
 
-@help_file_entry_rule
+@HelpFileEntryRule(LinterSeverity.HIGH)
 def faulty_help_type_rule(linter, help_entry):
     if linter.get_help_entry_type(help_entry) != 'group' and help_entry in linter.command_groups:
         raise RuleError('Command-group should be of help-type `group`')
@@ -42,7 +42,7 @@ def faulty_help_type_rule(linter, help_entry):
         raise RuleError('Command should be of help-type `command`')
 
 
-@help_file_entry_rule
+@HelpFileEntryRule(LinterSeverity.HIGH)
 def unrecognized_help_parameter_rule(linter, help_entry):
     if help_entry not in linter.commands:
         return
@@ -56,7 +56,7 @@ def unrecognized_help_parameter_rule(linter, help_entry):
         raise RuleError('The following parameter help names are invalid: {}'.format(' | '.join(violations)))
 
 
-@help_file_entry_rule
+@HelpFileEntryRule(LinterSeverity.HIGH)
 def faulty_help_example_rule(linter, help_entry):
     violations = []
     for index, example in enumerate(linter.get_help_entry_examples(help_entry)):
@@ -68,7 +68,7 @@ def faulty_help_example_rule(linter, help_entry):
             ' | '.join(violations)))
 
 
-@help_file_entry_rule
+@HelpFileEntryRule(LinterSeverity.HIGH)
 def faulty_help_example_parameters_rule(linter, help_entry):
     parser = linter.command_parser
     violations = []
