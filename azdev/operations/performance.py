@@ -171,19 +171,11 @@ def benchmark(commands, runs=20):
 
     import multiprocessing
 
-    def _process_pool_init():
-        import signal
-
-        def sigint_dummay_pass(signal_num, frame):  # pylint: disable=unused-argument
-            pass
-
-        signal.signal(signal.SIGINT, sigint_dummay_pass)
-
     # Measure every wanted commands
     for raw_command in commands:
         logger.info("Measuring %s...", raw_command)
 
-        pool = multiprocessing.Pool(multiprocessing.cpu_count(), _process_pool_init)
+        pool = multiprocessing.Pool(multiprocessing.cpu_count(), _benchmark_process_pool_init)
         try:
             time_series = pool.map_async(_benchmark_cmd_timer, [raw_command] * runs).get(1000)
         except multiprocessing.TimeoutError:
@@ -207,6 +199,15 @@ def benchmark(commands, runs=20):
         logger.warning(line_body)
 
     logger.warning("-" * (85 + len(max_len_cmd)))
+
+
+def _benchmark_process_pool_init():
+    import signal
+
+    def sigint_dummay_pass(signal_num, frame):  # pylint: disable=unused-argument
+        pass
+
+    signal.signal(signal.SIGINT, sigint_dummay_pass)
 
 
 def _benchmark_cmd_timer(raw_command):
