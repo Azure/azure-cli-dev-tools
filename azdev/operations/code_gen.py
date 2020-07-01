@@ -352,10 +352,7 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
     else:
         cmd = const.AUTO_REST_CMD + '{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
     display(cmd)
-    try:
-        subprocess.run(cmd, shell=True, check=True)
-    except subprocess.CalledProcessError as ex:
-        raise CLIError(ex)
+    subprocess.check_call(cmd, shell=True)
 
 
 def _add_extension(ext_name, repo_path):
