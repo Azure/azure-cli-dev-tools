@@ -291,13 +291,16 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
             raise CLIError('You are not running in a virtual enviroment and have not chosen to set one up.')
     elif 'VIRTUAL_ENV' in os.environ:
         raise CLIError("You are already running in a virtual enviroment, yet you want to set a new one up")
+
     heading('Azure CLI Dev Setup')
 
     _validate_input(cli_path, ext_repo_path, set_env, copy, use_global)
     # cases for handling legacy install
     if not any([cli_path, ext_repo_path]) or cli_path == "pypi" or (not cli_path or not ext_repo_path):
         return _handle_legacy(cli_path, ext_repo_path, ext, deps, time.time())
-
+    if 'CONDA_PREFIX' in os.environ:
+        raise CLIError('CONDA virutal enviroments are not supported outside' 
+                       ' of interactive mode or when -c and -r are provided')
     _check_paths(cli_path, ext_repo_path)
 
     if set_env:
