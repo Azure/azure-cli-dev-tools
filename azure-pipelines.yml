@@ -270,6 +270,7 @@ jobs:
 
 - job: PerformanceCheck
   displayName: "PerformanceCheck"
+  dependsOn: BuildPythonWheel
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
