@@ -6,6 +6,7 @@
 
 from argparse import Action
 
+
 class PerfBenchmarkCommandPrefixAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         if not namespace.command_prefixes:
