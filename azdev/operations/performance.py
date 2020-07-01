@@ -176,6 +176,9 @@ def benchmark(command_prefixes=None, runs=20):
     else:
         command_table = list(raw_command_table.keys())
 
+    if not command_table:
+        raise CLIError("No command could be run")
+
     max_len_cmd = max(command_table, key=len)
 
     line_tmpl = "| {" + "cmd:" + "<" + str(len(max_len_cmd)) + "s} |"
