@@ -8,6 +8,7 @@ import os
 
 from glob import glob
 from knack.util import CLIError
+from six.moves import configparser
 from azdev.utilities import get_azure_config
 from . import const
 
@@ -124,7 +125,7 @@ def get_name_index(invert=False, include_whl_extensions=False):
     config = get_azure_config()  # pylint: disable=import-error
     try:
         EXTENSIONS_DIR = config.get(const.EXT_SECTION, const.AZ_DEV_SRC)
-    except:
+    except (configparser.NoSectionError, configparser.NoOptionError):
         raise CLIError("Could not find extensions path in the config or the path is not valid.")
 
     table = {}
@@ -199,7 +200,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     config = get_azure_config()  # pylint: disable=import-error
     try:
         EXTENSIONS_DIR = config.get(const.EXT_SECTION, const.AZ_DEV_SRC)
-    except:
+    except (configparser.NoSectionError, configparser.NoOptionError):
         raise CLIError("Could not find extensions path in the config or the path is not valid.")
 
     # determine whether the call will filter or return all
