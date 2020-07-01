@@ -266,7 +266,7 @@ def _interactive_setup():
 
 def _validate_input(cli_path=None, ext_repo_path=None, set_env=None, copy=None, use_global=None):
     if copy and use_global:
-        raise CLIError("copy and use global are mutally exlcusive")
+        raise CLIError("Copy and use global are mutally exlcusive.")
     if not cli_path or not ext_repo_path:
         if cli_path == "pypi" and any([use_global, copy, set_env]):
             raise CLIError("pypi for cli path is mutally exlcusive with global copy and set env")
