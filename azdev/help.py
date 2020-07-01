@@ -18,7 +18,7 @@ helps['setup'] = """
         - name: Fully interactive setup (Must be run in an existing virtual environment).
           text: azdev setup
 
-        - name: Install public CLI and setup an extensions repo.
+        - name: Install public CLI and setup an extensions repo (Must be run in an existing virtual environment).
           text: azdev setup -r azure-cli-extensions
 
         - name: Install CLI in the current virtual environment, along with the extensions repo. Will create a azure directory and config in the current virtual environment.
