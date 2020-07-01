@@ -129,7 +129,7 @@ jobs:
         git clone --quiet https://github.com/Azure/azure-cli.git
         git clone --quiet https://github.com/Azure/azure-cli-extensions.git
         azdev setup -c ./azure-cli -r ./azure-cli-extensions -s env
-
+        source env/bin/activate
         azdev --version
 
         # unittest
