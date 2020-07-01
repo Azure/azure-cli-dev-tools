@@ -1,20 +1,15 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for
+# license information.
+# -----------------------------------------------------------------------------
+
 import azdev.utilities.const as const
 import os
 import subprocess
 import azdev.operations.extensions
 from knack.util import CLIError
 from azdev.utilities import display
-
-
-def validate_env():
-    if not os.environ.get(const.VIRTUAL_ENV):
-        raise RuntimeError("You are not running inside a virtual enviromet")
-    if not os.environ.get(const.AZ_CONFIG_DIR):
-        raise RuntimeError(
-            "AZURE_CONFIG_DIR env var is not set. Please rerun setup")
-    if not os.path.exists(os.path.join(os.environ[const.AZ_CONFIG_DIR], "config")):
-        raise RuntimeError(
-            "The Azure config file does not exist. please rerun setup")
 
 
 def edit_activate(azure_config_path, dot_azure_config, dot_azdev_config):
