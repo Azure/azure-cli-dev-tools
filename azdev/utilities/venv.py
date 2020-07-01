@@ -55,7 +55,7 @@ def ps1_edit(azure_config_path, dot_azure_config, dot_azdev_config):
     idx = content.find(const.PS1_VENV_SET)
     if idx < 0:
         raise CLIError("hmm, it looks like " + const.ACTIVATE_PS + " does"
-                           " not set the virutal enviroment variable VIRTUAL_ENV")
+                       " not set the virutal enviroment variable VIRTUAL_ENV")
     if content.find(const.EVN_AZ_CONFIG) < 0:
         content = content[:idx] + const.EVN_AZ_CONFIG + " = " + \
             "\"" + dot_azure_config + "\"; " + \
