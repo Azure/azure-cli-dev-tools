@@ -198,6 +198,7 @@ jobs:
       set -ev
       . scripts/ci/install.sh
       # verify azdev test works
+      source env/bin/activate
       azdev test redis
     displayName: 'Test azdev test'
 
@@ -230,6 +231,7 @@ jobs:
       set -ev
       . scripts/ci/install.sh
       # verify azdev linter works
+      source env/bin/activate
       azdev linter redis
     displayName: 'Test azdev linter'
 
@@ -262,5 +264,6 @@ jobs:
       set -ev
       . scripts/ci/install.sh
       # verify azdev style works
+      source env/bin/activate
       azdev style redis
     displayName: 'Test azdev style'
