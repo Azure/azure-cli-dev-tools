@@ -332,8 +332,8 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
         raise CLIError('{}\nPlease install npm.'.format(ex))
     # check if autorest is installed
     try:
-        subprocess.run('npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT)
+        subprocess.run(
+            'npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError:
         display('Installing autorest.\n')
         try:

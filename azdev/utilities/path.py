@@ -5,11 +5,11 @@
 # -----------------------------------------------------------------------------
 
 import os
-from . import const
+
 from glob import glob
-import sys
 from knack.util import CLIError
 from azdev.utilities import get_azure_config
+from . import const
 
 
 def extract_module_name(path):
@@ -71,13 +71,13 @@ def get_ext_repo_paths():
     :returns: Path (str) to Azure CLI dev extension repos.
     """
     from configparser import NoSectionError, NoOptionError
-    from .config import get_azure_config
     try:
         return get_azure_config().get(const.EXT_SECTION, const.AZ_DEV_SRC).split(',')
     except NoSectionError:
         raise CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup`.')
     except NoOptionError:
-        raise CLIError('Unable to retrieve the option {} from azure config section [{}]'.format(const.AZ_DEV_SRC, const.EXT_SECTION))
+        raise CLIError('Unable to retrieve the option {} from azure config section [{}]'.format(
+            const.AZ_DEV_SRC, const.EXT_SECTION))
 
 
 def find_file(file_name):
