@@ -329,16 +329,23 @@ jobs:
         versionSpec: '$(python.version)'
     - bash: |
         set -ev
-        . scripts/ci/install.sh
+        python -m venv env
+        .\venv36\Scripts\activate.bat
+        pip install -U pip setuptools wheel -q
+        pip install $(find ${BUILD_ARTIFACTSTAGINGDIRECTORY}/pypi -name *.tar.gz) -q
+        git clone https://github.com/Azure/azure-cli.git
+        git clone https://github.com/Azure/azure-cli-extensions.git
+        azdev setup -c -r azure-cli-extensions
+
         azdev --version
       displayName: 'Azdev Setup'
     - bash: |
         set -ev
-        . env/bin/activate
+        .\venv36\Scripts\activate.bat
         azdev perf load-times
       displayName: "Load Performance"
     - bash: |
         set -ev
-        . env/bin/activate
+        .\venv36\Scripts\activate.bat
         azdev perf benchmark "version" "network vnet -h" "rest -h" "storage account"
       displayName: "Execution Performance"
