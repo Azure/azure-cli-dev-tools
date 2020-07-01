@@ -22,6 +22,7 @@ from azdev.utilities import (
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
     get_path_table, require_virtual_env, get_name_index)
+import azdev.utilities.const as const
 from .pytest_runner import get_test_runner
 from .profile_context import ProfileContext, current_profile
 from .incremental_strategy import CLIAzureDevOpsContext
@@ -38,8 +39,7 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
     require_virtual_env()
 
-    DEFAULT_RESULT_FILE = 'test_results.xml'
-    DEFAULT_RESULT_PATH = os.path.join(get_azdev_config_dir(), DEFAULT_RESULT_FILE)
+    DEFAULT_RESULT_PATH = os.path.join(get_azdev_config_dir(), const.DEFAULT_RESULT_FILE)
 
     heading('Run Tests')
 
@@ -66,7 +66,7 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     # resolve the path at which to dump the XML results
     xml_path = xml_path or DEFAULT_RESULT_PATH
     if not xml_path.endswith('.xml'):
-        xml_path = os.path.join(xml_path, DEFAULT_RESULT_FILE)
+        xml_path = os.path.join(xml_path, const.DEFAULT_RESULT_FILE)
 
     # process environment variables
     if run_live:

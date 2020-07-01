@@ -4,10 +4,10 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-import azdev.utilities.const as const
 import os
 import subprocess
 import azdev.operations.extensions
+from . import const
 from knack.util import CLIError
 from azdev.utilities import display
 
@@ -69,15 +69,18 @@ def ps1_edit(azure_config_path, dot_azure_config, dot_azdev_config):
 def install_cli(cli_path, venv_path):
     venv_path = os.environ[const.VIRTUAL_ENV] = venv_path
     src_path = os.path.join(cli_path, 'src')
-    activate_path = os.path.join(venv_path, 'Scripts', 'activate') if const.IS_WINDOWS else 'source ' + os.path.join(
-        venv_path, const.UN_BIN, const.UN_ACTIVATE)
+    activate_path = (os.path.join(venv_path, 'Scripts', 'activate') 
+                     if const.IS_WINDOWS else 'source ' + os.path.join(
+                     venv_path, const.UN_BIN, const.UN_ACTIVATE))
     delimiter = ' && ' if const.IS_WINDOWS else '; '
     executable = None if const.IS_WINDOWS else const.BASH_EXE
     display("\nvenv activate path is " + str(activate_path))
-    subprocess.check_call(activate_path + delimiter + 'pip install --ignore-installed azure-common', stdout=subprocess.DEVNULL,
+    subprocess.check_call(activate_path + delimiter + 'pip install --ignore-installed azure-common', 
+                          stdout=subprocess.DEVNULL,
                           stderr=subprocess.DEVNULL, shell=True, executable=executable)
     display("\nInstalling nspkg ")
-    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-nspkg'), stdout=subprocess.DEVNULL,
+    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-nspkg'), 
+                          stdout=subprocess.DEVNULL,
                           stderr=subprocess.DEVNULL, shell=True, executable=executable)
     display("\nInstalling telemetry ")
     subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-telemetry'),
@@ -86,8 +89,10 @@ def install_cli(cli_path, venv_path):
     subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-core'),
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True, executable=executable)
     display("\nInstalling cli ")
-    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli'), shell=True, executable=executable)
-    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-testsdk'), stdout=subprocess.DEVNULL,
+    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli'),
+                          shell=True, executable=executable)
+    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-testsdk'), 
+                          stdout=subprocess.DEVNULL,
                           stderr=subprocess.DEVNULL, shell=True, executable=executable)
 
 
@@ -108,7 +113,8 @@ def install_extensions(venv_path, extensions):
     k = 0
     while k < len(all_ext) and extensions:
         if all_ext[k]['name'] in extensions:
-            subprocess.call(activate_path + delimiter + const.PIP_E_CMD + all_ext[k]['path'], shell=True, executable=executable)
+            subprocess.call(activate_path + delimiter + const.PIP_E_CMD + all_ext[k]['path'], shell=True,
+                            executable=executable)
             extensions.remove(all_ext[k]['name'])
         k += 1
     else:

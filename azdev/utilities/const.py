@@ -6,6 +6,7 @@
 
 import sys
 
+DEFAULT_RESULT_FILE = 'test_results.xml'
 COMMAND_MODULE_PREFIX = 'azure-cli-'
 EXTENSION_PREFIX = 'azext_'
 EXT_REPO_NAME = 'azure-cli-extensions'
