@@ -144,6 +144,12 @@ helps['perf load-times'] = """
     short-summary: Verify that all modules load within an acceptable timeframe.
 """
 
+helps['perf benchmark'] = """
+    short-summary: Display benchmark staticstic of Azure CLI (Extensions) commands via execute it with "python -m azure.cli {COMMAND}" in a separate process.
+    examples:
+        - name: Run benchmark on "network application-gateway" and "storage account"
+          text: azdev perf benchmark "network application-gateway -h" "storage account" "version" "group list"
+"""
 
 helps['extension'] = """
     short-summary: Control which CLI extensions are visible in the development environment.
