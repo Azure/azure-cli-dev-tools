@@ -176,6 +176,10 @@ def benchmark(commands, runs=20):
         logger.info("Measuring %s...", raw_command)
 
         pool = multiprocessing.Pool(multiprocessing.cpu_count(), _benchmark_process_pool_init)
+
+        # try/except like this because of a bug of Python multiprocessing.Pool (https://bugs.python.org/issue8296)
+        # Discussion on StackOverflow:
+        # https://stackoverflow.com/questions/1408356/keyboard-interrupts-with-pythons-multiprocessing-pool/1408476
         try:
             time_series = pool.map_async(_benchmark_cmd_timer, [raw_command] * runs).get(1000)
         except multiprocessing.TimeoutError:
