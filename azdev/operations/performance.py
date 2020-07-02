@@ -207,11 +207,7 @@ def benchmark(commands, runs=20):
 
 def _benchmark_process_pool_init():
     import signal
-
-    def sigint_dummay_pass(signal_num, frame):  # pylint: disable=unused-argument
-        pass
-
-    signal.signal(signal.SIGINT, sigint_dummay_pass)
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
 
 
 def _benchmark_cmd_timer(raw_command):
