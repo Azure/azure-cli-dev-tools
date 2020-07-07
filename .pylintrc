@@ -9,7 +9,9 @@ disable=
     cyclic-import,
     useless-object-inheritance,
     useless-import-alias,
-    useless-suppression
+    useless-suppression,
+    import-outside-toplevel,
+    wrong-import-order
 
 [TYPECHECK]
 # For Azure CLI extensions, we ignore some import errors as they'll be available in the environment of the CLI
