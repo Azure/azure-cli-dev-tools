@@ -74,7 +74,7 @@ setup(
         'tox',
         'wheel==0.30.0',
         'azure-storage-blob>=1.3.1,<2.0.0',
-        'isort=4.3.21'
+        'isort==4.3.21'
     ],
     extras_require={
         ":python_version<'3.0'": ['pylint==1.9.2', 'futures'],
