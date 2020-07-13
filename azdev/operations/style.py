@@ -151,8 +151,8 @@ def _run_pylint(modules):
     def run(paths, rcfile, desc):
         if not paths:
             return None
-        logger.warning("Using rcfile file: %s", rcfile)
-        logger.warning("Running on %s: %s", desc, " ".join(paths))
+        logger.debug("Using rcfile file: %s", rcfile)
+        logger.debug("Running on %s: %s", desc, "\n".join(paths))
         command = "pylint {} --ignore vendored_sdks,privates --rcfile={} -j {}".format(
             " ".join(paths), rcfile, multiprocessing.cpu_count()
         )
@@ -173,8 +173,8 @@ def _run_pep8(modules):
     def run(paths, rcfile, desc):
         if not paths:
             return None
-        logger.warning("Using config file: %s", rcfile)
-        logger.warning("Running on %s: %s", desc, " ".join(paths))
+        logger.debug("Using config file: %s", rcfile)
+        logger.debug("Running on %s:\n%s", desc, "\n".join(paths))
         command = "flake8 --statistics --append-config={} {}".format(
             rcfile, " ".join(paths)
         )
