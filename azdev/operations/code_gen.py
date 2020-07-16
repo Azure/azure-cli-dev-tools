@@ -331,28 +331,48 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
         subprocess.run('npm --version', shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as ex:
         raise CLIError('{}\nPlease install npm.'.format(ex))
-    # check if autorest is installed
-    try:
-        subprocess.run(
-            'npm list -g autorest', shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError:
-        display('Installing autorest.\n')
+    display('Installing autorest.\n')
+    if const.IS_WINDOWS:
         try:
-            if const.IS_WINDOWS:
-                subprocess.run('npm install -g autorest', shell=True, check=True)
-            else:
-                display('May need to provide your password.\n')
-                subprocess.run('sudo npm install -g autorest', shell=True, check=True)
+            subprocess.run('npm install -g autorest', shell=True, check=True)
         except subprocess.CalledProcessError as ex:
             raise CLIError("Failed to install autorest.\n{}".format(ex))
-    # update autorest core
-    subprocess.check_output('autorest --latest', shell=True)
-    if not use:
-        cmd = const.AUTO_REST_CMD + '{} {}'.format(repo_path, swagger_readme_file_path)
     else:
-        cmd = const.AUTO_REST_CMD + '{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
-    display(cmd)
-    subprocess.check_call(cmd, shell=True)
+        try:
+            subprocess.run('npm install -g autorest', shell=True, check=True, stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError as ex:
+            path = os.environ['PATH']
+            # check if npm is installed through nvm
+            if os.environ.get('NVM_DIR'):
+                raise CLIError(ex)
+            else:
+                # check if user using specific node version and manually add it to the os env PATH
+                node_version = subprocess.check_output('node --version', shell=True).decode('utf-8')
+                if node_version.endswith('\n'):
+                    node_version = node_version.replace('\n', '')
+                if 'node/' + node_version + '/bin' in path:
+                    raise CLIError(ex)
+                else:
+                    # create a new directory for npm global installations, to avoid using sudo in installing autorest
+                    npm_path = os.path.join(os.environ['HOME'], '.npm-packages')
+                    if not os.isdir(npm_path):
+                        os.mkdir(npm_path)
+                    npm_prefix = subprocess.check_output('npm prefix -g', shell=True).decode('utf-8')
+                    if npm_prefix.endswith('\n'):
+                        npm_prefix = npm_prefix.replace('\n', '')
+                    subprocess.run('npm config set prefix ' + npm_path, shell=True)
+                    os.environ['PATH'] = path + ':' + os.path.join(npm_path, 'bin')
+                    os.environ['MANPATH'] = os.path.join(npm_path, 'share', 'man')
+                    subprocess.run('npm install -g autorest', shell=True, check=True)
+                    subprocess.run('npm config set prefix ' + npm_prefix, shell=True)
+                    # update autorest core
+                    subprocess.check_output('autorest --latest', shell=True)
+                    if not use:
+                        cmd = const.AUTO_REST_CMD + '{} {}'.format(repo_path, swagger_readme_file_path)
+                    else:
+                        cmd = const.AUTO_REST_CMD + '{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
+                    display(cmd)
+                    subprocess.check_call(cmd, shell=True)
 
 
 def _add_extension(ext_name, repo_path):
