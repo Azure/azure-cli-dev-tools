@@ -16,7 +16,7 @@ def load_command_table(self, _):
         g.command('setup', 'setup')
 
     # TODO: enhance with tox support
-    with CommandGroup(self, '', operation_group('tests')) as g:
+    with CommandGroup(self, '', operation_group('testtool')) as g:
         g.command('test', 'run_tests')
 
     with CommandGroup(self, '', operation_group('style')) as g:

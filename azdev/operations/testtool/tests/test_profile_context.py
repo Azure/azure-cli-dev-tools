@@ -8,7 +8,7 @@ import unittest
 
 from knack.util import CLIError
 
-from azdev.operations.tests.profile_context import ProfileContext
+from azdev.operations.testtool.profile_context import ProfileContext
 
 
 class TestProfileContext(unittest.TestCase):
