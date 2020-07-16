@@ -55,7 +55,7 @@ setup(
         'azdev.operations.help.refdoc',
         'azdev.operations.linter',
         'azdev.operations.linter.rules',
-        'azdev.operations.tests',
+        'azdev.operations.testtool',
         'azdev.operations.extensions',
         'azdev.utilities',
     ],
