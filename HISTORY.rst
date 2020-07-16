@@ -2,6 +2,11 @@
 
 Release History
 ===============
+0.1.21
+++++++
+* Fix isort package version to 4.3.21.
+* `azdev perf benchmark`: support new command to calculate each command execution time.
+
 0.1.20
 ++++++
 * `azdev setup`: Fix missing dependencies of azure-cli-testsdk

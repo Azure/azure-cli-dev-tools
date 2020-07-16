@@ -24,6 +24,7 @@ disable=
     chained-comparison,
     useless-import-alias,
     useless-suppression,
+    import-outside-toplevel,
     wrong-import-order
 
 [FORMAT]

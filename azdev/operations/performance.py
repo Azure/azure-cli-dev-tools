@@ -5,12 +5,13 @@
 # -----------------------------------------------------------------------------
 
 import re
+import timeit
 
 from knack.log import get_logger
 from knack.util import CLIError
 
 from azdev.utilities import (
-    display, heading, subheading, cmd, require_azure_cli)
+    display, heading, subheading, cmd, py_cmd, require_azure_cli)
 
 logger = get_logger(__name__)
 
@@ -106,17 +107,20 @@ are large, check that you do not have top-level imports like azure.mgmt or msres
 in any modified files.
 """)
 
-    display('== PASSED MODULES ==')
+    display("== PASSED MODULES ==")
     display_table(passed_mods)
-    display('\nPASSED: Average load time all modules: {} ms'.format(
-        int(passed_mods[TOTAL]['average'])))
+    display(
+        "\nPASSED: Average load time all modules: {} ms".format(
+            int(passed_mods[TOTAL]["average"])
+        )
+    )
 
 
 def mean(data):
     """Return the sample arithmetic mean of data."""
     n = len(data)
     if n < 1:
-        raise ValueError('len < 1')
+        raise ValueError("len < 1")
     return sum(data) / float(n)
 
 
@@ -140,3 +144,103 @@ def display_table(data):
     for key, val in data.items():
         display('{:<20} {:>12.0f} {:>12.0f} {:>12.0f} {:>25}'.format(
             key, val['average'], val['threshold'], val['stdev'], str(val['values'])))
+
+
+# require azdev setup
+def benchmark(commands, runs=20):
+    if runs <= 0:
+        raise CLIError("Number of runs must be greater than 0.")
+
+    max_len_cmd = max(commands, key=len)
+
+    line_tmpl = "| {" + "cmd:" + "<" + str(len(max_len_cmd)) + "s} |"
+    line_tmpl = line_tmpl + " {min:10s} | {max:10s} | {avg:10s} | {mid:10s} | {std:10s} | {runs:10s} |"
+
+    line_head = line_tmpl.format(
+        cmd="Command",
+        min="Min",
+        max="Max",
+        avg="Mean",
+        mid="Median",
+        std="Std",
+        runs="Runs",
+    )
+
+    logger.warning(line_head)
+    logger.warning("-" * (85 + len(max_len_cmd)))
+
+    import multiprocessing
+
+    # Measure every wanted commands
+    for raw_command in commands:
+        logger.info("Measuring %s...", raw_command)
+
+        pool = multiprocessing.Pool(multiprocessing.cpu_count(), _benchmark_process_pool_init)
+
+        # try/except like this because of a bug of Python multiprocessing.Pool (https://bugs.python.org/issue8296)
+        # Discussion on StackOverflow:
+        # https://stackoverflow.com/questions/1408356/keyboard-interrupts-with-pythons-multiprocessing-pool/1408476
+        try:
+            time_series = pool.map_async(_benchmark_cmd_timer, [raw_command] * runs).get(1000)
+        except multiprocessing.TimeoutError:
+            pool.terminate()
+            break
+        else:
+            pool.close()
+        pool.join()
+
+        staticstic = _benchmark_cmd_staticstic(time_series)
+
+        line_body = line_tmpl.format(
+            cmd=raw_command,
+            min=str(staticstic["min"]),
+            max=str(staticstic["max"]),
+            avg=str(staticstic["avg"]),
+            mid=str(staticstic["media"]),
+            std=str(staticstic["std"]),
+            runs=str(runs),
+        )
+        logger.warning(line_body)
+
+    logger.warning("-" * (85 + len(max_len_cmd)))
+
+
+def _benchmark_process_pool_init():
+    import signal
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+
+def _benchmark_cmd_timer(raw_command):
+    s = timeit.default_timer()
+    py_cmd("azure.cli {}".format(raw_command), is_module=True)
+    e = timeit.default_timer()
+    return round(e - s, 4)
+
+
+def _benchmark_cmd_staticstic(time_series: list):
+    from math import sqrt
+
+    time_series.sort()
+
+    size = len(time_series)
+
+    if size % 2 == 0:
+        mid_time = (time_series[size // 2 - 1] + time_series[size // 2]) / 2
+    else:
+        mid_time = time_series[(size - 1) // 2]
+
+    min_time = time_series[0]
+    max_time = time_series[-1]
+    avg_time = sum(time_series) / size
+
+    std_deviation = sqrt(
+        sum([(t - avg_time) * (t - avg_time) for t in time_series]) / size
+    )
+
+    return {
+        "min": round(min_time, 4),
+        "max": round(max_time, 4),
+        "media": round(mid_time, 4),
+        "avg": round(avg_time, 4),
+        "std": round(std_deviation, 4),
+    }

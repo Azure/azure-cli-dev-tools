@@ -16,7 +16,7 @@ def load_command_table(self, _):
         g.command('setup', 'setup')
 
     # TODO: enhance with tox support
-    with CommandGroup(self, '', operation_group('tests')) as g:
+    with CommandGroup(self, '', operation_group('testtool')) as g:
         g.command('test', 'run_tests')
 
     with CommandGroup(self, '', operation_group('style')) as g:
@@ -43,6 +43,7 @@ def load_command_table(self, _):
 
     with CommandGroup(self, 'perf', operation_group('performance')) as g:
         g.command('load-times', 'check_load_time')
+        g.command('benchmark', 'benchmark', is_preview=True)
 
     with CommandGroup(self, 'extension', operation_group('extensions')) as g:
         g.command('add', 'add_extension')
