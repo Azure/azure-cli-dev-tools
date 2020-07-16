@@ -207,7 +207,7 @@ jobs:
       set -ev
       . scripts/ci/install.sh
       # verify azdev test works
-      source env/bin/activate
+      source /home/vsts/work/1/s/env/bin/activate
       azdev test redis
     displayName: 'Test azdev test'
 
