@@ -127,6 +127,7 @@ jobs:
 
         # install azdev from source code
         pip install -e .
+        pip install pytest-cov
 
         # azdev setup
         git clone --quiet https://github.com/Azure/azure-cli.git
@@ -135,9 +136,12 @@ jobs:
 
         azdev --version
 
-        # unittest
-        python -m unittest -v
+        python -m pytest azdev/ --ignore=azdev/mod_templates --capture=no --cov=. --cov-report=xml --cov-report=html
       displayName: 'Run Unittest'
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFiles: '**/test-*.xml'
+        testRunTitle: 'Publish test results for Python $(python.version)'
 
 
 - job: TestAzdevSetup
