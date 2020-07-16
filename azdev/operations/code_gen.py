@@ -328,6 +328,7 @@ def _get_swagger_readme_file_path(ext_name, swagger_repo, branch):
     return swagger_readme_file_path
 
 
+# pylint: disable=too-many-statements
 def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
     heading('Start generating extension {}.'.format(ext_name))
     # check if npm is installed

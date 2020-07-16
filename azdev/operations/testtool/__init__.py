@@ -21,7 +21,7 @@ from azdev.utilities import (
     ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
-    get_path_table, require_virtual_env, get_name_index)
+    get_path_table, require_virtual_env, get_name_index, const)
 from .pytest_runner import get_test_runner
 from .profile_context import ProfileContext, current_profile
 from .incremental_strategy import CLIAzureDevOpsContext
@@ -31,15 +31,14 @@ logger = get_logger(__name__)
 
 # pylint: disable=too-many-statements
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
-              run_live=False, profile=None, last_failed=False, pytest_args=None,
+              run_live=False, clean=False, profile=None, last_failed=False, pytest_args=None,
               no_exit_first=False,
               git_source=None, git_target=None, git_repo=None,
               cli_ci=False):
 
     require_virtual_env()
 
-    DEFAULT_RESULT_FILE = 'test_results.xml'
-    DEFAULT_RESULT_PATH = os.path.join(get_azdev_config_dir(), DEFAULT_RESULT_FILE)
+    DEFAULT_RESULT_PATH = os.path.join(get_azdev_config_dir(), const.DEFAULT_RESULT_FILE)
 
     heading('Run Tests')
 
@@ -66,7 +65,7 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
     # resolve the path at which to dump the XML results
     xml_path = xml_path or DEFAULT_RESULT_PATH
     if not xml_path.endswith('.xml'):
-        xml_path = os.path.join(xml_path, DEFAULT_RESULT_FILE)
+        xml_path = os.path.join(xml_path, const.DEFAULT_RESULT_FILE)
 
     # process environment variables
     if run_live:
@@ -107,15 +106,13 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
         logger.warning('No tests selected to run.')
         sys.exit(exit_code)
 
-    exit_code = 0
     with ProfileContext(profile):
         runner = get_test_runner(parallel=not in_series,
                                  log_path=xml_path,
                                  last_failed=last_failed,
-                                 no_exit_first=no_exit_first)
-        exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
-
-    sys.exit(0 if not exit_code else 1)
+                                 no_exit_first=no_exit_first,
+                                 clean=clean)
+        runner(test_paths=test_paths, pytest_args=pytest_args)
 
 
 def _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo):
