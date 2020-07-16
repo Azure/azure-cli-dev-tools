@@ -60,7 +60,11 @@ def create_module(mod_name='test', display_name=None, display_name_plural=None, 
     _display_success_message(COMMAND_MODULE_PREFIX + mod_name, mod_name)
 
 
-def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_URL, use=None):
+def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_URL, branch=None, use=None):
+    if not azure_rest_api_specs.startswith('http') and branch:
+        raise CLIError('Cannot specify azure-rest-api-specs repo branch when using local one.')
+    if not branch:
+        branch = 'master'
     require_virtual_env()
     repo_paths = get_ext_repo_paths()
     repo_path = next(
@@ -70,7 +74,7 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
                        'with `azdev extension repo add`?'.format(const.EXT_REPO_NAME))
     if not os.path.isdir(repo_path):
         raise CLIError("Invalid path {} in .azure config.".format(repo_path))
-    swagger_readme_file_path = _get_swagger_readme_file_path(ext_name, azure_rest_api_specs)
+    swagger_readme_file_path = _get_swagger_readme_file_path(ext_name, azure_rest_api_specs, branch)
     _generate_extension(ext_name, repo_path, swagger_readme_file_path, use)
     _add_extension(ext_name, repo_path)
 
@@ -304,14 +308,14 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
             raise result.error  # pylint: disable=raising-bad-type
 
 
-def _get_swagger_readme_file_path(ext_name, swagger_repo):
+def _get_swagger_readme_file_path(ext_name, swagger_repo, branch):
     from urllib import request, error
 
     swagger_readme_file_path = None
     if swagger_repo == const.GITHUB_SWAGGER_REPO_URL or \
             (swagger_repo.startswith('https://') and swagger_repo.endswith(const.SWAGGER_REPO_NAME)):
-        swagger_readme_file_path = '{}/blob/master/specification/{}/resource-manager'.format(
-            swagger_repo, ext_name)
+        swagger_readme_file_path = '{}/blob/{}/specification/{}/resource-manager'.format(
+            swagger_repo, branch, ext_name)
         # validate URL
         try:
             request.urlopen(swagger_readme_file_path)
@@ -355,7 +359,7 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
                 else:
                     # create a new directory for npm global installations, to avoid using sudo in installing autorest
                     npm_path = os.path.join(os.environ['HOME'], '.npm-packages')
-                    if not os.isdir(npm_path):
+                    if not os.path.isdir(npm_path):
                         os.mkdir(npm_path)
                     npm_prefix = subprocess.check_output('npm prefix -g', shell=True).decode('utf-8')
                     if npm_prefix.endswith('\n'):
@@ -371,7 +375,7 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
                         cmd = const.AUTO_REST_CMD + '{} {}'.format(repo_path, swagger_readme_file_path)
                     else:
                         cmd = const.AUTO_REST_CMD + '{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
-                    display(cmd)
+                    display('\n' + cmd + '\n')
                     subprocess.check_call(cmd, shell=True)
 
 
