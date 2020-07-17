@@ -333,18 +333,18 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
     heading('Start generating extension {}.'.format(ext_name))
     # check if npm is installed
     try:
-        subprocess.run('npm --version', shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.check_call('npm --version', shell=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as ex:
         raise CLIError('{}\nPlease install npm.'.format(ex))
     display('Installing autorest.\n')
     if const.IS_WINDOWS:
         try:
-            subprocess.run('npm install -g autorest', shell=True, check=True)
+            subprocess.check_call('npm install -g autorest', shell=True)
         except subprocess.CalledProcessError as ex:
             raise CLIError("Failed to install autorest.\n{}".format(ex))
     else:
         try:
-            subprocess.run('npm install -g autorest', shell=True, check=True, stderr=subprocess.DEVNULL)
+            subprocess.check_call('npm install -g autorest', shell=True, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError as ex:
             path = os.environ['PATH']
             # check if npm is installed through nvm
@@ -366,10 +366,10 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
             subprocess.run('npm config set prefix ' + npm_path, shell=True)
             os.environ['PATH'] = path + ':' + os.path.join(npm_path, 'bin')
             os.environ['MANPATH'] = os.path.join(npm_path, 'share', 'man')
-            subprocess.run('npm install -g autorest', shell=True, check=True)
+            subprocess.check_call('npm install -g autorest', shell=True)
             subprocess.run('npm config set prefix ' + npm_prefix, shell=True)
             # update autorest core
-            subprocess.check_output('autorest --latest', shell=True)
+            subprocess.check_call('autorest --latest', shell=True)
             if not use:
                 cmd = const.AUTO_REST_CMD + '{} {}'.format(repo_path, swagger_readme_file_path)
             else:
