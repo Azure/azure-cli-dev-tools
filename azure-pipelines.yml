@@ -273,7 +273,7 @@ jobs:
       set -ev
       . scripts/ci/install.sh
       # verify azdev style works
-      azdev style redis
+      azdev style
     displayName: 'Test azdev style'
 
 - job: PerformanceCheckOnLinux
