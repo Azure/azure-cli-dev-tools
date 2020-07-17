@@ -86,12 +86,13 @@ def install_cli(cli_path, venv_path):
     display("\nInstalling core ")
     subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-core'),
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True, executable=executable)
+    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-testsdk'),
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL, shell=True, executable=executable)
     display("\nInstalling cli ")
     subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli'),
                           shell=True, executable=executable)
-    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-testsdk'),
-                          stdout=subprocess.DEVNULL,
-                          stderr=subprocess.DEVNULL, shell=True, executable=executable)
+
 
 
 def install_extensions(venv_path, extensions):
