@@ -247,7 +247,7 @@ jobs:
       # install azdev from source code
       pip install -e .
       pip install pytest-cov
-      python3 -m venv env
+      python3 -m venv --system-site-package env
       source env/bin/activate
       # azdev setup
       git clone --quiet https://github.com/Azure/azure-cli.git
