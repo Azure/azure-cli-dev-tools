@@ -207,7 +207,8 @@ jobs:
 
       # install azdev from source code
       pip install -e .
-      
+      pip install pytest-cov
+
       # azdev setup
       git clone --quiet https://github.com/Azure/azure-cli.git
       git clone --quiet https://github.com/Azure/azure-cli-extensions.git
@@ -245,7 +246,7 @@ jobs:
       set -ev
       . scripts/ci/install.sh
       # verify azdev linter works
-      source env/bin/activate
+      # source env/bin/activate
       azdev linter CLI
     displayName: 'Test azdev linter'
 
