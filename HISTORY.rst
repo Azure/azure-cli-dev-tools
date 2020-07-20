@@ -2,6 +2,12 @@
 
 Release History
 ===============
+0.1.22
+++++++
+* Hornor the configuration of pylint and flake8 in Azure/azure-cli and Azure/azure-cli-extensions.
+* Rename test folder to make place for unittest of other commands.
+* Enable test result coverage.
+
 0.1.21
 ++++++
 * Fix isort package version to 4.3.21.
