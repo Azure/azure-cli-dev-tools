@@ -96,9 +96,7 @@ def install_cli(cli_path, venv_path):
     req_file = 'requirements.py3.{}.txt'.format(platform.system().lower() if const.IS_WINDOWS else platform.system())
     req_file = "{}/src/azure-cli/{}".format(cli_path, req_file)
     display("Installing " + req_file)
-    subprocess.check_call(activate_path + delimiter  + const.PIP_R_CMD + req_file, shell=True, executable=executable)
-
-
+    subprocess.check_call(activate_path + delimiter + const.PIP_R_CMD + req_file, shell=True, executable=executable)
 
 
 def install_extensions(venv_path, extensions):
