@@ -203,17 +203,10 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
+      #!/usr/bin/env bash
       set -ev
-
-      # install azdev from source code
-      pip install -e .
-      pip install pytest-cov
-
-      # azdev setup
-      git clone --quiet https://github.com/Azure/azure-cli.git
-      git clone --quiet https://github.com/Azure/azure-cli-extensions.git
-      azdev setup -c ./azure-cli -r ./azure-cli-extensions -s env
-      source env/bin/activate
+      . scripts/ci/install.sh
+      # verify azdev test works
       azdev test redis
     displayName: 'Test azdev test'
 
@@ -242,17 +235,10 @@ jobs:
       versionSpec: '$(python.version)'
 
   - bash: |
+      #!/usr/bin/env bash
       set -ev
-
-      # install azdev from source code
-      pip install -e .
-      pip install pytest-cov
-
-      # azdev setup
-      git clone --quiet https://github.com/Azure/azure-cli.git
-      git clone --quiet https://github.com/Azure/azure-cli-extensions.git
-      azdev setup -c ./azure-cli -r ./azure-cli-extensions -s env
-      source env/bin/activate
+      . scripts/ci/install.sh
+      # verify azdev linter works
       azdev linter CLI
     displayName: 'Test azdev linter'
 

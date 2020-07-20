@@ -6,6 +6,7 @@
 
 import os
 import subprocess
+import platform
 from knack.util import CLIError
 import azdev.operations.extensions
 from azdev.utilities import display
@@ -92,6 +93,11 @@ def install_cli(cli_path, venv_path):
     display("\nInstalling cli ")
     subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli'),
                           shell=True, executable=executable)
+    req_file = 'requirements.py3.{}.txt'.format(platform.system().lower() if const.IS_WINDOWS else platform.system())
+    req_file = "{}/src/azure-cli/{}".format(cli_path, req_file)
+    display("Installing " + req_file)
+    subprocess.check_call(activate_path + delimiter  + const.PIP_R_CMD + req_file, shell=True, executable=executable)
+
 
 
 
