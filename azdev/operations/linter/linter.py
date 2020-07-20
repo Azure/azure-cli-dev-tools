@@ -48,6 +48,8 @@ class Linter(object):  # pylint: disable=too-many-public-methods
         self._parameters = {}
         self._help_file_entries = set(help_file_entries.keys())
         self._command_parser = command_loader.cli_ctx.invocation.parser
+        self.total_count = 0
+        self.fail_count = 0
 
         for command_name, command in self._command_loader.command_table.items():
             self._parameters[command_name] = set()
