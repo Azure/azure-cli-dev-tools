@@ -14,7 +14,8 @@ from .command import (
     call,
     cmd,
     py_cmd,
-    pip_cmd
+    pip_cmd,
+    shell_cmd
 )
 from .const import (
     COMMAND_MODULE_PREFIX,
