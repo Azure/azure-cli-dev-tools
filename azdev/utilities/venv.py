@@ -9,7 +9,7 @@ import subprocess
 import platform
 from knack.util import CLIError
 import azdev.operations.extensions
-from azdev.utilities import display
+from azdev.utilities import display, shell_cmd
 from . import const
 
 
@@ -74,29 +74,29 @@ def install_cli(cli_path, venv_path):
     delimiter = ' && ' if const.IS_WINDOWS else '; '
     executable = None if const.IS_WINDOWS else const.BASH_EXE
     display("\nvenv activate path is " + str(activate_path))
-    subprocess.check_call(activate_path + delimiter + 'pip install --ignore-installed azure-common',
-                          stdout=subprocess.DEVNULL,
-                          stderr=subprocess.DEVNULL, shell=True, executable=executable)
+    shell_cmd(activate_path + delimiter + 'pip install --ignore-installed azure-common',
+              stdout=subprocess.DEVNULL,
+              stderr=subprocess.DEVNULL, executable=executable)
     display("\nInstalling nspkg ")
-    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-nspkg'),
-                          stdout=subprocess.DEVNULL,
-                          stderr=subprocess.DEVNULL, shell=True, executable=executable)
+    shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-nspkg'),
+              stdout=subprocess.DEVNULL,
+              stderr=subprocess.DEVNULL, executable=executable)
     display("\nInstalling telemetry ")
-    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-telemetry'),
-                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True, executable=executable)
+    shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-telemetry'),
+              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, executable=executable)
     display("\nInstalling core ")
-    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-core'),
-                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True, executable=executable)
-    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-testsdk'),
-                          stdout=subprocess.DEVNULL,
-                          stderr=subprocess.DEVNULL, shell=True, executable=executable)
+    shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-core'),
+              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, executable=executable)
+    shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-testsdk'),
+              stdout=subprocess.DEVNULL,
+              stderr=subprocess.DEVNULL, executable=executable)
     display("\nInstalling cli ")
-    subprocess.check_call(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli'),
-                          shell=True, executable=executable)
+    shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli'),
+              executable=executable)
     req_file = 'requirements.py3.{}.txt'.format(platform.system().lower() if const.IS_WINDOWS else platform.system())
     req_file = "{}/src/azure-cli/{}".format(cli_path, req_file)
     display("Installing " + req_file)
-    subprocess.check_call(activate_path + delimiter + const.PIP_R_CMD + req_file, shell=True, executable=executable)
+    shell_cmd(activate_path + delimiter + const.PIP_R_CMD + req_file, executable=executable)
 
 
 def install_extensions(venv_path, extensions):
@@ -108,7 +108,7 @@ def install_extensions(venv_path, extensions):
     if extensions == ['*']:
         display("\nInstalling all extensions")
         for i in all_ext:
-            subprocess.call(activate_path + delimiter + const.PIP_E_CMD + i['path'], shell=True, executable=executable)
+            shell_cmd(activate_path + delimiter + const.PIP_E_CMD + i['path'], executable=executable)
         extensions = False
     else:
         display("\nInstalling the following extensions: " + str(extensions))
@@ -116,8 +116,8 @@ def install_extensions(venv_path, extensions):
     k = 0
     while k < len(all_ext) and extensions:
         if all_ext[k]['name'] in extensions:
-            subprocess.call(activate_path + delimiter + const.PIP_E_CMD + all_ext[k]['path'], shell=True,
-                            executable=executable)
+            shell_cmd(activate_path + delimiter + const.PIP_E_CMD + all_ext[k]['path'],
+                      executable=executable)
             extensions.remove(all_ext[k]['name'])
         k += 1
     if extensions:

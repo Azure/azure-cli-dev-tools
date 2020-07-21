@@ -31,24 +31,23 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, clean):
         if pytest_args:
             arguments += pytest_args
         cmd = 'python -m pytest {}'.format(' '.join(arguments))
-        failed, k = False, 0
-        while k < len(test_paths) and not failed:
+        k = 0
+        while k < len(test_paths):
             cmd = ("python " + ('-B ' if clean else '') +
                    "-m pytest {}").format(' '.join([test_paths[k]] + arguments))
             display("running cmd " + str(cmd))
             try:
                 subprocess.check_call(cmd.split(), shell=const.IS_WINDOWS)
             except subprocess.CalledProcessError:
-                failed = True
-
-            if failed and clean:
-                display("Test failed, cleaning up recordings")
-                recordings = os.path.join(test_paths[k], 'recordings')
-                if os.path.isdir(recordings):
-                    recording_files = os.listdir(recordings)
-                    for file in recording_files:
-                        if file.endswith(".yaml"):
-                            os.remove(os.path.join(recordings, file))
+                if clean:
+                    display("Test failed, cleaning up recordings")
+                    recordings = os.path.join(test_paths[k], 'recordings')
+                    if os.path.isdir(recordings):
+                        recording_files = os.listdir(recordings)
+                        for file in recording_files:
+                            if file.endswith(".yaml"):
+                                os.remove(os.path.join(recordings, file))
+                break
             logger.info('Running: %s', cmd)
             k += 1
 

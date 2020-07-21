@@ -55,7 +55,8 @@ def cmd(command, message=False, show_stderr=True, **kwargs):
     except subprocess.CalledProcessError as err:
         return CommandResultItem(err.output, exit_code=err.returncode, error=err)
 
-def shell_cmd(command, message=False, stderr=True, stdout=True, check=True, raise_ex=True, timeout=None):
+def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, raise_ex=True, timeout=None, 
+              executable=None):
     # use default message if custom not provided
     if message is True:
         message = 'Running: {}\n'.format(command)
@@ -66,9 +67,11 @@ def shell_cmd(command, message=False, stderr=True, stdout=True, check=True, rais
     try:
         subprocess.run(
             command,
-            stdout=None if stdout else subprocess.DEVNULL,
-            stderr=None if stderr else subprocess.DEVNULL,
-            check=True if check else False,
+            stdout=stdout,
+            stderr=stderr,
+            check=check,
+            timeout=timeout,
+            executable=executable,
             shell=True)
     except subprocess.CalledProcessError as err:
         if raise_ex:
