@@ -72,7 +72,7 @@ setup(
         'requests',
         'sphinx==1.6.7',
         'tox',
-        'wheel==0.30.0',
+        'wheel==0.34.2',
         'azure-storage-blob>=1.3.1,<2.0.0',
         'isort==4.3.21'
     ],
