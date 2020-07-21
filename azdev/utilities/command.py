@@ -57,7 +57,7 @@ def cmd(command, message=False, show_stderr=True, **kwargs):
 
 
 def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, raise_ex=True, timeout=None,
-              executable=None):
+              executable=None, capture_output=False):
 
     # use default message if custom not provided
     if message is True:
@@ -67,14 +67,16 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
         display(message)
 
     try:
-        subprocess.run(
+        output = subprocess.run(
             command,
             stdout=stdout,
             stderr=stderr,
             check=check,
             timeout=timeout,
             executable=executable,
+            capture_output=capture_output,
             shell=True)
+        return CommandResultItem(output, exit_code=0, error=None)
     except subprocess.CalledProcessError as err:
         if raise_ex:
             raise err

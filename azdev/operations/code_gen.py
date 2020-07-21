@@ -18,8 +18,8 @@ from knack.util import CLIError
 import azdev.utilities.const as const
 
 from azdev.utilities import (
-    pip_cmd, display, heading, COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, get_cli_repo_path, get_ext_repo_paths,
-    find_files, require_virtual_env)
+    pip_cmd, shell_cmd, display, heading, COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, get_cli_repo_path,
+    get_ext_repo_paths, find_files, require_virtual_env)
 
 
 logger = get_logger(__name__)
@@ -333,49 +333,48 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
     heading('Start generating extension {}.'.format(ext_name))
     # check if npm is installed
     try:
-        subprocess.check_call('npm --version', shell=True, stdout=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as ex:
-        raise CLIError('{}\nPlease install npm.'.format(ex))
+        shell_cmd('npm --version', stdout=subprocess.DEVNULL, raise_ex=False)
+    except CLIError as ex:
+        raise ex
     display('Installing autorest.\n')
     if const.IS_WINDOWS:
         try:
-            subprocess.check_call('npm install -g autorest', shell=True)
-        except subprocess.CalledProcessError as ex:
-            raise CLIError("Failed to install autorest.\n{}".format(ex))
+            shell_cmd('npm install -g autorest', raise_ex=False)
+        except CLIError as ex:
+            raise ex
     else:
         try:
-            subprocess.check_call('npm install -g autorest', shell=True, stderr=subprocess.DEVNULL)
-        except subprocess.CalledProcessError as ex:
+            shell_cmd('npm install -g autorest', stderr=subprocess.DEVNULL, raise_ex=False)
+        except CLIError as ex:
             path = os.environ['PATH']
             # check if npm is installed through nvm
             if os.environ.get('NVM_DIR'):
-                raise CLIError(ex)
+                raise ex
             # check if user using specific node version and manually add it to the os env PATH
-            node_version = subprocess.check_output('node --version', shell=True).decode('utf-8')
+            node_version = shell_cmd('node --version', capture_output=True).result.stdout.decode('utf-8')
             if node_version.endswith('\n'):
                 node_version = node_version.replace('\n', '')
             if 'node/' + node_version + '/bin' in path:
-                raise CLIError(ex)
+                raise ex
             # create a new directory for npm global installations, to avoid using sudo in installing autorest
             npm_path = os.path.join(os.environ['HOME'], '.npm-packages')
             if not os.path.isdir(npm_path):
                 os.mkdir(npm_path)
-            npm_prefix = subprocess.check_output('npm prefix -g', shell=True).decode('utf-8')
+            npm_prefix = shell_cmd('npm prefix -g', capture_output=True).result.stdout.decode('utf-8')
             if npm_prefix.endswith('\n'):
                 npm_prefix = npm_prefix.replace('\n', '')
-            subprocess.run('npm config set prefix ' + npm_path, shell=True)
+            shell_cmd('npm config set prefix ' + npm_path)
             os.environ['PATH'] = path + ':' + os.path.join(npm_path, 'bin')
             os.environ['MANPATH'] = os.path.join(npm_path, 'share', 'man')
-            subprocess.check_call('npm install -g autorest', shell=True)
-            subprocess.run('npm config set prefix ' + npm_prefix, shell=True)
+            shell_cmd('npm install -g autorest')
+            shell_cmd('npm config set prefix ' + npm_prefix)
             # update autorest core
-            subprocess.check_call('autorest --latest', shell=True)
+            shell_cmd('autorest --latest')
             if not use:
                 cmd = const.AUTO_REST_CMD + '{} {}'.format(repo_path, swagger_readme_file_path)
             else:
                 cmd = const.AUTO_REST_CMD + '{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
-            display('\n' + cmd + '\n')
-            subprocess.check_call(cmd, shell=True)
+            shell_cmd(cmd, message=True)
 
 
 def _add_extension(ext_name, repo_path):
