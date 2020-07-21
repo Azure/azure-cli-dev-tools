@@ -55,8 +55,10 @@ def cmd(command, message=False, show_stderr=True, **kwargs):
     except subprocess.CalledProcessError as err:
         return CommandResultItem(err.output, exit_code=err.returncode, error=err)
 
-def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, raise_ex=True, timeout=None, 
+
+def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, raise_ex=True, timeout=None,
               executable=None):
+
     # use default message if custom not provided
     if message is True:
         message = 'Running: {}\n'.format(command)
@@ -76,7 +78,8 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
     except subprocess.CalledProcessError as err:
         if raise_ex:
             raise err
-        return CommandResultItem(err.output, exit_code=err.returncode, error=err)
+    return CommandResultItem(err.output, exit_code=err.returncode, error=err)
+
 
 def py_cmd(command, message=False, show_stderr=True, is_module=True, **kwargs):
     """ Run a script or command with Python.

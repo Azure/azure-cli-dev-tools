@@ -6,10 +6,8 @@
 # -----------------------------------------------------------------------------
 
 import os
-import subprocess
 from shutil import copytree, rmtree
 import shutil
-import shlex
 import time
 
 from knack.log import get_logger
