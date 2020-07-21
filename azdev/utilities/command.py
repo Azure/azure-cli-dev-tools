@@ -78,8 +78,6 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
     except subprocess.CalledProcessError as err:
         if raise_ex:
             raise err
-        return CommandResultItem(err.output, exit_code=err.returncode, error=err)
-    return
 
 
 def py_cmd(command, message=False, show_stderr=True, is_module=True, **kwargs):
