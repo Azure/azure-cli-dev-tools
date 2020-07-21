@@ -76,27 +76,27 @@ def install_cli(cli_path, venv_path):
     display("\nvenv activate path is " + str(activate_path))
     shell_cmd(activate_path + delimiter + 'pip install --ignore-installed azure-common',
               stdout=subprocess.DEVNULL,
-              stderr=subprocess.DEVNULL, executable=executable)
+              stderr=subprocess.DEVNULL, raise_ex=False, executable=executable)
     display("\nInstalling nspkg ")
     shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-nspkg'),
               stdout=subprocess.DEVNULL,
-              stderr=subprocess.DEVNULL, executable=executable)
+              stderr=subprocess.DEVNULL, raise_ex=False, executable=executable)
     display("\nInstalling telemetry ")
     shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-telemetry'),
-              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, executable=executable)
+              stdout=subprocess.DEVNULL, raise_ex=False, stderr=subprocess.DEVNULL, executable=executable)
     display("\nInstalling core ")
     shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-core'),
-              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, executable=executable)
+              stdout=subprocess.DEVNULL, raise_ex=False, stderr=subprocess.DEVNULL, executable=executable)
     shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-testsdk'),
               stdout=subprocess.DEVNULL,
-              stderr=subprocess.DEVNULL, executable=executable)
+              stderr=subprocess.DEVNULL, raise_ex=False, executable=executable)
     display("\nInstalling cli ")
     shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli'),
-              executable=executable)
+              raise_ex=False, executable=executable)
     req_file = 'requirements.py3.{}.txt'.format(platform.system().lower() if const.IS_WINDOWS else platform.system())
     req_file = "{}/src/azure-cli/{}".format(cli_path, req_file)
     display("Installing " + req_file)
-    shell_cmd(activate_path + delimiter + const.PIP_R_CMD + req_file, executable=executable)
+    shell_cmd(activate_path + delimiter + const.PIP_R_CMD + req_file, raise_ex=False, executable=executable)
 
 
 def install_extensions(venv_path, extensions):
