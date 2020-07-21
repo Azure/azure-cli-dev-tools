@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 from knack.log import get_logger
-from knack.util import CommandResultItem
+from knack.util import CommandResultItem, CLIError
 
 logger = get_logger(__name__)
 
@@ -78,6 +78,8 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
     except subprocess.CalledProcessError as err:
         if raise_ex:
             raise err
+        logger.debug(err)
+        raise CLIError("Command " + command + " failed. Trying running with --debug for more info")
 
 
 def py_cmd(command, message=False, show_stderr=True, is_module=True, **kwargs):
