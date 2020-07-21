@@ -18,6 +18,7 @@ from azdev.utilities import (
 
 
 logger = get_logger(__name__)
+CHECKERS_PATH = 'azdev.utilities.pylint_checkers'
 
 
 # pylint: disable=too-many-statements
@@ -149,14 +150,19 @@ def _run_pylint(modules):
         ext_paths.append(glob(os.path.join(path, glob_pattern))[0])
 
     def run(paths, rcfile, desc):
+        from importlib import import_module
         if not paths:
             return None
         logger.debug("Using rcfile file: %s", rcfile)
         logger.debug("Running on %s: %s", desc, "\n".join(paths))
-        command = "pylint {} --ignore vendored_sdks,privates --rcfile={} -j {}".format(
-            " ".join(paths), rcfile, multiprocessing.cpu_count()
+        my_env = os.environ.copy()
+        checker_path = import_module('{}'.format(CHECKERS_PATH)).__path__[0]
+        my_env['PYTHONPATH'] = checker_path
+        checkers = [os.path.splitext(f)[0] for f in os.listdir(checker_path) if os.path.isfile(os.path.join(checker_path, f)) and f != '__init__.py']
+        command = "pylint {} --load-plugins {} --ignore vendored_sdks,privates --rcfile={} -j {}".format(
+             " ".join(paths), ",".join(checkers), rcfile, multiprocessing.cpu_count()
         )
-        return py_cmd(command, message="Running pylint on {}...".format(desc))
+        return py_cmd(command, message="Running pylint on {}...".format(desc), env=my_env)
 
     cli_pylintrc, ext_pylintrc = _config_file_path("pylint")
 
