@@ -67,16 +67,27 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
         display(message)
 
     try:
-        output = subprocess.run(
-            command,
-            stdout=stdout,
-            stderr=stderr,
-            check=check,
-            timeout=timeout,
-            executable=executable,
-            capture_output=capture_output,
-            shell=True)
-        return CommandResultItem(output, exit_code=0, error=None)
+        if capture_output is False:
+            subprocess.run(
+                command,
+                stdout=stdout,
+                stderr=stderr,
+                check=check,
+                timeout=timeout,
+                executable=executable,
+                capture_output=capture_output,
+                shell=True)
+        else:
+            output = subprocess.run(
+                command,
+                stdout=stdout,
+                stderr=stderr,
+                check=check,
+                timeout=timeout,
+                executable=executable,
+                capture_output=capture_output,
+                shell=True).stdout.decode('utf-8').strip()
+            return CommandResultItem(output, exit_code=0, error=None)
     except subprocess.CalledProcessError as err:
         if raise_ex:
             raise err

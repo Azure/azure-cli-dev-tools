@@ -351,18 +351,17 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
             if os.environ.get('NVM_DIR'):
                 raise ex
             # check if user using specific node version and manually add it to the os env PATH
-            node_version = shell_cmd('node --version', capture_output=True).result.stdout.decode('utf-8')
-            if node_version.endswith('\n'):
-                node_version = node_version.replace('\n', '')
+            node_version = shell_cmd('node --version', capture_output=True).result
+            print('/////////////////')
+            print(node_version)
             if 'node/' + node_version + '/bin' in path:
                 raise ex
             # create a new directory for npm global installations, to avoid using sudo in installing autorest
             npm_path = os.path.join(os.environ['HOME'], '.npm-packages')
             if not os.path.isdir(npm_path):
                 os.mkdir(npm_path)
-            npm_prefix = shell_cmd('npm prefix -g', capture_output=True).result.stdout.decode('utf-8')
-            if npm_prefix.endswith('\n'):
-                npm_prefix = npm_prefix.replace('\n', '')
+            npm_prefix = shell_cmd('npm prefix -g', capture_output=True).result
+            print(npm_prefix)
             shell_cmd('npm config set prefix ' + npm_path)
             os.environ['PATH'] = path + ':' + os.path.join(npm_path, 'bin')
             os.environ['MANPATH'] = os.path.join(npm_path, 'share', 'man')
