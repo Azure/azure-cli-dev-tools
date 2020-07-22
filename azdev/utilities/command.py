@@ -66,8 +66,8 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
     if message:
         display(message)
 
-    try:
-        if capture_output is False:
+    if capture_output is False:
+        try:
             subprocess.run(
                 command,
                 stdout=stdout,
@@ -77,7 +77,13 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
                 executable=executable,
                 capture_output=capture_output,
                 shell=True)
-        else:
+        except subprocess.CalledProcessError as err:
+            if raise_ex:
+                raise err
+            logger.debug(err)
+            raise CLIError("Command " + command + " failed. Trying running with --debug for more info")
+    else:
+        try:
             output = subprocess.run(
                 command,
                 stdout=stdout,
@@ -88,11 +94,11 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
                 capture_output=capture_output,
                 shell=True).stdout.decode('utf-8').strip()
             return CommandResultItem(output, exit_code=0, error=None)
-    except subprocess.CalledProcessError as err:
-        if raise_ex:
-            raise err
-        logger.debug(err)
-        raise CLIError("Command " + command + " failed. Trying running with --debug for more info")
+        except subprocess.CalledProcessError as err:
+            if raise_ex:
+                raise err
+            logger.debug(err)
+            raise CLIError("Command " + command + " failed. Trying running with --debug for more info")
 
 
 def py_cmd(command, message=False, show_stderr=True, is_module=True, **kwargs):
