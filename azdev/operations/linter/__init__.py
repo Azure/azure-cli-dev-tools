@@ -23,7 +23,7 @@ from .util import filter_modules, merge_exclusion
 
 
 logger = get_logger(__name__)
-CHECKERS_PATH = 'azdev.utilities.pylint_checkers'
+CHECKERS_PATH = 'azdev.operations.linter.pylint_checkers'
 
 
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches
@@ -166,6 +166,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
 
 
 def pylint_rules(selected_modules):
+    # TODO: support severity for pylint rules
     from importlib import import_module
     my_env = os.environ.copy()
     checker_path = import_module('{}'.format(CHECKERS_PATH)).__path__[0]
@@ -178,7 +179,7 @@ def pylint_rules(selected_modules):
         display(os.linesep + 'No violations found for custom pylint rules.')
     if pylint_result and pylint_result.error:
         print(pylint_result.error.output.decode('utf-8'))
-        print(os.linesep + 'Linter: FAILED\n')
+        print('Linter: FAILED\n')
 
 
 def linter_severity_choices():
