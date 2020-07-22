@@ -66,39 +66,23 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
     if message:
         display(message)
 
-    if capture_output is False:
-        try:
-            subprocess.run(
-                command,
-                stdout=stdout,
-                stderr=stderr,
-                check=check,
-                timeout=timeout,
-                executable=executable,
-                capture_output=capture_output,
-                shell=True)
-        except subprocess.CalledProcessError as err:
-            if raise_ex:
-                raise err
-            logger.debug(err)
-            raise CLIError("Command " + command + " failed. Trying running with --debug for more info")
-    else:
-        try:
-            output = subprocess.run(
-                command,
-                stdout=stdout,
-                stderr=stderr,
-                check=check,
-                timeout=timeout,
-                executable=executable,
-                capture_output=capture_output,
-                shell=True).stdout.decode('utf-8').strip()
+    try:
+        output = subprocess.run(
+                                command,
+                                stdout=subprocess.PIPE if capture_output else stdout,
+                                stderr=subprocess.PIPE if capture_output else stderr,
+                                check=check,
+                                timeout=timeout,
+                                executable=executable,
+                                shell=True)
+        if capture_output:
             return CommandResultItem(output, exit_code=0, error=None)
-        except subprocess.CalledProcessError as err:
-            if raise_ex:
-                raise err
-            logger.debug(err)
-            raise CLIError("Command " + command + " failed. Trying running with --debug for more info")
+    except subprocess.CalledProcessError as err:
+        if raise_ex:
+            raise err
+        logger.debug(err)
+        raise CLIError("Command " + command + " failed. Trying running with --debug for more info")
+    return None
 
 
 def py_cmd(command, message=False, show_stderr=True, is_module=True, **kwargs):
