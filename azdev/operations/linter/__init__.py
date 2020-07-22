@@ -16,12 +16,14 @@ from knack.util import CLIError
 from azdev.utilities import (
     heading, subheading, display, get_path_table, require_azure_cli, filter_by_git_diff)
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
+from azdev.operations.style import run_pylint
 
 from .linter import LinterManager, LinterScope, RuleError, LinterSeverity
 from .util import filter_modules, merge_exclusion
 
 
 logger = get_logger(__name__)
+CHECKERS_PATH = 'azdev.utilities.pylint_checkers'
 
 
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches
@@ -158,7 +160,25 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         run_commands=not rule_types or 'commands' in rule_types,
         run_command_groups=not rule_types or 'command_groups' in rule_types,
         run_help_files_entries=not rule_types or 'help_entries' in rule_types)
+    print(os.linesep + 'Run custom pylint rules.')
+    pylint_rules(selected_modules)
     sys.exit(exit_code)
+
+
+def pylint_rules(selected_modules):
+    from importlib import import_module
+    my_env = os.environ.copy()
+    checker_path = import_module('{}'.format(CHECKERS_PATH)).__path__[0]
+    my_env['PYTHONPATH'] = checker_path
+    checkers = [os.path.splitext(f)[0] for f in os.listdir(checker_path) if
+                os.path.isfile(os.path.join(checker_path, f)) and f != '__init__.py']
+    enable = [s.replace('_', '-') for s in checkers]
+    pylint_result = run_pylint(selected_modules, env=my_env, checkers=checkers, disable_all=True, enable=enable)
+    if pylint_result and not pylint_result.error:
+        display(os.linesep + 'No violations found for custom pylint rules.')
+    if pylint_result and pylint_result.error:
+        print(pylint_result.error.output.decode('utf-8'))
+        print(os.linesep + 'Linter: FAILED\n')
 
 
 def linter_severity_choices():
