@@ -67,8 +67,7 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
         display(message)
 
     try:
-        output = subprocess.run(
-                                command,
+        output = subprocess.run(command,
                                 stdout=subprocess.PIPE if capture_output else stdout,
                                 stderr=subprocess.PIPE if capture_output else stderr,
                                 check=check,
