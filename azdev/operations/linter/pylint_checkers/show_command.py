@@ -29,7 +29,7 @@ class ShowCommandChecker(BaseChecker):
                 self.add_message(
                     'show-command', node=node,
                 )
-        except KeyError:
+        except IndexError:
             return
 
 def register(linter):
