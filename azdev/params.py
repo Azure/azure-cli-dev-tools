@@ -143,7 +143,7 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'extension create') as c:
         c.argument('azure_rest_api_specs', help='The local path or GitHub to azure-rest-api-specs repo.')
-        c.argument('branch', help='The repo branch when using remote azure-rest-api-specs repo. Default: master.')
+        c.argument('branch', help='The repo branch when using remote azure-rest-api-specs repo. Default: the default branch set in this repo.')
         c.argument('use', help='The URL for downloading autorest.az tgz file. You can get all releases here: https://github.com/Azure/autorest.az/releases')
 
     with ArgumentsContext(self, 'cli create') as c:

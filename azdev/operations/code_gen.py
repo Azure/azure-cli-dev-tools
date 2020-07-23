@@ -21,6 +21,8 @@ from azdev.utilities import (
     pip_cmd, shell_cmd, display, heading, COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, get_cli_repo_path,
     get_ext_repo_paths, find_files, require_virtual_env)
 
+from urllib import request, error
+
 
 logger = get_logger(__name__)
 
@@ -63,7 +65,7 @@ def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_UR
     if not azure_rest_api_specs.startswith('http') and branch:
         raise CLIError('Cannot specify azure-rest-api-specs repo branch when using local one.')
     if not branch:
-        branch = 'master'
+        branch = json.load(request.urlopen(const.GITHUB_API_SWAGGER_REPO_URL)).get('default_branch')
     require_virtual_env()
     repo_paths = get_ext_repo_paths()
     repo_path = next(
@@ -308,8 +310,6 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
 
 
 def _get_swagger_readme_file_path(ext_name, swagger_repo, branch):
-    from urllib import request, error
-
     swagger_readme_file_path = None
     if swagger_repo == const.GITHUB_SWAGGER_REPO_URL or \
             (swagger_repo.startswith('https://') and swagger_repo.endswith(const.SWAGGER_REPO_NAME)):

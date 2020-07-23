@@ -36,6 +36,7 @@ UN_EXPORT = 'export'
 BAT_ACTIVATE = 'activate.bat'
 BASH_EXE = '/bin/bash'
 GITHUB_SWAGGER_REPO_URL = 'https://github.com/Azure/azure-rest-api-specs'
+GITHUB_API_SWAGGER_REPO_URL = 'https://api.github.com/repos/Azure/azure-rest-api-specs'
 SWAGGER_REPO_NAME = 'azure-rest-api-specs'
 
 ENV_VAR_TEST_MODULES = 'AZDEV_TEST_TESTS'               # comma-separated list of modules to test
