@@ -351,8 +351,6 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
                 raise ex
             # check if user using specific node version and manually add it to the os env PATH
             node_version = shell_cmd('node --version', capture_output=True).result
-            print('/////////////////')
-            print(node_version)
             if 'node/' + node_version + '/bin' in path:
                 raise ex
             # create a new directory for npm global installations, to avoid using sudo in installing autorest
@@ -360,7 +358,6 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
             if not os.path.isdir(npm_path):
                 os.mkdir(npm_path)
             npm_prefix = shell_cmd('npm prefix -g', capture_output=True).result
-            print(npm_prefix)
             shell_cmd('npm config set prefix ' + npm_path)
             os.environ['PATH'] = path + ':' + os.path.join(npm_path, 'bin')
             os.environ['MANPATH'] = os.path.join(npm_path, 'share', 'man')

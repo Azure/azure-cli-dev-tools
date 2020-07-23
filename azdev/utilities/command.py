@@ -75,7 +75,7 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
                                 executable=executable,
                                 shell=True)
         if capture_output:
-            return CommandResultItem(output, exit_code=0, error=None)
+            return CommandResultItem(output.stdout.decode('utf-8').strip(), exit_code=0, error=None)
     except subprocess.CalledProcessError as err:
         if raise_ex:
             raise err
