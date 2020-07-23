@@ -163,7 +163,7 @@ def run_pylint(modules, checkers=None, env=None, disable_all=False, enable=None)
         if enable is not None:
             command += ' --enable {}'.format(",".join(enable))
 
-        return py_cmd(command, message=os.linesep+"Running pylint on {}...".format(desc), env=env)
+        return py_cmd(command, message="Running pylint on {}...".format(desc), env=env)
 
     cli_pylintrc, ext_pylintrc = _config_file_path("pylint")
 
