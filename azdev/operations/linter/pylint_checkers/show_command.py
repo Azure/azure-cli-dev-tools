@@ -21,9 +21,6 @@ class ShowCommandChecker(BaseChecker):
         ),
     }
 
-    def __init__(self, linter=None):
-        super(ShowCommandChecker, self).__init__(linter)
-
     def visit_call(self, node):
         try:
             if not (isinstance(node.args[0], astroid.node_classes.Const) and node.args[0].value == 'show'):
@@ -32,7 +29,7 @@ class ShowCommandChecker(BaseChecker):
                 self.add_message(
                     'show-command', node=node,
                 )
-        except:
+        except KeyError:
             return
 
 def register(linter):
