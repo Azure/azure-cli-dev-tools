@@ -428,11 +428,10 @@ def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):
 
     # upgrade to latest pip
     pip_cmd('install --upgrade pip -q', 'Upgrading pip...')
-
     _install_cli(cli_path, deps=deps)
-    _install_extensions(ext_to_install)
+    if ext_repo_path:
+        _install_extensions(ext_to_install)
     _copy_config_files()
-
     end = time.time()
     elapsed_min = int((end - start) / 60)
     elapsed_sec = int(end - start) % 60

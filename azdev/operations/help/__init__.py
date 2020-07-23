@@ -86,7 +86,7 @@ def _help_files_not_in_map(cli_repo, help_files_in_map):
 
 
 def generate_cli_ref_docs(output_dir=None, output_type=None, all_profiles=None):
-    require_virtual_env()
+
     # require that azure cli installed and warn the users if extensions are installed.
     require_azure_cli()
     output_dir = _process_ref_doc_output_dir(output_dir)

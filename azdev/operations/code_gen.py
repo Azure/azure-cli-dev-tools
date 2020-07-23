@@ -50,7 +50,6 @@ def _generate_files(env, generation_kwargs, file_list, dest_path):
 def create_module(mod_name='test', display_name=None, display_name_plural=None, required_sdk=None,
                   client_name=None, operation_name=None, sdk_property=None, not_preview=False, github_alias=None,
                   local_sdk=None):
-    require_virtual_env()
     repo_path = os.path.join(get_cli_repo_path(), _MODULE_ROOT_PATH)
     _create_package('', repo_path, False, mod_name, display_name, display_name_plural,
                     required_sdk, client_name, operation_name, sdk_property, not_preview, local_sdk)

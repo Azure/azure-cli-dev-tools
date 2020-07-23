@@ -53,11 +53,6 @@ def load_command_table(self, _):
         g.command('publish', 'publish_extensions')
         g.command('update-index', 'update_extension_index')
 
-    with CommandGroup(self, 'extension repo', operation_group('extensions')) as g:
-        g.command('add', 'add_extension_repo')
-        g.command('remove', 'remove_extension_repo')
-        g.command('list', 'list_extension_repos')
-
     with CommandGroup(self, 'cli', operation_group('help')) as g:
         g.command('generate-docs', 'generate_cli_ref_docs')
 
