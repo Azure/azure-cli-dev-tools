@@ -8,6 +8,7 @@ import astroid
 from pylint.checkers import BaseChecker
 from pylint.interfaces import IAstroidChecker
 
+
 class ShowCommandChecker(BaseChecker):
     __implements__ = IAstroidChecker
 
@@ -31,6 +32,7 @@ class ShowCommandChecker(BaseChecker):
                 )
         except IndexError:
             return
+
 
 def register(linter):
     linter.register_checker(ShowCommandChecker(linter))
