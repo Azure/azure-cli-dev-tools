@@ -154,7 +154,7 @@ def run_pylint(modules, checkers=None, env=None, disable_all=False, enable=None)
         logger.debug("Using rcfile file: %s", rcfile)
         logger.debug("Running on %s: %s", desc, "\n".join(paths))
         command = "pylint {} --ignore vendored_sdks,privates --rcfile={} -j {}".format(
-             " ".join(paths), rcfile, multiprocessing.cpu_count()
+            " ".join(paths), rcfile, multiprocessing.cpu_count()
         )
         if checkers is not None:
             command += ' --load-plugins {}'.format(",".join(checkers))
