@@ -138,7 +138,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         command_loader, help_file_entries, modules=selected_mod_names, include_whl_extensions=include_whl_extensions)
 
     if not command_loader.command_table:
-        raise CLIError('No commands selected to check.')
+        logger.warning('No commands selected to check.')
 
     # Instantiate and run Linter
     linter_manager = LinterManager(command_loader=command_loader,
