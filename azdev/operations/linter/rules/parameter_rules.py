@@ -151,8 +151,6 @@ def option_length_too_long(linter, command_name, parameter_name):
             return
         min_length = min(min_length, len(option))
     if min_length > length_threshold:
-        # linter.fail_count += 1
-        # print(linter.fail_count)
         raise RuleError("The lengths of all options {} are longer than {} ".format(options_list, length_threshold))
 
 
