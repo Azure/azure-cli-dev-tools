@@ -61,7 +61,7 @@ def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, rais
 
     # use default message if custom not provided
     if message is True:
-        message = 'Running: {}\n'.format(command)
+        message = '\nRunning: {}\n'.format(command)
     from . import display
     if message:
         display(message)

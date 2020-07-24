@@ -319,7 +319,8 @@ def _get_swagger_readme_file_path(ext_name, swagger_repo, branch):
         try:
             request.urlopen(swagger_readme_file_path)
         except error.HTTPError as ex:
-            raise CLIError('HTTPError: {}\nThe URL {} does not exist.'.format(ex.code, swagger_readme_file_path))
+            raise CLIError(
+                'HTTPError: {}\nNo swagger readme file found in this URL: {}'.format(ex.code, swagger_readme_file_path))
     else:
         swagger_readme_file_path = os.path.join(swagger_repo, 'specification', ext_name, 'resource-manager')
         if not os.path.isdir(swagger_readme_file_path):
@@ -334,13 +335,13 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
     try:
         shell_cmd('npm --version', stdout=subprocess.DEVNULL, raise_ex=False)
     except CLIError as ex:
-        raise ex
-    display('Installing autorest.\n')
+        raise CLIError('{}\nPlease install npm.'.format(ex))
+    display('Installing autorest...\n')
     if const.IS_WINDOWS:
         try:
             shell_cmd('npm install -g autorest', raise_ex=False)
         except CLIError as ex:
-            raise ex
+            raise CLIError("Failed to install autorest.\n{}".format(ex))
     else:
         try:
             shell_cmd('npm install -g autorest', stderr=subprocess.DEVNULL, raise_ex=False)
