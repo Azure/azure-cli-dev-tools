@@ -364,13 +364,13 @@ def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
             os.environ['MANPATH'] = os.path.join(npm_path, 'share', 'man')
             shell_cmd('npm install -g autorest')
             shell_cmd('npm config set prefix ' + npm_prefix)
-            # update autorest core
-            shell_cmd('autorest --latest')
-            if not use:
-                cmd = const.AUTO_REST_CMD + '{} {}'.format(repo_path, swagger_readme_file_path)
-            else:
-                cmd = const.AUTO_REST_CMD + '{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
-            shell_cmd(cmd, message=True)
+    # update autorest core
+    shell_cmd('autorest --latest')
+    if not use:
+        cmd = const.AUTO_REST_CMD + '{} {}'.format(repo_path, swagger_readme_file_path)
+    else:
+        cmd = const.AUTO_REST_CMD + '{} {} --use={}'.format(repo_path, swagger_readme_file_path, use)
+    shell_cmd(cmd, message=True)
 
 
 def _add_extension(ext_name, repo_path):
