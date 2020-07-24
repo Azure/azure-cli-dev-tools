@@ -54,7 +54,7 @@ class ParameterRule(BaseRule):
                             try:
                                 func(linter, command_name, parameter_name)
                             except RuleError as ex:
-                                linter_manager.mark_rule_failure()
+                                linter_manager.mark_rule_failure(self.severity)
                                 yield (_create_violation_msg(ex, 'Parameter: {}, `{}`', command_name, parameter_name),
                                        (command_name, parameter_name),
                                        func.__name__)
@@ -75,7 +75,7 @@ def _get_decorator(func, rule_group, print_format, severity):
                     try:
                         func(linter, iter_entity)
                     except RuleError as ex:
-                        linter_manager.mark_rule_failure()
+                        linter_manager.mark_rule_failure(severity)
                         yield (_create_violation_msg(ex, print_format, iter_entity), iter_entity, func.__name__)
 
         linter_manager.add_rule(rule_group, func.__name__, wrapper, severity)
