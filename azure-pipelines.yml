@@ -136,7 +136,7 @@ jobs:
 
         azdev --version
 
-        python -m pytest azdev/ --ignore=azdev/mod_templates --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
+        python -m pytest azdev/ --ignore=azdev/mod_templates --junitxml=junit/test-results.xml --cov=azdev/ --cov-report=xml --cov-report=html
     - task: PublishTestResults@2
       inputs:
         testResultsFiles: '**/test-*.xml'
