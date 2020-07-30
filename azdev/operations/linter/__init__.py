@@ -80,7 +80,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
 
     if not any((selected_modules[x] for x in selected_modules)):
-        raise CLIError('No modules selected.')
+        logger.warning('No commands selected to check.')
 
     selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
         list(selected_modules['ext'].keys())
