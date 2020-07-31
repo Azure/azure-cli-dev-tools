@@ -5,7 +5,7 @@ Release History
 0.1.23
 ++++++
 * [Linter] Only violation of high severity rule would exit with 1.
-* Bump pytest version to 5.0.0.
+* Minimal pytest version requires at least 5.0.0.
 
 0.1.22
 ++++++
