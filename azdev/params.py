@@ -102,7 +102,7 @@ def load_arguments(self, _):
         c.argument('runs', type=int, help='Number of runs to average performance over.')
 
     with ArgumentsContext(self, 'perf benchmark') as c:
-        c.positional('commands', nargs="+", help="Command prefix to run benchmark")
+        c.positional('commands', nargs="*", help="Command prefix to run benchmark. Omit to check all commands with --help.")
         c.argument('top', type=int, help='Show N slowest commands. 0 for all.')
 
     with ArgumentsContext(self, 'extension') as c:

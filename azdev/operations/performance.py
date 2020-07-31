@@ -147,9 +147,12 @@ def display_table(data):
 
 
 # require azdev setup
-def benchmark(commands, runs=20):
+def benchmark(commands=None, runs=20):
     if runs <= 0:
         raise CLIError("Number of runs must be greater than 0.")
+
+    if not commands:
+        commands = _benchmark_load_all_commands()
 
     result = []
 
@@ -175,12 +178,33 @@ def benchmark(commands, runs=20):
 
         staticstic = _benchmark_cmd_staticstic(time_series)
         staticstic.update({
-            'Command': raw_command
+            "Command": raw_command,
+            "Runs": runs,
         })
+
+        logger.info(staticstic)
 
         result.append(staticstic)
 
     return result
+
+
+def _benchmark_load_all_commands():
+    try:
+        from azure.cli.core import get_default_cli
+        from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args
+    except ImportError:
+        raise CLIError("Azure CLI is not installed")
+
+    az_cli = get_default_cli()
+
+    create_invoker_and_load_cmds_and_args(az_cli)
+
+    commands = list(az_cli.invocation.commands_loader.command_table.keys())
+
+    commands = [cmd + " --help" for cmd in commands]
+
+    return sorted(commands)
 
 
 def _benchmark_process_pool_init():
