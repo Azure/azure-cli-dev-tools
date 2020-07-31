@@ -310,7 +310,7 @@ jobs:
     - bash: |
         set -ev
         . env/bin/activate
-        azdev perf benchmark "version" "network vnet -h" "rest -h" "storage account"
+        azdev perf benchmark "version" "network vnet -h" "rest -h" "storage account" -o table
       displayName: "Execution Performance"
 
 # - job: PerformanceCheckOnWindows
