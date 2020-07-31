@@ -6,6 +6,8 @@
 
 from knack.commands import CommandGroup
 
+from .transformers import performance_benchmark_data_transformer
+
 
 def load_command_table(self, _):
 
@@ -43,7 +45,7 @@ def load_command_table(self, _):
 
     with CommandGroup(self, 'perf', operation_group('performance')) as g:
         g.command('load-times', 'check_load_time')
-        g.command('benchmark', 'benchmark', is_preview=True)
+        g.command('benchmark', 'benchmark', is_preview=True, table_transformer=performance_benchmark_data_transformer)
 
     with CommandGroup(self, 'extension', operation_group('extensions')) as g:
         g.command('add', 'add_extension')
