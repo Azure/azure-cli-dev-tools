@@ -2,6 +2,11 @@
 
 Release History
 ===============
+0.1.23
+++++++
+* [Linter] Only violation of high severity rule would exit with 1.
+* Minimal pytest version requires at least 5.0.0.
+
 0.1.22
 ++++++
 * Hornor the configuration of pylint and flake8 in Azure/azure-cli and Azure/azure-cli-extensions.
