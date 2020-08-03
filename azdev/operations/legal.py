@@ -54,7 +54,7 @@ def check_license_headers():
         for py_file in py_files:
             py_file = str(py_file)
 
-            if py_file.endswith('azure_bdist_wheel.py'):
+            if py_file.endswith('azure_cli_bdist_wheel.py'):
                 continue
 
             for ignore_token in _IGNORE_SUBDIRS:
