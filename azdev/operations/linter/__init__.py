@@ -220,6 +220,9 @@ def command_test_coverage(modules=None, rule_types=None, rules=None, ci_exclusio
     simple_command_table = _format_command_table(command_loader.command_table)
     parser = command_loader.cli_ctx.invocation.parser
     path = os.path.join(*TEST_COMMANDS)
+
+    commands_with_tests = []
+
     with open(path) as file:
         import shlex
         from azdev.operations.linter.rules.help_rules import _process_command_args
@@ -234,7 +237,7 @@ def command_test_coverage(modules=None, rule_types=None, rules=None, ci_exclusio
                 print(command)
                 pass
             command = file.readline()
-    _calculate_coverage_rate(simple_command_table)
+    _calculate_command_coverage_rate(simple_command_table, commands_with_tests)
 
 
 def _format_command_table(command_table):
@@ -242,7 +245,7 @@ def _format_command_table(command_table):
     ignore_arg = ['_subscription', 'cmd']
     for command, value in command_table.items():
         args_table = {arg: False for arg in value.arguments.keys() if arg not in ignore_arg}
-        simple_command_table[command] = args_table
+        simple_command_table[command] = [args_table, False] # arg table and is the command tested
     return simple_command_table
 
 
@@ -250,19 +253,29 @@ def _update_command_table(simple_command_table, namespace):
     command = namespace.command
     from knack.validators import DefaultInt, DefaultStr
     if command in simple_command_table:
+        simple_command_table[command][1] = True
         for key in simple_command_table[command].keys():
             if hasattr(namespace, key) and getattr(namespace, key) and (type(getattr(namespace, key)) not in [DefaultInt, DefaultStr]):
-                simple_command_table[command][key] = True
+                simple_command_table[command][0][key] = True
 
 
-def _calculate_coverage_rate(simple_command_table):
+def _calculate_command_coverage_rate(simple_command_table, commands_with_tests):
     command_coverage = {}
-    for command, args in simple_command_table.items():
+    for command, value in simple_command_table.items():
         command_group = command.split(' ')[0]
         if command_group not in command_coverage:
             command_coverage[command_group] = [0, 0]
         command_coverage[command_group][1] += 1
-        if any(args.values()):
+        if value[1]:
             command_coverage[command_group][0] += 1
+        else:
+            commands_with_tests.append(command)
     for command_group, value in command_coverage.items():
         print("{} command coverage is {}".format(command_group, value[0]*1.0/value[1]))
+
+
+def _save_commands_without_tests(commands_without_tests):
+    import json
+    file_name = os.path.join(get_cli_repo_path(), 'commands_without_tests.json')
+    with open(file_name, 'w') as out:
+        json.dump(commands_without_tests, out)
