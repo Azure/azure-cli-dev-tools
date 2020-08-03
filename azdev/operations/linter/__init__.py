@@ -24,7 +24,8 @@ from .util import filter_modules, merge_exclusion
 
 logger = get_logger(__name__)
 CHECKERS_PATH = 'azdev.operations.linter.pylint_checkers'
-TEST_COMMANDS = ['C:\\','Codes','azure-cli-dev-folder','azure-cli','az_command_coverage.txt']
+TEST_COMMANDS = [get_cli_repo_path(), 'az_command_coverage.txt']
+CLI_SUPRESS = [get_cli_repo_path(), 'test_exclusions.json']
 
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches
 def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
@@ -188,9 +189,10 @@ def linter_severity_choices():
     return [str(severity.name).lower() for severity in LinterSeverity]
 
 
-def command_test_coverage(modules=None, rule_types=None, rules=None, ci_exclusions=None,
+def command_test_coverage(modules=None,
                           git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
-                          min_severity=None, save_global_exclusion=False):
+                          save_global_exclusion=False):
+    import json
     require_azure_cli()
 
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
@@ -244,7 +246,14 @@ def command_test_coverage(modules=None, rule_types=None, rules=None, ci_exclusio
     parser = command_loader.cli_ctx.invocation.parser
     path = os.path.join(*TEST_COMMANDS)
 
-    commands_with_tests = []
+    commands_without_tests = []
+    test_exclusions = []
+
+    try:
+        with open(os.path.join(*CLI_SUPRESS)) as json_file:
+            test_exclusions = json.load(json_file)
+    except:
+        pass
 
     with open(path) as file:
         import shlex
@@ -260,7 +269,10 @@ def command_test_coverage(modules=None, rule_types=None, rules=None, ci_exclusio
                 print(command)
                 pass
             command = file.readline()
-    _calculate_command_coverage_rate(simple_command_table, commands_with_tests)
+    print("-------Test Results:-------")
+    _calculate_command_coverage_rate(simple_command_table, commands_without_tests, test_exclusions)
+    if save_global_exclusion:
+        _save_commands_without_tests(commands_without_tests)
 
 
 def _format_command_table(command_table):
@@ -282,7 +294,7 @@ def _update_command_table(simple_command_table, namespace):
                 simple_command_table[command][0][key] = True
 
 
-def _calculate_command_coverage_rate(simple_command_table, commands_with_tests):
+def _calculate_command_coverage_rate(simple_command_table, commands_without_tests, test_exclusions):
     command_coverage = {}
     for command, value in simple_command_table.items():
         command_group = command.split(' ')[0]
@@ -292,13 +304,17 @@ def _calculate_command_coverage_rate(simple_command_table, commands_with_tests):
         if value[1]:
             command_coverage[command_group][0] += 1
         else:
-            commands_with_tests.append(command)
+            commands_without_tests.append(command)
+            if command in test_exclusions:
+                command_coverage[command_group][0] += 1
+            else:
+                print("{} doesn't have test".format(command))
     for command_group, value in command_coverage.items():
         print("{} command coverage is {}".format(command_group, value[0]*1.0/value[1]))
 
 
 def _save_commands_without_tests(commands_without_tests):
     import json
-    file_name = os.path.join(get_cli_repo_path(), 'commands_without_tests.json')
+    file_name = os.path.join('.', 'commands_without_tests.json')
     with open(file_name, 'w') as out:
         json.dump(commands_without_tests, out)
