@@ -9,7 +9,7 @@ import os
 from glob import glob
 from knack.util import CLIError
 from six.moves import configparser
-from azdev.utilities import get_azure_config
+from azdev.utilities import get_azure_config, display
 from . import const
 
 
@@ -75,7 +75,8 @@ def get_ext_repo_paths():
     try:
         return get_azure_config().get(const.EXT_SECTION, const.AZ_DEV_SRC).split(',')
     except NoSectionError:
-        raise CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup`.')
+        raise CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup` '
+                        'with -r to set an extensions repo.')
     except NoOptionError:
         raise CLIError('Unable to retrieve the option {} from azure config section [{}]'.format(
             const.AZ_DEV_SRC, const.EXT_SECTION))
@@ -126,11 +127,10 @@ def get_name_index(invert=False, include_whl_extensions=False):
     try:
         EXTENSIONS_DIR = config.get(const.EXT_SECTION, const.AZ_DEV_SRC)
     except (configparser.NoSectionError, configparser.NoOptionError):
-        raise CLIError("Could not find extensions path in the config or the path is not valid.")
+        EXTENSIONS_DIR = ""
 
     table = {}
     cli_repo_path = get_cli_repo_path()
-    ext_repo_paths = get_ext_repo_paths()
 
     # unified azure-cli package (2.0.68 and later)
     paths = os.path.normcase(
@@ -140,9 +140,9 @@ def get_name_index(invert=False, include_whl_extensions=False):
     )
     modules_paths = glob(paths)
     core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
-    ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
+    ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
     whl_ext_paths = []
-    if include_whl_extensions:
+    if include_whl_extensions and EXTENSIONS_DIR:
         whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
 
     def _update_table(paths, key):
@@ -200,9 +200,11 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     config = get_azure_config()  # pylint: disable=import-error
     try:
         EXTENSIONS_DIR = config.get(const.EXT_SECTION, const.AZ_DEV_SRC)
-    except (configparser.NoSectionError, configparser.NoOptionError):
-        raise CLIError("Could not find extensions path in the config or the path is not valid.")
-
+        os.chdir(EXTENSIONS_DIR)
+    except (configparser.NoSectionError, configparser.NoOptionError, TypeError):
+        display("WARNING: No extension path found, only modules will be available. "
+                "rerun setup with -r to make extensions available\n")
+        EXTENSIONS_DIR = ""
     # determine whether the call will filter or return all
     if isinstance(include_only, str):
         include_only = [include_only]
@@ -210,8 +212,6 @@ def get_path_table(include_only=None, include_whl_extensions=False):
 
     table = {}
     cli_repo_path = get_cli_repo_path()
-    ext_repo_paths = get_ext_repo_paths()
-    os.chdir(EXTENSIONS_DIR)
 
     paths = os.path.normcase(
         os.path.join(
@@ -220,7 +220,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     )
     modules_paths = glob(paths)
     core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
-    ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
+    ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
     whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
 
     def _update_table(package_paths, key):

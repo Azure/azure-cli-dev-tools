@@ -262,24 +262,24 @@ def _interactive_setup():
         raise CLIError('Installation aborted.')
 
 
-def _validate_input(cli_path=None, ext_repo_path=None, set_env=None, copy=None, use_global=None):
+def _validate_input(cli_path, ext_repo_path, set_env, copy, use_global, ext):
+    if not cli_path:
+        raise CLIError("-c must be given if any other arguments are given")
     if copy and use_global:
         raise CLIError("Copy and use global are mutally exlcusive.")
-    if not cli_path or not ext_repo_path:
-        if cli_path == "pypi" and any([use_global, copy, set_env]):
-            raise CLIError("pypi for cli path is mutally exlcusive with global copy and set env")
-        if (cli_path or ext_repo_path) and any([use_global, copy, set_env]):
-            raise CLIError("if global, copy, or set env are set then both an extensions repo "
-                           " and a cli repo must be specified")
-        if any([use_global, copy, set_env]):
-            raise CLIError("if global, copy, or set env are set then both an"
-                           " extensions repo and a cli repo must be specified")
+    if cli_path == "pypi" and any([use_global, copy, set_env]):
+        raise CLIError("pypi for cli path is mutally exlcusive with global copy and set env")
+    if not cli_path and any([use_global, copy, set_env]):
+        raise CLIError("if global, copy, or set env are set then both an extensions repo "
+                       " and a cli repo must be specified")
+    if not ext_repo_path and ext:
+        raise CLIError("Extesions provided to be installed but no extensions path was given")
 
 
 def _check_paths(cli_path, ext_repo_path):
     if not os.path.isdir(cli_path):
         raise CLIError("The cli path is not a valid directory, please check the path")
-    if not os.path.isdir(ext_repo_path):
+    if ext_repo_path and not os.path.isdir(ext_repo_path):
         raise CLIError("The cli extensions path is not a valid directory, please check the path")
 
 
@@ -292,13 +292,15 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
 
     heading('Azure CLI Dev Setup')
 
-    _validate_input(cli_path, ext_repo_path, set_env, copy, use_global)
     # cases for handling legacy install
-    if not any([cli_path, ext_repo_path]) or cli_path == "pypi" or (not cli_path or not ext_repo_path):
+    if not any([cli_path, ext_repo_path]) or cli_path == "pypi":
+        display("WARNING: Installing azdev in legacy mode. Run with atleast -c "
+                "to install the latest azdev wihout \"pypi\"\n")
         return _handle_legacy(cli_path, ext_repo_path, ext, deps, time.time())
     if 'CONDA_PREFIX' in os.environ:
         raise CLIError('CONDA virutal enviroments are not supported outside'
                        ' of interactive mode or when -c and -r are provided')
+    _validate_input(cli_path, ext_repo_path, set_env, copy, use_global, ext)
     _check_paths(cli_path, ext_repo_path)
 
     if set_env:
@@ -348,16 +350,17 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     config = get_azure_config()
     if not config.get(const.CLOUD_SECTION, 'name', None):
         config.set_value(const.CLOUD_SECTION, 'name', const.AZ_CLOUD)
-    config.set_value(const.EXT_SECTION, const.AZ_DEV_SRC, os.path.abspath(ext_repo_path))
+    if ext_repo_path:
+        config.set_value(const.EXT_SECTION, const.AZ_DEV_SRC, os.path.abspath(ext_repo_path))
     venv.edit_activate(azure_path, dot_azure_config, dot_azdev_config)
     if cli_path:
         config.set_value(const.CLI_SECTION, const.AZ_DEV_SRC, os.path.abspath(cli_path))
         venv.install_cli(os.path.abspath(cli_path), azure_path)
     config = get_azdev_config()
-    config.set_value('ext', 'repo_paths', os.path.abspath(ext_repo_path))
+    config.set_value('ext', 'repo_paths', os.path.abspath(ext_repo_path) if ext_repo_path else '_NONE_')
     config.set_value('cli', 'repo_path', os.path.abspath(cli_path))
     _copy_config_files()
-    if ext:
+    if ext and ext_repo_path:
         venv.install_extensions(azure_path, ext)
 
     if not set_env:
