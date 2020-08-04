@@ -312,10 +312,10 @@ def _calculate_command_coverage_rate(simple_command_table, commands_without_test
             if command in test_exclusions:
                 command_coverage[command_group][0] += 1
             else:
-                # print("{} doesn't have test".format(command))
+                print("{} doesn't have test".format(command))
                 continue
-    for command_group, value in command_coverage.items():
-        print("{} command coverage is {}".format(command_group, value[0]*1.0/value[1]))
+    # for command_group, value in command_coverage.items():
+    #     print("{} command coverage is {}".format(command_group, value[0]*1.0/value[1]))
 
 
 def _save_commands_without_tests(commands_without_tests):
