@@ -24,8 +24,6 @@ from .util import filter_modules, merge_exclusion
 
 logger = get_logger(__name__)
 CHECKERS_PATH = 'azdev.operations.linter.pylint_checkers'
-TEST_COMMANDS = [get_cli_repo_path(), 'az_command_coverage.txt']
-CLI_SUPRESS = [get_cli_repo_path(), 'test_exclusions.json']
 
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches
 def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
@@ -192,6 +190,8 @@ def linter_severity_choices():
 def command_test_coverage(modules=None, git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
                           save_global_exclusion=False):
     import mock
+    TEST_COMMANDS = [get_cli_repo_path(), 'az_command_coverage.txt']
+    CLI_SUPRESS = [get_cli_repo_path(), 'test_exclusions.json']
 
     with mock.patch('azure.cli.core.commands.validators.validate_file_or_dict', return_value={}),\
             mock.patch('azure.cli.core.util.get_json_object', return_value={}),\
