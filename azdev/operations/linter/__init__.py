@@ -189,90 +189,94 @@ def linter_severity_choices():
     return [str(severity.name).lower() for severity in LinterSeverity]
 
 
-def command_test_coverage(modules=None,
-                          git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
+def command_test_coverage(modules=None, git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
                           save_global_exclusion=False):
-    import json
-    require_azure_cli()
+    import mock
 
-    from azure.cli.core import get_default_cli  # pylint: disable=import-error
-    from azure.cli.core.file_util import (  # pylint: disable=import-error
-        get_all_help, create_invoker_and_load_cmds_and_args)
-    # allow user to run only on CLI or extensions
-    cli_only = modules == ['CLI']
-    ext_only = modules == ['EXT']
-    if cli_only or ext_only:
-        modules = None
+    with mock.patch('azure.cli.core.commands.validators.validate_file_or_dict', return_value={}),\
+            mock.patch('azure.cli.core.util.get_json_object', return_value={}),\
+            mock.patch('azure.cli.command_modules.keyvault._validators.certificate_type', return_value="fakecert"):
+        import json
+        require_azure_cli()
 
-    selected_modules = get_path_table(include_only=modules, include_whl_extensions=include_whl_extensions)
+        from azure.cli.core import get_default_cli  # pylint: disable=import-error
+        from azure.cli.core.file_util import (  # pylint: disable=import-error
+            get_all_help, create_invoker_and_load_cmds_and_args)
+        # allow user to run only on CLI or extensions
+        cli_only = modules == ['CLI']
+        ext_only = modules == ['EXT']
+        if cli_only or ext_only:
+            modules = None
 
-    if cli_only:
-        selected_modules['ext'] = {}
-    if ext_only:
-        selected_modules['mod'] = {}
-        selected_modules['core'] = {}
+        selected_modules = get_path_table(include_only=modules, include_whl_extensions=include_whl_extensions)
 
-        # filter down to only modules that have changed based on git diff
-    selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
+        if cli_only:
+            selected_modules['ext'] = {}
+        if ext_only:
+            selected_modules['mod'] = {}
+            selected_modules['core'] = {}
 
-    if not any((selected_modules[x] for x in selected_modules)):
-        raise CLIError('No modules selected.')
+            # filter down to only modules that have changed based on git diff
+        selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
 
-    selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
-                         list(selected_modules['ext'].keys())
+        if not any((selected_modules[x] for x in selected_modules)):
+            raise CLIError('No modules selected.')
 
-    if selected_mod_names:
-        display('Modules: {}\n'.format(', '.join(selected_mod_names)))
+        selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
+                             list(selected_modules['ext'].keys())
 
-    start = time.time()
-    display('Initializing linter with command table and help files...')
-    az_cli = get_default_cli()
+        if selected_mod_names:
+            display('Modules: {}\n'.format(', '.join(selected_mod_names)))
 
-    # load commands, args, and help
-    create_invoker_and_load_cmds_and_args(az_cli)
+        start = time.time()
+        display('Initializing linter with command table and help files...')
+        az_cli = get_default_cli()
 
-    command_loader = az_cli.invocation.commands_loader
+        # load commands, args, and help
+        create_invoker_and_load_cmds_and_args(az_cli)
 
-    # load yaml help
-    help_file_entries = {}
+        command_loader = az_cli.invocation.commands_loader
 
-    # trim command table and help to just selected_modules
-    command_loader, help_file_entries = filter_modules(
-        command_loader, help_file_entries, modules=selected_mod_names, include_whl_extensions=include_whl_extensions)
+        # load yaml help
+        help_file_entries = {}
 
-    if not command_loader.command_table:
-        raise CLIError('No commands selected to check.')
-    simple_command_table = _format_command_table(command_loader.command_table)
-    parser = command_loader.cli_ctx.invocation.parser
-    path = os.path.join(*TEST_COMMANDS)
+        # trim command table and help to just selected_modules
+        command_loader, help_file_entries = filter_modules(
+            command_loader, help_file_entries, modules=selected_mod_names, include_whl_extensions=include_whl_extensions)
 
-    commands_without_tests = []
-    test_exclusions = []
+        if not command_loader.command_table:
+            raise CLIError('No commands selected to check.')
+        simple_command_table = _format_command_table(command_loader.command_table)
+        parser = command_loader.cli_ctx.invocation.parser
+        path = os.path.join(*TEST_COMMANDS)
 
-    try:
-        with open(os.path.join(*CLI_SUPRESS)) as json_file:
-            test_exclusions = json.load(json_file)
-    except:
-        pass
+        commands_without_tests = []
+        test_exclusions = []
 
-    with open(path) as file:
-        import shlex
-        from azdev.operations.linter.rules.help_rules import _process_command_args
-        command = file.readline()
-        while command:
-            try:
-                command_args = shlex.split(command, comments=True)  # split commands into command args, ignore comments.
-                command_args, nested_commands = _process_command_args(command_args)
-                ns = parser.parse_args(command_args)
-                _update_command_table(simple_command_table, ns)
-            except:
-                print(command)
-                pass
+        try:
+            with open(os.path.join(*CLI_SUPRESS)) as json_file:
+                test_exclusions = json.load(json_file)
+        except:
+            pass
+
+        with open(path) as file:
+            import shlex
+            from azdev.operations.linter.rules.help_rules import _process_command_args
             command = file.readline()
-    print("-------Test Results:-------")
-    _calculate_command_coverage_rate(simple_command_table, commands_without_tests, test_exclusions)
-    if save_global_exclusion:
-        _save_commands_without_tests(commands_without_tests)
+            while command:
+                try:
+                    command_args = shlex.split(command, comments=True)  # split commands into command args, ignore comments.
+                    command_args, nested_commands = _process_command_args(command_args)
+                    ns = parser.parse_args(command_args)
+                    _update_command_table(simple_command_table, ns)
+                except:
+                    print(command)
+                    pass
+                command = file.readline()
+        print("-------Test Results:-------")
+        _calculate_command_coverage_rate(simple_command_table, commands_without_tests, test_exclusions)
+        if save_global_exclusion:
+            _save_commands_without_tests(commands_without_tests)
 
 
 def _format_command_table(command_table):
@@ -289,7 +293,7 @@ def _update_command_table(simple_command_table, namespace):
     from knack.validators import DefaultInt, DefaultStr
     if command in simple_command_table:
         simple_command_table[command][1] = True
-        for key in simple_command_table[command].keys():
+        for key in simple_command_table[command][0].keys():
             if hasattr(namespace, key) and getattr(namespace, key) and (type(getattr(namespace, key)) not in [DefaultInt, DefaultStr]):
                 simple_command_table[command][0][key] = True
 
@@ -308,7 +312,8 @@ def _calculate_command_coverage_rate(simple_command_table, commands_without_test
             if command in test_exclusions:
                 command_coverage[command_group][0] += 1
             else:
-                print("{} doesn't have test".format(command))
+                # print("{} doesn't have test".format(command))
+                continue
     for command_group, value in command_coverage.items():
         print("{} command coverage is {}".format(command_group, value[0]*1.0/value[1]))
 
