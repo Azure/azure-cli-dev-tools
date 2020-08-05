@@ -144,7 +144,7 @@ def id_params_only_for_guid(linter, command_name, parameter_name):
 @ParameterRule(LinterSeverity.HIGH)
 def option_length_too_long(linter, command_name, parameter_name):
     min_length = 2147483647
-    length_threshold = 22 # only 5% argument's length exceed this value.
+    length_threshold = 22  # only 5% argument's length exceed this value.
     options_list = linter.get_parameter_options(command_name, parameter_name) or []
     for option in options_list:
         if isinstance(option, Deprecated) or option.startswith('--__'):
