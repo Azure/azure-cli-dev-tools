@@ -91,6 +91,15 @@ class TestBenchmarkCommands(TestCase):
         ]  # restore azure.cli.core to be unimported as the original
 
 
+# class _MockedMapResultCounter:
+#     def __init__(self, _, iterable):
+#         self.iterable = iterable
+
+#     def get(self, timeout=0):  # pylint: disable=unused-argument
+#         print(self.iterable)
+#         return [1] * len(self.iterable)
+
+
 class _MockedPoolMapResult:
     def __init__(self, func, iterable):
         self.func = func
@@ -111,23 +120,21 @@ class TestBenchmark(TestCase):
         with self.assertRaisesRegex(CLIError, "Number of runs must be greater than 0."):
             benchmark([], 0)
 
-    def test_benchmark_with_empty_commands(self):
-        """
-        Empty commands would fetch all commands from commmand table.
-        The result'size should be equal to the commands' size
-        """
+    # def test_benchmark_commands_size_with_empty_input(self):
+    #     """
+    #     Empty commands would fetch all commands from commmand table.
+    #     The result'size should be equal to the commands' size
+    #     """
 
-        with mock.patch(
-            "azdev.operations.performance._benchmark_cmd_timer",  # pylint: disable=bad-continuation
-            return_value=1,  # pylint: disable=bad-continuation
-        ), mock.patch(
-            "multiprocessing.pool.Pool.map_async",
-            lambda self, func, iterable, chunksize=None, callback=None, error_callback=None: _MockedPoolMapResult(
-                func, iterable
-            ),  # pylint: disable=bad-continuation
-        ):
-            result = benchmark([])
-            self.assertEqual(len(result), len(_benchmark_load_all_commands()))
+    #     with mock.patch(
+    #         "multiprocessing.pool.Pool.map_async",  # pylint: disable=bad-continuation
+    #         lambda self, _, iterable, chunksize=None, callback=None, error_callback=None: _MockedMapResultCounter(  # pylint: disable=bad-continuation
+    #             _, iterable,
+    #         ),
+    #     ):
+    #         result = benchmark([])
+
+    #         self.assertEqual(len(result), len(_benchmark_load_all_commands()))
 
     def test_benchmark_with_help_command(self):
         with mock.patch(
@@ -182,12 +189,12 @@ class TestBenchmark(TestCase):
                 "storage create",
             ]
 
-            result = benchmark(commands=commands, runs=11)
+            result = benchmark(commands=commands, runs=5)
 
             self.assertEqual(len(result), 3)
 
             for r in result:
-                self.assertEqual(r["Runs"], 11)
+                self.assertEqual(r["Runs"], 5)
 
     # def test_benchmark_timeout(self):
     #     import time
