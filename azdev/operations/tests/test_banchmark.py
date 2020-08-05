@@ -42,8 +42,7 @@ class TestBenchmarkStatistics(TestCase):
         even_avg = round(sum(even_length_data) / len(even_length_data), 4)
         even_std = round(
             sqrt(
-                sum((t - even_avg) ** 2 for t in even_length_data)
-                / len(even_length_data)
+                sum((t - even_avg) ** 2 for t in even_length_data) / len(even_length_data)
             ),
             4,
         )
