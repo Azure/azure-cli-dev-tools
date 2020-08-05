@@ -9,6 +9,7 @@ import os
 from shutil import copytree, rmtree
 import shutil
 import time
+import sys
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -289,6 +290,13 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
             raise CLIError('You are not running in a virtual enviroment and have not chosen to set one up.')
     elif 'VIRTUAL_ENV' in os.environ:
         raise CLIError("You are already running in a virtual enviroment, yet you want to set a new one up")
+
+    if const.SHELL in os.environ and const.IS_WINDOWS and const.BASH_NAME_WIN in os.environ[const.SHELL]:
+        heading("WARNING: You are running bash in Windows, the setup may not work correctly and "
+                "command may have unexpected behavior")
+        from knack.prompting import prompt_y_n
+        if not prompt_y_n('Would you like to continue with the install?'):
+            sys.exit(0)
 
     heading('Azure CLI Dev Setup')
 

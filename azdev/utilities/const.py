@@ -38,6 +38,8 @@ BASH_EXE = '/bin/bash'
 GITHUB_SWAGGER_REPO_URL = 'https://github.com/Azure/azure-rest-api-specs'
 GITHUB_API_SWAGGER_REPO_URL = 'https://api.github.com/repos/Azure/azure-rest-api-specs'
 SWAGGER_REPO_NAME = 'azure-rest-api-specs'
+SHELL = 'SHELL'
+BASH_NAME_WIN = 'bash.exe'
 
 ENV_VAR_TEST_MODULES = 'AZDEV_TEST_TESTS'               # comma-separated list of modules to test
 ENV_VAR_VIRTUAL_ENV = ['VIRTUAL_ENV', 'CONDA_PREFIX']   # used by system to identify virtual environment
