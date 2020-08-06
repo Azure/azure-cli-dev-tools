@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import os
+import shlex
 import subprocess
 import sys
 
@@ -23,8 +24,10 @@ def call(command, **kwargs):
     """
     from azdev.utilities import IS_WINDOWS
     return subprocess.call(
-        command.split(),
-        shell=IS_WINDOWS,
+        command,
+        # shlex.split(command),
+        shell=True,
+        # shell=IS_WINDOWS,
         **kwargs)
 
 
