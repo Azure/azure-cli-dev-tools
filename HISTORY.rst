@@ -2,6 +2,11 @@
 
 Release History
 ===============
+0.1.24
+++++++
+* [Linter] Argument must have an option whose length is less than 22.
+* [Linter] Argument cannot contain "`_`".
+
 0.1.23
 ++++++
 * [Linter] Only violation of high severity rule would exit with 1.
