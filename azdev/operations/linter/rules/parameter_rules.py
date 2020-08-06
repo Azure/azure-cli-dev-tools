@@ -139,3 +139,29 @@ def id_params_only_for_guid(linter, command_name, parameter_name):
         if param_help and _help_contains_queries(param_help, queries):
             raise RuleError("An option {} ends with '-id'. Arguments ending with '-id' "
                             "must be guids/uuids and not resource ids.".format(options_list))
+
+
+@ParameterRule(LinterSeverity.HIGH)
+def option_length_too_long(linter, command_name, parameter_name):
+    min_length = None
+    length_threshold = 22  # only 5% argument's length exceed this value.
+    options_list = linter.get_parameter_options(command_name, parameter_name) or []
+    for option in options_list:
+        if isinstance(option, Deprecated) or option.startswith('--__'):
+            return
+        min_length = min(min_length, len(option)) if min_length else len(option)
+    if min_length and min_length > length_threshold:
+        raise RuleError("The lengths of all options {} are longer than threshold {}. "
+                        "Argument {} must have a short abbreviation.".format(options_list,
+                                                                             length_threshold,
+                                                                             parameter_name))
+
+
+@ParameterRule(LinterSeverity.HIGH)
+def option_should_not_contain_under_score(linter, command_name, parameter_name):
+    options_list = linter.get_parameter_options(command_name, parameter_name) or []
+    for option in options_list:
+        if isinstance(option, Deprecated) or option.startswith('--__'):
+            return
+        if '_' in option:
+            raise RuleError("Argument's option {} contains '_' which should be '-' instead.".format(option))
