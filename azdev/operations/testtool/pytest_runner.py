@@ -38,6 +38,5 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark):
         cmd = 'python -m pytest {}'.format(' '.join(arguments))
         logger.info('Running: %s', cmd)
         return call(cmd)
-        # return os.system(cmd)
 
     return _run

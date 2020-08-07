@@ -5,7 +5,6 @@
 # -----------------------------------------------------------------------------
 
 import os
-import shlex
 import subprocess
 import sys
 
@@ -22,12 +21,9 @@ def call(command, **kwargs):
     :param kwargs: Any kwargs supported by subprocess.Popen
     :returns: (int) process exit code.
     """
-    from azdev.utilities import IS_WINDOWS
     return subprocess.call(
         command,
-        # shlex.split(command),
         shell=True,
-        # shell=IS_WINDOWS,
         **kwargs)
 
 
