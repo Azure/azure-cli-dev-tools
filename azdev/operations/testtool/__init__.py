@@ -29,7 +29,7 @@ from .incremental_strategy import CLIAzureDevOpsContext
 logger = get_logger(__name__)
 
 
-# pylint: disable=too-many-statements
+# pylint: disable=too-many-statements,too-many-locals
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None,
               no_exit_first=False, mark=None,
