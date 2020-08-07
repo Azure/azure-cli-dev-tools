@@ -53,6 +53,7 @@ def load_arguments(self, _):
         c.argument('pytest_args', nargs=argparse.REMAINDER, options_list=['--pytest-args', '-a'], help='Denotes the remaining args will be passed to pytest.')
         c.argument('last_failed', options_list='--lf', action='store_true', help='Re-run the last tests that failed.')
         c.argument('no_exit_first', options_list='--no-exitfirst', action='store_true', help='Do not exit on first error or failed test')
+        c.argument('mark', help='Select tests with this mark. You can add @pytest.mark.custom_mark to a test')
 
         # CI parameters
         c.argument('cli_ci',

@@ -11,7 +11,7 @@ from knack.log import get_logger
 from azdev.utilities import call
 
 
-def get_test_runner(parallel, log_path, last_failed, no_exit_first):
+def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark):
     """Create a pytest execution method"""
     def _run(test_paths, pytest_args):
 
@@ -24,6 +24,9 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first):
 
         if no_exit_first:
             arguments.remove('-x')
+
+        if mark:
+            arguments.append('-m "{}"'.format(mark))
 
         arguments.extend(test_paths)
         if parallel:
