@@ -211,8 +211,9 @@ class LinterManager(object):
 
             self._rules[rule_type][rule_name] = rule_callable, get_linter, rule_severity
 
-    def mark_rule_failure(self):
-        self._exit_code = 1
+    def mark_rule_failure(self, rule_severity):
+        if rule_severity is LinterSeverity.HIGH:
+            self._exit_code = 1
 
     @property
     def exclusions(self):

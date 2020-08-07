@@ -2,6 +2,22 @@
 
 Release History
 ===============
+0.1.24
+++++++
+* [Linter] Argument must have an option whose length is less than 22.
+* [Linter] Argument cannot contain "`_`".
+
+0.1.23
+++++++
+* [Linter] Only violation of high severity rule would exit with 1.
+* Minimal pytest version requires at least 5.0.0.
+
+0.1.22
+++++++
+* Hornor the configuration of pylint and flake8 in Azure/azure-cli and Azure/azure-cli-extensions.
+* Rename test folder to make place for unittest of other commands.
+* Enable test result coverage.
+
 0.1.21
 ++++++
 * Fix isort package version to 4.3.21.
