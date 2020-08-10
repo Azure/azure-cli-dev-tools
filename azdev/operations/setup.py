@@ -301,7 +301,7 @@ def _check_env(set_env):
         raise CLIError("You are already running in a virtual enviroment, yet you want to set a new one up")
 
 
-def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None):   
+def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None): 
     _check_env(set_env)
 
     _check_shell()
