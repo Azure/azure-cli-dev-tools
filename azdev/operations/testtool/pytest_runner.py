@@ -48,9 +48,9 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, clean):
                         for file in recording_files:
                             if file.endswith(".yaml"):
                                 os.remove(os.path.join(recordings, file))
-                sys.exit(1)
+                return True
             logger.info('Running: %s', cmd)
             k += 1
-        sys.exit(0)
+        return False
 
     return _run

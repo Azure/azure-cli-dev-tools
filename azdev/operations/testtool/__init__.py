@@ -112,7 +112,8 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
                                  last_failed=last_failed,
                                  no_exit_first=no_exit_first,
                                  clean=clean)
-        runner(test_paths=test_paths, pytest_args=pytest_args)
+        failed = runner(test_paths=test_paths, pytest_args=pytest_args)
+        sys.ext(1 if failed else 0)
 
 
 def _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo):
