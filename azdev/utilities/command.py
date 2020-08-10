@@ -21,10 +21,9 @@ def call(command, **kwargs):
     :param kwargs: Any kwargs supported by subprocess.Popen
     :returns: (int) process exit code.
     """
-    from azdev.utilities import IS_WINDOWS
     return subprocess.call(
-        command.split(),
-        shell=IS_WINDOWS,
+        command,
+        shell=True,
         **kwargs)
 
 

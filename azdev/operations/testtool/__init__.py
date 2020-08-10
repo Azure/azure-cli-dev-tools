@@ -29,10 +29,10 @@ from .incremental_strategy import CLIAzureDevOpsContext
 logger = get_logger(__name__)
 
 
-# pylint: disable=too-many-statements
+# pylint: disable=too-many-statements,too-many-locals
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, clean=False, profile=None, last_failed=False, pytest_args=None,
-              no_exit_first=False,
+              no_exit_first=False, mark=None,
               git_source=None, git_target=None, git_repo=None,
               cli_ci=False):
 
@@ -99,18 +99,17 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
             logger.warning("'%s' not found. If newly added, re-run with --discover", t)
             continue
 
-    exit_code = 0
-
     # Tests have been collected. Now run them.
     if not test_paths:
         logger.warning('No tests selected to run.')
-        sys.exit(exit_code)
+        sys.exit(0)
 
     with ProfileContext(profile):
         runner = get_test_runner(parallel=not in_series,
                                  log_path=xml_path,
                                  last_failed=last_failed,
                                  no_exit_first=no_exit_first,
+                                 mark=mark,
                                  clean=clean)
         runner(test_paths=test_paths, pytest_args=pytest_args)
 
