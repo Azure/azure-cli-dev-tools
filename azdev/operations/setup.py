@@ -293,12 +293,16 @@ def _check_shell():
             sys.exit(0)
 
 
-def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None):
+def _check_env(set_env):
     if not set_env:
         if not get_env_path():
             raise CLIError('You are not running in a virtual enviroment and have not chosen to set one up.')
     elif 'VIRTUAL_ENV' in os.environ:
         raise CLIError("You are already running in a virtual enviroment, yet you want to set a new one up")
+
+
+def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None):   
+    _check_env(set_env)
 
     _check_shell()
 
