@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import os
+import sys
 import subprocess
 from knack.log import get_logger
 from azdev.utilities import const, display
@@ -47,8 +48,9 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, clean):
                         for file in recording_files:
                             if file.endswith(".yaml"):
                                 os.remove(os.path.join(recordings, file))
-                break
+                sys.exit(1)
             logger.info('Running: %s', cmd)
             k += 1
+        sys.exit(0)
 
     return _run
