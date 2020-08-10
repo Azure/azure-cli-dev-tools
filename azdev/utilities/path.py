@@ -76,7 +76,7 @@ def get_ext_repo_paths():
         return get_azure_config().get(const.EXT_SECTION, const.AZ_DEV_SRC).split(',')
     except NoSectionError:
         raise CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup` '
-                        'with -r to set an extensions repo.')
+                       'with -r to set an extensions repo.')
     except NoOptionError:
         raise CLIError('Unable to retrieve the option {} from azure config section [{}]'.format(
             const.AZ_DEV_SRC, const.EXT_SECTION))

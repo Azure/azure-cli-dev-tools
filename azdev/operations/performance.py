@@ -147,27 +147,14 @@ def display_table(data):
 
 
 # require azdev setup
-def benchmark(commands, runs=20):
+def benchmark(commands=None, runs=20):
     if runs <= 0:
         raise CLIError("Number of runs must be greater than 0.")
 
-    max_len_cmd = max(commands, key=len)
+    if not commands:
+        commands = _benchmark_load_all_commands()
 
-    line_tmpl = "| {" + "cmd:" + "<" + str(len(max_len_cmd)) + "s} |"
-    line_tmpl = line_tmpl + " {min:10s} | {max:10s} | {avg:10s} | {mid:10s} | {std:10s} | {runs:10s} |"
-
-    line_head = line_tmpl.format(
-        cmd="Command",
-        min="Min",
-        max="Max",
-        avg="Mean",
-        mid="Median",
-        std="Std",
-        runs="Runs",
-    )
-
-    logger.warning(line_head)
-    logger.warning("-" * (85 + len(max_len_cmd)))
+    result = []
 
     import multiprocessing
 
@@ -190,19 +177,34 @@ def benchmark(commands, runs=20):
         pool.join()
 
         staticstic = _benchmark_cmd_staticstic(time_series)
+        staticstic.update({
+            "Command": raw_command,
+            "Runs": runs,
+        })
 
-        line_body = line_tmpl.format(
-            cmd=raw_command,
-            min=str(staticstic["min"]),
-            max=str(staticstic["max"]),
-            avg=str(staticstic["avg"]),
-            mid=str(staticstic["media"]),
-            std=str(staticstic["std"]),
-            runs=str(runs),
-        )
-        logger.warning(line_body)
+        logger.info(staticstic)
 
-    logger.warning("-" * (85 + len(max_len_cmd)))
+        result.append(staticstic)
+
+    return result
+
+
+def _benchmark_load_all_commands():
+    try:
+        from azure.cli.core import get_default_cli
+        from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args
+    except ImportError:
+        raise CLIError("Azure CLI is not installed")
+
+    az_cli = get_default_cli()
+
+    create_invoker_and_load_cmds_and_args(az_cli)
+
+    commands = list(az_cli.invocation.commands_loader.command_table.keys())
+
+    commands = [cmd + " --help" for cmd in commands]
+
+    return sorted(commands)
 
 
 def _benchmark_process_pool_init():
@@ -238,9 +240,9 @@ def _benchmark_cmd_staticstic(time_series: list):
     )
 
     return {
-        "min": round(min_time, 4),
-        "max": round(max_time, 4),
-        "media": round(mid_time, 4),
-        "avg": round(avg_time, 4),
-        "std": round(std_deviation, 4),
+        "Min": round(min_time, 4),
+        "Max": round(max_time, 4),
+        "Media": round(mid_time, 4),
+        "Avg": round(avg_time, 4),
+        "Std": round(std_deviation, 4),
     }
