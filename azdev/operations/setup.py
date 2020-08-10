@@ -288,9 +288,9 @@ def _check_shell():
     if const.SHELL in os.environ and const.IS_WINDOWS and const.BASH_NAME_WIN in os.environ[const.SHELL]:
         heading("WARNING: You are running bash in Windows, the setup may not work correctly and "
                 "command may have unexpected behavior")
-    from knack.prompting import prompt_y_n
-    if not prompt_y_n('Would you like to continue with the install?'):
-        sys.exit(0)
+        from knack.prompting import prompt_y_n
+        if not prompt_y_n('Would you like to continue with the install?'):
+            sys.exit(0)
 
 
 def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None):
