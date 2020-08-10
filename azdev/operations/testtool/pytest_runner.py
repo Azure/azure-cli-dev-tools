@@ -5,7 +5,6 @@
 # -----------------------------------------------------------------------------
 
 import os
-import sys
 import subprocess
 from knack.log import get_logger
 from azdev.utilities import const, display
