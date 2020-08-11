@@ -2,6 +2,12 @@
 
 Release History
 ===============
+0.1.25
+++++++
+* `azdev test`: new parameter --mark
+* Update the way invoking pytest
+* `azdev perf benchmark`: refine output
+
 0.1.24
 ++++++
 * [Linter] Argument must have an option whose length is less than 22.
