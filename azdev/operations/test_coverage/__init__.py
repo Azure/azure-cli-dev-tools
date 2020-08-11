@@ -10,9 +10,9 @@ import time
 from knack.util import CLIError
 
 from azdev.utilities import (display, get_path_table, require_azure_cli, filter_by_git_diff)
-from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
+from azdev.utilities.path import get_cli_repo_path
 
-from .util import filter_modules, merge_exclusion
+from azdev.operations.linter.util import filter_modules
 
 def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
                   save_global_exclusion=False):

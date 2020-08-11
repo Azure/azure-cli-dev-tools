@@ -78,6 +78,16 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'cli update-setup') as c:
         c.argument('pin', action='store_true', help='Pin the module versions in azure-cli\'s setup.py file.')
 
+    with ArgumentsContext(self, 'test-coverage') as c:
+        c.positional('modules', modules_type)
+        c.argument('save_global_exclusion',
+                   action='store_true',
+                   options_list=['--save', '-s'],
+                   help="Allow saving global exclusion. It would take effect when modules is CLI or EXT.",
+                   deprecate_info=c.deprecate(hide=True))
+        c.argument('include_whl_extensions',
+                   action='store_true',
+                   help="Allow running test-coverage on extensions installed by `az extension add`.")
     # region linter
     with ArgumentsContext(self, 'linter') as c:
         c.positional('modules', modules_type)
