@@ -6,6 +6,7 @@ Release History
 ++++++
 * `azdev test`: new parameter --mark
 * Update the way invoking pytest
+* `azdev perf benchmark`: refine output
 
 0.1.24
 ++++++
