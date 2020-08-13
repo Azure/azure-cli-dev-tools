@@ -32,13 +32,13 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark, clean)
         if pytest_args:
             arguments += pytest_args
         tests_params = [(i, clean, arguments) for i in test_paths]
-        test_pass = True
+        test_fail = False
         with multiprocessing.Pool(multiprocessing.cpu_count()) as the_pool:
             try:
                 the_pool.map(_run_test, tests_params)
             except subprocess.CalledProcessError:
-                test_pass = False
-        return test_pass
+                test_fail = True
+        return test_fail
 
     return _run
 
