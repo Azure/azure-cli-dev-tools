@@ -147,7 +147,8 @@ def update_command_table(simple_command_table, namespace):
         for key in simple_command_table[command][0].keys():
             if all([hasattr(namespace, key),
                     getattr(namespace, key),
-                    type(getattr(namespace, key)) not in [DefaultInt, DefaultStr]]):
+                    type(getattr(namespace, key)) != DefaultInt,
+                    type(getattr(namespace, key)) != DefaultStr]):
                 simple_command_table[command][0][key] = True
 
 
