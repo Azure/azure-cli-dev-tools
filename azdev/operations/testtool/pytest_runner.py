@@ -6,7 +6,6 @@
 
 import os
 import subprocess
-from knack.log import get_logger
 from azdev.utilities import const, display
 import multiprocessing
 
@@ -45,7 +44,7 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark, clean)
 
 
 def _run_test(test_args):
-    cmd = ("python " + ('-B ' if test_args[1] else ' ') + 
+    cmd = ("python " + ('-B ' if test_args[1] else ' ') +
            "-m pytest {}").format(' '.join([test_args[0]] + test_args[2]))
     try:
         subprocess.check_call(cmd.split(), shell=const.IS_WINDOWS)
