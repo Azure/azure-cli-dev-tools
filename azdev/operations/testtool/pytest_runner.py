@@ -8,13 +8,12 @@ import os
 import subprocess
 from knack.log import get_logger
 from azdev.utilities import const, display
+import multiprocessing
 
 
 def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark, clean):
     """Create a pytest execution method"""
     def _run(test_paths, pytest_args):
-
-        logger = get_logger(__name__)
 
         if os.name == 'posix':
             arguments = ['-x', '-v', '--boxed', '-p no:warnings', '--log-level=WARN', '--junit-xml', log_path]
@@ -27,34 +26,36 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark, clean)
         if mark:
             arguments.append('-m "{}"'.format(mark))
 
-        arguments.extend(test_paths)
-
         if parallel:
             arguments += ['-n', 'auto']
         if last_failed:
             arguments.append('--lf')
         if pytest_args:
             arguments += pytest_args
-        cmd = 'python -m pytest {}'.format(' '.join(arguments))
-        k = 0
-        while k < len(test_paths):
-            cmd = ("python " + ('-B ' if clean else '') +
-                   "-m pytest {}").format(' '.join([test_paths[k]] + arguments))
-            display("running cmd " + str(cmd))
+        tests_params = [(i, clean, arguments) for i in test_paths]
+        test_pass = True
+        with multiprocessing.Pool(multiprocessing.cpu_count()) as the_pool:
             try:
-                subprocess.check_call(cmd.split(), shell=const.IS_WINDOWS)
+                the_pool.map(_run_test, tests_params)
             except subprocess.CalledProcessError:
-                if clean:
-                    display("Test failed, cleaning up recordings")
-                    recordings = os.path.join(test_paths[k], 'recordings')
-                    if os.path.isdir(recordings):
-                        recording_files = os.listdir(recordings)
-                        for file in recording_files:
-                            if file.endswith(".yaml"):
-                                os.remove(os.path.join(recordings, file))
-                return True
-            logger.info('Running: %s', cmd)
-            k += 1
-        return False
+                test_pass = False
+        return test_pass
 
     return _run
+
+
+def _run_test(test_args):
+    cmd = ("python " + ('-B ' if test_args[1] else ' ') + 
+           "-m pytest {}").format(' '.join([test_args[0]] + test_args[2]))
+    try:
+        subprocess.check_call(cmd.split(), shell=const.IS_WINDOWS)
+    except subprocess.CalledProcessError as e:
+        if test_args[1]:
+            display("Test failed, cleaning up recordings")
+            recordings = os.path.join(test_args[0], 'recordings')
+            if os.path.isdir(recordings):
+                recording_files = os.listdir(recordings)
+                for file in recording_files:
+                    if file.endswith(".yaml"):
+                        os.remove(os.path.join(recordings, file))
+        raise e
