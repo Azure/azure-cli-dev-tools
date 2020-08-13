@@ -8,11 +8,15 @@ import os
 import time
 
 from knack.util import CLIError
+from knack.log import get_logger
 
 from azdev.utilities import (display, get_path_table, require_azure_cli, filter_by_git_diff)
 from azdev.utilities.path import get_cli_repo_path
 
 from azdev.operations.linter.util import filter_modules
+
+logger = get_logger(__name__)
+
 
 def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
                   save_global_exclusion=False):
@@ -36,7 +40,7 @@ def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
         for ns in load_test_commands(parser):
             update_command_table(simple_command_table, ns)
 
-        print("-------Test Results:-------")
+        logger.warning("-------Test Results:-------")
         calculate_command_coverage_rate(simple_command_table, commands_without_tests, test_exclusions)
         if save_global_exclusion:
             save_commands_without_tests(commands_without_tests)
@@ -44,11 +48,12 @@ def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
 
 def load_exclusions(exclusion_path):
     import json
+
     test_exclusions = []
     try:
         with open(exclusion_path) as json_file:
             test_exclusions = json.load(json_file)
-    except:
+    except (OSError, IOError):
         pass
     return test_exclusions
 
@@ -64,11 +69,11 @@ def load_test_commands(parser):
         while command:
             try:
                 command_args = shlex.split(command, comments=True)  # split commands into command args, ignore comments.
-                command_args, nested_commands = _process_command_args(command_args)
+                command_args, _ = _process_command_args(command_args)
                 ns = parser.parse_args(command_args)
                 yield ns
             except:
-                print(command)
+                logger.debug(command)
                 pass
             command = file.readline()
 
@@ -78,8 +83,8 @@ def load_command_table_and_command_loader(modules=None, git_source=None,
     require_azure_cli()
 
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
-    from azure.cli.core.file_util import (  # pylint: disable=import-error
-        get_all_help, create_invoker_and_load_cmds_and_args)
+    from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args  # pylint: disable=import-error
+
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
     ext_only = modules == ['EXT']
@@ -106,7 +111,6 @@ def load_command_table_and_command_loader(modules=None, git_source=None,
     if selected_mod_names:
         display('Modules: {}\n'.format(', '.join(selected_mod_names)))
 
-    start = time.time()
     display('Initializing linter with command table and help files...')
     az_cli = get_default_cli()
 
@@ -142,7 +146,9 @@ def update_command_table(simple_command_table, namespace):
     if command in simple_command_table:
         simple_command_table[command][1] = True
         for key in simple_command_table[command][0].keys():
-            if hasattr(namespace, key) and getattr(namespace, key) and (type(getattr(namespace, key)) not in [DefaultInt, DefaultStr]):
+            if all([hasattr(namespace, key),
+                    getattr(namespace, key),
+                    type(getattr(namespace, key)) not in [DefaultInt, DefaultStr]]):
                 simple_command_table[command][0][key] = True
 
 
@@ -160,7 +166,7 @@ def calculate_command_coverage_rate(simple_command_table, commands_without_tests
             if command in test_exclusions:
                 command_coverage[command_group][0] += 1
             else:
-                print("{} doesn't have test".format(command))
+                logger.warning("{} doesn't have test".format(command))
                 continue
 
 
