@@ -72,9 +72,8 @@ def load_test_commands(parser):
                 command_args, _ = _process_command_args(command_args)
                 ns = parser.parse_args(command_args)
                 yield ns
-            except:
+            except:  # pylint: disable=bare-except
                 logger.debug(command)
-                pass
             command = file.readline()
 
 
@@ -166,7 +165,7 @@ def calculate_command_coverage_rate(simple_command_table, commands_without_tests
             if command in test_exclusions:
                 command_coverage[command_group][0] += 1
             else:
-                logger.warning("{} doesn't have test".format(command))
+                logger.warning("% doesn't have test", command)
                 continue
 
 
