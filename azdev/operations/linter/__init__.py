@@ -25,6 +25,7 @@ from .util import filter_modules, merge_exclusion
 logger = get_logger(__name__)
 CHECKERS_PATH = 'azdev.operations.linter.pylint_checkers'
 
+
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches
 def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,

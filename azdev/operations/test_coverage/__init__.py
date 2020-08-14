@@ -98,14 +98,14 @@ def load_command_table_and_command_loader(modules=None, git_source=None,
         selected_modules['mod'] = {}
         selected_modules['core'] = {}
 
-        # filter down to only modules that have changed based on git diff
+    # filter down to only modules that have changed based on git diff
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
 
     if not any((selected_modules[x] for x in selected_modules)):
         raise CLIError('No modules selected.')
 
     selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
-                         list(selected_modules['ext'].keys())
+        list(selected_modules['ext'].keys())
 
     if selected_mod_names:
         display('Modules: {}\n'.format(', '.join(selected_mod_names)))
@@ -135,7 +135,7 @@ def format_command_table(command_table):
     ignore_arg = ['_subscription', 'cmd']
     for command, value in command_table.items():
         args_table = {arg: False for arg in value.arguments.keys() if arg not in ignore_arg}
-        simple_command_table[command] = [args_table, False] # arg table and is the command tested
+        simple_command_table[command] = [args_table, False]  # arg table and is the command tested
     return simple_command_table
 
 
