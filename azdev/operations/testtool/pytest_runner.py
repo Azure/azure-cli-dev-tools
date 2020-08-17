@@ -37,6 +37,7 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark, clean)
             try:
                 the_pool.map(_run_test, tests_params)
             except subprocess.CalledProcessError:
+                display("TEST FAILED! : " + str(subprocess.CalledProcessError.stdout))
                 test_fail = True
         return test_fail
 
