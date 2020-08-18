@@ -130,7 +130,7 @@ jobs:
         pip install pytest-cov
 
         # azdev setup
-        git clone --quiet https://github.com/arrownj/azure-cli.git@another_pep420
+        git clone --quiet --branch another_pep420 https://github.com/arrownj/azure-cli.git
         git clone --quiet https://github.com/Azure/azure-cli-extensions.git
         azdev setup -c ./azure-cli -r ./azure-cli-extensions
 
