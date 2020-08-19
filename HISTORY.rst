@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.26
+++++++
+* Support PEP420 package
+
 0.1.25
 ++++++
 * `azdev test`: new parameter --mark
