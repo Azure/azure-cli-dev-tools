@@ -7,6 +7,7 @@ Release History
 * `azdev test`: new parameter --mark
 * Update the way invoking pytest
 * `azdev perf benchmark`: refine output
+* Support PEP420 package
 
 0.1.24
 ++++++
