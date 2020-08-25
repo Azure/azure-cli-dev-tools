@@ -160,8 +160,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         run_commands=not rule_types or 'commands' in rule_types,
         run_command_groups=not rule_types or 'command_groups' in rule_types,
         run_help_files_entries=not rule_types or 'help_entries' in rule_types)
-    logger.info(os.linesep)
-    logger.info('Run custom pylint rules.')
+    display(os.linesep + 'Run custom pylint rules.')
     exit_code += pylint_rules(selected_modules)
     sys.exit(exit_code)
 
@@ -178,9 +177,10 @@ def pylint_rules(selected_modules):
     pylint_result = run_pylint(selected_modules, env=my_env, checkers=checkers, disable_all=True, enable=enable)
     if pylint_result and not pylint_result.error:
         display(os.linesep + 'No violations found for custom pylint rules.')
+        display('Linter: PASSED\n')
     if pylint_result and pylint_result.error:
-        logger.info(pylint_result.error.output.decode('utf-8'))
-        logger.info('Linter: FAILED\n')
+        display(pylint_result.error.output.decode('utf-8'))
+        display('Linter: FAILED\n')
     return pylint_result.exit_code
 
 

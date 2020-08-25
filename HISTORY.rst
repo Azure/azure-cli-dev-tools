@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.28
+++++++
+* [Linter] Fix minor display issue in `azdev linter`.
+
 0.1.27
 ++++++
 * [Linter] "Show" command should use `show_command` or `custom_show_command`.
