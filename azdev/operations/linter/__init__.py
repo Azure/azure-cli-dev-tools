@@ -177,6 +177,7 @@ def pylint_rules(selected_modules):
     pylint_result = run_pylint(selected_modules, env=my_env, checkers=checkers, disable_all=True, enable=enable)
     if pylint_result and not pylint_result.error:
         display(os.linesep + 'No violations found for custom pylint rules.')
+        display('Linter: PASSED\n')
     if pylint_result and pylint_result.error:
         display(pylint_result.error.output.decode('utf-8'))
         display('Linter: FAILED\n')
