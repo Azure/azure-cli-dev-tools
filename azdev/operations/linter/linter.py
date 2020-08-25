@@ -257,7 +257,7 @@ class LinterManager(object):
             self._run_rules('params')
 
         if not self.exit_code:
-            print(os.linesep + 'No violations found.')
+            print(os.linesep + 'No violations found for linter rules.')
 
         if self._update_global_exclusion is not None:
             if self._update_global_exclusion == 'CLI':

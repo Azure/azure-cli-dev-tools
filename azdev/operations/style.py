@@ -79,7 +79,7 @@ def check_style(modules=None, pylint=False, pep8=False, git_source=None, git_tar
         exit_code_sum += pep8_result.exit_code
 
     if pylint:
-        pylint_result = _run_pylint(selected_modules)
+        pylint_result = run_pylint(selected_modules)
         exit_code_sum += pylint_result.exit_code
 
     display('')
@@ -131,7 +131,7 @@ def _combine_command_result(cli_result, ext_result):
     return final_result
 
 
-def _run_pylint(modules):
+def run_pylint(modules, checkers=None, env=None, disable_all=False, enable=None):
     def get_core_module_paths(modules):
         core_paths = []
         for p in modules["core"].values():
@@ -148,7 +148,7 @@ def _run_pylint(modules):
         glob_pattern = os.path.normcase(os.path.join("{}*".format(EXTENSION_PREFIX)))
         ext_paths.append(glob(os.path.join(path, glob_pattern))[0])
 
-    def run(paths, rcfile, desc):
+    def run(paths, rcfile, desc, checkers=None, env=None, disable_all=False, enable=None):
         if not paths:
             return None
         logger.debug("Using rcfile file: %s", rcfile)
@@ -156,12 +156,21 @@ def _run_pylint(modules):
         command = "pylint {} --ignore vendored_sdks,privates --rcfile={} -j {}".format(
             " ".join(paths), rcfile, multiprocessing.cpu_count()
         )
-        return py_cmd(command, message="Running pylint on {}...".format(desc))
+        if checkers is not None:
+            command += ' --load-plugins {}'.format(",".join(checkers))
+        if disable_all:
+            command += ' --disable=all'
+        if enable is not None:
+            command += ' --enable {}'.format(",".join(enable))
+
+        return py_cmd(command, message="Running pylint on {}...".format(desc), env=env)
 
     cli_pylintrc, ext_pylintrc = _config_file_path("pylint")
 
-    cli_result = run(cli_paths, cli_pylintrc, "modules")
-    ext_result = run(ext_paths, ext_pylintrc, "extensions")
+    cli_result = run(cli_paths, cli_pylintrc, "modules",
+                     checkers=checkers, env=env, disable_all=disable_all, enable=enable)
+    ext_result = run(ext_paths, ext_pylintrc, "extensions",
+                     checkers=checkers, env=env, disable_all=disable_all, enable=enable)
     return _combine_command_result(cli_result, ext_result)
 
 
