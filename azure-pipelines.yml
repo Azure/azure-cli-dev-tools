@@ -240,7 +240,7 @@ jobs:
       set -ev
       . scripts/ci/install.sh
       # verify azdev linter works
-      azdev linter CLI
+      azdev linter acr
     displayName: 'Test azdev linter'
 
 - job: TestAzdevStyle
