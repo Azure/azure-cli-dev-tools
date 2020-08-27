@@ -58,7 +58,6 @@ def load_exclusions(exclusion_path):
     return test_exclusions
 
 
-# noqa: E722
 def load_test_commands(parser):
     TEST_COMMANDS = [get_cli_repo_path(), 'az_command_coverage.txt']
     path = os.path.join(*TEST_COMMANDS)
@@ -73,7 +72,7 @@ def load_test_commands(parser):
                 command_args, _ = _process_command_args(command_args)
                 ns = parser.parse_args(command_args)
                 yield ns
-            except:  # pylint: disable=bare-except
+            except:  # pylint: disable=bare-except # noqa: E722
                 logger.debug(command)
             command = file.readline()
 
