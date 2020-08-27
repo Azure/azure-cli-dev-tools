@@ -58,6 +58,7 @@ def load_exclusions(exclusion_path):
     return test_exclusions
 
 
+# noqa: E722
 def load_test_commands(parser):
     TEST_COMMANDS = [get_cli_repo_path(), 'az_command_coverage.txt']
     path = os.path.join(*TEST_COMMANDS)
