@@ -18,8 +18,8 @@ from azdev.operations.linter.util import filter_modules
 logger = get_logger(__name__)
 
 
-def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
-                  save_global_exclusion=False):
+def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
+                  include_whl_extensions=False, save_global_exclusion=False):
     import mock
     exclusion_path = os.path.join(*[get_cli_repo_path(), 'test_exclusions.json'])
 
@@ -31,13 +31,13 @@ def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
                                                                git_target,
                                                                git_repo,
                                                                include_whl_extensions)
-        simple_command_table = format_command_table(command_loader.command_table)
+        simple_command_table = simplify_command_table(command_loader.command_table)
         parser = command_loader.cli_ctx.invocation.parser
         commands_without_tests = []
 
         test_exclusions = load_exclusions(exclusion_path)
 
-        for ns in load_test_commands(parser):
+        for ns in parse_test_commands(parser):
             update_command_table(simple_command_table, ns)
 
         display("-------Test Results:-------")
@@ -58,7 +58,7 @@ def load_exclusions(exclusion_path):
     return test_exclusions
 
 
-def load_test_commands(parser):
+def parse_test_commands(parser):
     TEST_COMMANDS = [get_cli_repo_path(), 'az_command_coverage.txt']
     path = os.path.join(*TEST_COMMANDS)
 
@@ -78,7 +78,8 @@ def load_test_commands(parser):
 
 
 def load_command_table_and_command_loader(modules=None, git_source=None,
-                                          git_target=None, git_repo=None, include_whl_extensions=False):
+                                          git_target=None, git_repo=None,
+                                          include_whl_extensions=False):
     require_azure_cli()
 
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
@@ -130,7 +131,7 @@ def load_command_table_and_command_loader(modules=None, git_source=None,
     return command_loader
 
 
-def format_command_table(command_table):
+def simplify_command_table(command_table):
     simple_command_table = {}
     ignore_arg = ['_subscription', 'cmd']
     for command, value in command_table.items():
@@ -166,7 +167,7 @@ def calculate_command_coverage_rate(simple_command_table, commands_without_tests
             if command in test_exclusions:
                 command_coverage[command_group][0] += 1
             else:
-                logger.warning("% doesn't have test", command)
+                display("% doesn't have test", command)
                 continue
 
 
