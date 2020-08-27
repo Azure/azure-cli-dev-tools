@@ -167,7 +167,7 @@ def calculate_command_coverage_rate(simple_command_table, commands_without_tests
             if command in test_exclusions:
                 command_coverage[command_group][0] += 1
             else:
-                display("% doesn't have test", command)
+                display("{} doesn't have test".format(command))
                 continue
 
 
