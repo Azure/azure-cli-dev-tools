@@ -40,7 +40,7 @@ def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
         for ns in load_test_commands(parser):
             update_command_table(simple_command_table, ns)
 
-        logger.warning("-------Test Results:-------")
+        display("-------Test Results:-------")
         calculate_command_coverage_rate(simple_command_table, commands_without_tests, test_exclusions)
         if save_global_exclusion:
             save_commands_without_tests(commands_without_tests)
