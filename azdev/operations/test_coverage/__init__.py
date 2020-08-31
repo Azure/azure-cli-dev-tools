@@ -19,7 +19,8 @@ logger = get_logger(__name__)
 
 
 def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
-                  include_whl_extensions=False, save_global_exclusion=False):
+                  include_whl_extensions=False, save_global_exclusion=False,
+                  cli_ci=False):
     import mock
     exclusion_path = os.path.join(*[get_cli_repo_path(), 'test_exclusions.json'])
 
@@ -30,7 +31,8 @@ def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
                                                                git_source,
                                                                git_target,
                                                                git_repo,
-                                                               include_whl_extensions)
+                                                               include_whl_extensions,
+                                                               cli_ci)
         simple_command_table = simplify_command_table(command_loader.command_table)
         parser = command_loader.cli_ctx.invocation.parser
         commands_without_tests = []
@@ -79,12 +81,13 @@ def parse_test_commands(parser):
 
 def load_command_table_and_command_loader(modules=None, git_source=None,
                                           git_target=None, git_repo=None,
-                                          include_whl_extensions=False):
+                                          include_whl_extensions=False,
+                                          cli_ci=False):
     require_azure_cli()
 
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
     from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args  # pylint: disable=import-error
-
+    from ..testtool.incremental_strategy import CLIAzureDevOpsContext
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
     ext_only = modules == ['EXT']
@@ -103,10 +106,14 @@ def load_command_table_and_command_loader(modules=None, git_source=None,
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
 
     if not any((selected_modules[x] for x in selected_modules)):
-        raise CLIError('No modules selected.')
+        display('No modules selected.')
 
     selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
         list(selected_modules['ext'].keys())
+
+    if cli_ci is True:
+        ctx = CLIAzureDevOpsContext(git_repo, git_source, git_target)
+        selected_modules = ctx.filter(None)
 
     if selected_mod_names:
         display('Modules: {}\n'.format(', '.join(selected_mod_names)))
