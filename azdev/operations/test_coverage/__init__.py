@@ -153,9 +153,9 @@ def update_command_table(simple_command_table, namespace):
     if command in simple_command_table:
         simple_command_table[command][1] = True
         for key in simple_command_table[command][0].keys():
-            if all([hasattr(namespace, key) and getattr(namespace, key),
-                    not isinstance(getattr(namespace, key), DefaultInt),
-                    not isinstance(getattr(namespace, key), DefaultStr)]):
+            if hasattr(namespace, key) and getattr(namespace, key) and all([
+                not isinstance(getattr(namespace, key), DefaultInt),
+                not isinstance(getattr(namespace, key), DefaultStr)]):
                 simple_command_table[command][0][key] = True
 
 
