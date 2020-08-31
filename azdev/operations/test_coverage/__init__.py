@@ -113,7 +113,7 @@ def load_command_table_and_command_loader(modules=None, git_source=None,
 
     if cli_ci is True:
         ctx = CLIAzureDevOpsContext(git_repo, git_source, git_target)
-        selected_modules = ctx.filter(None)
+        selected_mod_names = ctx.filter(None)
 
     if selected_mod_names:
         display('Modules: {}\n'.format(', '.join(selected_mod_names)))
@@ -134,7 +134,7 @@ def load_command_table_and_command_loader(modules=None, git_source=None,
         command_loader, help_file_entries, modules=selected_mod_names, include_whl_extensions=include_whl_extensions)
 
     if not command_loader.command_table:
-        raise CLIError('No commands selected to check.')
+        display('No commands selected to check.')
     return command_loader
 
 
