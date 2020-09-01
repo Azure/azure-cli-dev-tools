@@ -5,7 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import os
-import time
+import sys
 
 from knack.util import CLIError
 from knack.log import get_logger
@@ -23,6 +23,7 @@ def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
                   cli_ci=False):
     import mock
     exclusion_path = os.path.join(*[get_cli_repo_path(), 'test_exclusions.json'])
+    exit_code = 0
 
     with mock.patch('azure.cli.core.commands.validators.validate_file_or_dict', return_value={}),\
             mock.patch('azure.cli.core.util.get_json_object', return_value={}),\
@@ -43,9 +44,15 @@ def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
             update_command_table(simple_command_table, ns)
 
         display("-------Test Results:-------")
-        calculate_command_coverage_rate(simple_command_table, commands_without_tests, test_exclusions)
+        is_full_coverage = calculate_command_coverage_rate(simple_command_table, commands_without_tests, test_exclusions)
+
         if save_global_exclusion:
             save_commands_without_tests(commands_without_tests)
+
+        if not is_full_coverage:
+            exit_code += 1
+
+        sys.exit(exit_code)
 
 
 def load_exclusions(exclusion_path):
@@ -160,6 +167,7 @@ def update_command_table(simple_command_table, namespace):
 
 
 def calculate_command_coverage_rate(simple_command_table, commands_without_tests, test_exclusions):
+    is_full_coverage = True
     command_coverage = {}
     for command, value in simple_command_table.items():
         command_group = command.split(' ')[0]
@@ -173,8 +181,10 @@ def calculate_command_coverage_rate(simple_command_table, commands_without_tests
             if command in test_exclusions:
                 command_coverage[command_group][0] += 1
             else:
+                is_full_coverage = False
                 display("{} doesn't have test".format(command))
                 continue
+    return is_full_coverage
 
 
 def save_commands_without_tests(commands_without_tests):
