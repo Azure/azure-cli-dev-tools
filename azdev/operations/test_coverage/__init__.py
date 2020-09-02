@@ -39,8 +39,8 @@ def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
         commands_without_tests = []
 
         test_exclusions = load_exclusions(exclusion_path)
-
-        for ns in parse_test_commands(parser):
+        commands_record_file = [get_cli_repo_path(), 'az_command_coverage.txt']
+        for ns in parse_test_commands(parser, commands_record_file):
             update_command_table(simple_command_table, ns)
 
         display("-------Test Results:-------")
@@ -67,23 +67,24 @@ def load_exclusions(exclusion_path):
     return test_exclusions
 
 
-def parse_test_commands(parser):
-    TEST_COMMANDS = [get_cli_repo_path(), 'az_command_coverage.txt']
-    path = os.path.join(*TEST_COMMANDS)
-
-    with open(path) as file:
-        import shlex
-        from azdev.operations.linter.rules.help_rules import _process_command_args
-        command = file.readline()
-        while command:
-            try:
-                command_args = shlex.split(command, comments=True)  # split commands into command args, ignore comments.
-                command_args, _ = _process_command_args(command_args)
-                ns = parser.parse_args(command_args)
-                yield ns
-            except:  # pylint: disable=bare-except # noqa: E722
-                logger.debug(command)
+def parse_test_commands(parser, commands_record_file):
+    path = os.path.join(*commands_record_file)
+    if os.path.exists(path):
+        with open(path) as file:
+            import shlex
+            from azdev.operations.linter.rules.help_rules import _process_command_args
             command = file.readline()
+            while command:
+                try:
+                    command_args = shlex.split(command, comments=True)  # split commands into command args, ignore comments.
+                    command_args, _ = _process_command_args(command_args)
+                    ns = parser.parse_args(command_args)
+                    yield ns
+                except:  # pylint: disable=bare-except # noqa: E722
+                    logger.debug(command)
+                command = file.readline()
+    else:
+        logger.debug("Commands record file doesn't exist.")
 
 
 def load_command_table_and_command_loader(modules=None, git_source=None,
@@ -148,9 +149,10 @@ def load_command_table_and_command_loader(modules=None, git_source=None,
 def simplify_command_table(command_table):
     simple_command_table = {}
     ignore_arg = ['_subscription', 'cmd']
-    for command, value in command_table.items():
-        args_table = {arg: False for arg in value.arguments.keys() if arg not in ignore_arg}
-        simple_command_table[command] = [args_table, False]  # arg table and is the command tested
+    if command_table:
+        for command, value in command_table.items():
+            args_table = {arg: False for arg in value.arguments.keys() if arg not in ignore_arg}
+            simple_command_table[command] = [args_table, False]  # arg table and is the command tested
     return simple_command_table
 
 

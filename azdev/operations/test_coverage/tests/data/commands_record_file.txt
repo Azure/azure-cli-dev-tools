@@ -1,0 +1,7 @@
+az network show -h
+az
+az network -h
+az ppp
+az network vnet subnet show -h
+az network vnet subnet show -a sss
+az network vnet show -n myvnet -g 20200902
