@@ -78,7 +78,7 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'cli update-setup') as c:
         c.argument('pin', action='store_true', help='Pin the module versions in azure-cli\'s setup.py file.')
 
-    with ArgumentsContext(self, 'test-coverage') as c:
+    with ArgumentsContext(self, 'test-coverage cli') as c:
         c.positional('modules', modules_type)
         c.argument('save_global_exclusion',
                    action='store_true',
