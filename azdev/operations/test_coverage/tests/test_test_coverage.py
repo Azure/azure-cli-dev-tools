@@ -16,11 +16,12 @@ from azdev.operations.test_coverage import (load_exclusions,
 
 TEST_DIR = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
 
+
 class TestTestCoverage(unittest.TestCase):
     def test_load_exclusions(self):
         valid_exclusion_path = os.path.join(TEST_DIR, 'data', 'exclusions.json')
         exclusion = load_exclusions(valid_exclusion_path)
-        self.assertCountEqual(["network vnet show","storage account show"], exclusion)
+        self.assertCountEqual(["network vnet show", "storage account show"], exclusion)
 
         invalid_exclusion_path = os.path.join(TEST_DIR, 'data', 'invalid_exclusions.json')
         exclusion = load_exclusions(invalid_exclusion_path)
