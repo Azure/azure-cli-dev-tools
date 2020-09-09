@@ -20,11 +20,11 @@ class TestTestCoverage(unittest.TestCase):
     def test_load_exclusions(self):
         valid_exclusion_path = os.path.join(TEST_DIR, 'data', 'exclusions.json')
         exclusion = load_exclusions(valid_exclusion_path)
-        self.assertItemsEqual(["network vnet show","storage account show"], exclusion)
+        self.assertCountEqual(["network vnet show","storage account show"], exclusion)
 
         invalid_exclusion_path = os.path.join(TEST_DIR, 'data', 'invalid_exclusions.json')
         exclusion = load_exclusions(invalid_exclusion_path)
-        self.assertItemsEqual([], exclusion)
+        self.assertCountEqual([], exclusion)
 
     def test_simplify_command_table(self):
         try:

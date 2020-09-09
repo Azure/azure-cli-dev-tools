@@ -18,9 +18,9 @@ from azdev.operations.linter.util import filter_modules
 logger = get_logger(__name__)
 
 
-def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
-                  include_whl_extensions=False, save_global_exclusion=False,
-                  cli_ci=False):
+def test_coverage_cli(modules=None, git_source=None, git_target=None, git_repo=None,
+                      include_whl_extensions=False, save_global_exclusion=False,
+                      cli_ci=False):
     import mock
     exclusion_path = os.path.join(*[get_cli_repo_path(), 'test_exclusions.json'])
     exit_code = 0
@@ -44,7 +44,9 @@ def test_coverage(modules=None, git_source=None, git_target=None, git_repo=None,
             update_command_table(simple_command_table, ns)
 
         display("-------Test Results:-------")
-        is_full_coverage = calculate_command_coverage_rate(simple_command_table, commands_without_tests, test_exclusions)
+        is_full_coverage = calculate_command_coverage_rate(simple_command_table,
+                                                           commands_without_tests,
+                                                           test_exclusions)
 
         if save_global_exclusion:
             save_commands_without_tests(commands_without_tests)
@@ -76,7 +78,7 @@ def parse_test_commands(parser, commands_record_file):
             command = file.readline()
             while command:
                 try:
-                    command_args = shlex.split(command, comments=True)  # split commands into command args, ignore comments.
+                    command_args = shlex.split(command, comments=True)  # split commands into command args.
                     command_args, _ = _process_command_args(command_args)
                     ns = parser.parse_args(command_args)
                     yield ns
@@ -163,8 +165,9 @@ def update_command_table(simple_command_table, namespace):
         simple_command_table[command][1] = True
         for key in simple_command_table[command][0].keys():
             if hasattr(namespace, key) and getattr(namespace, key) and all([
-                not isinstance(getattr(namespace, key), DefaultInt),
-                not isinstance(getattr(namespace, key), DefaultStr)]):
+                    not isinstance(getattr(namespace, key), DefaultInt),
+                    not isinstance(getattr(namespace, key), DefaultStr)
+            ]):
                 simple_command_table[command][0][key] = True
 
 
