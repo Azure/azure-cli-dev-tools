@@ -8,11 +8,11 @@ import unittest
 import os
 from knack.util import CLIError
 
-from azdev.operations.test_coverage import (load_exclusions,
-                                            parse_test_commands,
-                                            simplify_command_table,
-                                            update_command_table,
-                                            calculate_command_coverage_rate)
+from azdev.operations.coverage import (load_exclusions,
+                                       parse_test_commands,
+                                       simplify_command_table,
+                                       update_command_table,
+                                       calculate_command_coverage_rate)
 
 TEST_DIR = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
 
