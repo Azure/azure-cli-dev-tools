@@ -83,6 +83,11 @@ def load_arguments(self, _):
         c.argument('include_whl_extensions',
                    action='store_true',
                    help="Allow running test-coverage on extensions installed by `az extension add`.")
+        c.argument('cli_ci',
+                   action='store_true',
+                   arg_group='Continuous Integration',
+                   help='Apply incremental test strategy to Azure CLI on Azure DevOps')
+
     # region linter
     with ArgumentsContext(self, 'linter') as c:
         c.positional('modules', modules_type)

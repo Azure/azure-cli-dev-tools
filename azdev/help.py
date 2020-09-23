@@ -67,6 +67,13 @@ helps['configure'] = """
     short-summary: Configure azdev for use without installing anything.
 """
 
+helps['coverage'] = """
+    short-summary: Commands to check code coverage.
+"""
+
+helps['coverage cli'] = """
+    short-summary: Calculate command test coverage rate.
+"""
 
 helps['verify'] = """
     short-summary: Verify CLI product features.
