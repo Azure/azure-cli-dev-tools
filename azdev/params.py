@@ -61,11 +61,6 @@ def load_arguments(self, _):
                    arg_group='Continuous Integration',
                    help='Apply incremental test strategy to Azure CLI on Azure DevOps')
 
-    with ArgumentsContext(self, 'coverage') as c:
-        c.argument('prefix', type=str, help='Filter analysis by command prefix.')
-        c.argument('report', action='store_true', help='Display results as a report.')
-        c.argument('untested_params', nargs='+', help='Space-separated list of param dest values to search for (OR logic)')
-
     with ArgumentsContext(self, 'style') as c:
         c.positional('modules', modules_type)
         c.argument('pylint', action='store_true', help='Run pylint.')
@@ -78,7 +73,7 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'cli update-setup') as c:
         c.argument('pin', action='store_true', help='Pin the module versions in azure-cli\'s setup.py file.')
 
-    with ArgumentsContext(self, 'test-coverage cli') as c:
+    with ArgumentsContext(self, 'coverage cli') as c:
         c.positional('modules', modules_type)
         c.argument('save_global_exclusion',
                    action='store_true',

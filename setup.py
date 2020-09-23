@@ -56,7 +56,7 @@ setup(
         'azdev.operations.linter',
         'azdev.operations.linter.rules',
         'azdev.operations.linter.pylint_checkers',
-        'azdev.operations.test_coverage',
+        'azdev.operations.coverage',
         'azdev.operations.testtool',
         'azdev.operations.extensions',
         'azdev.utilities',

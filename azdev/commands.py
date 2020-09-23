@@ -27,7 +27,7 @@ def load_command_table(self, _):
     with CommandGroup(self, '', operation_group('linter')) as g:
         g.command('linter', 'run_linter')
 
-    with CommandGroup(self, 'test-coverage', operation_group('test_coverage')) as g:
+    with CommandGroup(self, 'coverage', operation_group('coverage')) as g:
         g.command('cli', 'test_coverage_cli')
 
     with CommandGroup(self, 'verify', operation_group('pypi')) as g:
