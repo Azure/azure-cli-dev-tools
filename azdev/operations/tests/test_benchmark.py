@@ -81,14 +81,18 @@ class TestBenchmarkCommands(TestCase):
     def test_load_all_commands_fail(self):
         import sys
 
-        sys.modules["azure.cli.core"] = mock.MagicMock(side_effect=ImportError)
+        original_azure_cli_core_mod = sys.modules.get("azure.cli.core")
+        sys.modules["azure.cli.core"] = None
 
-        with self.assertRaisesRegex(CLIError, "Azure CLI is not installed"):
+        with self.assertRaisesRegex(CLIError, "Azure CLI is not installed") as e:
             _benchmark_load_all_commands()
 
-        del sys.modules[
-            "azure.cli.core"
-        ]  # restore azure.cli.core to be unimported as the original
+        if original_azure_cli_core_mod:
+            sys.modules["azure.cli.core"] = original_azure_cli_core_mod
+        else:
+            del sys.modules[
+                "azure.cli.core"
+            ]  # restore azure.cli.core to the unimported status
 
 
 # class _MockedMapResultCounter:
