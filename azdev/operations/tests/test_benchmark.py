@@ -84,7 +84,7 @@ class TestBenchmarkCommands(TestCase):
         original_azure_cli_core_mod = sys.modules.get("azure.cli.core")
         sys.modules["azure.cli.core"] = None
 
-        with self.assertRaisesRegex(CLIError, "Azure CLI is not installed") as e:
+        with self.assertRaisesRegex(CLIError, "Azure CLI is not installed"):
             _benchmark_load_all_commands()
 
         if original_azure_cli_core_mod:
