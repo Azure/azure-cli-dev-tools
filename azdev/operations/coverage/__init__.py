@@ -39,8 +39,8 @@ def test_coverage_cli(modules=None, git_source=None, git_target=None, git_repo=N
         commands_without_tests = []
 
         test_exclusions = load_exclusions(exclusion_path)
-        commands_record_file = [get_cli_repo_path(), 'az_command_coverage.txt']
-        for ns in parse_test_commands(parser, commands_record_file):
+        commands_record_file_path = os.path.join(get_cli_repo_path(), 'az_command_coverage.txt')
+        for ns in parse_test_commands(parser, commands_record_file_path):
             update_command_table(simple_command_table, ns)
 
         display("-------Test Results:-------")
@@ -69,10 +69,9 @@ def load_exclusions(exclusion_path):
     return test_exclusions
 
 
-def parse_test_commands(parser, commands_record_file):
-    path = os.path.join(*commands_record_file)
-    if os.path.exists(path):
-        with open(path) as file:
+def parse_test_commands(parser, commands_record_file_path):
+    if os.path.exists(commands_record_file_path):
+        with open(commands_record_file_path) as file:
             import shlex
             from azdev.operations.linter.rules.help_rules import _process_command_args
             command = file.readline()
