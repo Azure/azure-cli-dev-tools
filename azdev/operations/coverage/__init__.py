@@ -52,7 +52,10 @@ def test_coverage_cli(modules=None, git_source=None, git_target=None, git_repo=N
             save_commands_without_tests(commands_without_tests)
 
         if not is_full_coverage:
+            display("Please add test for those commands which don't have test right now")
             exit_code += 1
+        else:
+            display("All commands have test right now. Good job!")
 
         sys.exit(exit_code)
 
