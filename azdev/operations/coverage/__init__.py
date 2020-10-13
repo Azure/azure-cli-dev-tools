@@ -17,7 +17,6 @@ from azdev.operations.linter.util import filter_modules
 
 logger = get_logger(__name__)
 
-
 def test_coverage_cli(modules=None, git_source=None, git_target=None, git_repo=None,
                       include_whl_extensions=False, save_global_exclusion=False,
                       cli_ci=False):
@@ -27,7 +26,8 @@ def test_coverage_cli(modules=None, git_source=None, git_target=None, git_repo=N
 
     with mock.patch('azure.cli.core.commands.validators.validate_file_or_dict', return_value={}),\
             mock.patch('azure.cli.core.util.get_json_object', return_value={}),\
-            mock.patch('azure.cli.command_modules.keyvault._validators.certificate_type', return_value="fake-cert"):
+            mock.patch('azure.cli.command_modules.keyvault._validators.certificate_type', return_value="fake-cert"),\
+            mock.patch('azure.cli.core.parser.AzCliCommandParser._get_extension_use_dynamic_install_config', return_value="no"):
         command_loader = load_command_table_and_command_loader(modules,
                                                                git_source,
                                                                git_target,
