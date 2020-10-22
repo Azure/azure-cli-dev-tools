@@ -5,11 +5,12 @@
 # -----------------------------------------------------------------------------
 
 import os
+
 from glob import glob
-
 from knack.util import CLIError
-
-from .const import COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, ENV_VAR_VIRTUAL_ENV
+from six.moves import configparser
+from azdev.utilities import get_azure_config, display
+from . import const
 
 
 def extract_module_name(path):
@@ -34,7 +35,7 @@ def get_env_path():
     :returns: Path (str) to the virtual env or None.
     """
     env_path = None
-    for item in ENV_VAR_VIRTUAL_ENV:
+    for item in const.ENV_VAR_VIRTUAL_ENV:
         env_path = os.environ.get(item)
         if env_path:
             break
@@ -70,12 +71,15 @@ def get_ext_repo_paths():
 
     :returns: Path (str) to Azure CLI dev extension repos.
     """
-    from configparser import NoSectionError
-    from .config import get_azdev_config
+    from configparser import NoSectionError, NoOptionError
     try:
-        return get_azdev_config().get('ext', 'repo_paths').split(',')
+        return get_azure_config().get(const.EXT_SECTION, const.AZ_DEV_SRC).split(',')
     except NoSectionError:
-        raise CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup`.')
+        raise CLIError('Unable to retrieve extensions repo path from config. Please run `azdev setup` '
+                       'with -r to set an extensions repo.')
+    except NoOptionError:
+        raise CLIError('Unable to retrieve the option {} from azure config section [{}]'.format(
+            const.AZ_DEV_SRC, const.EXT_SECTION))
 
 
 def find_file(file_name):
@@ -119,11 +123,14 @@ def make_dirs(path):
 def get_name_index(invert=False, include_whl_extensions=False):
     """ Returns a dictionary containing the long and short names of modules and extensions is {SHORT:LONG} format or
         {LONG:SHORT} format when invert=True. """
-    from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
+    config = get_azure_config()  # pylint: disable=import-error
+    try:
+        EXTENSIONS_DIR = config.get(const.EXT_SECTION, const.AZ_DEV_SRC)
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        EXTENSIONS_DIR = ""
 
     table = {}
     cli_repo_path = get_cli_repo_path()
-    ext_repo_paths = get_ext_repo_paths()
 
     # unified azure-cli package (2.0.68 and later)
     paths = os.path.normcase(
@@ -133,9 +140,9 @@ def get_name_index(invert=False, include_whl_extensions=False):
     )
     modules_paths = glob(paths)
     core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
-    ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
+    ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
     whl_ext_paths = []
-    if include_whl_extensions:
+    if include_whl_extensions and EXTENSIONS_DIR:
         whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
 
     def _update_table(paths, key):
@@ -149,15 +156,15 @@ def get_name_index(invert=False, include_whl_extensions=False):
             if key == 'ext':
                 short_name = base_name
                 for item in os.listdir(folder):
-                    if item.startswith(EXTENSION_PREFIX):
+                    if item.startswith(const.EXTENSION_PREFIX):
                         long_name = item
                         break
-            elif base_name.startswith(COMMAND_MODULE_PREFIX):
+            elif base_name.startswith(const.COMMAND_MODULE_PREFIX):
                 long_name = base_name
-                short_name = base_name.replace(COMMAND_MODULE_PREFIX, '') or '__main__'
+                short_name = base_name.replace(const.COMMAND_MODULE_PREFIX, '') or '__main__'
             else:
                 short_name = base_name
-                long_name = '{}{}'.format(COMMAND_MODULE_PREFIX, base_name)
+                long_name = '{}{}'.format(const.COMMAND_MODULE_PREFIX, base_name)
             if not invert:
                 table[short_name] = long_name
             else:
@@ -190,8 +197,14 @@ def get_path_table(include_only=None, include_whl_extensions=False):
         }
     }
     """
-    from azure.cli.core.extension import EXTENSIONS_DIR  # pylint: disable=import-error
-
+    config = get_azure_config()  # pylint: disable=import-error
+    try:
+        EXTENSIONS_DIR = config.get(const.EXT_SECTION, const.AZ_DEV_SRC)
+        os.chdir(EXTENSIONS_DIR)
+    except (configparser.NoSectionError, configparser.NoOptionError, TypeError):
+        display("WARNING: No extension path found, only modules will be available. "
+                "rerun setup with -r to make extensions available\n")
+        EXTENSIONS_DIR = ""
     # determine whether the call will filter or return all
     if isinstance(include_only, str):
         include_only = [include_only]
@@ -199,7 +212,6 @@ def get_path_table(include_only=None, include_whl_extensions=False):
 
     table = {}
     cli_repo_path = get_cli_repo_path()
-    ext_repo_paths = get_ext_repo_paths()
 
     paths = os.path.normcase(
         os.path.join(
@@ -208,7 +220,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     )
     modules_paths = glob(paths)
     core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
-    ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
+    ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
     whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
 
     def _update_table(package_paths, key):
@@ -221,10 +233,10 @@ def get_path_table(include_only=None, include_whl_extensions=False):
 
             if key == 'ext':
                 short_name = base_name
-                long_name = next((item for item in os.listdir(folder) if item.startswith(EXTENSION_PREFIX)), None)
+                long_name = next((item for item in os.listdir(folder) if item.startswith(const.EXTENSION_PREFIX)), None)
             else:
                 short_name = base_name
-                long_name = '{}{}'.format(COMMAND_MODULE_PREFIX, base_name)
+                long_name = '{}{}'.format(const.COMMAND_MODULE_PREFIX, base_name)
 
             if get_all:
                 table[key][long_name if key == 'ext' else short_name] = folder

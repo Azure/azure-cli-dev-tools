@@ -49,6 +49,7 @@
     <Compile Include="azdev\operations\__init__.py" />
     <Compile Include="azdev\params.py" />
     <Compile Include="azdev\utilities\config.py" />
+    <Compile Include="azdev\utilities\venv.py" />
     <Compile Include="azdev\utilities\const.py">
       <SubType>Code</SubType>
     </Compile>

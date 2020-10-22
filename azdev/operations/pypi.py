@@ -16,7 +16,8 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     display, heading, subheading, cmd, py_cmd, get_path_table,
-    pip_cmd, COMMAND_MODULE_PREFIX, require_azure_cli, find_files)
+    pip_cmd, COMMAND_MODULE_PREFIX, require_azure_cli, require_virtual_env,
+    find_files)
 
 logger = get_logger(__name__)
 
@@ -131,6 +132,7 @@ def verify_versions():
     import tempfile
     import shutil
 
+    require_virtual_env()
     require_azure_cli()
 
     heading('Verify CLI Versions')
