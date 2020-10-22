@@ -23,6 +23,7 @@ ENV_AZ_DEV_CONFIG = '$env:AZDEV_CONFIG_DIR'
 EXTENSION_PREFIX = 'azext_'
 EXT_REPO_NAME = 'azure-cli-extensions'
 EXT_SECTION = 'extension'
+GITHUB_CLI_REPO_URL = 'https://github.com/azure/azure-cli'
 IS_WINDOWS = sys.platform.lower() in ['windows', 'win32']
 PIP_E_CMD = 'pip install -e '
 PIP_R_CMD = 'pip install -r '

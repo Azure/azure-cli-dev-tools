@@ -21,7 +21,8 @@ import azdev.utilities.const as const
 import azdev.utilities.venv as venv
 from azdev.utilities import (
     display, heading, subheading, pip_cmd, find_file, get_env_path,
-    get_azdev_config_dir, get_azdev_config, get_azure_config, shell_cmd)
+    get_azdev_config_dir, get_azdev_config, get_azure_config, shell_cmd,
+    get_cli_repo_path)
 
 logger = get_logger(__name__)
 
@@ -264,8 +265,6 @@ def _interactive_setup():
 
 
 def _validate_input(cli_path, ext_repo_path, set_env, copy, use_global, ext):
-    if not cli_path:
-        raise CLIError("-c must be given if any other arguments are given")
     if copy and use_global:
         raise CLIError("Copy and use global are mutally exlcusive.")
     if cli_path == "pypi" and any([use_global, copy, set_env]):
@@ -316,6 +315,12 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     if 'CONDA_PREFIX' in os.environ:
         raise CLIError('CONDA virutal enviroments are not supported outside'
                        ' of interactive mode or when -c and -r are provided')
+
+    if not cli_path:
+        try:
+            cli_path = get_cli_repo_path()
+        except CLIError:
+            cli_path = const.GITHUB_CLI_REPO_URL
     _validate_input(cli_path, ext_repo_path, set_env, copy, use_global, ext)
     _check_paths(cli_path, ext_repo_path)
 
