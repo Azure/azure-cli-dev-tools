@@ -317,10 +317,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
                        ' of interactive mode or when -c and -r are provided')
 
     if not cli_path:
-        try:
-            cli_path = get_cli_repo_path()
-        except CLIError:
-            cli_path = const.GITHUB_CLI_REPO_URL
+        cli_path = get_cli_repo_path()
     _validate_input(cli_path, ext_repo_path, set_env, copy, use_global, ext)
     _check_paths(cli_path, ext_repo_path)
 
