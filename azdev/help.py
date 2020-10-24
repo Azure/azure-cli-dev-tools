@@ -18,22 +18,25 @@ helps['setup'] = """
         - name: Fully interactive setup (Must be run in an existing virtual environment).
           text: azdev setup
 
-        - name: Install CLI and setup an extensions repo (Must be run in an existing virtual environment), will use the CLI repo path from global .azdev config.
-          text: azdev setup -r azure-cli-extensions
-
-        - name: Install CLI an existing virtual environment, along with the extensions repo. Will create a azure directory and config in the current virtual environment.
+        - name: Install CLI and setup an extensions repo in an existing virtual environment. Will create a azure directory and config in the current virtual environment.
           text: azdev setup -c azure-cli -r azure-cli-extensions
 
-        - name: Same as above but install the `alias` extension in the existing virtual environment too.
+        - name: Same as above, but install the `alias` extension in the existing virtual environment too.
           text: azdev setup -c azure-cli -r azure-cli-extensions -e alias
+        
+        - name: Same as above, but will use the CLI repo path in local .azdev config, or the one in global .azdev config if not found the local one.
+          text: azdev setup -r azure-cli-extensions
 
-        - name: Install CLI a new virtual environment, along with the extensions repo. Will create a azure directory and config in the current virtual environment.
+        - name: Same as above, but only install CLI without setup an extensions repo.
+          text: azdev setup -c azure-cli
+
+        - name: Install CLI and setup an extensions repo in a new virtual environment. Will create a azure directory and config in the current virtual environment.
           text: azdev setup -c azure-cli -r azure-cli-extensions -s env1
 
         - name: Same as above, but do not setup new azure directory and config in this virtual environment
           text: azdev setup -c azure-cli -r azure-cli-extensions -s env1 -g
 
-        - name: Same as above but copy over system level azure settings into new virtual environment azure settings
+        - name: Same as above, but copy over system level azure settings into new virtual environment azure settings
           text: azdev setup -c azure-cli -r azure-cli-extensions -s env1 --copy
 """
 
