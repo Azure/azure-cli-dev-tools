@@ -21,8 +21,7 @@ import azdev.utilities.const as const
 import azdev.utilities.venv as venv
 from azdev.utilities import (
     display, heading, subheading, pip_cmd, find_file, get_env_path,
-    get_azdev_config_dir, get_azdev_config, get_azure_config, shell_cmd,
-    get_cli_repo_path)
+    get_azdev_config_dir, get_azdev_config, get_azure_config, shell_cmd)
 
 logger = get_logger(__name__)
 
@@ -320,13 +319,14 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
         local_azdev_config = os.path.join(os.environ.get(const.VIRTUAL_ENV), '.azdev', const.CONFIG_NAME)
         cli_path = _get_azdev_cli_path(local_azdev_config)
         if cli_path is None:
-            print('Not found cli path in local azdev config file(' + local_azdev_config + '), will use the one in global azdev config.')
+            print('Not found cli path in local azdev config file(' + local_azdev_config +
+            '), will use the one in global azdev config.')
             global_azdev_config = os.path.expanduser(os.path.join('~', '.azdev', const.CONFIG_NAME))
             cli_path = _get_azdev_cli_path(global_azdev_config)
             if cli_path is None:
                 raise CLIError('Not found cli path in global azdev config file: ' + global_azdev_config)
         print('cli_path: ' + cli_path)
-    
+
     _validate_input(cli_path, ext_repo_path, set_env, copy, use_global, ext)
     _check_paths(cli_path, ext_repo_path)
 
@@ -399,8 +399,8 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
 
 def _get_azdev_cli_path(config_file_path):
     if not os.path.exists(config_file_path):
-        return
-    
+        return None
+
     import configparser
     with open(config_file_path, "r") as file:
         config_parser = configparser.RawConfigParser()
@@ -408,6 +408,8 @@ def _get_azdev_cli_path(config_file_path):
         content = config_parser._sections
         if 'cli' in content and 'repo_path' in content['cli']:
             return content.get('cli').get('repo_path')
+        else:
+            return None
 
 
 def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):
