@@ -316,16 +316,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
                        ' of interactive mode or when -c and -r are provided')
 
     if not cli_path:
-        local_azdev_config = os.path.join(os.environ.get(const.VIRTUAL_ENV), '.azdev', const.CONFIG_NAME)
-        cli_path = _get_azdev_cli_path(local_azdev_config)
-        if cli_path is None:
-            display('Not found cli path in local azdev config file: ' + local_azdev_config)
-            display('Will use the one in global azdev config.')
-            global_azdev_config = os.path.expanduser(os.path.join('~', '.azdev', const.CONFIG_NAME))
-            cli_path = _get_azdev_cli_path(global_azdev_config)
-            if cli_path is None:
-                raise CLIError('Not found cli path in global azdev config file: ' + global_azdev_config)
-        display('cli_path: ' + cli_path)
+        cli_path = _handle_no_cli_path()
 
     _validate_input(cli_path, ext_repo_path, set_env, copy, use_global, ext)
     _check_paths(cli_path, ext_repo_path)
@@ -405,10 +396,23 @@ def _get_azdev_cli_path(config_file_path):
     with open(config_file_path, "r") as file:
         config_parser = configparser.RawConfigParser()
         config_parser.read_string(file.read())
-        content = config_parser._sections
-        if 'cli' in content and 'repo_path' in content['cli']:
-            return content.get('cli').get('repo_path')
+        if config_parser.has_section('cli') and config_parser.has_option('cli', 'repo_path'):
+            return config_parser.get('cli', 'repo_path')
         return None
+
+
+def _handle_no_cli_path():
+    local_azdev_config = os.path.join(os.environ.get(const.VIRTUAL_ENV), '.azdev', const.CONFIG_NAME)
+    cli_path = _get_azdev_cli_path(local_azdev_config)
+    if cli_path is None:
+        display('Not found cli path in local azdev config file: ' + local_azdev_config)
+        display('Will use the one in global azdev config.')
+        global_azdev_config = os.path.expanduser(os.path.join('~', '.azdev', const.CONFIG_NAME))
+        cli_path = _get_azdev_cli_path(global_azdev_config)
+        if cli_path is None:
+            raise CLIError('Not found cli path in global azdev config file: ' + global_azdev_config)
+    display('cli_path: ' + cli_path)
+    return cli_path
 
 
 def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):
