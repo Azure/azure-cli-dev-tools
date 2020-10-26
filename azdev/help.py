@@ -23,7 +23,7 @@ helps['setup'] = """
 
         - name: Same as above, but install the `alias` extension in the existing virtual environment too.
           text: azdev setup -c azure-cli -r azure-cli-extensions -e alias
-        
+
         - name: Same as above, but will use the CLI repo path in local .azdev config, or the one in global .azdev config if not found the local one.
           text: azdev setup -r azure-cli-extensions
 
