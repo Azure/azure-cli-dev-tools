@@ -55,6 +55,7 @@ setup(
         'azdev.operations.help.refdoc',
         'azdev.operations.linter',
         'azdev.operations.linter.rules',
+        'azdev.operations.linter.pylint_checkers',
         'azdev.operations.testtool',
         'azdev.operations.extensions',
         'azdev.utilities',
