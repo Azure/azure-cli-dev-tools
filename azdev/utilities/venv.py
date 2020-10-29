@@ -93,29 +93,3 @@ def install_cli(cli_path, venv_path):
     req_file = "{}/src/azure-cli/{}".format(cli_path, req_file)
     display("Installing " + req_file)
     shell_cmd(activate_path + delimiter + const.PIP_R_CMD + req_file, raise_ex=False, executable=executable)
-
-
-def install_extensions(venv_path, extensions):
-    activate_path = os.path.join(venv_path, 'Scripts', 'activate') if const.IS_WINDOWS else 'source ' + os.path.join(
-        venv_path, const.UN_BIN, const.UN_ACTIVATE)
-    delimiter = ' && ' if const.IS_WINDOWS else '; '
-    executable = None if const.IS_WINDOWS else const.BASH_EXE
-    all_ext = azdev.operations.extensions.list_extensions()
-    if extensions == ['*']:
-        display("\nInstalling all extensions")
-        for i in all_ext:
-            shell_cmd(activate_path + delimiter + const.PIP_E_CMD + i['path'], executable=executable)
-        extensions = False
-    else:
-        display("\nInstalling the following extensions: " + str(extensions))
-        extensions = set(extensions)
-    k = 0
-    while k < len(all_ext) and extensions:
-        if all_ext[k]['name'] in extensions:
-            shell_cmd(activate_path + delimiter + const.PIP_E_CMD + all_ext[k]['path'],
-                      executable=executable)
-            extensions.remove(all_ext[k]['name'])
-        k += 1
-    if extensions:
-        raise CLIError("The following extensions were not found. Ensure you have added "
-                       "the repo using `--repo/-r PATH`.\n    {}".format('\n    '.join(extensions)))
