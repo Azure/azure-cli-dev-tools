@@ -270,7 +270,7 @@ def _check_paths(cli_path, ext_repo_path):
 
 
 def _check_shell():
-    if const.SHELL in os.environ and const.IS_WINDOWS and const.BASH_NAME_WIN in os.environ[const.SHELL]:
+    if 'SHELL' in os.environ and const.IS_WINDOWS and 'bash.exe' in os.environ['SHELL']:
         heading("WARNING: You are running bash in Windows, the setup may not work correctly and "
                 "command may have unexpected behavior")
         from knack.prompting import prompt_y_n
@@ -312,7 +312,7 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
         shell_cmd((const.VENV_CMD if const.IS_WINDOWS else const.VENV_CMD3) + set_env, raise_ex=False)
         azure_path = os.path.join(os.path.abspath(os.getcwd()), set_env)
     else:
-        azure_path = os.environ.get(const.VIRTUAL_ENV)
+        azure_path = os.environ.get('VIRTUAL_ENV')
 
     dot_azure_config = os.path.join(azure_path, '.azure')
     dot_azdev_config = os.path.join(azure_path, '.azdev')
@@ -353,13 +353,13 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, 
     # set env vars for get azure config and get azdev config
     os.environ['AZURE_CONFIG_DIR'], os.environ['AZDEV_CONFIG_DIR'] = dot_azure_config, dot_azdev_config
     config = get_azure_config()
-    if not config.get(const.CLOUD_SECTION, 'name', None):
-        config.set_value(const.CLOUD_SECTION, 'name', const.AZ_CLOUD)
+    if not config.get('cloud', 'name', None):
+        config.set_value('cloud', 'name', 'AzureCloud')
     if ext_repo_path:
         config.set_value(const.EXT_SECTION, const.AZ_DEV_SRC, os.path.abspath(ext_repo_path))
     venv.edit_activate(azure_path, dot_azure_config, dot_azdev_config)
     if cli_path:
-        config.set_value(const.CLI_SECTION, const.AZ_DEV_SRC, os.path.abspath(cli_path))
+        config.set_value('clipath', const.AZ_DEV_SRC, os.path.abspath(cli_path))
         venv.install_cli(os.path.abspath(cli_path), azure_path)
     config = get_azdev_config()
     config.set_value('ext', 'repo_paths', os.path.abspath(ext_repo_path) if ext_repo_path else '_NONE_')
@@ -389,7 +389,7 @@ def _get_azdev_cli_path(config_file_path):
 
 
 def _handle_no_cli_path():
-    local_azdev_config = os.path.join(os.environ.get(const.VIRTUAL_ENV), '.azdev', const.CONFIG_NAME)
+    local_azdev_config = os.path.join(os.environ.get('VIRTUAL_ENV'), '.azdev', const.CONFIG_NAME)
     cli_path = _get_azdev_cli_path(local_azdev_config)
     if cli_path is None:
         display('Not found cli path in local azdev config file: ' + local_azdev_config)

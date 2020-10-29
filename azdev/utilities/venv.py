@@ -37,8 +37,8 @@ def unix_edit(azure_config_path, dot_azure_config, dot_azdev_config):
 
 
 def bat_edit(azure_config_path, dot_azure_config, dot_azdev_config):
-    activate_path = os.path.join(azure_config_path, const.SCRIPTS,
-                                 const.BAT_ACTIVATE)
+    activate_path = os.path.join(azure_config_path, 'Scripts',
+                                 'activate.bat')
     content = open(activate_path, "r").readlines()
     if const.AZ_CONFIG_DIR not in content[1]:
         content = content[0:1] + ['set ' + const.AZ_CONFIG_DIR +
@@ -50,17 +50,17 @@ def bat_edit(azure_config_path, dot_azure_config, dot_azdev_config):
 
 
 def ps1_edit(azure_config_path, dot_azure_config, dot_azdev_config):
-    activate_path = os.path.join(azure_config_path, const.SCRIPTS,
-                                 const.ACTIVATE_PS)
+    activate_path = os.path.join(azure_config_path, 'Scripts',
+                                 'Activate.ps1')
     content = open(activate_path, "r").read()
-    idx = content.find(const.PS1_VENV_SET)
+    idx = content.find('$env:VIRTUAL_ENV')
     if idx < 0:
-        raise CLIError("hmm, it looks like " + const.ACTIVATE_PS + " does"
+        raise CLIError("hmm, it looks like Activate.ps1 does"
                        " not set the virutal enviroment variable VIRTUAL_ENV")
-    if content.find(const.ENV_AZ_CONFIG) < 0:
-        content = content[:idx] + const.ENV_AZ_CONFIG + " = " + \
+    if content.find('$env:AZURE_CONFIG_DIR') < 0:
+        content = content[:idx] + '$env:AZURE_CONFIG_DIR' + " = " + \
             "\"" + dot_azure_config + "\"; " + \
-            const.ENV_AZ_DEV_CONFIG + " = " + \
+            "$env:AZDEV_CONFIG_DIR = " + \
             "\"" + dot_azdev_config + "\"; " + \
             content[idx:]
     with open(activate_path, "w") as file:
@@ -72,7 +72,7 @@ def install_cli(cli_path, venv_path):
     activate_path = (os.path.join(venv_path, 'Scripts', 'activate')
                      if const.IS_WINDOWS else 'source ' + os.path.join(venv_path, const.UN_BIN, const.UN_ACTIVATE))
     delimiter = ' && ' if const.IS_WINDOWS else '; '
-    executable = None if const.IS_WINDOWS else const.BASH_EXE
+    executable = None if const.IS_WINDOWS else '/bin/bash'
     display("\nvenv activate path is " + str(activate_path))
     shell_cmd(activate_path + delimiter + 'pip install --ignore-installed azure-common',
               stdout=subprocess.DEVNULL,
@@ -99,7 +99,7 @@ def install_extensions(venv_path, extensions):
     activate_path = os.path.join(venv_path, 'Scripts', 'activate') if const.IS_WINDOWS else 'source ' + os.path.join(
         venv_path, const.UN_BIN, const.UN_ACTIVATE)
     delimiter = ' && ' if const.IS_WINDOWS else '; '
-    executable = None if const.IS_WINDOWS else const.BASH_EXE
+    executable = None if const.IS_WINDOWS else '/bin/bash'
     all_ext = azdev.operations.extensions.list_extensions()
     if extensions == ['*']:
         display("\nInstalling all extensions")
