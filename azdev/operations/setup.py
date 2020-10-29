@@ -92,10 +92,6 @@ def _install_cli(cli_path, deps=None):
         # Resolve dependencies from setup.py files.
         # command modules have dependency on azure-cli-core so install this first
         pip_cmd(
-            "install -q -e {}/src/azure-cli-nspkg".format(cli_path),
-            "Installing `azure-cli-nspkg`..."
-        )
-        pip_cmd(
             "install -q -e {}/src/azure-cli-telemetry".format(cli_path),
             "Installing `azure-cli-telemetry`..."
         )
@@ -113,10 +109,6 @@ def _install_cli(cli_path, deps=None):
     else:
         # First install packages without dependencies,
         # then resolve dependencies from requirements.*.txt file.
-        pip_cmd(
-            "install -e {}/src/azure-cli-nspkg --no-deps".format(cli_path),
-            "Installing `azure-cli-nspkg`..."
-        )
         pip_cmd(
             "install -e {}/src/azure-cli-telemetry --no-deps".format(cli_path),
             "Installing `azure-cli-telemetry`..."
@@ -140,11 +132,6 @@ def _install_cli(cli_path, deps=None):
         req_file = 'requirements.py3.{}.txt'.format(system)
         pip_cmd("install -r {}/src/azure-cli/{}".format(cli_path, req_file),
                 "Installing `{}`...".format(req_file))
-
-    # Ensure that the site package's azure/__init__.py has the old style namespace
-    # package declaration by installing the old namespace package
-    pip_cmd("install -q -I azure-nspkg==1.0.0", "Installing `azure-nspkg`...")
-    pip_cmd("install -q -I azure-mgmt-nspkg==1.0.0", "Installing `azure-mgmt-nspkg`...")
 
 
 def _copy_config_files():
