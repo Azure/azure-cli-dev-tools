@@ -21,6 +21,38 @@ def edit_activate(azure_config_path, dot_azure_config, dot_azdev_config):
         unix_edit(azure_config_path, dot_azure_config, dot_azdev_config)
 
 
+def edit_pyenv_activate(activate_path):
+    set_azdev_content = 'set -gx AZDEV_CONFIG_DIR "${prefix}/.azdev";\n'
+    set_azure_content = 'set -gx AZURE_CONFIG_DIR "${prefix}/.azure";\n'
+    export_azdev_content = 'export AZDEV_CONFIG_DIR="${prefix}/.azdev";\n'
+    export_azure_content = 'export AZURE_CONFIG_DIR="${prefix}/.azure";\n'
+
+    insert(activate_path, set_azdev_content, get_line_num(activate_path, "set -gx VIRTUAL_ENV \"${prefix}\";"))
+    insert(activate_path, set_azure_content, get_line_num(activate_path, "set -gx VIRTUAL_ENV \"${prefix}\";"))
+    insert(activate_path, export_azdev_content, get_line_num(activate_path, "export VIRTUAL_ENV=\"${prefix}\";"))
+    insert(activate_path, export_azure_content, get_line_num(activate_path, "export VIRTUAL_ENV=\"${prefix}\";"))
+
+
+def insert(file_path, content, line_num):
+    if line_num == -1:
+        raise CLIError("Cannot find a proper place to set/export environment variable.")
+    if get_line_num(file_path, content) == -1:
+        with open(file_path, 'r+') as reader:
+            file_content = reader.readlines()
+            file_content.insert(line_num, content)
+            reader.seek(0)
+            for line in file_content:
+                reader.write(line)
+
+
+def get_line_num(file_path, target):
+    with open(file_path, 'r') as reader:
+        for num, line in enumerate(reader, 1):
+            if target in line:
+                return num
+    return -1
+
+
 def unix_edit(azure_config_path, dot_azure_config, dot_azdev_config):
     activate_path = os.path.join(azure_config_path, const.UN_BIN,
                                  const.UN_ACTIVATE)

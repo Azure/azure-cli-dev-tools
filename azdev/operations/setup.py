@@ -286,8 +286,17 @@ def _check_env(set_env):
         raise CLIError("You are already running in a virtual enviroment, yet you want to set a new one up")
 
 
+def _check_pyenv():
+    if 'PYENV_VIRTUAL_ENV' in os.environ and not const.IS_WINDOWS:
+        activate_path = os.path.join(
+            os.environ['PYENV_ROOT'], 'plugins', 'pyenv-virtualenv', 'bin', 'pyenv-sh-activate')
+        venv.edit_pyenv_activate(activate_path)
+
+
 def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None):
     _check_env(set_env)
+
+    _check_pyenv()
 
     _check_shell()
 
