@@ -41,8 +41,7 @@ def insert(file_path, content, line_num):
             file_content = reader.readlines()
             file_content.insert(line_num, content)
             reader.seek(0)
-            for line in file_content:
-                reader.write(line)
+            reader.writelines(file_content)
 
 
 def get_line_num(file_path, target):

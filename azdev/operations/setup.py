@@ -287,10 +287,13 @@ def _check_env(set_env):
 
 
 def _check_pyenv():
-    if 'PYENV_VIRTUAL_ENV' in os.environ and not const.IS_WINDOWS:
-        activate_path = os.path.join(
-            os.environ['PYENV_ROOT'], 'plugins', 'pyenv-virtualenv', 'bin', 'pyenv-sh-activate')
-        venv.edit_pyenv_activate(activate_path)
+    if 'PYENV_VIRTUAL_ENV' in os.environ:
+        if const.IS_WINDOWS:
+            raise CLIError('AZDEV does not support setup in a pyenv-win virtual environment.')
+        else:
+            activate_path = os.path.join(
+                os.environ['PYENV_ROOT'], 'plugins', 'pyenv-virtualenv', 'bin', 'pyenv-sh-activate')
+            venv.edit_pyenv_activate(activate_path)
 
 
 def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None):
