@@ -14,7 +14,8 @@ from .command import (
     call,
     cmd,
     py_cmd,
-    pip_cmd
+    pip_cmd,
+    shell_cmd
 )
 from .const import (
     COMMAND_MODULE_PREFIX,
@@ -22,8 +23,7 @@ from .const import (
     IS_WINDOWS,
     ENV_VAR_TEST_MODULES,
     ENV_VAR_TEST_LIVE,
-    ENV_VAR_VIRTUAL_ENV,
-    EXT_REPO_NAME
+    ENV_VAR_VIRTUAL_ENV
 )
 from .display import (
     display,
@@ -76,7 +76,6 @@ __all__ = [
     'ENV_VAR_TEST_MODULES',
     'ENV_VAR_TEST_LIVE',
     'ENV_VAR_VIRTUAL_ENV',
-    'EXT_REPO_NAME',
     'IS_WINDOWS',
     'extract_module_name',
     'find_file',
