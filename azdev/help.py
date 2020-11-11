@@ -19,6 +19,7 @@ helps['setup'] = """
           text: azdev setup
 
         - name: Install CLI and setup an extensions repo in an existing virtual environment. Will create a azure directory and config in the current virtual environment.
+                Note the existing virtual environment could created by VENV or PYENV.
           text: azdev setup -c azure-cli -r azure-cli-extensions
 
         - name: Same as above, but install the `alias` extension in the existing virtual environment too.
@@ -31,6 +32,7 @@ helps['setup'] = """
           text: azdev setup -c azure-cli
 
         - name: Install CLI and setup an extensions repo in a new virtual environment. Will create a azure directory and config in the current virtual environment.
+                Note -s is using VENV to create a new virtual environment, should un-install PYENV if you have.
           text: azdev setup -c azure-cli -r azure-cli-extensions -s env1
 
         - name: Same as above, but do not setup new azure directory and config in this virtual environment
