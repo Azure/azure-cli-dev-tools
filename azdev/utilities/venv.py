@@ -112,8 +112,7 @@ def install_cli(cli_path, venv_path):
     shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-telemetry'),
               stdout=subprocess.DEVNULL, raise_ex=False, stderr=subprocess.DEVNULL, executable=executable)
     display("\nInstalling core ")
-    shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-core'),
-              stdout=subprocess.DEVNULL, raise_ex=False, stderr=subprocess.DEVNULL, executable=executable)
+    shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-core'), executable=executable)
     shell_cmd(activate_path + delimiter + const.PIP_E_CMD + os.path.join(src_path, 'azure-cli-testsdk'),
               stdout=subprocess.DEVNULL,
               stderr=subprocess.DEVNULL, raise_ex=False, executable=executable)
