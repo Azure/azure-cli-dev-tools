@@ -106,6 +106,7 @@ def generate_cli_ref_docs(output_dir=None, output_type=None, all_profiles=None):
 
 
 def generate_extension_ref_docs(output_dir=None, output_type=None):
+    require_virtual_env()
     # require that azure cli installed
     require_azure_cli()
     output_dir = _process_ref_doc_output_dir(output_dir)

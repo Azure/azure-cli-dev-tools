@@ -9,14 +9,20 @@ from __future__ import print_function
 import json
 import os
 import re
+import subprocess
 
 from knack.log import get_logger
 from knack.prompting import prompt_y_n, prompt
 from knack.util import CLIError
 
+import azdev.utilities.const as const
+
 from azdev.utilities import (
-    pip_cmd, display, heading, COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, get_cli_repo_path, get_ext_repo_paths,
-    find_files)
+    pip_cmd, shell_cmd, display, heading, COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, get_cli_repo_path,
+    get_ext_repo_paths, find_files, require_virtual_env)
+
+from urllib import request, error
+
 
 logger = get_logger(__name__)
 
@@ -55,24 +61,26 @@ def create_module(mod_name='test', display_name=None, display_name_plural=None, 
     _display_success_message(COMMAND_MODULE_PREFIX + mod_name, mod_name)
 
 
-def create_extension(ext_name='test', repo_name='azure-cli-extensions',
-                     display_name=None, display_name_plural=None,
-                     required_sdk=None, client_name=None, operation_name=None, sdk_property=None,
-                     not_preview=False, github_alias=None, local_sdk=None):
-    repo_path = None
+def create_extension(ext_name, azure_rest_api_specs=const.GITHUB_SWAGGER_REPO_URL, branch=None, use=None):
+    if not azure_rest_api_specs.startswith('http') and branch:
+        raise CLIError('Cannot specify azure-rest-api-specs repo branch when using local one.')
+    if not branch:
+        branch = json.load(
+            request.urlopen('https://api.github.com/repos/Azure/azure-rest-api-specs')).get('default_branch')
+    require_virtual_env()
     repo_paths = get_ext_repo_paths()
-    repo_path = next((x for x in repo_paths if x.endswith(repo_name)), None)
-
+    repo_path = next(
+        (x for x in repo_paths if x.endswith(const.EXT_REPO_NAME) or x.endswith(const.EXT_REPO_NAME + '\\')), None)
     if not repo_path:
         raise CLIError('Unable to find `{}` repo. Have you cloned it and added '
-                       'with `azdev extension repo add`?'.format(repo_name))
+                       'with `azdev extension repo add`?'.format(const.EXT_REPO_NAME))
+    if not os.path.isdir(repo_path):
+        raise CLIError("Invalid path {} in .azure config.".format(repo_path))
+    swagger_readme_file_path = _get_swagger_readme_file_path(ext_name, azure_rest_api_specs, branch)
+    _generate_extension(ext_name, repo_path, swagger_readme_file_path, use)
+    _add_extension(ext_name, repo_path)
 
-    _create_package(EXTENSION_PREFIX, os.path.join(repo_path, 'src'), True, ext_name, display_name,
-                    display_name_plural, required_sdk, client_name, operation_name, sdk_property, not_preview,
-                    local_sdk)
-    _add_to_codeowners(repo_path, EXTENSION_PREFIX, ext_name, github_alias)
-
-    _display_success_message(EXTENSION_PREFIX + ext_name, ext_name)
+    _display_success_message(ext_name, ext_name)
 
 
 def _display_success_message(package_name, group_name):
@@ -300,3 +308,75 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
         result = pip_cmd('install -e {}'.format(new_package_path), "Installing `{}{}`...".format(prefix, name))
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
+
+
+def _get_swagger_readme_file_path(ext_name, swagger_repo, branch):
+    swagger_readme_file_path = None
+    if swagger_repo == const.GITHUB_SWAGGER_REPO_URL or \
+            (swagger_repo.startswith('https://') and swagger_repo.endswith('azure-rest-api-specs')):
+        swagger_readme_file_path = '{}/blob/{}/specification/{}/resource-manager'.format(
+            swagger_repo, branch, ext_name)
+        # validate URL
+        try:
+            request.urlopen(swagger_readme_file_path)
+        except error.HTTPError as ex:
+            raise CLIError(
+                'HTTPError: {}\nNo swagger readme file found in this URL: {}'.format(ex.code, swagger_readme_file_path))
+    else:
+        swagger_readme_file_path = os.path.join(swagger_repo, 'specification', ext_name, 'resource-manager')
+        if not os.path.isdir(swagger_readme_file_path):
+            raise CLIError("The path {} does not exist.".format(swagger_readme_file_path))
+    return swagger_readme_file_path
+
+
+# pylint: disable=too-many-statements
+def _generate_extension(ext_name, repo_path, swagger_readme_file_path, use):
+    heading('Start generating extension {}.'.format(ext_name))
+    # check if npm is installed
+    try:
+        shell_cmd('npm --version', stdout=subprocess.DEVNULL, raise_ex=False)
+    except CLIError as ex:
+        raise CLIError('{}\nPlease install npm.'.format(ex))
+    display('Installing autorest...\n')
+    if const.IS_WINDOWS:
+        try:
+            shell_cmd('npm install -g autorest', raise_ex=False)
+        except CLIError as ex:
+            raise CLIError("Failed to install autorest.\n{}".format(ex))
+    else:
+        try:
+            shell_cmd('npm install -g autorest', stderr=subprocess.DEVNULL, raise_ex=False)
+        except CLIError as ex:
+            path = os.environ['PATH']
+            # check if npm is installed through nvm
+            if os.environ.get('NVM_DIR'):
+                raise ex
+            # check if user using specific node version and manually add it to the os env PATH
+            node_version = shell_cmd('node --version', capture_output=True).result
+            if 'node/' + node_version + '/bin' in path:
+                raise ex
+            # create a new directory for npm global installations, to avoid using sudo in installing autorest
+            npm_path = os.path.join(os.environ['HOME'], '.npm-packages')
+            if not os.path.isdir(npm_path):
+                os.mkdir(npm_path)
+            npm_prefix = shell_cmd('npm prefix -g', capture_output=True).result
+            shell_cmd('npm config set prefix ' + npm_path)
+            os.environ['PATH'] = path + ':' + os.path.join(npm_path, 'bin')
+            os.environ['MANPATH'] = os.path.join(npm_path, 'share', 'man')
+            shell_cmd('npm install -g autorest')
+            shell_cmd('npm config set prefix ' + npm_prefix)
+    # update autorest core
+    shell_cmd('autorest --latest')
+    if not use:
+        cmd = 'autorest --az --azure-cli-extension-folder={} {}'.format(repo_path, swagger_readme_file_path)
+    else:
+        cmd = 'autorest --az --azure-cli-extension-folder={} {} --use={}'.format(
+            repo_path, swagger_readme_file_path, use)
+    shell_cmd(cmd, message=True)
+
+
+def _add_extension(ext_name, repo_path):
+    new_package_path = os.path.join(repo_path, 'src', ext_name)
+    result = pip_cmd('install -e {}'.format(new_package_path), "Adding extension `{}`...".format(new_package_path))
+    if result.error:
+        raise result.error

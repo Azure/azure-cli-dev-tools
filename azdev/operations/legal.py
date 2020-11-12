@@ -44,8 +44,12 @@ def check_license_headers():
 
     cli_path = get_cli_repo_path()
     all_paths = [cli_path]
-    for path in get_ext_repo_paths():
-        all_paths.append(path)
+    try:
+        ext_repo = get_ext_repo_paths()
+        for path in ext_repo:
+            all_paths.append(path)
+    except CLIError:
+        display("No CLI ext path, running check only on modules")
 
     files_without_header = []
     for path in all_paths:
