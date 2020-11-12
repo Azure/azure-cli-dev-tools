@@ -28,7 +28,6 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark, clean)
             arguments.append('-m "{}"'.format(mark))
 
         arguments.extend(test_paths)
-
         if parallel:
             arguments += ['-n', 'auto']
         if last_failed:
