@@ -61,7 +61,6 @@ setup(
         'azdev.utilities',
     ],
     install_requires=[
-        'azure-cli-core==2.9.1.*',
         'virtualenv',
         'docutils',
         'flake8',

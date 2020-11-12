@@ -13,26 +13,22 @@ import shutil
 import tempfile
 
 from subprocess import check_call, check_output, CalledProcessError
-
-from knack.util import CLIError
-from knack.log import get_logger
-
-from azure.cli.core.extension.operations import list_available_extensions, list_extensions as list_cli_extensions  # pylint: disable=import-error
 from azdev.utilities import (
     display, heading, subheading,
     get_cli_repo_path, get_path_table,
     require_virtual_env
 )
-
 from azdev.utilities.tools import require_azure_cli
 from azdev.operations.extensions import list_extensions as list_dev_cli_extensions
+from knack.util import CLIError
+from knack.log import get_logger
+require_virtual_env()
 
 DOC_MAP_NAME = 'doc_source_map.json'
 HELP_FILE_NAME = '_help.py'
 DOC_SOURCE_MAP_PATH = os.path.join('doc', 'sphinx', 'azhelpgen', DOC_MAP_NAME)
 
 _logger = get_logger(__name__)
-
 
 def check_document_map():
 
@@ -262,6 +258,7 @@ def _get_profiles():
 
 
 def _warn_if_exts_installed():
+    from azure.cli.core.extension.operations import list_extensions as list_cli_extensions  # pylint: disable=import-error
     cli_extensions, dev_cli_extensions = list_cli_extensions(), list_dev_cli_extensions()
     if cli_extensions:
         _logger.warning("One or more CLI Extensions are installed and will be included in ref doc output.")
@@ -278,6 +275,7 @@ def _get_available_extension_urls():
 
     :return: list of 3-tuples in the form of '(extension_name, extension_file_name, extensions_download_url)'
     """
+    from azure.cli.core.extension.operations import list_available_extensions  # pylint: disable=import-error
     all_pub_extensions = list_available_extensions(show_details=True)
     compatible_extensions = list_available_extensions()
 
