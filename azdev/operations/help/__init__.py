@@ -30,6 +30,7 @@ DOC_SOURCE_MAP_PATH = os.path.join('doc', 'sphinx', 'azhelpgen', DOC_MAP_NAME)
 
 _logger = get_logger(__name__)
 
+
 def check_document_map():
 
     heading('Verify Document Map')
