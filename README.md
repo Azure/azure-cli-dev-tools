@@ -21,7 +21,7 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
 
 ## Setting up your development environment
 
-1. Install Python 3.6+ from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7. Also install python-dev apt package (at least on ubuntu) or you will have psutil issues #269
+1. Install Python 3.6+ from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7. Also install `gcc` and `python-dev` apt package or `python3-devel` rpm package on Linux, otherwise you will have psutil issues #269
 2. Fork and clone the repository or repositories you wish to develop for.
     - For Azure CLI: https://github.com/Azure/azure-cli
     - For Azure CLI Extensions: https://github.com/Azure/azure-cli-extensions
