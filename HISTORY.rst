@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.29
+++++++
+* `azdev setup`: Pin pip to 20.2.4.
+
 0.1.28
 ++++++
 * [Linter] Fix minor display issue in `azdev linter`.

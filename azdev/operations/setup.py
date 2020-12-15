@@ -311,8 +311,8 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
     # install packages
     subheading('Installing packages')
 
-    # upgrade to latest pip
-    pip_cmd('install --upgrade pip -q', 'Upgrading pip...')
+    # Use pip==20.2.4, due to https://github.com/pypa/pip/issues/9284
+    pip_cmd('install --upgrade pip==20.2.4 -q', 'Installing pip==20.2.4...')
 
     _install_cli(cli_path, deps=deps)
     _install_extensions(ext_to_install)
