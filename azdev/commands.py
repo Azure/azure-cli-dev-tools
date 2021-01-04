@@ -69,3 +69,6 @@ def load_command_table(self, _):
 
     with CommandGroup(self, 'extension', operation_group('help')) as g:
         g.command('generate-docs', 'generate_extension_ref_docs')
+
+    with CommandGroup(self, 'translator', operation_group('translator')) as g:
+        g.command('generate-manual-config', 'generate_manual_config')

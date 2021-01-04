@@ -179,3 +179,6 @@ def load_arguments(self, _):
                                           'If the base directory does not exist, it will be created')
             c.argument('output_type', choices=['xml', 'html', 'text', 'man', 'latex'], default="xml",
                        help='Output type of the generated docs.')
+
+    with ArgumentsContext(self, 'translator generate-manual-config') as c:
+        c.argument('rp_dir', help='Directory to setup manual configuration')

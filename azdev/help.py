@@ -250,7 +250,6 @@ helps['extension repo remove'] = """
         that repository.
 """
 
-
 helps['extension repo list'] = """
     short-summary: >
         List the repositories that will be searched for in-development extensions.
@@ -261,4 +260,13 @@ helps['extension generate-docs'] = """
        Generate reference docs for CLI extensions commands.
     long-summary: >
         This command installs the extensions in a temporary directory and sets it as the extensions dir when generating reference docs.
+"""
+
+helps['translator'] = """
+    short-summary: Translate CLI Commands.
+"""
+
+helps['translator generate-manual-config'] = """
+    short-summary: >
+       Generate manual config for CLI commands.
 """
