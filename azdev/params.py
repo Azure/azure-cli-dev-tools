@@ -182,3 +182,6 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'translator generate-manual-config') as c:
         c.argument('mod_name', help='Name of the module to setup manual configuration')
+        c.argument('output_name', help='File path of the generated configuration. '
+                                       'If the base directory does not exist, it will be created. '
+                                       'If the file exists, the generation will be failed')

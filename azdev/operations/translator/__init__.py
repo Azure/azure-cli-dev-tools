@@ -8,7 +8,7 @@ import importlib
 import os
 
 from knack.log import get_logger
-from knack.util import CLIError
+from knack.util import CLIError,ensure_dir
 
 
 from azdev.utilities import get_ext_repo_paths, find_files, get_cli_repo_path, get_azure_config
@@ -18,6 +18,15 @@ logger = get_logger(__name__)
 
 
 EXTENSIONS_MOD_PREFIX = 'azext_'
+
+
+def generate_manual_config(mod_name, output_path=None):
+    module, mod_path = _get_module(mod_name)
+    output_path = _get_output_path(mod_path, output_path)
+
+
+def parse_module(module):
+    pass
 
 
 def _get_extension_module_input_name(ext_dir):
@@ -56,5 +65,14 @@ def _get_module(mod_name):
         raise CLIError("Cannot Find module {}".format(mod_name))
 
 
-def generate_manual_config(mod_name):
-    module, path = _get_module(mod_name)
+def _get_output_path(mod_path, output_path=None):
+    if output_path is None:
+        output_dir = os.path.join(mod_path, 'configuration')
+        output_path = os.path.join(output_dir, 'commands.yaml')
+    else:
+        output_dir = os.path.dirname(output_path)
+    ensure_dir(output_dir)
+    if os.path.exists(output_path):
+        raise CLIError("Configuration file already exists.")
+    return output_path
+
