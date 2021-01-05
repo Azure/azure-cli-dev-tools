@@ -181,4 +181,4 @@ def load_arguments(self, _):
                        help='Output type of the generated docs.')
 
     with ArgumentsContext(self, 'translator generate-manual-config') as c:
-        c.argument('rp_dir', help='Directory to setup manual configuration')
+        c.argument('mod_name', help='Name of the module to setup manual configuration')
