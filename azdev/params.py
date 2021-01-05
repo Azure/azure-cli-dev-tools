@@ -7,7 +7,7 @@
 # pylint: disable=line-too-long
 import argparse
 
-from knack.arguments import ArgumentsContext, CLIArgumentType
+from knack.arguments import ArgumentsContext, CLIArgumentType, CaseInsensitiveList
 
 from azdev.completer import get_test_completion
 from azdev.operations.linter import linter_severity_choices
@@ -15,6 +15,40 @@ from azdev.operations.linter import linter_severity_choices
 
 class Flag:
     """ Place holder to be used for optionals that take 0 or more arguments """
+
+
+def get_three_state_flag(positive_label='true', negative_label='false', invert=False, return_label=False):
+    """ Creates a flag-like argument that can also accept positive/negative values. This allows
+    consistency between create commands that typically use flags and update commands that require
+    positive/negative values without introducing breaking changes. Flag-like behavior always
+    implies the affirmative unless invert=True then invert the logic.
+    - positive_label: label for the positive value (ex: 'enabled')
+    - negative_label: label for the negative value (ex: 'disabled')
+    - invert: invert the boolean logic for the flag
+    - return_label: if true, return the corresponding label. Otherwise, return a boolean value
+    """
+    choices = [positive_label, negative_label]
+
+    # pylint: disable=too-few-public-methods
+    class ThreeStateAction(argparse.Action):
+
+        def __call__(self, parser, namespace, values, option_string=None):
+            values = values or positive_label
+            is_positive = values.lower() == positive_label.lower()
+            is_positive = not is_positive if invert else is_positive
+            set_val = None
+            if return_label:
+                set_val = positive_label if is_positive else negative_label
+            else:
+                set_val = is_positive
+            setattr(namespace, self.dest, set_val)
+
+    params = {
+        'choices': CaseInsensitiveList(choices),
+        'nargs': '?',
+        'action': ThreeStateAction
+    }
+    return CLIArgumentType(**params)
 
 
 # pylint: disable=too-many-statements
@@ -183,5 +217,5 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'translator generate-manual-config') as c:
         c.argument('mod_name', help='Name of the module to setup manual configuration')
         c.argument('output_name', help='File path of the generated configuration. '
-                                       'If the base directory does not exist, it will be created. '
-                                       'If the file exists, the generation will be failed')
+                                       'If the base directory does not exist, it will be created.')
+        c.argument('overwrite', arg_type=get_three_state_flag(), help='Overwrite existing config file.')
