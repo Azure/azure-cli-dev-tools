@@ -64,8 +64,8 @@ class AZDevTransCommandGroup:
         self.sub_commands = {}
 
         self.deprecate_info = None
-        self.is_preview = False
-        self.is_experimental = False
+        self.is_preview = None
+        self.is_experimental = None
         if not table_instance:
             return
 
@@ -81,13 +81,7 @@ class AZDevTransCommandGroup:
 
 class AZDevTransCommand:
 
-    def __init__(self, name, parent_group, full_name, table_instance,
-                 transform=None, table_transformer=None, confirmation=None, exception_handler=None, client_factory=None,
-                 operations_tmpl=None, no_wait_param=None, supports_no_wait=None, validator=None, client_arg_name=None,
-                 doc_string_source=None, deprecate_info=None, supports_local_cache=None, model_path=None,
-                 min_api=None, max_api=None, resource_type=None, operation_group=None, custom_command_type=None,
-                 command_type=None, is_preview=None, preview_info=None, is_experimental=None, experimental_info=None,
-                 local_context_attribute=None):
+    def __init__(self, name, parent_group, full_name, table_instance):
         self.name = name
         self.parent_group = parent_group
         self.full_name = full_name
@@ -95,10 +89,17 @@ class AZDevTransCommand:
         self.sub_arguments = {}
 
         self.deprecate_info = None
-        self.is_preview = False
-        self.is_experimental = False
+        self.is_preview = None
+        self.is_experimental = None
 
+        if table_instance.deprecate_info:
+            self.deprecate_info = AZDevTransDeprecateInfo(table_instance.deprecate_info)
 
+        if table_instance.preview_info:
+            self.is_preview = True
+
+        if table_instance.experimental_info:
+            self.is_experimental = True
 
 
 class AZDevTransArgument:
