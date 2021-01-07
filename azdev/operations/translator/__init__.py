@@ -11,6 +11,7 @@ from knack.cli import CLI
 from knack.commands import CLICommandsLoader
 from knack.log import get_logger
 from knack.util import CLIError, ensure_dir
+from knack.deprecation import Deprecated
 
 from azdev.operations.extensions import list_extensions
 from azdev.utilities import get_cli_repo_path
@@ -20,10 +21,10 @@ logger = get_logger(__name__)
 EXTENSIONS_MOD_PREFIX = 'azext_'
 
 
-class AZDevTranslatorCtx(CLI):
+class AZDevTransCtx(CLI):
 
     def __init__(self, **kwargs):
-        super(AZDevTranslatorCtx, self).__init__(**kwargs)
+        super(AZDevTransCtx, self).__init__(**kwargs)
         self.data['headers'] = {}
         self.data['command'] = 'unknown'
         self.data['command_extension_name'] = None
@@ -31,17 +32,101 @@ class AZDevTranslatorCtx(CLI):
         self.data['query_active'] = False
 
 
-class AZDevTranslatorModuleParser(CLICommandsLoader):
+class AZDevTransDeprecateInfo:
+
+    _PLACEHOLDER_INSTANCE = Deprecated(
+        redirect='{redirect}',  # use {redirect} as placeholder value in template
+        hide='{hide}',
+        expiration='{expiration}',
+        object_type='{object_type}',
+        target='{target}'
+    )
+
+    _DEFAULT_TAG_TEMPLATE = _PLACEHOLDER_INSTANCE._get_tag(_PLACEHOLDER_INSTANCE)
+    _DEFAULT_MESSAGE_TEMPLATE = _PLACEHOLDER_INSTANCE._get_message(_PLACEHOLDER_INSTANCE)
+
+    def __init__(self, table_instance):
+        self.redirect = table_instance.redirect
+        self.hide = table_instance.hide
+        self.expiration = table_instance.expiration
+        self.tag_template = table_instance._get_tag(self._PLACEHOLDER_INSTANCE)
+        self.message_template = table_instance._get_message(self._PLACEHOLDER_INSTANCE)
+
+
+class AZDevTransCommandGroup:
+
+    def __init__(self, name, parent_group, full_name, table_instance):
+        self.name = name
+        self.parent_group = parent_group
+        self.full_name = full_name
+
+        self.sub_groups = {}
+        self.sub_commands = {}
+
+        self.deprecate_info = None
+        self.is_preview = False
+        self.is_experimental = False
+        if not table_instance:
+            return
+
+        if 'deprecate_info' in table_instance.group_kwargs:
+            self.deprecate_info = AZDevTransDeprecateInfo(table_instance.group_kwargs['deprecate_info'])
+
+        if 'preview_info' in table_instance.group_kwargs:
+            self.is_preview = True
+
+        if 'experimental_info' in table_instance.group_kwargs:
+            self.is_experimental = True
+
+
+class AZDevTransCommand:
+
+    def __init__(self, name, parent_group, full_name, table_instance,
+                 transform=None, table_transformer=None, confirmation=None, exception_handler=None, client_factory=None,
+                 operations_tmpl=None, no_wait_param=None, supports_no_wait=None, validator=None, client_arg_name=None,
+                 doc_string_source=None, deprecate_info=None, supports_local_cache=None, model_path=None,
+                 min_api=None, max_api=None, resource_type=None, operation_group=None, custom_command_type=None,
+                 command_type=None, is_preview=None, preview_info=None, is_experimental=None, experimental_info=None,
+                 local_context_attribute=None):
+        self.name = name
+        self.parent_group = parent_group
+        self.full_name = full_name
+
+        self.sub_arguments = {}
+
+        self.deprecate_info = None
+        self.is_preview = False
+        self.is_experimental = False
+
+
+
+
+class AZDevTransArgument:
+
+    def __init__(self, name, parent_command,
+                 options_list=None, id_part=None, completer=None, validator=None, configured_default=None,
+                 arg_group=None, arg_type=None, deprecate_info=None,
+                 option_strings=None, dest=None,
+                 nargs=None, const=None, default=None, type=None, choices=None, required=None, help=None, metavar=None,
+                 action=None, default_value_source=None,
+                 min_api=None, max_api=None, resource_type=None, operation_group=None, custom_command_type=None,
+                 command_type=None, is_preview=None, preview_info=None, is_experimental=None, experimental_info=None,
+                 local_context_attribute=None):
+        self.name = name
+        self.parent_command = parent_command
+
+
+class AZDevTransModuleParser(CLICommandsLoader):
 
     def __init__(self, cli_ctx=None, **kwargs):
-        cli_ctx = cli_ctx or AZDevTranslatorCtx()
-        super(AZDevTranslatorModuleParser, self).__init__(cli_ctx=cli_ctx, **kwargs)
+        cli_ctx = cli_ctx or AZDevTransCtx()
+        super(AZDevTransModuleParser, self).__init__(cli_ctx=cli_ctx, **kwargs)
         self.cmd_to_loader_map = {}
 
     def load_module(self, module):
         command_table, command_group_table = self._load_module_command_loader(module)
-        for cmd in command_table.values():
-            cmd.command_source = module
+        for command in command_table.values():
+            command.command_source = module
         self.command_table.update(command_table)
         self.command_group_table.update(command_group_table)
 
@@ -58,14 +143,51 @@ class AZDevTranslatorModuleParser(CLICommandsLoader):
         return command_table, command_loader.command_group_table
 
     def build_commands_tree(self):
+        root = AZDevTransCommandGroup(name='az', full_name='', parent_group=None, table_instance=None)
+        self._add_sub_command_groups(parent_group=root, prefix='')
+        self._add_sub_commands(parent_group=root, prefix='')
+        return root
+
+    def _add_sub_command_groups(self, parent_group, prefix):
+        for full_name in self.command_group_table:
+            key_words = full_name.split()
+            if len(key_words) == 0:
+                continue
+
+            if prefix == ' '.join(key_words[:-1]):
+                name = key_words[-1]
+                group = AZDevTransCommandGroup(
+                    name=name, parent_group=parent_group, full_name=full_name,
+                    table_instance=self.command_group_table[full_name]
+                )
+                parent_group.sub_groups[name] = group
+                sub_prefix = '{} {}'.format(prefix, name).strip()
+                self._add_sub_command_groups(parent_group=group, prefix=sub_prefix)
+                self._add_sub_commands(parent_group=group, prefix=sub_prefix)
+
+    def _add_sub_commands(self, parent_group, prefix):
+        for full_name in self.command_table:
+            key_words = full_name.split()
+            if prefix == ' '.join(key_words[:-1]):
+                name = key_words[-1]
+                command = AZDevTransCommand(
+                    name=name, parent_group=parent_group, full_name=full_name,
+                    table_instance=self.command_table[full_name]
+                )
+                parent_group.sub_commands[name] = command
+                self._add_sub_arguments(command=command)
+
+    def _add_sub_arguments(self, command):
         pass
 
 
 def generate_manual_config(mod_name, output_path=None, overwrite=False):
     module, mod_path = _get_module(mod_name)
-    output_path = _get_output_path(mod_path, output_path, overwrite)
-    parser = AZDevTranslatorModuleParser()
+    parser = AZDevTransModuleParser()
     parser.load_module(module)
+    parser.build_commands_tree()
+
+    # output_path = _get_output_path(mod_path, output_path, overwrite)
 
 
 def _get_extension_module_input_name(ext_dir):
