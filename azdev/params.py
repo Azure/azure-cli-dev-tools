@@ -8,7 +8,6 @@
 import argparse
 
 from knack.arguments import ArgumentsContext, CLIArgumentType, CaseInsensitiveList
-
 from azdev.completer import get_test_completion
 from azdev.operations.linter import linter_severity_choices
 
@@ -218,4 +217,6 @@ def load_arguments(self, _):
         c.argument('mod_name', help='Name of the module to setup manual configuration')
         c.argument('output_name', help='File path of the generated configuration. '
                                        'If the base directory does not exist, it will be created.')
+        c.argument('profile', help='The profile to generate, default value is: latest')     # different profiles will use different configurations.
         c.argument('overwrite', arg_type=get_three_state_flag(), help='Overwrite existing config file.')
+        c.argument('is_extension', arg_type=get_three_state_flag(), help='Whether the module is an extension.')
