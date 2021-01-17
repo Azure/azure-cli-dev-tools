@@ -74,8 +74,13 @@ class AZDevTransDeprecateInfo:
         self.tag_template = table_instance._get_tag(self._PLACEHOLDER_INSTANCE)
         self.message_template = table_instance._get_message(self._PLACEHOLDER_INSTANCE)
 
+# command_group_set = set()
+
 
 class AZDevTransCommandGroup:
+
+    # supported: 'is_preview', 'preview_info', 'is_experimental', 'experimental_info', 'operations_tmpl'
+    # 'min_api', 'max_api', 'resource_type', 'operation_group', 'custom_command_type', 'command_type',  'local_context_attribute'
 
     def __init__(self, name, parent_group, full_name, table_instance):
         self.name = name
@@ -85,72 +90,252 @@ class AZDevTransCommandGroup:
         self.sub_groups = {}
         self.sub_commands = {}
 
-        self.deprecate_info = None
-        self.is_preview = None
-        self.is_experimental = None
         if not table_instance:
-            return
+            table_instance = None
 
-        if 'deprecate_info' in table_instance.group_kwargs:
-            self.deprecate_info = AZDevTransDeprecateInfo(table_instance.group_kwargs['deprecate_info'])
+        self._parse_deprecate_info(table_instance)
+        self._parse_is_preview(table_instance)
+        self._parse_is_experimental(table_instance)
+        assert not (self.is_preview and self.is_experimental)
 
-        if 'preview_info' in table_instance.group_kwargs:
-            self.is_preview = True
+        self._parse_operations_tmpl(table_instance)
 
-        if 'experimental_info' in table_instance.group_kwargs:
-            self.is_experimental = True
+    def _parse_deprecate_info(self, table_instance):
+        if table_instance is None:
+            deprecate_info = None
+        else:
+            deprecate_info = table_instance.group_kwargs.get('deprecate_info', None)
+        if deprecate_info is not None:
+            deprecate_info = AZDevTransDeprecateInfo(deprecate_info)
+        self.deprecate_info = deprecate_info
+
+    def _parse_is_preview(self, table_instance):
+        if table_instance is None:
+            is_preview = False
+        else:
+            is_preview = table_instance.group_kwargs.get('is_preview', False)
+        assert isinstance(is_preview, bool)
+        self.is_preview = is_preview
+
+    def _parse_is_experimental(self, table_instance):
+        if table_instance is None:
+            is_experimental = False
+        else:
+            is_experimental = table_instance.group_kwargs.get('is_experimental', False)
+        assert isinstance(is_experimental, bool)
+        self.is_experimental = is_experimental
+
+    def _parse_operations_tmpl(self, table_instance):
+        if table_instance is None:
+            operations_tmpl = None
+        else:
+            operations_tmpl = table_instance.operations_tmpl
+        assert operations_tmpl is None or isinstance(operations_tmpl, str)
+        self.operations_tmpl = operations_tmpl
 
 
 DEFAULT_NO_WAIT_PARAM_DEST = 'no_wait'
 
+# command_set
+
 
 class AZDevTransCommand:
+    # supported: 'confirmation', 'no_wait_param', 'supports_no_wait', 'is_preview', 'preview_info', 'is_experimental', 'experimental_info', 'deprecate_info',
+    # 'table_transformer', 'exception_handler', 'client_factory', 'transform', 'validator', 'supports_local_cache', 'min_api', 'max_api',
+
+    # PendingForDeprecation: 'client_arg_name', 'model_path', 'resource_type', 'operation_group',
+    # 'custom_command_type', 'command_type',
+
+    # TODO: parse operation combine operation template and function name
+
+    # ignored: 'doc_string_source', 'local_context_attribute'
 
     def __init__(self, name, parent_group, full_name, table_instance):
-        # print(full_name)
         self.name = name
         self.parent_group = parent_group
         self.full_name = full_name
 
         self.sub_arguments = {}
 
-        self.deprecate_info = None
-        self.is_preview = None
-        self.is_experimental = None
+        self._parse_deprecate_info(table_instance)
+        self._parse_is_preview(table_instance)
+        self._parse_is_experimental(table_instance)
+        assert not (self.is_preview and self.is_experimental)
 
-        if table_instance.deprecate_info:
-            self.deprecate_info = AZDevTransDeprecateInfo(table_instance.deprecate_info)
+        self._parse_confirmation(table_instance)
+        self._parse_no_wait(table_instance)
+
+        self._parse_min_api(table_instance)
+        self._parse_max_api(table_instance)
+        self._parse_resource_type(table_instance)
+        self._parse_operation_group(table_instance)
+
+        self._parse_client_arg_name(table_instance)
+
+        self._parse_supports_local_cache(table_instance)
+        self._parse_model_path(table_instance)
+
+        self._parse_client_factory(table_instance)  # TODO:
+        # self._parse_operations_tmpl(table_instance)     # TODO:
+        self._parse_validator(table_instance)   # TODO:
+        self._parse_transform(table_instance)   # TODO:
+        self._parse_table_transformer(table_instance)   # TODO:
+        self._parse_exception_handler(table_instance)   # TODO:
+
+    def _parse_deprecate_info(self, table_instance):
+        deprecate_info = table_instance.deprecate_info
+        if deprecate_info is not None:
+            deprecate_info = AZDevTransDeprecateInfo(deprecate_info)
+        self.deprecate_info = deprecate_info
+
+    def _parse_is_preview(self, table_instance):
         if table_instance.preview_info:
             self.is_preview = True
+        else:
+            self.is_preview = False
+
+    def _parse_is_experimental(self, table_instance):
         if table_instance.experimental_info:
             self.is_experimental = True
+        else:
+            self.is_experimental = False
 
-        self.confirmation = None
+    def _parse_confirmation(self, table_instance):
         if table_instance.confirmation:
             self.confirmation = True
+        else:
+            self.confirmation = False
 
+    def _parse_no_wait(self, table_instance):
         self.no_wait_param = None
         if table_instance.supports_no_wait:
             self.no_wait_param = DEFAULT_NO_WAIT_PARAM_DEST
         if table_instance.no_wait_param:
             self.no_wait_param = table_instance.no_wait_param
-        # doc_string_source will not be used in configuration. The full help should be there.
 
+    def _parse_client_factory(self, table_instance):
+        client_factory = table_instance.command_kwargs.get('client_factory', None)
+        if client_factory is not None:
+            if isinstance(client_factory, types.FunctionType):
+                # TODO: convert to string
+                pass
+            else:
+                raise CLIError('Not supported client_factory type {}'.format(type(client_factory)))
+        self.client_factory = client_factory
 
-# _argument_keys = set()
-# 'deprecate_info', 'is_preview', 'is_experimental',
-# 'dest', 'help', 'options_list',
-# 'action', 'arg_group', 'arg_type', 'choices', 'default',
-# 'completer', 'configured_default', 'const'
-# 'id_part',
-# 'local_context_attribute',
-# 'max_api', 'min_api',
-# 'nargs',  'required', 'type', 'validator'
+    # def _parse_operations_tmpl(self, table_instance):
+    #     operations_tmpl = table_instance.command_kwargs.get('operations_tmpl', None)
+    #     if operations_tmpl is None:
+    #         print(operations_tmpl)
+    #     assert operations_tmpl is None or isinstance(operations_tmpl, str)
+    #     self.operations_tmpl = operations_tmpl
 
-# ignored: 'metavar', 'operation_group', 'resource_type', 'dest'
-# invalid: 'option_list', 'metave', ' FilesCompleter'
+    def _parse_validator(self, table_instance):
+        validator = table_instance.validator
+        if validator is not None:
+            if isinstance(validator, types.FunctionType):
+                # TODO: convert to string
+                pass
+            else:
+                raise CLIError("Not Support validator type {}".format(type(validator)))
+        self.validator = validator
+
+    def _parse_transform(self, table_instance):
+        transform = table_instance.command_kwargs.get('transform', None)
+        if transform is not None:
+            if isinstance(transform, types.FunctionType):
+                # TODO: convert to string
+                pass
+            else:
+                # TODO: convert callable instance to string
+                # DeploymentOutputLongRunningOperation etc
+                pass
+        self.transform = transform
+
+    def _parse_table_transformer(self, table_instance):
+        table_transformer = table_instance.table_transformer
+        if table_transformer is not None:
+            if isinstance(table_transformer, types.FunctionType):
+                # TODO: convert table_transformer to string
+                pass
+            elif isinstance(table_transformer, str):
+                # TODO:
+                pass
+            else:
+                raise CLIError('Invalid table_transformer type {}'.format(type(table_transformer)))
+        self.table_transformer = table_transformer
+
+    def _parse_exception_handler(self, table_instance):
+        exception_handler = table_instance.exception_handler
+        if exception_handler is not None:
+            if isinstance(exception_handler, types.FunctionType):
+                # TODO: convert to string
+                pass
+            else:
+                raise CLIError('Not supported exception_handler type {}'.format(type(exception_handler)))
+        self.exception_handler = exception_handler
+
+    def _parse_client_arg_name(self, table_instance):
+        # TODO: Deprecate this parameter, because it's only for eventgrid track1 SDK usage
+        client_arg_name = table_instance.command_kwargs.get('client_arg_name', None)
+        assert client_arg_name is None or isinstance(client_arg_name, str)
+        if client_arg_name is not None:
+            if client_arg_name == 'client':
+                client_arg_name = None
+        self.client_arg_name = client_arg_name
+
+    def _parse_supports_local_cache(self, table_instance):
+        supports_local_cache = table_instance.command_kwargs.get('supports_local_cache', False)
+        assert isinstance(supports_local_cache, bool)
+        self.supports_local_cache = supports_local_cache
+
+    def _parse_model_path(self, table_instance):
+        # TODO: Deprecate this parameter, Only `network front-door waf-policy` command group used.
+        model_path = table_instance.command_kwargs.get('model_path', None)
+        assert model_path is None or isinstance(model_path, str)
+        self.model_path = model_path
+
+    def _parse_min_api(self, table_instance):
+        min_api = table_instance.command_kwargs.get('min_api', None)
+        assert min_api is None or isinstance(min_api, str)
+        self.min_api = min_api
+
+    def _parse_max_api(self, table_instance):
+        max_api = table_instance.command_kwargs.get('max_api', None)
+        assert max_api is None or isinstance(max_api, str)
+        self.max_api = max_api
+
+    def _parse_resource_type(self, table_instance):
+        from azure.cli.core.profiles import ResourceType, CustomResourceType, PROFILE_TYPE
+        resource_type = table_instance.command_kwargs.get('resource_type', None)
+        if resource_type is not None:
+            if isinstance(resource_type, ResourceType):
+                # TODO: convert to string
+                pass
+            elif isinstance(resource_type, CustomResourceType):
+                # TODO: convert to string
+                pass
+            elif resource_type == PROFILE_TYPE:
+                # used only in commands: ad sp | ad app | feature
+                # TODO: Deprecate this value. Don't need this for profile specific configuration
+                pass
+            else:
+                raise CLIError("Not supported resource_type type {}".format(type(resource_type)))
+        self.resource_type = resource_type
+
+    def _parse_operation_group(self, table_instance):
+        operation_group = table_instance.command_kwargs.get('operation_group', None)
+        assert operation_group is None or isinstance(operation_group, str)
+        self.operation_group = operation_group
+
+    # def _parse_custom_command_type(self):
+
 
 class AZDevTransArgument:
+    # supported: 'deprecate_info', 'is_preview', 'is_experimental', 'dest', 'help', 'options_list', 'action', 'arg_group', 'arg_type', 'choices', 'default', 'completer', 'configured_default', 'const', 'id_part', 'local_context_attribute', 'max_api', 'min_api', 'nargs',  'required', 'type', 'validator'
+    # ignored: 'metavar', 'operation_group', 'resource_type', 'dest'
+    # invalid: 'option_list', 'metave', ' FilesCompleter'
+    # TODO CHECK: option_strings, default_value_source, custom_command_type, command_type
 
     def __init__(self, name, parent_command, table_instance):
         self.name = name
@@ -176,14 +361,17 @@ class AZDevTransArgument:
         self._parse_choices(type_settings)
         self._parse_default(type_settings)
         self._parse_id_part(type_settings)
+
         self._parse_max_api(type_settings)
         self._parse_min_api(type_settings)
+
         self._parse_nargs(type_settings)
         self._parse_required(type_settings)
         self._parse_configured_default(type_settings)
-        self._parse_const(type_settings)
 
         self._parse_action(type_settings)   # TODO:
+        self._parse_const(type_settings)
+
         self._parse_completer(type_settings)    # TODO:
         self._parse_local_context_attribute(type_settings)  # TODO:
         self._parse_type(type_settings)         # TODO:
@@ -321,10 +509,11 @@ class AZDevTransArgument:
         self.completer = completer
 
     def _parse_local_context_attribute(self, type_settings):
+        from azure.cli.core.local_context import LocalContextAttribute
         local_context_attribute = type_settings.get('local_context_attribute', None)
         if local_context_attribute is not None:
-            # TODO: convert to string
-            pass
+            assert isinstance(local_context_attribute, LocalContextAttribute)
+            # TODO: convert to AZDEVLocalContextAttribute
         self.local_context_attribute = local_context_attribute
 
     def _parse_type(self, type_settings):
@@ -354,12 +543,6 @@ class AZDevTransArgument:
             assert isinstance(validator, types.FunctionType)
             # TODO: Convert to string
         self.validator = validator
-
-
-# option_strings=None,
-# default_value_source=None,
-# custom_command_type=None,
-# command_type=None,
 
 
 class AZDevTransModuleParser(CLICommandsLoader):
@@ -472,7 +655,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
             arg.type.update(other=overrides)
 
         for arg_name, arg in command_args.items():
-            if arg_name in ['cmd', 'properties_to_set', 'properties_to_add', 'properties_to_remove', 'force_string', 'no_wait']:
+            if arg_name in ['cmd', 'properties_to_set', 'properties_to_add', 'properties_to_remove', 'force_string', 'no_wait', '_cache']:
                 continue
             command.sub_arguments[arg_name] = AZDevTransArgument(arg_name, parent_command=command, table_instance=arg)
             # try:
