@@ -74,13 +74,13 @@ class AZDevTransDeprecateInfo:
         self.tag_template = table_instance._get_tag(self._PLACEHOLDER_INSTANCE)
         self.message_template = table_instance._get_message(self._PLACEHOLDER_INSTANCE)
 
-# command_group_set = set()
-
 
 class AZDevTransCommandGroup:
-
     # supported: 'is_preview', 'preview_info', 'is_experimental', 'experimental_info', 'operations_tmpl'
-    # 'min_api', 'max_api', 'resource_type', 'operation_group', 'custom_command_type', 'command_type',  'local_context_attribute'
+
+    # Ignored: 'custom_command_type', 'command_type',  'local_context_attribute', 'command_type',
+    # 'custom_command_type', 'transform', 'validator', 'exception_handler', 'supports_no_wait', 'min_api', 'max_api',
+    # 'resource_type', 'operation_group', 'client_factory'
 
     def __init__(self, name, parent_group, full_name, table_instance):
         self.name = name
@@ -144,11 +144,9 @@ class AZDevTransCommand:
     # 'table_transformer', 'exception_handler', 'client_factory', 'transform', 'validator', 'supports_local_cache', 'min_api', 'max_api',
 
     # PendingForDeprecation: 'client_arg_name', 'model_path', 'resource_type', 'operation_group',
-    # 'custom_command_type', 'command_type',
-
     # TODO: parse operation combine operation template and function name
 
-    # ignored: 'doc_string_source', 'local_context_attribute'
+    # ignored: 'doc_string_source', 'local_context_attribute', 'custom_command_type', 'command_type',
 
     def __init__(self, name, parent_group, full_name, table_instance):
         self.name = name
@@ -726,20 +724,20 @@ def _get_output_path(mod_path, output_path, overwrite):
     return output_path
 
 
-if __name__ == "__main__":
-    def _get_all_mod_names():
-        cli_path = get_cli_repo_path()
-        command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
-        my_list = os.listdir(command_modules_dir)
-        print(my_list)
-        mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
-                     and not mod_name.startswith('__')]
-        return mod_names
-
-    mod_names = _get_all_mod_names()
-    values = set()
-    for mod_name in mod_names:
-        print(mod_name)
-        generate_manual_config(mod_name)
-    # print(sorted(list(_argument_keys)))
+# if __name__ == "__main__":
+#     def _get_all_mod_names():
+#         cli_path = get_cli_repo_path()
+#         command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
+#         my_list = os.listdir(command_modules_dir)
+#         print(my_list)
+#         mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
+#                      and not mod_name.startswith('__')]
+#         return mod_names
+#
+#     mod_names = _get_all_mod_names()
+#     values = set()
+#     for mod_name in mod_names:
+#         print(mod_name)
+#         generate_manual_config(mod_name)
+#     # print(sorted(list(command_group_set)))
 
