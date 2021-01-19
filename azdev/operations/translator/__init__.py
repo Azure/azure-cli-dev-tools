@@ -246,5 +246,6 @@ if __name__ == "__main__":
     for mod_name in mod_names:
         print(mod_name)
         generate_manual_config(mod_name)
-    # print(sorted(list(command_group_set)))
+    from azdev.operations.translator.argument import argument_help_kwargs
+    print(sorted(list(argument_help_kwargs)))
 

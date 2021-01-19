@@ -1,4 +1,14 @@
-from .utilities import AZDevTransDeprecateInfo
+from azdev.operations.translator.utilities import AZDevTransDeprecateInfo
+from knack.help import _load_help_file
+
+
+class AZDevTransCommandGroupHelp:
+
+    def __init__(self, help_data):
+        assert help_data['type'].lower() == 'group'
+        self.short_summary = help_data.get('short-summary', None)
+        self.long_summary = help_data.get('long-summary', None)
+        assert self.short_summary
 
 
 class AZDevTransCommandGroup:
@@ -25,6 +35,7 @@ class AZDevTransCommandGroup:
         assert not (self.is_preview and self.is_experimental)
 
         self._parse_operations_tmpl(table_instance)
+        self._parse_help(table_instance)
 
     def _parse_deprecate_info(self, table_instance):
         if table_instance is None:
@@ -59,3 +70,11 @@ class AZDevTransCommandGroup:
         assert operations_tmpl is None or isinstance(operations_tmpl, str)
         self.operations_tmpl = operations_tmpl
 
+    def _parse_help(self, table_instance):
+        if table_instance is None:
+            hp = None
+        else:
+            help_data = _load_help_file(self.full_name)
+            assert help_data is not None
+            hp = AZDevTransCommandGroupHelp(help_data)
+        self.help = hp

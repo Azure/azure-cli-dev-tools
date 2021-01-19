@@ -1,10 +1,34 @@
 from knack.util import CLIError
+from knack.help_files import _load_help_file
+from knack.help import HelpExample
+
 import types
 
 from azdev.operations.translator.utilities import AZDevTransDeprecateInfo
 
 
 DEFAULT_NO_WAIT_PARAM_DEST = 'no_wait'
+
+
+class AZDevTransCommandHelp:
+
+    def __init__(self, description, help_data):
+        try:
+            self.short_summary = description[:description.index('.')]
+            long_summary = description[description.index('.') + 1:].lstrip()
+            self.long_summary = ' '.join(long_summary.splitlines())
+        except (ValueError, AttributeError):
+            self.short_summary = description
+
+        if help_data:
+            assert help_data['type'].lower() == 'command'
+            short_summary = help_data.get('short-summary', None)
+            long_summary = help_data.get('long-summary', None)
+            if short_summary:
+                self.short_summary = short_summary
+            if long_summary:
+                self.long_summary = long_summary
+            assert self.short_summary
 
 
 class AZDevTransCommand:
@@ -47,6 +71,8 @@ class AZDevTransCommand:
         self._parse_transform(table_instance)   # TODO:
         self._parse_table_transformer(table_instance)   # TODO:
         self._parse_exception_handler(table_instance)   # TODO:
+
+        self._parse_help(table_instance)
 
     def _parse_deprecate_info(self, table_instance):
         deprecate_info = table_instance.deprecate_info
@@ -196,3 +222,25 @@ class AZDevTransCommand:
 
     # def _parse_custom_command_type(self):
 
+    def _parse_help(self, table_instance):
+        description = table_instance.description
+        if callable(description):
+            description = description()
+        assert isinstance(description, str)
+        help_data = _load_help_file(self.full_name)
+        self.help = AZDevTransCommandHelp(description, help_data)
+
+        examples = None
+        if help_data:
+            if 'examples' in help_data:
+                examples = [HelpExample(d) for d in help_data['examples']]
+            elif 'example' in help_data:
+                examples = [HelpExample(d) for d in help_data['example']]
+        self.examples = examples
+
+        parameters_help_data = {}
+        if help_data:
+            if 'parameters' in help_data:
+                for parameter in help_data['parameters']:
+                    parameters_help_data[parameter['name']] = parameter
+        self.parameters_help_data = parameters_help_data

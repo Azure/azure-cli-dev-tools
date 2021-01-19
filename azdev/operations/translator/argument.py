@@ -4,6 +4,24 @@ from knack.deprecation import Deprecated
 from azdev.operations.translator.utilities import AZDevTransDeprecateInfo
 
 
+argument_help_kwargs = set()
+
+
+class AZDevTransArgumentHelp:
+
+    def __init__(self, description, help_data):
+        self.short_summary = help_data.get('short-summary', description)
+        self.long_summary = help_data.get('long-summary', None)
+        populator_commands = help_data.get('populator-commands', [])
+        self.populator_commands = []
+        if len(populator_commands) > 0:
+            for command in populator_commands:
+                assert isinstance(command, str)
+                if command.startswith('`'):
+                    command = command.strip('`')
+                self.populator_commands.append(command)
+
+
 class AZDevTransArgument:
     # supported: 'deprecate_info', 'is_preview', 'is_experimental', 'dest', 'help', 'options_list', 'action', 'arg_group', 'arg_type', 'choices', 'default', 'completer', 'configured_default', 'const', 'id_part', 'local_context_attribute', 'max_api', 'min_api', 'nargs',  'required', 'type', 'validator'
     # ignored: 'metavar', 'operation_group', 'resource_type', 'dest'
@@ -28,7 +46,7 @@ class AZDevTransArgument:
         assert not (self.is_preview and self.is_experimental)
 
         self._parse_dest(type_settings)
-        self._parse_help(type_settings)
+
         self._parse_options_list(type_settings)
         self._parse_arg_group(type_settings)
         self._parse_choices(type_settings)
@@ -50,6 +68,8 @@ class AZDevTransArgument:
         self._parse_type(type_settings)         # TODO:
         self._parse_validator(type_settings)    # TODO:
 
+        self._parse_help(type_settings)
+
     def _parse_deprecate_info(self, type_settings):
         deprecate_info = type_settings.get('deprecate_info', None)
         if deprecate_info is not None:
@@ -61,9 +81,22 @@ class AZDevTransArgument:
         assert dest == self.name
 
     def _parse_help(self, type_settings):
-        help = type_settings.get('help', None)
-        assert help is None or isinstance(help, str)
-        self.help = help
+
+        help_description = type_settings.get('help', None)
+        assert help_description is None or isinstance(help_description, str)
+
+        help_data = {}
+        options = self.options_list
+        if options is None:
+            options = ['--{}'.format(self.name).replace('_', '-')]
+        options = set(options)
+        for key, value in self.parent_command.parameters_help_data.items():
+            if set(key.split()).isdisjoint(options):
+                continue
+            assert not help_data
+            help_data = value
+
+        self.help = AZDevTransArgumentHelp(help_description, help_data)
 
     def _parse_options_list(self, type_settings):
         options_list = type_settings.get('options_list', None)
