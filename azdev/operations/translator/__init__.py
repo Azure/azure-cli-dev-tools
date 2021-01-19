@@ -231,21 +231,18 @@ def _get_output_path(mod_path, output_path, overwrite):
     return output_path
 
 
-if __name__ == "__main__":
-    def _get_all_mod_names():
-        cli_path = get_cli_repo_path()
-        command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
-        my_list = os.listdir(command_modules_dir)
-        print(my_list)
-        mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
-                     and not mod_name.startswith('__')]
-        return mod_names
-
-    mod_names = _get_all_mod_names()
-    values = set()
-    for mod_name in mod_names:
-        print(mod_name)
-        generate_manual_config(mod_name)
-    from azdev.operations.translator.argument import argument_help_kwargs
-    print(sorted(list(argument_help_kwargs)))
-
+# if __name__ == "__main__":
+#     def _get_all_mod_names():
+#         cli_path = get_cli_repo_path()
+#         command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
+#         my_list = os.listdir(command_modules_dir)
+#         print(my_list)
+#         mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
+#                      and not mod_name.startswith('__')]
+#         return mod_names
+#
+#     mod_names = _get_all_mod_names()
+#     values = set()
+#     for mod_name in mod_names:
+#         print(mod_name)
+#         generate_manual_config(mod_name)

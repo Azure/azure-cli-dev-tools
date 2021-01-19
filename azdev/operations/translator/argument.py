@@ -4,9 +4,6 @@ from knack.deprecation import Deprecated
 from azdev.operations.translator.utilities import AZDevTransDeprecateInfo
 
 
-argument_help_kwargs = set()
-
-
 class AZDevTransArgumentHelp:
 
     def __init__(self, description, help_data):
