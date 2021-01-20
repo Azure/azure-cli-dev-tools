@@ -4,7 +4,7 @@ from knack.help import HelpExample
 
 import types
 
-from azdev.operations.translator.utilities import AZDevTransDeprecateInfo
+from .utilities import AZDevTransDeprecateInfo
 
 
 DEFAULT_NO_WAIT_PARAM_DEST = 'no_wait'
@@ -65,8 +65,9 @@ class AZDevTransCommand:
         self._parse_supports_local_cache(table_instance)
         self._parse_model_path(table_instance)
 
-        self._parse_client_factory(table_instance)  # TODO:
-        # self._parse_operations_tmpl(table_instance)     # TODO:
+        # self._parse_client_factory(table_instance)
+
+        self._parse_operation(table_instance)
         self._parse_validator(table_instance)   # TODO:
         self._parse_transform(table_instance)   # TODO:
         self._parse_table_transformer(table_instance)   # TODO:
@@ -107,20 +108,36 @@ class AZDevTransCommand:
 
     def _parse_client_factory(self, table_instance):
         client_factory = table_instance.command_kwargs.get('client_factory', None)
+        if client_factory is None:
+            pass
+
         if client_factory is not None:
-            if isinstance(client_factory, types.FunctionType):
-                # TODO: convert to string
-                pass
-            else:
-                raise CLIError('Not supported client_factory type {}'.format(type(client_factory)))
+            pass
+            # from azure.cli.core.translator import ClientFactory
+            # if isinstance(client_factory, ClientFactory):
+            #     client_factory = str(client_factory)
+            # else:
+            #     raise CLIError('Not supported client_factory type {}'.format(type(client_factory)))
+        else:
+            print('\t', self.full_name)
         self.client_factory = client_factory
 
-    # def _parse_operations_tmpl(self, table_instance):
-    #     operations_tmpl = table_instance.command_kwargs.get('operations_tmpl', None)
-    #     if operations_tmpl is None:
-    #         print(operations_tmpl)
-    #     assert operations_tmpl is None or isinstance(operations_tmpl, str)
-    #     self.operations_tmpl = operations_tmpl
+    def _parse_operation(self, table_instance):
+        # if 'operation_str' in table_instance.command_kwargs:
+        #     print('\t', table_instance.command_kwargs['operation_str'])
+        if 'operation_str' not in table_instance.command_kwargs:
+            print('\t', self.full_name)
+        # operations_tmpl = table_instance.command_kwargs.get('operations_tmpl', None)
+        # if operations_tmpl is None:
+        #     if 'command_type' in table_instance.command_kwargs:
+        #         operations_tmpl = table_instance.command_kwargs['command_type'].settings['operations_tmpl']
+        #         assert 'custom_command_type' not in table_instance.command_kwargs
+        #     elif 'custom_command_type' in table_instance.command_kwargs:
+        #         operations_tmpl = table_instance.command_kwargs['custom_command_type'].settings['operations_tmpl']
+        #     else:
+        #         raise CLIError('Cannot fetch operation_tmpl for command `{}`'.format(self.full_name))
+        #
+        # self.operation = operations_tmpl
 
     def _parse_validator(self, table_instance):
         validator = table_instance.validator

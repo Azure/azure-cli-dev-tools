@@ -1,7 +1,7 @@
 import types
 from knack.deprecation import Deprecated
 
-from azdev.operations.translator.utilities import AZDevTransDeprecateInfo
+from .utilities import AZDevTransDeprecateInfo
 
 
 class AZDevTransArgumentHelp:
@@ -78,7 +78,6 @@ class AZDevTransArgument:
         assert dest == self.name
 
     def _parse_help(self, type_settings):
-
         help_description = type_settings.get('help', None)
         assert help_description is None or isinstance(help_description, str)
 

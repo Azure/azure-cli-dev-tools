@@ -49,6 +49,13 @@ class AZDevTransCtx(CLI):
         self.cloud.profile = profile
         self.invocation = AZDevTransInvocation()
 
+    def get_cli_version(self):
+        from azure.cli.core import __version__
+        return __version__
+
+    def _should_enable_color(self):
+        return False
+
 
 class AZDevTransModuleParser(CLICommandsLoader):
 
@@ -84,8 +91,6 @@ class AZDevTransModuleParser(CLICommandsLoader):
         return AZDevArgumentContext
 
     def command_loader_registry_argument(self, command_loader):
-        # loader
-
         command_loader.supported_api_version = lambda **kwargs: True
         command_loader.skip_applicability = True
         command_loader._argument_context_cls = self.get_argument_context_cls(command_loader._argument_context_cls)
@@ -231,18 +236,18 @@ def _get_output_path(mod_path, output_path, overwrite):
     return output_path
 
 
-# if __name__ == "__main__":
-#     def _get_all_mod_names():
-#         cli_path = get_cli_repo_path()
-#         command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
-#         my_list = os.listdir(command_modules_dir)
-#         print(my_list)
-#         mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
-#                      and not mod_name.startswith('__')]
-#         return mod_names
-#
-#     mod_names = _get_all_mod_names()
-#     values = set()
-#     for mod_name in mod_names:
-#         print(mod_name)
-#         generate_manual_config(mod_name)
+if __name__ == "__main__":
+    def _get_all_mod_names():
+        cli_path = get_cli_repo_path()
+        command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
+        my_list = os.listdir(command_modules_dir)
+        print(my_list)
+        mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
+                     and not mod_name.startswith('__')]
+        return mod_names
+
+    mod_names = _get_all_mod_names()
+    values = set()
+    for mod_name in mod_names:
+        print(mod_name)
+        generate_manual_config(mod_name)

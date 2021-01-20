@@ -1,4 +1,4 @@
-from azdev.operations.translator.utilities import AZDevTransDeprecateInfo
+from .utilities import AZDevTransDeprecateInfo
 from knack.help import _load_help_file
 
 
