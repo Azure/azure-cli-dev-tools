@@ -249,5 +249,7 @@ if __name__ == "__main__":
     mod_names = _get_all_mod_names()
     values = set()
     for mod_name in mod_names:
+        if mod_name in ['keyvault', 'batch']:
+            continue
         print(mod_name)
         generate_manual_config(mod_name)

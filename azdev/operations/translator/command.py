@@ -65,9 +65,9 @@ class AZDevTransCommand:
         self._parse_supports_local_cache(table_instance)
         self._parse_model_path(table_instance)
 
+        self._parse_operation(table_instance)
         # self._parse_client_factory(table_instance)
 
-        self._parse_operation(table_instance)
         self._parse_validator(table_instance)   # TODO:
         self._parse_transform(table_instance)   # TODO:
         self._parse_table_transformer(table_instance)   # TODO:
@@ -123,21 +123,12 @@ class AZDevTransCommand:
         self.client_factory = client_factory
 
     def _parse_operation(self, table_instance):
-        # if 'operation_str' in table_instance.command_kwargs:
-        #     print('\t', table_instance.command_kwargs['operation_str'])
-        if 'operation_str' not in table_instance.command_kwargs:
-            print('\t', self.full_name)
-        # operations_tmpl = table_instance.command_kwargs.get('operations_tmpl', None)
-        # if operations_tmpl is None:
-        #     if 'command_type' in table_instance.command_kwargs:
-        #         operations_tmpl = table_instance.command_kwargs['command_type'].settings['operations_tmpl']
-        #         assert 'custom_command_type' not in table_instance.command_kwargs
-        #     elif 'custom_command_type' in table_instance.command_kwargs:
-        #         operations_tmpl = table_instance.command_kwargs['custom_command_type'].settings['operations_tmpl']
-        #     else:
-        #         raise CLIError('Cannot fetch operation_tmpl for command `{}`'.format(self.full_name))
-        #
-        # self.operation = operations_tmpl
+        from azure.cli.core.commands.command_operation import BaseCommandOperation
+        command_operation = table_instance.command_kwargs.get('command_operation', None)
+        if not isinstance(command_operation, BaseCommandOperation):
+            raise TypeError('Command operation is not an instant of "BaseCommandOperation", get "{}"'.format(
+                type(command_operation)))
+        self.operation = command_operation
 
     def _parse_validator(self, table_instance):
         validator = table_instance.validator
@@ -236,8 +227,6 @@ class AZDevTransCommand:
         operation_group = table_instance.command_kwargs.get('operation_group', None)
         assert operation_group is None or isinstance(operation_group, str)
         self.operation_group = operation_group
-
-    # def _parse_custom_command_type(self):
 
     def _parse_help(self, table_instance):
         description = table_instance.description
