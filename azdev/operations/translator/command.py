@@ -57,7 +57,7 @@ class AZDevTransCommand:
 
         self._parse_min_api(table_instance)
         self._parse_max_api(table_instance)
-        self._parse_resource_type(table_instance)
+        self._parse_resource_type(table_instance)   # TODO:
         self._parse_operation_group(table_instance)
 
         self._parse_client_arg_name(table_instance)
@@ -71,7 +71,7 @@ class AZDevTransCommand:
         self._parse_validator(table_instance)
         self._parse_transform(table_instance)
         self._parse_table_transformer(table_instance)
-        self._parse_exception_handler(table_instance)   # TODO:
+        self._parse_exception_handler(table_instance)
 
         self._parse_help(table_instance)
 
@@ -154,13 +154,12 @@ class AZDevTransCommand:
         self.table_transformer = table_transformer
 
     def _parse_exception_handler(self, table_instance):
+        from azure.cli.core.translator.exception_handler import AzExceptionHandler
         exception_handler = table_instance.exception_handler
         if exception_handler is not None:
-            if isinstance(exception_handler, types.FunctionType):
-                # TODO: convert to string
-                pass
-            else:
-                raise CLIError('Not supported exception_handler type {}'.format(type(exception_handler)))
+            if not isinstance(exception_handler, AzExceptionHandler):
+                raise TypeError('Exception handler is not an instance of "AzExceptionHandler", get "{}"'.format(
+                    type(exception_handler)))
         self.exception_handler = exception_handler
 
     def _parse_client_arg_name(self, table_instance):
