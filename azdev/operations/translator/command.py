@@ -69,8 +69,8 @@ class AZDevTransCommand:
         self._parse_client_factory(table_instance)
 
         self._parse_validator(table_instance)
-        self._parse_transform(table_instance)   # TODO:
-        self._parse_table_transformer(table_instance)   # TODO:
+        self._parse_transform(table_instance)
+        self._parse_table_transformer(table_instance)
         self._parse_exception_handler(table_instance)   # TODO:
 
         self._parse_help(table_instance)
@@ -132,28 +132,25 @@ class AZDevTransCommand:
         self.validator = validator
 
     def _parse_transform(self, table_instance):
+        from azure.cli.core.translator.transformer import AzTransformer
         transform = table_instance.command_kwargs.get('transform', None)
         if transform is not None:
-            if isinstance(transform, types.FunctionType):
-                # TODO: convert to string
-                pass
-            else:
-                # TODO: convert callable instance to string
-                # DeploymentOutputLongRunningOperation etc
-                pass
+            if not isinstance(transform, AzTransformer):
+                raise TypeError('Transform is not an instance of "AzTransformer", get "{}"'.format(
+                    type(transform)))
         self.transform = transform
 
     def _parse_table_transformer(self, table_instance):
+        from azure.cli.core.translator.transformer import AzTransformer
         table_transformer = table_instance.table_transformer
+        if isinstance(table_transformer, str):
+            table_transformer = table_transformer.strip()
+            if not table_transformer:
+                table_transformer = None
         if table_transformer is not None:
-            if isinstance(table_transformer, types.FunctionType):
-                # TODO: convert table_transformer to string
-                pass
-            elif isinstance(table_transformer, str):
-                # TODO:
-                pass
-            else:
-                raise CLIError('Invalid table_transformer type {}'.format(type(table_transformer)))
+            if not isinstance(table_transformer, str) and not isinstance(table_transformer, AzTransformer):
+                raise TypeError('Table transform is not a string or an instance of "AzTransformer", get "{}"'.format(
+                    type(table_transformer)))
         self.table_transformer = table_transformer
 
     def _parse_exception_handler(self, table_instance):
