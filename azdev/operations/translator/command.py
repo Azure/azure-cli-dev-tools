@@ -4,7 +4,7 @@ from knack.help import HelpExample
 
 import types
 
-from .utilities import AZDevTransDeprecateInfo
+from .utilities import AZDevTransDeprecateInfo, check_validator
 
 
 DEFAULT_NO_WAIT_PARAM_DEST = 'no_wait'
@@ -66,9 +66,9 @@ class AZDevTransCommand:
         self._parse_model_path(table_instance)
 
         self._parse_operation(table_instance)
-        # self._parse_client_factory(table_instance)
+        self._parse_client_factory(table_instance)
 
-        self._parse_validator(table_instance)   # TODO:
+        self._parse_validator(table_instance)
         self._parse_transform(table_instance)   # TODO:
         self._parse_table_transformer(table_instance)   # TODO:
         self._parse_exception_handler(table_instance)   # TODO:
@@ -106,22 +106,6 @@ class AZDevTransCommand:
         if table_instance.no_wait_param:
             self.no_wait_param = table_instance.no_wait_param
 
-    def _parse_client_factory(self, table_instance):
-        client_factory = table_instance.command_kwargs.get('client_factory', None)
-        if client_factory is None:
-            pass
-
-        if client_factory is not None:
-            pass
-            # from azure.cli.core.translator import ClientFactory
-            # if isinstance(client_factory, ClientFactory):
-            #     client_factory = str(client_factory)
-            # else:
-            #     raise CLIError('Not supported client_factory type {}'.format(type(client_factory)))
-        else:
-            print('\t', self.full_name)
-        self.client_factory = client_factory
-
     def _parse_operation(self, table_instance):
         from azure.cli.core.commands.command_operation import BaseCommandOperation
         command_operation = table_instance.command_kwargs.get('command_operation', None)
@@ -130,14 +114,21 @@ class AZDevTransCommand:
                 type(command_operation)))
         self.operation = command_operation
 
+    def _parse_client_factory(self, table_instance):
+        from azure.cli.core.translator.client_factory import AzClientFactory
+        client_factory = table_instance.command_kwargs.get('client_factory', None)
+        if client_factory is not None:
+            if not isinstance(client_factory, AzClientFactory):
+                raise TypeError('Client factory is not an instance of "AzClientFactory", get "{}"'.format(
+                    type(client_factory)))
+        else:
+            # print('\t "{}" has no client factory'.format(self.full_name))
+            pass
+        self.client_factory = client_factory
+
     def _parse_validator(self, table_instance):
         validator = table_instance.validator
-        if validator is not None:
-            if isinstance(validator, types.FunctionType):
-                # TODO: convert to string
-                pass
-            else:
-                raise CLIError("Not Support validator type {}".format(type(validator)))
+        check_validator(validator)
         self.validator = validator
 
     def _parse_transform(self, table_instance):

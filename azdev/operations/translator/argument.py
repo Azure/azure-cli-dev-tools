@@ -1,7 +1,7 @@
 import types
 from knack.deprecation import Deprecated
 
-from .utilities import AZDevTransDeprecateInfo
+from .utilities import AZDevTransDeprecateInfo, check_validator
 
 
 class AZDevTransArgumentHelp:
@@ -63,7 +63,7 @@ class AZDevTransArgument:
         self._parse_completer(type_settings)    # TODO:
         self._parse_local_context_attribute(type_settings)  # TODO:
         self._parse_type(type_settings)         # TODO:
-        self._parse_validator(type_settings)    # TODO:
+        self._parse_validator(type_settings)
 
         self._parse_help(type_settings)
 
@@ -238,8 +238,6 @@ class AZDevTransArgument:
 
     def _parse_validator(self, type_settings):
         validator = type_settings.get('validator', None)
-        if validator is not None:
-            assert isinstance(validator, types.FunctionType)
-            # TODO: Convert to string
+        check_validator(validator)
         self.validator = validator
 

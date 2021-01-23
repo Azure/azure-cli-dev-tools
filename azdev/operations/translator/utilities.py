@@ -1,4 +1,6 @@
 from knack.deprecation import Deprecated
+from azure.cli.core.translator.validator import AzValidator, AzFuncValidator, AzClassValidator
+from azure.cli.core.util import get_arg_list
 
 
 class _MockCliCtx:
@@ -49,3 +51,20 @@ class AZDevTransDeprecateInfo:
     def get_default_message_template(cls):
         placeholder_instance = cls.get_placeholder_instance()
         return placeholder_instance._get_message(placeholder_instance)
+
+
+def check_validator(validator):
+    if validator is not None:
+        if not isinstance(validator, AzValidator):
+            raise TypeError('Validator is not an instance of "AzValidator", get "{}"'.format(
+                type(validator)))
+
+        if isinstance(validator, AzFuncValidator):
+            arg_list = get_arg_list(validator.func)
+        elif isinstance(validator, AzClassValidator):
+            arg_list = get_arg_list(validator.instance)
+        else:
+            raise NotImplementedError()
+
+        if 'ns' not in arg_list and 'cmd' not in arg_list and 'namespace' not in arg_list:
+            raise TypeError('Validator "{}" signature is invalid'.format(validator))
