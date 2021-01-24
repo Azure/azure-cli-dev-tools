@@ -6,6 +6,9 @@ from .utilities import AZDevTransDeprecateInfo, AZDevTransValidator, AZDevTransN
 class AZDevTransCommandHelp(AZDevTransNode):
 
     def __init__(self, description, help_data):
+        self.short_summary = None
+        self.long_summary = None
+
         try:
             self.short_summary = description[:description.index('.')]
             long_summary = description[description.index('.') + 1:].lstrip()
@@ -139,8 +142,9 @@ class AZDevTransCommandOperation(AZDevTransNode):
             value['getter-operation'] = ctx.simplify_import_path(self.command_operation.getter_operation)
             value['setter-operation'] = ctx.simplify_import_path(self.command_operation.setter_operation)
             value['setter-arg-name'] = self.command_operation.setter_arg_name
-            if self.command_operation.custom_function_op:
-                value['custom-function-operation'] = ctx.simplify_import_path(self.command_operation.custom_function_op)
+            if self.command_operation.custom_function_operation:
+                value['custom-function-operation'] = ctx.simplify_import_path(
+                    self.command_operation.custom_function_operation)
             if self.command_operation.child_collection_prop_name:
                 child_value = OrderedDict()
                 child_value['collection-prop-name'] = self.command_operation.child_collection_prop_name
@@ -164,7 +168,7 @@ class AZDevTransTransform(AZDevTransNode):
     def to_config(self, ctx):
         from azure.cli.core.translator.transformer import AzFuncTransformer
         key = 'transform'
-        if isinstance(transform, AzFuncTransformer):
+        if isinstance(self.transform, AzFuncTransformer):
             value = ctx.get_import_path(self.transform.module_name, self.transform.name)
         else:
             raise NotImplementedError()
@@ -183,8 +187,11 @@ class AZDevTransTableTransformer(AZDevTransNode):
     def to_config(self, ctx):
         from azure.cli.core.translator.transformer import AzFuncTransformer
         key = 'table-transformer'
-        if isinstance(ctx, AzFuncTransformer):
+        if isinstance(self.table_transformer, AzFuncTransformer):
             value = ctx.get_import_path(self.table_transformer.module_name, self.table_transformer.name)
+        elif isinstance(self.table_transformer, str):
+            # TODO: distinguish string and AzFuncTransformer value
+            value = self.table_transformer
         else:
             raise NotImplementedError()
         return key, value
@@ -202,7 +209,7 @@ class AZDevTransExceptionHandler(AZDevTransNode):
     def to_config(self, ctx):
         from azure.cli.core.translator.exception_handler import AzFuncExceptionHandler
         key = 'exception-handler'
-        if isinstance(exception_handler, AzFuncExceptionHandler):
+        if isinstance(self.exception_handler, AzFuncExceptionHandler):
             value = ctx.get_import_path(self.exception_handler.module_name, self.exception_handler.name)
         else:
             raise NotImplementedError()

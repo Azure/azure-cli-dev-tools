@@ -19,6 +19,7 @@ from azdev.utilities import get_cli_repo_path
 from azdev.operations.translator.argument import AZDevTransArgument
 from azdev.operations.translator.command import AZDevTransCommand
 from azdev.operations.translator.command_group import AZDevTransCommandGroup
+from azdev.operations.translator.utilities import ConfigurationCtx
 
 logger = get_logger(__name__)
 
@@ -119,6 +120,10 @@ class AZDevTransModuleParser(CLICommandsLoader):
         self._add_sub_commands(parent_group=root, prefix='')
         return root
 
+    def convert_commands_tree_to_config(self, root):
+        ctx = ConfigurationCtx()
+        return root.to_config(ctx)
+
     def _add_sub_command_groups(self, parent_group, prefix):
         for full_name in self.command_group_table:
             key_words = full_name.split()
@@ -180,7 +185,8 @@ def generate_manual_config(mod_name, output_path=None, overwrite=False, profile=
     module, mod_path = _get_module(mod_name, is_extension)
     parser = AZDevTransModuleParser(profile=profile)
     parser.load_module(module)
-    parser.build_commands_tree()
+    root = parser.build_commands_tree()
+    configuration = parser.convert_commands_tree_to_config(root)
 
     # output_path = _get_output_path(mod_path, output_path, overwrite)
 

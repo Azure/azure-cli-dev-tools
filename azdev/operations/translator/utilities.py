@@ -14,6 +14,20 @@ class _MockCliCtx:
         return __version__
 
 
+class ConfigurationCtx:
+
+    def __init__(self):
+        pass
+
+    def get_import_path(self, module_name, name):
+        path = "{}#{}".format(module_name, name)
+        return self.simplify_import_path(path)
+
+    def simplify_import_path(self, path):
+        # TODO: FIXME
+        return path
+
+
 class AZDevTransNode:
 
     def to_config(self, ctx):
