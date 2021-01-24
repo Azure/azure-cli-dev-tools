@@ -1,10 +1,11 @@
 import types
 from knack.deprecation import Deprecated
+from collections import OrderedDict
 
-from .utilities import AZDevTransDeprecateInfo, check_validator
+from .utilities import AZDevTransDeprecateInfo, AZDevTransValidator, AZDevTransNode
 
 
-class AZDevTransArgumentHelp:
+class AZDevTransArgumentHelp(AZDevTransNode):
 
     def __init__(self, description, help_data):
         self.short_summary = help_data.get('short-summary', description)
@@ -18,8 +19,54 @@ class AZDevTransArgumentHelp:
                     command = command.strip('`')
                 self.populator_commands.append(command)
 
+    def to_config(self, ctx):
+        key = 'help'
+        value = OrderedDict()
+        if self.short_summary:
+            value['short-summary'] = self.short_summary
+        if self.long_summary:
+            value['long-summary'] = self.long_summary
+        if self.populator_commands:
+            value['populator-commands'] = self.populator_commands
 
-class AZDevTransArgument:
+        if set(value.keys()) == {"short-summary"}:
+            value = value['short-summary']
+        return key, value
+
+
+class AZDevTransArgumentOptions(AZDevTransNode):
+
+    def __init__(self, options_list):
+        if not isinstance(options_list, (list, tuple)):
+            raise TypeError('Expect list or tuple. Got "{}"'.format(type(options_list)))
+        converted_options = {}
+        for option in options_list:
+            if not isinstance(option, str):
+                if not isinstance(option, Deprecated):
+                    raise TypeError('Expect Deprecated. Got "{}"'.format(type(option)))
+                option = AZDevTransDeprecateInfo(option)
+                option_str = option.target
+            else:
+                option_str = option
+            if option_str in converted_options:
+                raise TypeError('Duplicated value in options list: "{}"'.format(option_str))
+            converted_options[option_str] = option
+        self.options = converted_options
+
+    def to_config(self, ctx):
+        key = 'options'
+        values = []
+        for option_str in sorted(list(self.options.keys())):
+            option = self.options[option_str]
+            if isinstance(option, str):
+                values.append(option)
+            elif isinstance(option, AZDevTransDeprecateInfo):
+                _, value = option.to_config(ctx)
+                values.append(value)
+        return key, values
+
+
+class AZDevTransArgument(AZDevTransNode):
     # supported: 'deprecate_info', 'is_preview', 'is_experimental', 'dest', 'help', 'options_list', 'action', 'arg_group', 'arg_type', 'choices', 'default', 'completer', 'configured_default', 'const', 'id_part', 'local_context_attribute', 'max_api', 'min_api', 'nargs',  'required', 'type', 'validator'
     # ignored: 'metavar', 'operation_group', 'resource_type', 'dest'
     # invalid: 'option_list', 'metave', ' FilesCompleter'
@@ -96,18 +143,10 @@ class AZDevTransArgument:
 
     def _parse_options_list(self, type_settings):
         options_list = type_settings.get('options_list', None)
+        if options_list is not None and len(options_list) == 0:
+            options_list = None
         if options_list is not None:
-            assert isinstance(options_list, (list, tuple))
-            converted_options_list = []
-            for idx in range(len(options_list)):
-                option = options_list[idx]
-                if not isinstance(option, str):
-                    assert isinstance(option, Deprecated)
-                    option = AZDevTransDeprecateInfo(option)
-                converted_options_list.append(option)
-            options_list = converted_options_list
-            if len(options_list) == 0:
-                options_list = None
+            options_list = AZDevTransArgumentOptions(options_list)
         self.options_list = options_list
 
     def _parse_arg_group(self, type_settings):
@@ -130,8 +169,6 @@ class AZDevTransArgument:
             default = None
 
         if default is not None:
-            if isinstance(default, bool):
-                default = str(default)
             if self.choices is not None:
                 if isinstance(default, list):
                     for value in default:
@@ -195,6 +232,12 @@ class AZDevTransArgument:
         assert isinstance(required, bool)
         self.required = required
 
+    def _parse_validator(self, type_settings):
+        validator = type_settings.get('validator', None)
+        if validator is not None:
+            validator = AZDevTransValidator(validator)
+        self.validator = validator
+
     def _parse_action(self, type_settings):
         action = type_settings.get('action', None)
         if action is not None:
@@ -236,8 +279,5 @@ class AZDevTransArgument:
                 pass
         self.typ = typ
 
-    def _parse_validator(self, type_settings):
-        validator = type_settings.get('validator', None)
-        check_validator(validator)
-        self.validator = validator
-
+    def to_config(self, ctx):
+        pass

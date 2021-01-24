@@ -1,6 +1,6 @@
 from knack.deprecation import Deprecated
-from azure.cli.core.translator.validator import AzValidator, AzFuncValidator, AzClassValidator
-from azure.cli.core.util import get_arg_list
+from collections import OrderedDict
+from six import string_types
 
 
 class _MockCliCtx:
@@ -14,7 +14,13 @@ class _MockCliCtx:
         return __version__
 
 
-class AZDevTransDeprecateInfo:
+class AZDevTransNode:
+
+    def to_config(self, ctx):
+        raise NotImplementedError()
+
+
+class AZDevTransDeprecateInfo(AZDevTransNode):
 
     def __init__(self, table_instance):
         self.object_type = table_instance.object_type
@@ -27,6 +33,28 @@ class AZDevTransDeprecateInfo:
         placeholder_instance = AZDevTransDeprecateInfo.get_placeholder_instance()
         self.tag_template = table_instance._get_tag(placeholder_instance)
         self.message_template = table_instance._get_message(placeholder_instance)
+
+    def to_config(self, ctx):
+        key = 'deprecate'
+        value = OrderedDict()
+        if self.target:
+            value['target'] = self.target
+
+        if self.redirect:
+            value['redirect'] = self.redirect
+        if self.hide:
+            if isinstance(self.hide, bool):
+                value['hide'] = self.hide
+            elif isinstance(self.hide, string_types):
+                value['hide-since'] = self.hide
+        if self.expiration:
+            value['expire-since'] = self.expiration
+
+        if self.tag_template != self.get_default_tag_template():
+            value['tag-template'] = self.tag_template
+        if self.message_template != self.get_default_message_template():
+            value['message-template'] = self.message_template
+        return key, value
 
     @classmethod
     def get_placeholder_instance(cls):
@@ -53,8 +81,11 @@ class AZDevTransDeprecateInfo:
         return placeholder_instance._get_message(placeholder_instance)
 
 
-def check_validator(validator):
-    if validator is not None:
+class AZDevTransValidator(AZDevTransNode):
+
+    def __init__(self, validator):
+        from azure.cli.core.util import get_arg_list
+        from azure.cli.core.translator.validator import AzValidator, AzFuncValidator, AzClassValidator
         if not isinstance(validator, AzValidator):
             raise TypeError('Validator is not an instance of "AzValidator", get "{}"'.format(
                 type(validator)))
@@ -68,3 +99,21 @@ def check_validator(validator):
 
         if 'ns' not in arg_list and 'cmd' not in arg_list and 'namespace' not in arg_list:
             raise TypeError('Validator "{}" signature is invalid'.format(validator))
+        self.validator = validator
+
+    def to_config(self, ctx):
+        from azure.cli.core.translator.validator import AzValidator, AzFuncValidator, AzClassValidator
+        key = 'validator'
+        if isinstance(self.validator, AzFuncValidator):
+            value = ctx.get_import_path(self.validator.module_name, self.validator.name)
+        elif isinstance(self.validator, AzClassValidator):
+            value = OrderedDict()
+            value['cls'] = ctx.get_import_path(self.validator.module_name, self.validator.name)
+            kwargs = OrderedDict()
+            for k in sorted(list(self.validator.kwargs.keys())):
+                kwargs[k] = self.validator.kwargs[k]
+            value['kwargs'] = kwargs
+        else:
+            raise NotImplementedError()
+        return key, value
+
