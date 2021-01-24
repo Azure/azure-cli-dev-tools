@@ -129,9 +129,10 @@ class AZDevTransArgument(AZDevTransNode):
         assert help_description is None or isinstance(help_description, str)
 
         help_data = {}
-        options = self.options_list
-        if options is None:
+        if self.options_list is None:
             options = ['--{}'.format(self.name).replace('_', '-')]
+        else:
+            options = list(self.options_list.options.keys())
         options = set(options)
         for key, value in self.parent_command.parameters_help_data.items():
             if set(key.split()).isdisjoint(options):
@@ -168,13 +169,13 @@ class AZDevTransArgument(AZDevTransNode):
         if default == '':
             default = None
 
-        if default is not None:
-            if self.choices is not None:
-                if isinstance(default, list):
-                    for value in default:
-                        assert value in self.choices
-                else:
-                    assert default in self.choices
+        # if default is not None:
+        #     if self.choices is not None:
+        #         if isinstance(default, list):
+        #             for value in default:
+        #                 assert value in self.choices
+        #         else:
+        #             assert default in self.choices
         self.default = default
 
     def _parse_configured_default(self, type_settings):
