@@ -81,4 +81,33 @@ class AZDevTransCommandGroup(AZDevTransNode):
         self.help = hp
 
     def to_config(self, ctx):
-        pass
+        key = self.name
+        value = OrderedDict()
+
+        if self.deprecate_info:
+            k, v = self.deprecate_info.to_config(ctx)
+            value[k] = v
+
+        if self.is_preview:
+            value['preview'] = self.is_preview
+        if self.is_experimental:
+            value['experimental'] = self.is_experimental
+
+        if self.help:
+            k, v = self.help.to_config(ctx)
+            value[k] = v
+
+        if self.sub_commands:
+            sub_commands = OrderedDict()
+            for sub_command_name in sorted(list(self.sub_commands.keys())):
+                k, v = self.sub_commands[sub_command_name].to_config(ctx)
+                sub_commands[k] = v
+            value['commands'] = sub_commands
+
+        if self.sub_groups:
+            sub_groups = OrderedDict()
+            for sub_group_name in sorted(list(self.sub_groups.keys())):
+                k, v = self.sub_groups[sub_group_name].to_config(ctx)
+                sub_groups[k] = v
+            value['command-groups'] = sub_groups
+        return key, value

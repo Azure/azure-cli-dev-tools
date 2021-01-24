@@ -420,4 +420,81 @@ class AZDevTransCommand(AZDevTransNode):
         self.client_arg_name = client_arg_name
 
     def to_config(self, ctx):
-        pass
+        key = self.name
+        value = OrderedDict()
+
+        if self.deprecate_info:
+            k, v = self.deprecate_info.to_config(ctx)
+            value[k] = v
+
+        if self.is_preview:
+            value['preview'] = self.is_preview
+        if self.is_experimental:
+            value['experimental'] = self.is_experimental
+
+        if self.min_api:
+            value['min-api'] = self.min_api
+        if self.max_api:
+            value['max-api'] = self.max_api
+
+        if self.help:
+            k, v = self.help.to_config(ctx)
+            value[k] = v
+
+        if self.resource_type:
+            k, v = self.resource_type.to_config(ctx)
+            value[k] = v
+        if self.operation_group:
+            value['operation-group'] = self.operation_group
+        if self.operation:
+            k, v = self.operation.to_config(ctx)
+            value[k] = v
+        if self.client_factory:
+            k, v = self.client_factory.to_config(ctx)
+            value[k] = v
+        if self.client_arg_name:
+            value['client-arg-name'] = self.client_arg_name
+
+        if self.confirmation:
+            value['confirmation'] = self.confirmation
+        if self.no_wait:
+            k, v = self.no_wait.to_config(ctx)
+            value[k] = v
+
+        if self.validator:
+            k, v = self.validator.to_config(ctx)
+            value[k] = v
+
+        if self.transform:
+            k, v = self.transform.to_config(ctx)
+            value[k] = v
+
+        if self.table_transformer:
+            k, v = self.table_transformer.to_config(ctx)
+            value[k] = v
+
+        if self.exception_handler:
+            k, v = self.exception_handler.to_config(ctx)
+            value[k] = v
+
+        if self.supports_local_cache:
+            value['local-cache'] = self.supports_local_cache
+        if self.model_path:
+            value['model-path'] = self.model_path
+
+        if self.sub_arguments:
+            arguments = OrderedDict()
+            for arg_name in sorted(list(self.sub_arguments.keys())):
+                k, v = self.sub_arguments[arg_name].to_config(ctx)
+                arguments[k] = v
+            value['arguments'] = arguments
+
+        return key, value
+
+    def to_example_config(self, ctx):
+        key = self.name
+        if self.examples:
+            _, value = self.examples.to_config(ctx)
+        else:
+            value = []
+        return key, value

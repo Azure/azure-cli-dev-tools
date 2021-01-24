@@ -168,7 +168,7 @@ class AZDevTransArgument(AZDevTransNode):
         default = type_settings.get('default', None)
         if default == '':
             default = None
-
+        # custom function signature always has default value. FYI private_link_primary in network
         # if default is not None:
         #     if self.choices is not None:
         #         if isinstance(default, list):
@@ -281,4 +281,41 @@ class AZDevTransArgument(AZDevTransNode):
         self.typ = typ
 
     def to_config(self, ctx):
-        pass
+        key = self.name
+        value = OrderedDict()
+        if self.deprecate_info:
+            k, v = self.deprecate_info.to_config(ctx)
+            value[k] = v
+        if self.is_preview:
+            value['preview'] = self.is_preview
+        if self.is_experimental:
+            value['experimental'] = self.is_experimental
+
+        if self.min_api:
+            value['min-api'] = self.min_api
+        if self.max_api:
+            value['max-api'] = self.max_api
+
+        if self.options_list:
+            k, v = self.options_list.to_config(ctx)
+            value[k] = v
+        if self.help:
+            k, v = self.help.to_config(ctx)
+            value[k] = v
+
+        if self.id_part:
+            value['id-part'] = self.id_part
+        if self.arg_group:
+            value['arg-group'] = self.arg_group
+        if self.nargs:
+            value['nargs'] = self.nargs
+        if self.required:
+            value['required'] = self.required
+        if self.choices:
+            value['choices'] = self.choices
+        if self.default:
+            value['default'] = self.default
+        if self.validator:
+            k, v = self.validator.to_config(ctx)
+            value[k] = v
+        return key, value
