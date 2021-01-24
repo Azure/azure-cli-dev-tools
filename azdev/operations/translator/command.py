@@ -57,7 +57,7 @@ class AZDevTransCommand:
 
         self._parse_min_api(table_instance)
         self._parse_max_api(table_instance)
-        self._parse_resource_type(table_instance)   # TODO:
+        self._parse_resource_type(table_instance)
         self._parse_operation_group(table_instance)
 
         self._parse_client_arg_name(table_instance)
@@ -197,17 +197,16 @@ class AZDevTransCommand:
         resource_type = table_instance.command_kwargs.get('resource_type', None)
         if resource_type is not None:
             if isinstance(resource_type, ResourceType):
-                # TODO: convert to string
                 pass
             elif isinstance(resource_type, CustomResourceType):
-                # TODO: convert to string
+                # used for extensions. it will call register_resource_type.
                 pass
             elif resource_type == PROFILE_TYPE:
                 # used only in commands: ad sp | ad app | feature
                 # TODO: Deprecate this value. Don't need this for profile specific configuration
-                pass
+                raise NotImplementedError()
             else:
-                raise CLIError("Not supported resource_type type {}".format(type(resource_type)))
+                raise TypeError("Not supported resource_type type {}".format(type(resource_type)))
         self.resource_type = resource_type
 
     def _parse_operation_group(self, table_instance):
