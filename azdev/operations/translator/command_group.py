@@ -83,6 +83,7 @@ class AZDevTransCommandGroup(AZDevTransNode):
     def to_config(self, ctx):
         key = self.name
         value = OrderedDict()
+        value["full-name"] = self.full_name
 
         if self.deprecate_info:
             k, v = self.deprecate_info.to_config(ctx)
