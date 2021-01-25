@@ -93,8 +93,6 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
-      Python39:
-        python.version: '3.9'
   steps:
     - task: UsePythonVersion@0
       displayName: 'Use Python $(python.version)'
@@ -142,8 +140,6 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
-      Python39:
-        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -178,8 +174,6 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
-      Python39:
-        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -214,8 +208,6 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
-      Python39:
-        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -250,8 +242,6 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
-      Python39:
-        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -285,8 +275,6 @@ jobs:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
-      Python39:
-        python.version: '3.9'
   steps:
     - task: DownloadPipelineArtifact@1
       displayName: 'Download Build'
