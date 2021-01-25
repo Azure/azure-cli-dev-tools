@@ -20,7 +20,8 @@ from knack.log import get_logger
 from azure.cli.core.extension.operations import list_available_extensions, list_extensions as list_cli_extensions  # pylint: disable=import-error
 from azdev.utilities import (
     display, heading, subheading,
-    get_cli_repo_path, get_path_table
+    get_cli_repo_path, get_path_table,
+    require_virtual_env
 )
 
 from azdev.utilities.tools import require_azure_cli

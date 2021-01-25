@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 from knack.log import get_logger
-from knack.util import CommandResultItem
+from knack.util import CommandResultItem, CLIError
 
 logger = get_logger(__name__)
 
@@ -36,8 +36,7 @@ def cmd(command, message=False, show_stderr=True, **kwargs):
     :param kwargs: Any kwargs supported by subprocess.Popen
     :returns: CommandResultItem object.
     """
-    from azdev.utilities import IS_WINDOWS, display
-
+    from . import IS_WINDOWS, display
     # use default message if custom not provided
     if message is True:
         message = 'Running: {}\n'.format(command)
@@ -54,6 +53,34 @@ def cmd(command, message=False, show_stderr=True, **kwargs):
         return CommandResultItem(output, exit_code=0, error=None)
     except subprocess.CalledProcessError as err:
         return CommandResultItem(err.output, exit_code=err.returncode, error=err)
+
+
+def shell_cmd(command, message=False, stderr=None, stdout=None, check=True, raise_ex=True, timeout=None,
+              executable=None, capture_output=False):
+
+    # use default message if custom not provided
+    if message is True:
+        message = '\nRunning: {}\n'.format(command)
+    from . import display
+    if message:
+        display(message)
+
+    try:
+        output = subprocess.run(command,
+                                stdout=subprocess.PIPE if capture_output else stdout,
+                                stderr=subprocess.PIPE if capture_output else stderr,
+                                check=check,
+                                timeout=timeout,
+                                executable=executable,
+                                shell=True)
+        if capture_output:
+            return CommandResultItem(output.stdout.decode('utf-8').strip(), exit_code=0, error=None)
+    except subprocess.CalledProcessError as err:
+        if raise_ex:
+            raise err
+        logger.debug(err)
+        raise CLIError("Command " + command + " failed. Trying running with --debug for more info")
+    return None
 
 
 def py_cmd(command, message=False, show_stderr=True, is_module=True, **kwargs):

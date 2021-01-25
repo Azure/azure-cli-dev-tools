@@ -6,7 +6,9 @@
 
 import os
 from shutil import copytree, rmtree
+import shutil
 import time
+import sys
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -14,9 +16,11 @@ from knack.util import CLIError
 from azdev.operations.extensions import (
     list_extensions, add_extension_repo, remove_extension)
 from azdev.params import Flag
+import azdev.utilities.const as const
+import azdev.utilities.venv as venv
 from azdev.utilities import (
-    display, heading, subheading, pip_cmd, find_file,
-    get_azdev_config_dir, get_azdev_config, require_virtual_env, get_azure_config)
+    display, heading, subheading, pip_cmd, find_file, get_env_path,
+    get_azdev_config_dir, get_azdev_config, get_azure_config, shell_cmd)
 
 logger = get_logger(__name__)
 
@@ -196,8 +200,8 @@ def _interactive_setup():
         # repo directory. To use multiple extension repos or identify a repo outside the cwd, they must specify
         # the path.
         if prompt_y_n('\nDo you plan to develop CLI extensions?'):
-            display('\nGreat! Input the paths for the extension repos you wish to develop for, one per '
-                    'line. You can add as many repos as you like. (TIP: to quickly get started, press RETURN to '
+            display('\nGreat! Input the path for the extension repos you wish to develop for. '
+                    '(TIP: to quickly get started, press RETURN to '
                     'use your current working directory).')
             first_repo = True
             while True:
@@ -245,14 +249,170 @@ def _interactive_setup():
         raise CLIError('Installation aborted.')
 
 
-def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
+def _validate_input(cli_path, ext_repo_path, set_env, copy, use_global, ext):
+    if copy and use_global:
+        raise CLIError("Copy and use global are mutally exlcusive.")
+    if cli_path == "pypi" and any([use_global, copy, set_env]):
+        raise CLIError("pypi for cli path is mutally exlcusive with global copy and set env")
+    if not cli_path and any([use_global, copy, set_env]):
+        raise CLIError("if global, copy, or set env are set then both an extensions repo "
+                       " and a cli repo must be specified")
+    if not ext_repo_path and ext:
+        raise CLIError("Extesions provided to be installed but no extensions path was given")
 
-    require_virtual_env()
 
-    start = time.time()
+def _check_paths(cli_path, ext_repo_path):
+    if not os.path.isdir(cli_path):
+        raise CLIError("The cli path is not a valid directory, please check the path")
+    if ext_repo_path and not os.path.isdir(ext_repo_path):
+        raise CLIError("The cli extensions path is not a valid directory, please check the path")
+
+
+def _check_shell():
+    if 'SHELL' in os.environ and const.IS_WINDOWS and 'bash.exe' in os.environ['SHELL']:
+        heading("WARNING: You are running bash in Windows, the setup may not work correctly and "
+                "command may have unexpected behavior")
+        from knack.prompting import prompt_y_n
+        if not prompt_y_n('Would you like to continue with the install?'):
+            sys.exit(0)
+
+
+def _check_env(set_env):
+    if not set_env:
+        if not get_env_path():
+            raise CLIError('You are not running in a virtual enviroment and have not chosen to set one up.')
+        _check_pyenv()
+    elif 'VIRTUAL_ENV' in os.environ:
+        raise CLIError("You are already running in a virtual enviroment, yet you want to set a new one up")
+
+
+def _check_pyenv():
+    if 'PYENV_VIRTUAL_ENV' in os.environ:
+        if const.IS_WINDOWS:
+            raise CLIError('AZDEV does not support setup in a pyenv-win virtual environment.')
+        activate_path = os.path.join(
+            os.environ['PYENV_ROOT'], 'plugins', 'pyenv-virtualenv', 'bin', 'pyenv-sh-activate')
+        venv.edit_pyenv_activate(activate_path)
+
+
+def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None, set_env=None, copy=None, use_global=None):
+    _check_env(set_env)
+
+    _check_shell()
 
     heading('Azure CLI Dev Setup')
 
+    # cases for handling legacy install
+    if not any([cli_path, ext_repo_path]) or cli_path == "pypi":
+        display("WARNING: Installing azdev in legacy mode. Run with atleast -c "
+                "to install the latest azdev wihout \"pypi\"\n")
+        return _handle_legacy(cli_path, ext_repo_path, ext, deps, time.time())
+    if 'CONDA_PREFIX' in os.environ:
+        raise CLIError('CONDA virutal enviroments are not supported outside'
+                       ' of interactive mode or when -c and -r are provided')
+
+    if not cli_path:
+        cli_path = _handle_no_cli_path()
+
+    _validate_input(cli_path, ext_repo_path, set_env, copy, use_global, ext)
+    _check_paths(cli_path, ext_repo_path)
+
+    if set_env:
+        shell_cmd((const.VENV_CMD if const.IS_WINDOWS else const.VENV_CMD3) + set_env, raise_ex=False)
+        azure_path = os.path.join(os.path.abspath(os.getcwd()), set_env)
+    else:
+        azure_path = os.environ.get('VIRTUAL_ENV')
+
+    dot_azure_config = os.path.join(azure_path, '.azure')
+    dot_azdev_config = os.path.join(azure_path, '.azdev')
+
+    # clean up venv dirs if they already existed
+    # and this is a reinstall/new setup
+    if os.path.isdir(dot_azure_config):
+        shutil.rmtree(dot_azure_config)
+    if os.path.isdir(dot_azdev_config):
+        shutil.rmtree(dot_azdev_config)
+
+    global_az_config = os.path.expanduser(os.path.join('~', '.azure'))
+    global_azdev_config = os.path.expanduser(os.path.join('~', '.azdev'))
+    azure_config_path = os.path.join(dot_azure_config, const.CONFIG_NAME)
+    azdev_config_path = os.path.join(dot_azdev_config, const.CONFIG_NAME)
+
+    if os.path.isdir(global_az_config) and copy:
+        shutil.copytree(global_az_config, dot_azure_config)
+        if os.path.isdir(global_azdev_config):
+            shutil.copytree(global_azdev_config, dot_azdev_config)
+        else:
+            os.mkdir(dot_azdev_config)
+            file = open(azdev_config_path, "w")
+            file.close()
+    elif not use_global and not copy:
+        os.mkdir(dot_azure_config)
+        os.mkdir(dot_azdev_config)
+        file_az, file_dev = open(azure_config_path, "w"), open(azdev_config_path, "w")
+        file_az.close()
+        file_dev.close()
+    elif os.path.isdir(global_az_config):
+        dot_azure_config, dot_azdev_config = global_az_config, global_azdev_config
+        azure_config_path = os.path.join(dot_azure_config, const.CONFIG_NAME)
+    else:
+        raise CLIError(
+            "Global AZ config is not set up, yet it was specified to be used.")
+
+    # set env vars for get azure config and get azdev config
+    os.environ['AZURE_CONFIG_DIR'], os.environ['AZDEV_CONFIG_DIR'] = dot_azure_config, dot_azdev_config
+    config = get_azure_config()
+    if not config.get('cloud', 'name', None):
+        config.set_value('cloud', 'name', 'AzureCloud')
+    if ext_repo_path:
+        config.set_value(const.EXT_SECTION, const.AZ_DEV_SRC, os.path.abspath(ext_repo_path))
+    venv.edit_activate(azure_path, dot_azure_config, dot_azdev_config)
+    if cli_path:
+        config.set_value('clipath', const.AZ_DEV_SRC, os.path.abspath(cli_path))
+        venv.install_cli(os.path.abspath(cli_path), azure_path)
+    config = get_azdev_config()
+    config.set_value('ext', 'repo_paths', os.path.abspath(ext_repo_path) if ext_repo_path else '_NONE_')
+    config.set_value('cli', 'repo_path', os.path.abspath(cli_path))
+    _copy_config_files()
+    if ext and ext_repo_path:
+        venv.install_extensions(azure_path, ext)
+
+    if not set_env:
+        heading("The setup was successful! Please run or re-run the virtual environment activation script.")
+    else:
+        heading("The setup was successful!")
+    return None
+
+
+def _get_azdev_cli_path(config_file_path):
+    if not os.path.exists(config_file_path):
+        return None
+
+    import configparser
+    with open(config_file_path, "r") as file:
+        config_parser = configparser.RawConfigParser()
+        config_parser.read_string(file.read())
+        if config_parser.has_section('cli') and config_parser.has_option('cli', 'repo_path'):
+            return config_parser.get('cli', 'repo_path')
+        return None
+
+
+def _handle_no_cli_path():
+    local_azdev_config = os.path.join(os.environ.get('VIRTUAL_ENV'), '.azdev', const.CONFIG_NAME)
+    cli_path = _get_azdev_cli_path(local_azdev_config)
+    if cli_path is None:
+        display('Not found cli path in local azdev config file: ' + local_azdev_config)
+        display('Will use the one in global azdev config.')
+        global_azdev_config = os.path.expanduser(os.path.join('~', '.azdev', const.CONFIG_NAME))
+        cli_path = _get_azdev_cli_path(global_azdev_config)
+        if cli_path is None:
+            raise CLIError('Not found cli path in global azdev config file: ' + global_azdev_config)
+    display('cli_path: ' + cli_path)
+    return cli_path
+
+
+def _handle_legacy(cli_path, ext_repo_path, ext, deps, start):
+    ext_repo_path = [ext_repo_path] if ext_repo_path else None
     ext_to_install = []
     if not any([cli_path, ext_repo_path, ext]):
         cli_path, ext_repo_path, ext_to_install = _interactive_setup()
@@ -279,7 +439,6 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
         # must add the necessary repo to add an extension
         if ext and not ext_repo_path:
             raise CLIError('usage error: --repo EXT_REPO [EXT_REPO ...] [--ext EXT_NAME ...]')
-
         get_azure_config().set_value('extension', 'dev_sources', '')
         if ext_repo_path:
             # add extension repo(s)
@@ -313,11 +472,10 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
 
     # upgrade to latest pip
     pip_cmd('install --upgrade pip -q', 'Upgrading pip...')
-
     _install_cli(cli_path, deps=deps)
-    _install_extensions(ext_to_install)
+    if ext_repo_path:
+        _install_extensions(ext_to_install)
     _copy_config_files()
-
     end = time.time()
     elapsed_min = int((end - start) / 60)
     elapsed_sec = int(end - start) % 60
