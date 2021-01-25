@@ -6,7 +6,9 @@
 
 import importlib
 import os
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
+import yaml
+import json
 
 from knack.cli import CLI
 from knack.commands import CLICommandsLoader
@@ -120,9 +122,19 @@ class AZDevTransModuleParser(CLICommandsLoader):
         self._add_sub_commands(parent_group=root, prefix='')
         return root
 
-    def convert_commands_tree_to_config(self, root):
+    def convert_commands_to_config(self, root):
         ctx = ConfigurationCtx()
-        return root.to_config(ctx)
+        k, v = root.to_config(ctx)
+        config = OrderedDict()
+        config[k] = v
+        return config
+
+    def convert_examples_to_config(self, root):
+        ctx = ConfigurationCtx()
+        k, v = root.to_example_config(ctx)
+        config = OrderedDict()
+        config[k] = v
+        return config
 
     def _add_sub_command_groups(self, parent_group, prefix):
         for full_name in self.command_group_table:
@@ -186,9 +198,10 @@ def generate_manual_config(mod_name, output_path=None, overwrite=False, profile=
     parser = AZDevTransModuleParser(profile=profile)
     parser.load_module(module)
     root = parser.build_commands_tree()
-    configuration = parser.convert_commands_tree_to_config(root)
-
-    # output_path = _get_output_path(mod_path, output_path, overwrite)
+    commands_config = parser.convert_commands_to_config(root)
+    write_configuration(commands_config, 'commands', mod_path, output_path, profile, overwrite)
+    examples_config = parser.convert_examples_to_config(root)
+    write_configuration(examples_config, 'examples', mod_path, output_path, profile, overwrite)
 
 
 def _get_extension_module_input_name(ext_dir):
@@ -230,32 +243,39 @@ def _get_module(mod_name, is_extension):
         raise CLIError("Cannot Find module {}".format(mod_name))
 
 
-def _get_output_path(mod_path, output_path, overwrite):
-    if output_path is None:
+def write_configuration(data, file_name, mod_path, output_dir, profile, overwrite):
+    if output_dir is None:
         output_dir = os.path.join(mod_path, 'configuration')
-        output_path = os.path.join(output_dir, 'commands.yaml')
-    else:
-        output_dir = os.path.dirname(output_path)
-    ensure_dir(output_dir)
-    if os.path.exists(output_path) and not overwrite:
-        raise CLIError("Configuration file already exists.")
-    return output_path
+    output_path = os.path.join(output_dir, profile, file_name)
+    ensure_dir(os.path.dirname(output_path))
+
+    json_path = "{}.json".format(output_path)
+    yaml_path = "{}.yaml".format(output_path)
+    if os.path.exists(json_path) and not overwrite:
+        raise CLIError("{} file {} already exists.".format(json_path))
+    if os.path.exists(yaml_path) and not overwrite:
+        raise CLIError("{} file {} already exists.".format(yaml_path))
+    with open(json_path, 'w') as fw:
+        json.dump(data, fw, indent=2)
+    with open(json_path, 'r') as fr:
+        with open(yaml_path, 'w') as fw:
+            yaml.dump(json.load(fr), fw)
 
 
-if __name__ == "__main__":
-    def _get_all_mod_names():
-        cli_path = get_cli_repo_path()
-        command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
-        my_list = os.listdir(command_modules_dir)
-        print(my_list)
-        mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
-                     and not mod_name.startswith('__')]
-        return mod_names
-
-    mod_names = _get_all_mod_names()
-    values = set()
-    for mod_name in mod_names:
-        if mod_name in ['keyvault', 'batch']:
-            continue
-        print(mod_name)
-        generate_manual_config(mod_name)
+# if __name__ == "__main__":
+#     def _get_all_mod_names():
+#         cli_path = get_cli_repo_path()
+#         command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
+#         my_list = os.listdir(command_modules_dir)
+#         print(my_list)
+#         mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
+#                      and not mod_name.startswith('__')]
+#         return mod_names
+#
+#     mod_names = _get_all_mod_names()
+#     values = set()
+#     for mod_name in mod_names:
+#         if mod_name in ['keyvault', 'batch']:
+#             continue
+#         print(mod_name)
+#         generate_manual_config(mod_name)

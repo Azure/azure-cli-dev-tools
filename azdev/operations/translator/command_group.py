@@ -111,3 +111,22 @@ class AZDevTransCommandGroup(AZDevTransNode):
                 sub_groups[k] = v
             value['command-groups'] = sub_groups
         return key, value
+
+    def to_example_config(self, ctx):
+        key = self.name
+        value = OrderedDict()
+
+        if self.sub_commands:
+            sub_commands = OrderedDict()
+            for sub_command_name in sorted(list(self.sub_commands.keys())):
+                k, v = self.sub_commands[sub_command_name].to_example_config(ctx)
+                sub_commands[k] = v
+            value['commands'] = sub_commands
+
+        if self.sub_groups:
+            sub_groups = OrderedDict()
+            for sub_group_name in sorted(list(self.sub_groups.keys())):
+                k, v = self.sub_groups[sub_group_name].to_example_config(ctx)
+                sub_groups[k] = v
+            value['command-groups'] = sub_groups
+        return key, value

@@ -123,10 +123,11 @@ class AZDevTransValidator(AZDevTransNode):
         elif isinstance(self.validator, AzClassValidator):
             value = OrderedDict()
             value['cls'] = ctx.get_import_path(self.validator.module_name, self.validator.name)
-            kwargs = OrderedDict()
-            for k in sorted(list(self.validator.kwargs.keys())):
-                kwargs[k] = self.validator.kwargs[k]
-            value['kwargs'] = kwargs
+            # FIXME: kwargs can be deserialized
+            # kwargs = OrderedDict()
+            # for k in sorted(list(self.validator.kwargs.keys())):
+            #     kwargs[k] = self.validator.kwargs[k]
+            # value['kwargs'] = kwargs
         else:
             raise NotImplementedError()
         return key, value
