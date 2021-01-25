@@ -207,7 +207,6 @@ def load_arguments(self, _):
 
     for scope in ['cli', 'extension']:
         with ArgumentsContext(self, '{} generate-docs'.format(scope)) as c:
-
             c.argument('output_dir', help='Directory to place the generated docs in. Defaults to a temporary directory. '
                                           'If the base directory does not exist, it will be created')
             c.argument('output_type', choices=['xml', 'html', 'text', 'man', 'latex'], default="xml",

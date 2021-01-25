@@ -1,6 +1,7 @@
 from knack.deprecation import Deprecated
 from collections import OrderedDict
 from six import string_types
+import json
 
 
 class _MockCliCtx:
@@ -113,6 +114,14 @@ class AZDevTransValidator(AZDevTransNode):
 
         if 'ns' not in arg_list and 'cmd' not in arg_list and 'namespace' not in arg_list:
             raise TypeError('Validator "{}" signature is invalid'.format(validator))
+
+        if isinstance(validator, AzClassValidator):
+            try:
+                json.dumps(validator.kwargs)
+            except Exception:
+                raise TypeError('Validator "{}#{}" kwargs cannot dump to json'.format(
+                    validator.module_name, validator.name
+                ))
         self.validator = validator
 
     def to_config(self, ctx):
@@ -123,11 +132,10 @@ class AZDevTransValidator(AZDevTransNode):
         elif isinstance(self.validator, AzClassValidator):
             value = OrderedDict()
             value['cls'] = ctx.get_import_path(self.validator.module_name, self.validator.name)
-            # FIXME: kwargs can be deserialized
-            # kwargs = OrderedDict()
-            # for k in sorted(list(self.validator.kwargs.keys())):
-            #     kwargs[k] = self.validator.kwargs[k]
-            # value['kwargs'] = kwargs
+            kwargs = OrderedDict()
+            for k in sorted(list(self.validator.kwargs.keys())):
+                kwargs[k] = self.validator.kwargs[k]
+            value['kwargs'] = kwargs
         else:
             raise NotImplementedError()
         return key, value
