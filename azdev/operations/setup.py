@@ -15,7 +15,7 @@ from azdev.operations.extensions import (
     list_extensions, add_extension_repo, remove_extension)
 from azdev.params import Flag
 from azdev.utilities import (
-    display, heading, subheading, pip_cmd, find_file,
+    display, heading, subheading, pip_cmd, CommandError, find_file,
     get_azdev_config_dir, get_azdev_config, require_virtual_env, get_azure_config)
 
 logger = get_logger(__name__)
@@ -76,56 +76,60 @@ def _install_cli(cli_path, deps=None):
         whl_list = " ".join(
             [os.path.join(privates_dir, f) for f in os.listdir(privates_dir)]
         )
-        pip_cmd("install -q {}".format(whl_list), "Installing private whl files...")
+        pip_cmd("install {}".format(whl_list), "Installing private whl files...")
 
     # install general requirements
     pip_cmd(
-        "install -q -r {}/requirements.txt".format(cli_path),
+        "install -r {}".format(os.path.join(cli_path, "requirements.txt")),
         "Installing `requirements.txt`..."
     )
+    cli_src = os.path.join(cli_path, 'src')
     if deps == 'setup.py':
         # Resolve dependencies from setup.py files.
         # command modules have dependency on azure-cli-core so install this first
         pip_cmd(
-            "install -q -e {}/src/azure-cli-telemetry".format(cli_path),
+            "install -e {}".format(os.path.join(cli_src, 'azure-cli-telemetry')),
             "Installing `azure-cli-telemetry`..."
         )
         pip_cmd(
-            "install -q -e {}/src/azure-cli-core".format(cli_path),
+            "install -e {}".format(os.path.join(cli_src, 'azure-cli-core')),
             "Installing `azure-cli-core`..."
         )
 
         # azure cli has dependencies on the above packages so install this one last
-        pip_cmd("install -q -e {}/src/azure-cli".format(cli_path), "Installing `azure-cli`...")
+        pip_cmd("install -e {}".format(os.path.join(cli_src, 'azure-cli')),
+                "Installing `azure-cli`...")
+
         pip_cmd(
-            "install -q -e {}/src/azure-cli-testsdk".format(cli_path),
+            "install -e {}".format(os.path.join(cli_src, 'azure-cli-testsdk')),
             "Installing `azure-cli-testsdk`..."
         )
     else:
         # First install packages without dependencies,
         # then resolve dependencies from requirements.*.txt file.
         pip_cmd(
-            "install -e {}/src/azure-cli-telemetry --no-deps".format(cli_path),
+            "install -e {} --no-deps".format(os.path.join(cli_src, 'azure-cli-telemetry')),
             "Installing `azure-cli-telemetry`..."
         )
         pip_cmd(
-            "install -e {}/src/azure-cli-core --no-deps".format(cli_path),
+            "install -e {} --no-deps".format(os.path.join(cli_src, 'azure-cli-core')),
             "Installing `azure-cli-core`..."
         )
 
-        pip_cmd("install -e {}/src/azure-cli --no-deps".format(cli_path), "Installing `azure-cli`...")
+        pip_cmd("install -e {} --no-deps".format(os.path.join(cli_src, 'azure-cli')),
+                "Installing `azure-cli`...")
 
         # The dependencies of testsdk are not in requirements.txt as this package is not needed by the
         # azure-cli package for running commands.
         # Here we need to install with dependencies for azdev test.
         pip_cmd(
-            "install -e {}/src/azure-cli-testsdk".format(cli_path),
+            "install -e {}".format(os.path.join(cli_src, 'azure-cli-testsdk')),
             "Installing `azure-cli-testsdk`..."
         )
         import platform
         system = platform.system()
         req_file = 'requirements.py3.{}.txt'.format(system)
-        pip_cmd("install -r {}/src/azure-cli/{}".format(cli_path, req_file),
+        pip_cmd("install -r {}".format(os.path.join(cli_src, 'azure-cli', req_file)),
                 "Installing `{}`...".format(req_file))
 
 
@@ -312,10 +316,15 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
     subheading('Installing packages')
 
     # upgrade to latest pip
-    pip_cmd('install --upgrade pip -q', 'Upgrading pip...')
+    pip_cmd('install --upgrade pip', 'Upgrading pip...')
 
-    _install_cli(cli_path, deps=deps)
-    _install_extensions(ext_to_install)
+    try:
+        _install_cli(cli_path, deps=deps)
+        _install_extensions(ext_to_install)
+    except CommandError as err:
+        logger.error(err)
+        return
+
     _copy_config_files()
 
     end = time.time()
