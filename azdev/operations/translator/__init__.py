@@ -193,7 +193,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
             #     ))
 
 
-def generate_manual_config(mod_name, output_path=None, overwrite=False, profile='latest', is_extension=False):
+def generate_commands_config(mod_name, output_path=None, overwrite=False, profile='latest', is_extension=False):
     module, mod_path = _get_module(mod_name, is_extension)
     parser = AZDevTransModuleParser(profile=profile)
     parser.load_module(module)
@@ -257,9 +257,11 @@ def write_configuration(data, file_name, mod_path, output_dir, profile, overwrit
         raise CLIError("{} file {} already exists.".format(yaml_path))
     with open(json_path, 'w') as fw:
         json.dump(data, fw, indent=2)
+    print("Output File Success: {}".format(json_path))
     with open(json_path, 'r') as fr:
         with open(yaml_path, 'w') as fw:
             yaml.dump(json.load(fr), fw)
+    print("Output File Success: {}".format(yaml_path))
 
 
 # if __name__ == "__main__":
@@ -278,4 +280,4 @@ def write_configuration(data, file_name, mod_path, output_dir, profile, overwrit
 #         if mod_name in ['keyvault', 'batch']:
 #             continue
 #         print(mod_name)
-#         generate_manual_config(mod_name)
+#         generate_commands_config(mod_name)

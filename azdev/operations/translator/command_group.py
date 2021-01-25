@@ -101,15 +101,23 @@ class AZDevTransCommandGroup(AZDevTransNode):
             sub_commands = OrderedDict()
             for sub_command_name in sorted(list(self.sub_commands.keys())):
                 k, v = self.sub_commands[sub_command_name].to_config(ctx)
+                if v is None:
+                    continue
                 sub_commands[k] = v
-            value['commands'] = sub_commands
+            if len(sub_commands) > 0:
+                value['commands'] = sub_commands
 
         if self.sub_groups:
             sub_groups = OrderedDict()
             for sub_group_name in sorted(list(self.sub_groups.keys())):
                 k, v = self.sub_groups[sub_group_name].to_config(ctx)
+                if v is None:
+                    continue
                 sub_groups[k] = v
-            value['command-groups'] = sub_groups
+            if len(sub_groups) > 0:
+                value['command-groups'] = sub_groups
+        if 'commands' not in value and 'command-groups' not in value:
+            return key, None
         return key, value
 
     def to_example_config(self, ctx):
@@ -120,13 +128,21 @@ class AZDevTransCommandGroup(AZDevTransNode):
             sub_commands = OrderedDict()
             for sub_command_name in sorted(list(self.sub_commands.keys())):
                 k, v = self.sub_commands[sub_command_name].to_example_config(ctx)
+                if v is None:
+                    continue
                 sub_commands[k] = v
-            value['commands'] = sub_commands
+            if len(sub_commands) > 0:
+                value['commands'] = sub_commands
 
         if self.sub_groups:
             sub_groups = OrderedDict()
             for sub_group_name in sorted(list(self.sub_groups.keys())):
                 k, v = self.sub_groups[sub_group_name].to_example_config(ctx)
+                if v is None:
+                    continue
                 sub_groups[k] = v
-            value['command-groups'] = sub_groups
+            if len(sub_groups) > 0:
+                value['command-groups'] = sub_groups
+        if 'commands' not in value and 'command-groups' not in value:
+            return key, None
         return key, value
