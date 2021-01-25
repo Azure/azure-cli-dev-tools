@@ -201,7 +201,7 @@ def _config_file_path(style_type="pylint"):
 
     ext_repo_path = filter(
         lambda x: "azure-cli-extension" in x,
-        get_azdev_config().get("ext", "repo_paths").split(),
+        get_azdev_config().get("ext", "repo_paths").split(','),
     )
     try:
         ext_repo_path = next(ext_repo_path)

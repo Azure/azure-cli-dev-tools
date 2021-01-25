@@ -61,6 +61,7 @@ setup(
         'azdev.utilities',
     ],
     install_requires=[
+        'virtualenv',
         'docutils',
         'flake8',
         'gitpython',
@@ -68,7 +69,7 @@ setup(
         'knack',
         'mock',
         'pytest>=5.0.0',
-        'pytest-xdist', # depends on pytest-forked
+        'pytest-xdist',  # depends on pytest-forked
         'pyyaml',
         'requests',
         'sphinx==1.6.7',

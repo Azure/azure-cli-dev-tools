@@ -5,7 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import os
-
+import sys
 from knack.config import CLIConfig
 
 
@@ -21,7 +21,11 @@ def get_azdev_config_dir():
     """ Returns the user's .azdev directory. """
     from azdev.utilities import get_env_path
     env_name = None
-    _, env_name = os.path.splitdrive(get_env_path())
+    if not get_env_path():
+        _, env_name = os.path.splitdrive(sys.executable)
+    else:
+        _, env_name = os.path.splitdrive(get_env_path())
+
     azdev_dir = os.getenv('AZDEV_CONFIG_DIR', None) or os.path.expanduser(os.path.join('~', '.azdev'))
     if not env_name:
         return azdev_dir
