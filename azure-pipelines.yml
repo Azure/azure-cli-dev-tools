@@ -6,56 +6,33 @@ trigger:
     include:
     - '*'
 jobs:
-- job: Tox36
-  displayName: 'Tox: Python 3.6'
+- job: Tox
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-18.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+        tox_env: 'py36'
+      Python37:
+        python.version: '3.7'
+        tox_env: 'py37'
+      Python38:
+        python.version: '3.8'
+        tox_env: 'py38'
+      Python39:
+        python.version: '3.9'
+        tox_env: 'py39'
   steps:
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.6'
+    displayName: 'Use Python $(python.version)'
     inputs:
-      versionSpec: 3.6
+      versionSpec: '$(python.version)'
   - task: Bash@3
     displayName: 'Run Tox'
     env:
-      TOXENV: py36
-    inputs:
-      targetType: 'filePath'
-      filePath: scripts/ci/run_tox.sh
-
-- job: Tox37
-  displayName: 'Tox: Python 3.7'
-  condition: succeeded()
-  pool:
-    vmImage: 'ubuntu-16.04'
-  steps:
-  - task: UsePythonVersion@0
-    displayName: 'Use Python 3.7'
-    inputs:
-      versionSpec: 3.7
-  - task: Bash@3
-    displayName: 'Run Tox'
-    env:
-      TOXENV: py37
-    inputs:
-      targetType: 'filePath'
-      filePath: scripts/ci/run_tox.sh
-
-- job: Tox38
-  displayName: 'Tox: Python 3.8'
-  condition: succeeded()
-  pool:
-    vmImage: 'ubuntu-16.04'
-  steps:
-  - task: UsePythonVersion@0
-    displayName: 'Use Python 3.8'
-    inputs:
-      versionSpec: 3.8
-  - task: Bash@3
-    displayName: 'Run Tox'
-    env:
-      TOXENV: py38
+      TOXENV: $(tox_env)
     inputs:
       targetType: 'filePath'
       filePath: scripts/ci/run_tox.sh
@@ -64,7 +41,7 @@ jobs:
   displayName: 'Extract Metadata'
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-18.04'
   steps:
   - task: Bash@3
     displayName: 'Extract Version'
@@ -84,7 +61,7 @@ jobs:
   dependsOn: ExtractMetadata
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-18.04'
   steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.7'
@@ -107,13 +84,17 @@ jobs:
   timeoutInMinutes: 10
 
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-18.04'
   strategy:
     matrix:
       Python36:
         python.version: '3.6'
+      Python37:
+        python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
     - task: UsePythonVersion@0
       displayName: 'Use Python $(python.version)'
@@ -152,13 +133,17 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-18.04'
   strategy:
     matrix:
       Python36:
+        python.version: '3.6'
+      Python37:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -184,13 +169,17 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-18.04'
   strategy:
     matrix:
       Python36:
+        python.version: '3.6'
+      Python37:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -216,13 +205,17 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-18.04'
   strategy:
     matrix:
       Python36:
+        python.version: '3.6'
+      Python37:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -248,13 +241,17 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-18.04'
   strategy:
     matrix:
       Python36:
+        python.version: '3.6'
+      Python37:
         python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -279,13 +276,17 @@ jobs:
   displayName: "Performance Check on Linux"
   dependsOn: BuildPythonWheel
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-18.04'
   strategy:
     matrix:
       Python36:
         python.version: '3.6'
+      Python37:
+        python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
     - task: DownloadPipelineArtifact@1
       displayName: 'Download Build'

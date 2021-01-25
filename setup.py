@@ -45,7 +45,7 @@ setup(
         'Programming Language :: Python :: 3.8'
     ],
     keywords='azure',
-    python_requires='>=3.6,<=3.9',
+    python_requires='>=3.6',
     packages=[
         'azdev',
         'azdev.config',
