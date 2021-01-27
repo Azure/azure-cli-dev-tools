@@ -6,7 +6,6 @@
 
 # Verify that all *.py files have a license header in the file.
 
-from __future__ import print_function
 import os
 import sys
 
