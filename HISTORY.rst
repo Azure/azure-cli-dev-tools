@@ -2,6 +2,12 @@
 
 Release History
 ===============
+
+0.1.29
+++++++
+* `azdev setup`: Show error if `pip` command fails.
+* Support Python 3.9.
+
 0.1.28
 ++++++
 * [Linter] Fix minor display issue in `azdev linter`.
