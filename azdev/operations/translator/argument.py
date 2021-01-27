@@ -89,18 +89,47 @@ class AZDevTransArgumentAction(AZDevTransNode):
         if isinstance(self.action, str):
             value = self.action
         elif issubclass(self.action, AzClsAction):
-            module_name = self.action.import_module
-            name = self.action.import_name
-            value = ctx.get_import_path(module_name, name)
+            value = ctx.get_import_path(self.action.import_module, self.action.import_name)
         elif issubclass(self.action, AzClsActionByFactory):
             value = OrderedDict()
-            value['cls'] = ctx.get_import_path(self.action.import_module, self.action.import_name)
+            value['factory'] = ctx.get_import_path(self.action.import_module, self.action.import_name)
             kwargs = OrderedDict()
             for k in sorted(list(self.action.kwargs.keys())):
                 kwargs[k] = self.action.kwargs[k]
             value['kwargs'] = kwargs
         else:
             raise NotImplementedError()
+        return key, value
+
+
+class AZDevTransArgumentCompleter(AZDevTransNode):
+
+    def __init__(self, completer):
+        from azure.cli.core.translator.completer import AzCompleter, AzFuncCompleterByFactory
+        if not isinstance(completer, AzCompleter):
+            raise TypeError("Expect AzCompleter, got '{}'".format(completer))
+        if isinstance(completer, AzFuncCompleterByFactory):
+            try:
+                json.dumps(completer.kwargs)
+            except Exception:
+                raise TypeError('Argument completer "{}" kwargs cannot dump to json'.format(completer))
+        self.completer = completer
+
+    def to_config(self, ctx):
+        from azure.cli.core.translator.completer import AzFuncCompleter, AzFuncCompleterByFactory
+        key = 'completer'
+        if isinstance(self.completer, AzFuncCompleter):
+            value = ctx.get_import_path(self.completer.import_module, self.completer.import_name)
+        elif isinstance(self.completer, AzFuncCompleterByFactory):
+            value = OrderedDict()
+            value['factory'] = ctx.get_import_path(self.completer.import_module, self.completer.import_name)
+            kwargs = OrderedDict()
+            for k in sorted(list(self.completer.kwargs.keys())):
+                kwargs[k] = self.completer.kwargs[k]
+            value['kwargs'] = kwargs
+        else:
+            raise NotImplementedError()
+
         return key, value
 
 
@@ -137,19 +166,21 @@ class AZDevTransArgument(AZDevTransNode):
 
         self._parse_options_list(type_settings)
         self._parse_arg_group(type_settings)
-        self._parse_choices(type_settings)  # TODO:
+
+        self._parse_action(type_settings)  # TODO:
+        self._parse_choices(type_settings)
+        self._parse_nargs(type_settings)
 
         self._parse_default(type_settings)
         self._parse_id_part(type_settings)
 
-        self._parse_nargs(type_settings)
         self._parse_required(type_settings)
         self._parse_configured_default(type_settings)
 
-        self._parse_action(type_settings)
         self._parse_const(type_settings)
 
-        self._parse_completer(type_settings)    # TODO:
+        self._parse_completer(type_settings)
+
         self._parse_local_context_attribute(type_settings)  # TODO:
         self._parse_type(type_settings)         # TODO:
         self._parse_validator(type_settings)
@@ -200,8 +231,6 @@ class AZDevTransArgument(AZDevTransNode):
         self.arg_group = arg_group
 
     def _parse_choices(self, type_settings):
-        # TODO: parse enum arg_type (link to SDK Model enum value)
-        # TODO: parse get three state flag
         choices = type_settings.get('choices', None)
         if choices is not None:
             for value in choices:
@@ -292,6 +321,8 @@ class AZDevTransArgument(AZDevTransNode):
         self.validator = validator
 
     def _parse_action(self, type_settings):
+        # TODO: parse enum arg_type (link to SDK Model enum value)
+        # TODO: parse get three state flag
         action = type_settings.get('action', None)
         if isinstance(action, str):
             action = action.strip()
@@ -304,8 +335,7 @@ class AZDevTransArgument(AZDevTransNode):
     def _parse_completer(self, type_settings):
         completer = type_settings.get('completer', None)
         if completer is not None:
-            # TODO: convert completer to string
-            pass
+            completer = AZDevTransArgumentCompleter(completer)
         self.completer = completer
 
     def _parse_local_context_attribute(self, type_settings):
@@ -378,5 +408,8 @@ class AZDevTransArgument(AZDevTransNode):
             value[k] = v
         if self.validator:
             k, v = self.validator.to_config(ctx)
+            value[k] = v
+        if self.completer:
+            k, v = self.completer.to_config(ctx)
             value[k] = v
         return key, value

@@ -131,7 +131,7 @@ class AZDevTransValidator(AZDevTransNode):
             value = ctx.get_import_path(self.validator.import_module, self.validator.import_name)
         elif isinstance(self.validator, AzFuncValidatorByFactory):
             value = OrderedDict()
-            value['cls'] = ctx.get_import_path(self.validator.import_module, self.validator.import_name)
+            value['factory'] = ctx.get_import_path(self.validator.import_module, self.validator.import_name)
             kwargs = OrderedDict()
             for k in sorted(list(self.validator.kwargs.keys())):
                 kwargs[k] = self.validator.kwargs[k]
