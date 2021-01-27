@@ -105,10 +105,10 @@ class AZDevTransArgumentAction(AZDevTransNode):
 class AZDevTransArgumentCompleter(AZDevTransNode):
 
     def __init__(self, completer):
-        from azure.cli.core.translator.completer import AzCompleter, AzFuncCompleterByFactory
+        from azure.cli.core.translator.completer import AzCompleter, AzFuncCompleterByFactory, AzExternalCompleterByFactory
         if not isinstance(completer, AzCompleter):
             raise TypeError("Expect AzCompleter, got '{}'".format(completer))
-        if isinstance(completer, AzFuncCompleterByFactory):
+        if isinstance(completer, (AzFuncCompleterByFactory, AzExternalCompleterByFactory)):
             try:
                 json.dumps(completer.kwargs)
             except Exception:
@@ -116,11 +116,19 @@ class AZDevTransArgumentCompleter(AZDevTransNode):
         self.completer = completer
 
     def to_config(self, ctx):
-        from azure.cli.core.translator.completer import AzFuncCompleter, AzFuncCompleterByFactory
+        from azure.cli.core.translator.completer import AzFuncCompleter, AzFuncCompleterByFactory,\
+            AzExternalCompleterByFactory
         key = 'completer'
         if isinstance(self.completer, AzFuncCompleter):
             value = ctx.get_import_path(self.completer.import_module, self.completer.import_name)
         elif isinstance(self.completer, AzFuncCompleterByFactory):
+            value = OrderedDict()
+            value['factory'] = ctx.get_import_path(self.completer.import_module, self.completer.import_name)
+            kwargs = OrderedDict()
+            for k in sorted(list(self.completer.kwargs.keys())):
+                kwargs[k] = self.completer.kwargs[k]
+            value['kwargs'] = kwargs
+        elif isinstance(self.completer, AzExternalCompleterByFactory):
             value = OrderedDict()
             value['factory'] = ctx.get_import_path(self.completer.import_module, self.completer.import_name)
             kwargs = OrderedDict()
@@ -178,7 +186,6 @@ class AZDevTransArgument(AZDevTransNode):
         self._parse_configured_default(type_settings)
 
         self._parse_const(type_settings)
-
         self._parse_completer(type_settings)
 
         self._parse_local_context_attribute(type_settings)  # TODO:
