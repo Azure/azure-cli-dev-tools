@@ -1,8 +1,10 @@
 import types
 from knack.deprecation import Deprecated
+from knack.arguments import IgnoreAction
 from collections import OrderedDict
-
 from .utilities import AZDevTransDeprecateInfo, AZDevTransValidator, AZDevTransNode
+import json
+import argparse
 
 
 class AZDevTransArgumentHelp(AZDevTransNode):
@@ -66,6 +68,42 @@ class AZDevTransArgumentOptions(AZDevTransNode):
         return key, values
 
 
+class AZDevTransArgumentAction(AZDevTransNode):
+
+    def __init__(self, action):
+        from azure.cli.core.translator.action import AzAction, AzClsActionByFactory
+        if not isinstance(action, str) and not issubclass(action, AzAction):
+            raise TypeError("Expect str or AzAction type, got '{}'".format(action))
+        if not isinstance(action, str) and issubclass(action, AzClsActionByFactory):
+            try:
+                json.dumps(action.kwargs)
+            except Exception:
+                raise TypeError('Argument action "{}#{}" kwargs cannot dump to json'.format(
+                    action.import_module, action.import_name
+                ))
+        self.action = action
+
+    def to_config(self, ctx):
+        from azure.cli.core.translator.action import AzClsAction, AzClsActionByFactory
+        key = 'action'
+        if isinstance(self.action, str):
+            value = self.action
+        elif issubclass(self.action, AzClsAction):
+            module_name = self.action.import_module
+            name = self.action.import_name
+            value = ctx.get_import_path(module_name, name)
+        elif issubclass(self.action, AzClsActionByFactory):
+            value = OrderedDict()
+            value['cls'] = ctx.get_import_path(self.action.import_module, self.action.import_name)
+            kwargs = OrderedDict()
+            for k in sorted(list(self.action.kwargs.keys())):
+                kwargs[k] = self.action.kwargs[k]
+            value['kwargs'] = kwargs
+        else:
+            raise NotImplementedError()
+        return key, value
+
+
 class AZDevTransArgument(AZDevTransNode):
     # supported: 'deprecate_info', 'is_preview', 'is_experimental', 'dest', 'help', 'options_list', 'action', 'arg_group', 'arg_type', 'choices', 'default', 'completer', 'configured_default', 'const', 'id_part', 'local_context_attribute', 'max_api', 'min_api', 'nargs',  'required', 'type', 'validator'
     # ignored: 'metavar', 'operation_group', 'resource_type', 'dest'
@@ -91,20 +129,24 @@ class AZDevTransArgument(AZDevTransNode):
 
         self._parse_dest(type_settings)
 
-        self._parse_options_list(type_settings)
-        self._parse_arg_group(type_settings)
-        self._parse_choices(type_settings)
-        self._parse_default(type_settings)
-        self._parse_id_part(type_settings)
-
         self._parse_max_api(type_settings)
         self._parse_min_api(type_settings)
+
+        if self._parse_is_ignore(type_settings):
+            return
+
+        self._parse_options_list(type_settings)
+        self._parse_arg_group(type_settings)
+        self._parse_choices(type_settings)  # TODO:
+
+        self._parse_default(type_settings)
+        self._parse_id_part(type_settings)
 
         self._parse_nargs(type_settings)
         self._parse_required(type_settings)
         self._parse_configured_default(type_settings)
 
-        self._parse_action(type_settings)   # TODO:
+        self._parse_action(type_settings)
         self._parse_const(type_settings)
 
         self._parse_completer(type_settings)    # TODO:
@@ -158,6 +200,8 @@ class AZDevTransArgument(AZDevTransNode):
         self.arg_group = arg_group
 
     def _parse_choices(self, type_settings):
+        # TODO: parse enum arg_type (link to SDK Model enum value)
+        # TODO: parse get three state flag
         choices = type_settings.get('choices', None)
         if choices is not None:
             for value in choices:
@@ -168,7 +212,7 @@ class AZDevTransArgument(AZDevTransNode):
         default = type_settings.get('default', None)
         if default == '':
             default = None
-        # custom function signature always has default value. FYI private_link_primary in network
+        # TODO: custom function signature always has default value. FYI private_link_primary in network
         # if default is not None:
         #     if self.choices is not None:
         #         if isinstance(default, list):
@@ -190,8 +234,10 @@ class AZDevTransArgument(AZDevTransNode):
         if const == '':
             const = None
         if const is not None:
-            assert self.action is not None and 'const' in self.action
-            assert isinstance(const, (str, int))
+            if not isinstance(const, (str, int)):
+                raise TypeError("Expect str or int, Got '{}'".format(const))
+            if self.action is None or not isinstance(self.action.action, str) or 'const' not in self.action.action:
+                raise TypeError("Invalid action: expect string with const")
         self.const = const
 
     def _parse_id_part(self, type_settings):
@@ -210,6 +256,12 @@ class AZDevTransArgument(AZDevTransNode):
         is_experimental = type_settings.get('is_experimental', False)
         assert isinstance(is_experimental, bool)
         self.is_experimental = is_experimental
+
+    def _parse_is_ignore(self, type_settings):
+        self.is_ignore = False
+        if type_settings.get('action', None) == IgnoreAction and type_settings.get('help', None) == argparse.SUPPRESS:
+            self.is_ignore = True
+        return self.is_ignore
 
     def _parse_max_api(self, type_settings):
         max_api = type_settings.get('max_api', None)
@@ -241,10 +293,12 @@ class AZDevTransArgument(AZDevTransNode):
 
     def _parse_action(self, type_settings):
         action = type_settings.get('action', None)
+        if isinstance(action, str):
+            action = action.strip()
+            if not action:
+                action = None
         if action is not None:
-            if not isinstance(action, str):
-                # TODO: convert class type instance to string
-                pass
+            action = AZDevTransArgumentAction(action)
         self.action = action
 
     def _parse_completer(self, type_settings):
@@ -296,6 +350,10 @@ class AZDevTransArgument(AZDevTransNode):
         if self.max_api:
             value['max-api'] = self.max_api
 
+        if self.is_ignore:
+            value['ignore'] = True
+            return key, value
+
         if self.options_list:
             k, v = self.options_list.to_config(ctx)
             value[k] = v
@@ -315,6 +373,9 @@ class AZDevTransArgument(AZDevTransNode):
             value['choices'] = self.choices
         if self.default:
             value['default'] = self.default
+        if self.action:
+            k, v = self.action.to_config(ctx)
+            value[k] = v
         if self.validator:
             k, v = self.validator.to_config(ctx)
             value[k] = v

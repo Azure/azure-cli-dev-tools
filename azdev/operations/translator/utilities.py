@@ -100,14 +100,14 @@ class AZDevTransValidator(AZDevTransNode):
 
     def __init__(self, validator):
         from azure.cli.core.util import get_arg_list
-        from azure.cli.core.translator.validator import AzValidator, AzFuncValidator, AzClassValidator
+        from azure.cli.core.translator.validator import AzValidator, AzFuncValidator, AzFuncValidatorByFactory
         if not isinstance(validator, AzValidator):
             raise TypeError('Validator is not an instance of "AzValidator", get "{}"'.format(
                 type(validator)))
 
         if isinstance(validator, AzFuncValidator):
             arg_list = get_arg_list(validator.func)
-        elif isinstance(validator, AzClassValidator):
+        elif isinstance(validator, AzFuncValidatorByFactory):
             arg_list = get_arg_list(validator.instance)
         else:
             raise NotImplementedError()
@@ -115,23 +115,23 @@ class AZDevTransValidator(AZDevTransNode):
         if 'ns' not in arg_list and 'cmd' not in arg_list and 'namespace' not in arg_list:
             raise TypeError('Validator "{}" signature is invalid'.format(validator))
 
-        if isinstance(validator, AzClassValidator):
+        if isinstance(validator, AzFuncValidatorByFactory):
             try:
                 json.dumps(validator.kwargs)
             except Exception:
                 raise TypeError('Validator "{}#{}" kwargs cannot dump to json'.format(
-                    validator.module_name, validator.name
+                    validator.import_module, validator.import_name
                 ))
         self.validator = validator
 
     def to_config(self, ctx):
-        from azure.cli.core.translator.validator import AzValidator, AzFuncValidator, AzClassValidator
+        from azure.cli.core.translator.validator import AzFuncValidator, AzFuncValidatorByFactory
         key = 'validator'
         if isinstance(self.validator, AzFuncValidator):
-            value = ctx.get_import_path(self.validator.module_name, self.validator.name)
-        elif isinstance(self.validator, AzClassValidator):
+            value = ctx.get_import_path(self.validator.import_module, self.validator.import_name)
+        elif isinstance(self.validator, AzFuncValidatorByFactory):
             value = OrderedDict()
-            value['cls'] = ctx.get_import_path(self.validator.module_name, self.validator.name)
+            value['cls'] = ctx.get_import_path(self.validator.import_module, self.validator.import_name)
             kwargs = OrderedDict()
             for k in sorted(list(self.validator.kwargs.keys())):
                 kwargs[k] = self.validator.kwargs[k]

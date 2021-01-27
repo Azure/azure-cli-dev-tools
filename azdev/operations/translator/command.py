@@ -93,10 +93,10 @@ class AZDevTransClientFactory(AZDevTransNode):
         self.client_factory = client_factory
 
     def to_config(self, ctx):
-        from azure.cli.core.translator.client_factory import AzClientFactory
+        from azure.cli.core.translator.client_factory import AzFuncClientFactory
         key = "client-factory"
-        if isinstance(self.client_factory, AzClientFactory):
-            value = ctx.get_import_path(self.client_factory.module_name, self.client_factory.name)
+        if isinstance(self.client_factory, AzFuncClientFactory):
+            value = ctx.get_import_path(self.client_factory.import_module, self.client_factory.import_name)
         else:
             raise NotImplementedError()
         return key, value
@@ -169,7 +169,7 @@ class AZDevTransTransform(AZDevTransNode):
         from azure.cli.core.translator.transformer import AzFuncTransformer
         key = 'transform'
         if isinstance(self.transform, AzFuncTransformer):
-            value = ctx.get_import_path(self.transform.module_name, self.transform.name)
+            value = ctx.get_import_path(self.transform.import_module, self.transform.import_name)
         else:
             raise NotImplementedError()
         return key, value
@@ -188,7 +188,7 @@ class AZDevTransTableTransformer(AZDevTransNode):
         from azure.cli.core.translator.transformer import AzFuncTransformer
         key = 'table-transformer'
         if isinstance(self.table_transformer, AzFuncTransformer):
-            value = ctx.get_import_path(self.table_transformer.module_name, self.table_transformer.name)
+            value = ctx.get_import_path(self.table_transformer.import_module, self.table_transformer.import_name)
         elif isinstance(self.table_transformer, str):
             # TODO: distinguish string and AzFuncTransformer value
             value = self.table_transformer
@@ -210,7 +210,7 @@ class AZDevTransExceptionHandler(AZDevTransNode):
         from azure.cli.core.translator.exception_handler import AzFuncExceptionHandler
         key = 'exception-handler'
         if isinstance(self.exception_handler, AzFuncExceptionHandler):
-            value = ctx.get_import_path(self.exception_handler.module_name, self.exception_handler.name)
+            value = ctx.get_import_path(self.exception_handler.import_module, self.exception_handler.import_name)
         else:
             raise NotImplementedError()
         return key, value
