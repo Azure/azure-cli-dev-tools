@@ -14,6 +14,7 @@ helps[''] = """
 
 helps['setup'] = """
     short-summary: Set up your environment for development of Azure CLI command modules and/or extensions.
+    long-summary: Use --verbose to show the commands that are run, --debug to show the command output.
     examples:
         - name: Fully interactive setup.
           text: azdev setup

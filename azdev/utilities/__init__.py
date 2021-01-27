@@ -14,7 +14,8 @@ from .command import (
     call,
     cmd,
     py_cmd,
-    pip_cmd
+    pip_cmd,
+    CommandError
 )
 from .const import (
     COMMAND_MODULE_PREFIX,
@@ -67,6 +68,7 @@ __all__ = [
     'cmd',
     'py_cmd',
     'pip_cmd',
+    'CommandError',
     'test_cmd',
     'get_env_path',
     'get_azure_config_dir',
