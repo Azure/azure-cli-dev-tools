@@ -112,6 +112,7 @@ class AZDevTransArgumentCompleter(AZDevTransNode):
             try:
                 json.dumps(completer.kwargs)
             except Exception:
+                # Do not support get_storage_name_completion_list, get_storage_acl_name_completion_list
                 raise TypeError('Argument completer "{}" kwargs cannot dump to json'.format(completer))
         self.completer = completer
 
@@ -138,6 +139,23 @@ class AZDevTransArgumentCompleter(AZDevTransNode):
         else:
             raise NotImplementedError()
 
+        return key, value
+
+
+class AZDevTransArgumentLocalContextAttribute(AZDevTransNode):
+
+    def __init__(self, attribute):
+        from azure.cli.core.local_context import LocalContextAttribute
+        if not isinstance(attribute, LocalContextAttribute):
+            raise TypeError("Expect LocalContextAttribute, got '{}'".format(attribute))
+        self.attribute = attribute
+
+    def to_config(self, ctx):
+        key = 'local-context-attribute'
+        value = OrderedDict()
+        value['name'] = self.attribute.name
+        value['actions'] = self.attribute.actions
+        value['scopes'] = self.attribute.scopes
         return key, value
 
 
@@ -188,7 +206,7 @@ class AZDevTransArgument(AZDevTransNode):
         self._parse_const(type_settings)
         self._parse_completer(type_settings)
 
-        self._parse_local_context_attribute(type_settings)  # TODO:
+        self._parse_local_context_attribute(type_settings)
         self._parse_type(type_settings)         # TODO:
         self._parse_validator(type_settings)
 
@@ -346,11 +364,9 @@ class AZDevTransArgument(AZDevTransNode):
         self.completer = completer
 
     def _parse_local_context_attribute(self, type_settings):
-        from azure.cli.core.local_context import LocalContextAttribute
         local_context_attribute = type_settings.get('local_context_attribute', None)
         if local_context_attribute is not None:
-            assert isinstance(local_context_attribute, LocalContextAttribute)
-            # TODO: convert to AZDEVLocalContextAttribute
+            local_context_attribute = AZDevTransArgumentLocalContextAttribute(local_context_attribute)
         self.local_context_attribute = local_context_attribute
 
     def _parse_type(self, type_settings):
@@ -418,5 +434,8 @@ class AZDevTransArgument(AZDevTransNode):
             value[k] = v
         if self.completer:
             k, v = self.completer.to_config(ctx)
+            value[k] = v
+        if self.local_context_attribute:
+            k, v = self.local_context_attribute.to_config(ctx)
             value[k] = v
         return key, value
