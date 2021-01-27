@@ -83,6 +83,7 @@ def _install_cli(cli_path, deps=None):
         "install -r {}".format(os.path.join(cli_path, "requirements.txt")),
         "Installing `requirements.txt`..."
     )
+
     cli_src = os.path.join(cli_path, 'src')
     if deps == 'setup.py':
         # Resolve dependencies from setup.py files.
@@ -97,8 +98,10 @@ def _install_cli(cli_path, deps=None):
         )
 
         # azure cli has dependencies on the above packages so install this one last
-        pip_cmd("install -e {}".format(os.path.join(cli_src, 'azure-cli')),
-                "Installing `azure-cli`...")
+        pip_cmd(
+            "install -e {}".format(os.path.join(cli_src, 'azure-cli')),
+            "Installing `azure-cli`..."
+        )
 
         pip_cmd(
             "install -e {}".format(os.path.join(cli_src, 'azure-cli-testsdk')),
@@ -116,8 +119,10 @@ def _install_cli(cli_path, deps=None):
             "Installing `azure-cli-core`..."
         )
 
-        pip_cmd("install -e {} --no-deps".format(os.path.join(cli_src, 'azure-cli')),
-                "Installing `azure-cli`...")
+        pip_cmd(
+            "install -e {} --no-deps".format(os.path.join(cli_src, 'azure-cli')),
+            "Installing `azure-cli`..."
+        )
 
         # The dependencies of testsdk are not in requirements.txt as this package is not needed by the
         # azure-cli package for running commands.
@@ -129,8 +134,10 @@ def _install_cli(cli_path, deps=None):
         import platform
         system = platform.system()
         req_file = 'requirements.py3.{}.txt'.format(system)
-        pip_cmd("install -r {}".format(os.path.join(cli_src, 'azure-cli', req_file)),
-                "Installing `{}`...".format(req_file))
+        pip_cmd(
+            "install -r {}".format(os.path.join(cli_src, 'azure-cli', req_file)),
+            "Installing `{}`...".format(req_file)
+        )
 
 
 def _copy_config_files():
@@ -315,10 +322,9 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
     # install packages
     subheading('Installing packages')
 
-    # upgrade to latest pip
-    pip_cmd('install --upgrade pip', 'Upgrading pip...')
-
     try:
+        # upgrade to latest pip
+        pip_cmd('install --upgrade pip', 'Upgrading pip...')
         _install_cli(cli_path, deps=deps)
         _install_extensions(ext_to_install)
     except CommandError as err:
