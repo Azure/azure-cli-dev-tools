@@ -1,4 +1,3 @@
-import types
 from knack.deprecation import Deprecated
 from knack.arguments import IgnoreAction
 from collections import OrderedDict
@@ -159,6 +158,42 @@ class AZDevTransArgumentLocalContextAttribute(AZDevTransNode):
         return key, value
 
 
+class AZDevTransArgumentTypeConverter(AZDevTransNode):
+
+    def __init__(self, converter):
+        from azure.cli.core.translator.type_converter import AzTypeConverter, AzFuncTypeConverterByFactory
+        if converter not in (str, int, float, bool):
+            if not isinstance(converter, AzTypeConverter):
+                print(converter)
+                # raise TypeError("Expect AzTypeConverter, got '{}'".format(converter))
+
+            if isinstance(converter, AzFuncTypeConverterByFactory):
+                try:
+                    json.dumps(converter.kwargs)
+                except Exception:
+                    raise TypeError('Argument type factory "{}" kwargs cannot dump to json'.format(converter))
+        self.converter = converter
+
+    def to_config(self, ctx):
+        from azure.cli.core.translator.type_converter import AzFuncTypeConverter, AzLocationNameTypeConverter,\
+            AzFuncTypeConverterByFactory
+        key = 'type'
+        if self.converter in (str, int, float, bool):
+            value = str(self.converter)
+        elif isinstance(self.converter, AzFuncTypeConverter):
+            value = ctx.get_import_path(self.converter.import_module, self.converter.import_name)
+        elif isinstance(self.converter, (AzFuncTypeConverterByFactory, AzLocationNameTypeConverter)):
+            value = OrderedDict()
+            value['factory'] = ctx.get_import_path(self.converter.import_module, self.converter.import_name)
+            kwargs = OrderedDict()
+            for k in sorted(list(self.converter.kwargs.keys())):
+                kwargs[k] = self.converter.kwargs[k]
+        else:
+            raise NotImplementedError()
+
+        return key, value
+
+
 class AZDevTransArgument(AZDevTransNode):
     # supported: 'deprecate_info', 'is_preview', 'is_experimental', 'dest', 'help', 'options_list', 'action', 'arg_group', 'arg_type', 'choices', 'default', 'completer', 'configured_default', 'const', 'id_part', 'local_context_attribute', 'max_api', 'min_api', 'nargs',  'required', 'type', 'validator'
     # ignored: 'metavar', 'operation_group', 'resource_type', 'dest'
@@ -207,7 +242,7 @@ class AZDevTransArgument(AZDevTransNode):
         self._parse_completer(type_settings)
 
         self._parse_local_context_attribute(type_settings)
-        self._parse_type(type_settings)         # TODO:
+        self._parse_type_converter(type_settings)
         self._parse_validator(type_settings)
 
         self._parse_help(type_settings)
@@ -369,23 +404,11 @@ class AZDevTransArgument(AZDevTransNode):
             local_context_attribute = AZDevTransArgumentLocalContextAttribute(local_context_attribute)
         self.local_context_attribute = local_context_attribute
 
-    def _parse_type(self, type_settings):
-        typ = type_settings.get('type', str)
-        if typ not in (str, int, float, bool):
-            if isinstance(typ, types.FunctionType):
-                # TODO: convert to string
-                pass
-            elif isinstance(typ, types.MethodDescriptorType):
-                # TODO: convert class method to string
-                pass
-            elif isinstance(typ, type):
-                # TODO: convert class to string
-                pass
-            else:
-                # SizeWithUnitConverter
-                # TODO: convert callable instance to string
-                pass
-        self.typ = typ
+    def _parse_type_converter(self, type_settings):
+        type_converter = type_settings.get('type', None)
+        if type_converter is not None:
+            type_converter = AZDevTransArgumentTypeConverter(type_converter)
+        self.type_converter = type_converter
 
     def to_config(self, ctx):
         key = self.name
@@ -437,5 +460,8 @@ class AZDevTransArgument(AZDevTransNode):
             value[k] = v
         if self.local_context_attribute:
             k, v = self.local_context_attribute.to_config(ctx)
+            value[k] = v
+        if self.type_converter:
+            k, v = self.type_converter.to_config(ctx)
             value[k] = v
         return key, value
