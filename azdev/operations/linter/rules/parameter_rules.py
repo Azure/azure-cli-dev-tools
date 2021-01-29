@@ -149,7 +149,12 @@ def option_length_too_long(linter, command_name, parameter_name):
     for option in options_list:
         if isinstance(option, Deprecated) or option.startswith('--__'):
             return
-        min_length = min(min_length, len(option)) if min_length else len(option)
+        option_len = len(option)
+        if option.startswith('--'):
+            option_len -= 2
+        elif option.startswith('-'):
+            option_len -= 1
+        min_length = min(min_length, option_len) if min_length else option_len
     if min_length and min_length > length_threshold:
         raise RuleError("The lengths of all options {} are longer than threshold {}. "
                         "Argument {} must have a short abbreviation.".format(options_list,
