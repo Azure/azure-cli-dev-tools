@@ -2,6 +2,13 @@
 
 Release History
 ===============
+
+0.1.29
+++++++
+* `azdev linter`: Remove the prefix dashes in option length calculation (#284)
+* `azdev setup`: Show error if `pip` command fails (#281)
+* Support Python 3.9 (#280)
+
 0.1.28
 ++++++
 * [Linter] Fix minor display issue in `azdev linter`.
