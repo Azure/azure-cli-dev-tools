@@ -4,6 +4,7 @@ from collections import OrderedDict
 from .utilities import AZDevTransDeprecateInfo, AZDevTransValidator, AZDevTransNode
 import json
 import argparse
+import inspect
 
 
 class AZDevTransArgumentHelp(AZDevTransNode):
@@ -228,13 +229,13 @@ class AZDevTransArgument(AZDevTransNode):
         self._parse_options_list(type_settings)
         self._parse_arg_group(type_settings)
 
-        self._parse_action(type_settings)  # TODO:
+        self._parse_action(type_settings)
         self._parse_choices(type_settings)
         self._parse_nargs(type_settings)
-
         self._parse_default(type_settings)
-        self._parse_id_part(type_settings)
+        self._parse_arg_type(type_settings)
 
+        self._parse_id_part(type_settings)
         self._parse_required(type_settings)
         self._parse_configured_default(type_settings)
 
@@ -409,6 +410,31 @@ class AZDevTransArgument(AZDevTransNode):
         if type_converter is not None:
             type_converter = AZDevTransArgumentTypeConverter(type_converter)
         self.type_converter = type_converter
+
+    def _parse_arg_type(self, type_settings):
+        from azure.cli.core.translator.arg_type import AzArgTypeInstance, AzArgTypeByFactory
+        arg_type = type_settings.get('_arg_type', None)
+        if arg_type is not None:
+            if isinstance(arg_type, AzArgTypeInstance):
+                print(arg_type)
+            elif isinstance(arg_type, AzArgTypeByFactory):
+                print(arg_type)
+        # from azure.cli.core.commands.parameters import EnumAction
+        # arg_type = None
+        # if self.action is not None and not isinstance(self.action.action, str):
+        #     if self.action.action.import_module == 'azure.cli.core.commands.parameters':
+        #         if self.action.action.import_name == 'EnumAction':
+        #             pass
+        #         elif self.action.action.import_name == 'get_three_state_action':
+        #             pass
+        #
+        #
+        #     # if issubclass(self.action.action, EnumAction):
+        #     #     enum_model = type_settings.get('enum_model', None)
+        #     # elif:
+        #     #     pass
+        #     pass
+        self.arg_type = arg_type
 
     def to_config(self, ctx):
         key = self.name
