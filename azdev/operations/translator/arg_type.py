@@ -316,7 +316,7 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
             k, v = self.type_converter.to_config(ctx)
             value[k] = v
 
-        return self.key, value
+        return self.register_name, value
 
 
 def build_arg_type(arg_type):

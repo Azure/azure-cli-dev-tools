@@ -26,6 +26,8 @@ class AZDevTransArgument(AZDevTransNode):
             # Block storage has_header arg_type: https://github.com/Azure/azure-cli/blob/dd891a940b3a15751ecfbf71b62a1aafb1cfe608/src/azure-cli/azure/cli/command_modules/storage/_params.py#L887
             raise TypeError("Not support nested arg_type")
 
+        self.arg_type = None
+
         self._parse_deprecate_info(type_settings)
         self._parse_is_preview(type_settings)
         self._parse_is_experimental(type_settings)
@@ -195,8 +197,6 @@ class AZDevTransArgument(AZDevTransNode):
         self.validator = validator
 
     def _parse_action(self, type_settings):
-        # TODO: parse enum arg_type (link to SDK Model enum value)
-        # TODO: parse get three state flag
         action = type_settings.get('action', None)
         if isinstance(action, str):
             action = action.strip()
@@ -225,7 +225,7 @@ class AZDevTransArgument(AZDevTransNode):
         value = OrderedDict()
 
         arg_type_values = {}
-        if not self.is_ignore and self.arg_type:
+        if self.arg_type:
             ctx.set_art_type_reference_format(False)
             _, arg_type_values = self.arg_type.to_config(ctx)
             ctx.set_art_type_reference_format(True)

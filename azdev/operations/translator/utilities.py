@@ -22,7 +22,7 @@ class ConfigurationCtx:
 
     def __init__(self):
         self._arg_type_reference_format_queue = []
-        pass
+        self._output_arg_types = set()
 
     def set_art_type_reference_format(self, to_reference_format):
         assert isinstance(to_reference_format, bool)
@@ -42,6 +42,13 @@ class ConfigurationCtx:
     def get_import_path(self, module_name, name):
         path = "{}#{}".format(module_name, name)
         return self.simplify_import_path(path)
+
+    def add_output_arg_type(self, register_name):
+        assert register_name not in self._output_arg_types
+        self._output_arg_types.add(register_name)
+
+    def is_output_arg_type(self, register_name):
+        return register_name in self._output_arg_types
 
     def simplify_import_path(self, path):
         # TODO: FIXME

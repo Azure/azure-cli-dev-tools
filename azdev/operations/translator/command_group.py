@@ -35,6 +35,7 @@ class AZDevTransCommandGroup(AZDevTransNode):
         self.name = name
         self.parent_group = parent_group
         self.full_name = full_name
+        self.registered_arg_types = {}
 
         self.sub_groups = {}
         self.sub_commands = {}
@@ -83,7 +84,8 @@ class AZDevTransCommandGroup(AZDevTransNode):
     def to_config(self, ctx):
         key = self.name
         value = OrderedDict()
-        value["full-name"] = self.full_name
+        if self.full_name:
+            value["full-name"] = self.full_name
 
         if self.deprecate_info:
             k, v = self.deprecate_info.to_config(ctx)
@@ -97,6 +99,24 @@ class AZDevTransCommandGroup(AZDevTransNode):
         if self.help:
             k, v = self.help.to_config(ctx)
             value[k] = v
+
+        if self.registered_arg_types:
+            output_arg_types = OrderedDict()
+            for register_name in sorted(list(self.registered_arg_types.keys())):
+                if ctx.is_output_arg_type(register_name):
+                    continue
+                arg_types = self.registered_arg_types[register_name]
+                if len(arg_types) == 1:
+                    continue
+                # TODO: checkout arg_types are same
+                arg_type = [*arg_types.values()][0]
+                ctx.set_art_type_reference_format(False)
+                k, v = arg_type.to_config(ctx)
+                output_arg_types[k] = v
+                ctx.unset_art_type_reference_format()
+                ctx.add_output_arg_type(register_name)
+            if len(output_arg_types) > 0:
+                value['argument_types'] = output_arg_types
 
         if self.sub_commands:
             sub_commands = OrderedDict()

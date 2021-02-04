@@ -21,6 +21,7 @@ from azdev.operations.translator.argument import AZDevTransArgument
 from azdev.operations.translator.command import AZDevTransCommand
 from azdev.operations.translator.command_group import AZDevTransCommandGroup
 from azdev.operations.translator.utilities import ConfigurationCtx
+from azdev.operations.translator.arg_type import AZDevTransArgTypeInstance
 
 logger = get_logger(__name__)
 
@@ -152,6 +153,14 @@ class AZDevTransModuleParser(CLICommandsLoader):
                 self._add_sub_command_groups(parent_group=group, prefix=sub_prefix)
                 self._add_sub_commands(parent_group=group, prefix=sub_prefix)
 
+        registered_arg_types = parent_group.registered_arg_types
+        for sub_command_name, sub_command_group in parent_group.sub_groups.items():
+            for register_name, arg_types in sub_command_group.registered_arg_types.items():
+                if register_name not in registered_arg_types:
+                    registered_arg_types[register_name] = {}
+                arg_type = [*arg_types.values()][0]
+                registered_arg_types[register_name][sub_command_name] = arg_type
+
     def _add_sub_commands(self, parent_group, prefix):
         for full_name in self.command_table:
             key_words = full_name.split()
@@ -164,6 +173,14 @@ class AZDevTransModuleParser(CLICommandsLoader):
                 )
                 self._add_sub_arguments(command=command, table_instance=table_instance)
                 parent_group.sub_commands[name] = command
+
+        registered_arg_types = parent_group.registered_arg_types
+        for sub_command_name, sub_command in parent_group.sub_commands.items():
+            for register_name, arg_types in sub_command.registered_arg_types.items():
+                if register_name not in registered_arg_types:
+                    registered_arg_types[register_name] = {}
+                arg_type = [*arg_types.values()][0]
+                registered_arg_types[register_name][sub_command_name] = arg_type
 
     def _add_sub_arguments(self, command, table_instance):
 
@@ -184,6 +201,14 @@ class AZDevTransModuleParser(CLICommandsLoader):
             if arg_name in ['cmd', 'properties_to_set', 'properties_to_add', 'properties_to_remove', 'force_string', 'no_wait', '_cache']:
                 continue
             command.sub_arguments[arg_name] = AZDevTransArgument(arg_name, parent_command=command, table_instance=arg)
+
+        registered_arg_types = command.registered_arg_types
+        for arg_name, arg in command.sub_arguments.items():
+            if arg.arg_type is not None and isinstance(arg.arg_type, AZDevTransArgTypeInstance):
+                arg_type = arg.arg_type
+                if arg_type.register_name not in registered_arg_types:
+                    registered_arg_types[arg_type.register_name] = {}
+                registered_arg_types[arg_type.register_name][arg_name] = arg_type
 
 
 def generate_commands_config(mod_name, output_path=None, overwrite=False, profile='latest', is_extension=False):
@@ -258,20 +283,20 @@ def write_configuration(data, file_name, mod_path, output_dir, profile, overwrit
     # print("Output File Success: {}".format(yaml_path))
 
 
-if __name__ == "__main__":
-    def _get_all_mod_names():
-        cli_path = get_cli_repo_path()
-        command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
-        my_list = os.listdir(command_modules_dir)
-        print(my_list)
-        mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
-                     and not mod_name.startswith('__')]
-        return mod_names
-
-    mod_names = _get_all_mod_names()
-    values = set()
-    for mod_name in mod_names:
-        if mod_name in ['keyvault', 'batch']:
-            continue
-        print(mod_name)
-        generate_commands_config(mod_name)
+# if __name__ == "__main__":
+#     def _get_all_mod_names():
+#         cli_path = get_cli_repo_path()
+#         command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
+#         my_list = os.listdir(command_modules_dir)
+#         print(my_list)
+#         mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
+#                      and not mod_name.startswith('__')]
+#         return mod_names
+#
+#     mod_names = _get_all_mod_names()
+#     values = set()
+#     for mod_name in mod_names:
+#         if mod_name in ['keyvault', 'batch']:
+#             continue
+#         print(mod_name)
+#         generate_commands_config(mod_name)
