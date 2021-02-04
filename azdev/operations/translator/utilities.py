@@ -3,6 +3,9 @@ from knack.cli import CLI
 from collections import OrderedDict
 from six import string_types
 import json
+from enum import Enum
+from collections.abc import KeysView, ValuesView
+import inspect
 
 
 class _MockCliCtx:
@@ -142,11 +145,20 @@ class AZDevTransValidator(AZDevTransNode):
         return key, value
 
 
-def process_factory_kwargs(factory_kwargs, convert_cli_ctx=True):
+def process_factory_kwargs(factory_kwargs, convert_cli_ctx=True, convert_enum=True):
     kwargs = {}
     for k, v in factory_kwargs.items():
         if isinstance(v, CLI) and convert_cli_ctx:
             v = '$cli_ctx'
+        elif convert_enum and isinstance(v, type) and issubclass(v, Enum):
+            v = {
+                '_type': 'Enum',
+                'module': v.__module__,
+                'name': v.__name__
+            }
+        elif isinstance(v, KeysView):
+            # TODO: Not support this. Handle TYPE_CLIENT_MAPPING to enum
+            v = list(v)
         kwargs[k] = v
     try:
         json.dumps(kwargs)

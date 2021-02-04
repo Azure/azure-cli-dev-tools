@@ -2,7 +2,7 @@ from knack.arguments import IgnoreAction
 from collections import OrderedDict
 from azdev.operations.translator.utilities import AZDevTransDeprecateInfo, AZDevTransValidator, AZDevTransNode
 import argparse
-from azdev.operations.translator.arg_type import AZDevTransArgType
+from azdev.operations.translator.arg_type import build_arg_type
 from .help import build_argument_help
 from .options import build_argument_options_list
 from .action import build_argument_action
@@ -218,9 +218,7 @@ class AZDevTransArgument(AZDevTransNode):
 
     def _parse_arg_type(self, type_settings):
         arg_type = type_settings.get('_arg_type', None)
-        if arg_type is not None:
-            arg_type = AZDevTransArgType(arg_type)
-        self.arg_type = arg_type
+        self.arg_type = build_arg_type(arg_type)
 
     def to_config(self, ctx):
         key = self.name
