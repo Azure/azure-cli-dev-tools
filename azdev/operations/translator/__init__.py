@@ -122,15 +122,15 @@ class AZDevTransModuleParser(CLICommandsLoader):
         self._add_sub_commands(parent_group=root, prefix='')
         return root
 
-    def convert_commands_to_config(self, root):
-        ctx = ConfigurationCtx()
-        k, v = root.to_config(ctx)
+    def convert_commands_to_config(self, root, ctx):
         config = OrderedDict()
+        if ctx.imports:
+            config['imports'] = ctx.imports
+        k, v = root.to_config(ctx)
         config[k] = v
         return config
 
-    def convert_examples_to_config(self, root):
-        ctx = ConfigurationCtx()
+    def convert_examples_to_config(self, root, ctx):
         k, v = root.to_example_config(ctx)
         config = OrderedDict()
         config[k] = v
@@ -216,8 +216,28 @@ def generate_commands_config(mod_name, output_path=None, overwrite=False, profil
     parser = AZDevTransModuleParser(profile=profile)
     parser.load_module(module)
     root = parser.build_commands_tree()
-    commands_config = parser.convert_commands_to_config(root)
-    examples_config = parser.convert_examples_to_config(root)
+    imports = {
+        'get_three_state_action': 'azure.cli.core.commands.parameters#get_three_state_action',
+        'get_three_state_flag': 'azure.cli.core.commands.parameters#get_three_state_flag',
+        'get_enum_type': 'azure.cli.core.commands.parameters#get_enum_type',
+        'EnumAction': 'azure.cli.core.commands.parameters#EnumAction',
+        'FilesCompleter': 'azure.cli.core.translator.completer#FilesCompleter',
+        'file_type': 'azure.cli.core.commands.parameters#file_type',
+        'get_location_type': 'azure.cli.core.commands.parameters#get_location_type',
+        'get_resource_name_completion_list': 'azure.cli.core.commands.parameters#get_resource_name_completion_list',
+        'get_default_location_from_resource_group': 'azure.cli.core.commands.validators#get_default_location_from_resource_group',
+        'get_location_completion_list': 'azure.cli.core.commands.parameters#get_location_completion_list',
+        'get_location_name_type': 'azure.cli.core.commands.parameters#get_location_name_type',
+        'deployment_validate_table_format': 'azure.cli.core.commands.arm#deployment_validate_table_format',
+        'handle_template_based_exception': 'azure.cli.core.commands.arm#handle_template_based_exception',
+        'json_object_type': 'azure.cli.core.commands.parameters#json_object_type',
+        'get_resource_group_completion_list': 'azure.cli.core.commands.parameters#get_resource_group_completion_list',
+        'validate_tags': 'azure.cli.core.commands.validators#validate_tags'
+    }
+    ctx = ConfigurationCtx(module=module, imports=imports)
+    commands_config = parser.convert_commands_to_config(root, ctx)
+    ctx = ConfigurationCtx(module=module)
+    examples_config = parser.convert_examples_to_config(root, ctx)
     write_configuration(commands_config, 'commands', mod_path, output_path, profile, overwrite)
     write_configuration(examples_config, 'examples', mod_path, output_path, profile, overwrite)
 

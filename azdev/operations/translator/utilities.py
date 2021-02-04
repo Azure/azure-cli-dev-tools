@@ -20,9 +20,13 @@ class _MockCliCtx:
 
 class ConfigurationCtx:
 
-    def __init__(self):
+    def __init__(self, module, imports=None):
         self._arg_type_reference_format_queue = []
         self._output_arg_types = set()
+        self._module_name = module.__name__
+        self.imports = imports or {}
+        self._reversed_imports = dict([(v, k) for k, v in self.imports.items()])
+        assert len(self.imports) == len(self._reversed_imports)
 
     def set_art_type_reference_format(self, to_reference_format):
         assert isinstance(to_reference_format, bool)
@@ -51,7 +55,10 @@ class ConfigurationCtx:
         return register_name in self._output_arg_types
 
     def simplify_import_path(self, path):
-        # TODO: FIXME
+        if path in self._reversed_imports:
+            path = '${}'.format(self._reversed_imports[path])
+        elif path.startswith(self._module_name):
+            path = path.replace(self._module_name, '')
         return path
 
     def get_enum_inport_path(self, module_name, name):

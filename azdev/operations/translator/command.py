@@ -499,6 +499,7 @@ class AZDevTransCommand(AZDevTransNode):
                 if ctx.is_output_arg_type(register_name):
                     continue
                 arg_types = self.registered_arg_types[register_name]
+                # TODO: checkout arg_types are same
                 arg_type = [*arg_types.values()][0]
                 ctx.set_art_type_reference_format(False)
                 k, v = arg_type.to_config(ctx)
