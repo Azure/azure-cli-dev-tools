@@ -185,12 +185,6 @@ class AZDevTransModuleParser(CLICommandsLoader):
             if arg_name in ['cmd', 'properties_to_set', 'properties_to_add', 'properties_to_remove', 'force_string', 'no_wait', '_cache']:
                 continue
             command.sub_arguments[arg_name] = AZDevTransArgument(arg_name, parent_command=command, table_instance=arg)
-            # try:
-            #     command.sub_arguments[arg_name] = AZDevTransArgument(arg_name, parent_command=command, table_instance=arg)
-            # except Exception as ex:
-            #     raise CLIError("Parse argument '{}' failed for command '{}': {}".format(
-            #         arg_name, command.full_name, ex
-            #     ))
 
 
 def generate_commands_config(mod_name, output_path=None, overwrite=False, profile='latest', is_extension=False):
@@ -198,8 +192,8 @@ def generate_commands_config(mod_name, output_path=None, overwrite=False, profil
     parser = AZDevTransModuleParser(profile=profile)
     parser.load_module(module)
     root = parser.build_commands_tree()
-    commands_config = parser.convert_commands_to_config(root)
-    examples_config = parser.convert_examples_to_config(root)
+    # commands_config = parser.convert_commands_to_config(root)
+    # examples_config = parser.convert_examples_to_config(root)
     # write_configuration(commands_config, 'commands', mod_path, output_path, profile, overwrite)
     # write_configuration(examples_config, 'examples', mod_path, output_path, profile, overwrite)
 
@@ -264,20 +258,20 @@ def write_configuration(data, file_name, mod_path, output_dir, profile, overwrit
     print("Output File Success: {}".format(yaml_path))
 
 
-# if __name__ == "__main__":
-#     def _get_all_mod_names():
-#         cli_path = get_cli_repo_path()
-#         command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
-#         my_list = os.listdir(command_modules_dir)
-#         print(my_list)
-#         mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
-#                      and not mod_name.startswith('__')]
-#         return mod_names
-#
-#     mod_names = _get_all_mod_names()
-#     values = set()
-#     for mod_name in mod_names:
-#         if mod_name in ['keyvault', 'batch']:
-#             continue
-#         print(mod_name)
-#         generate_commands_config(mod_name)
+if __name__ == "__main__":
+    def _get_all_mod_names():
+        cli_path = get_cli_repo_path()
+        command_modules_dir = os.path.join(cli_path, 'src', 'azure-cli', 'azure', 'cli', 'command_modules')
+        my_list = os.listdir(command_modules_dir)
+        print(my_list)
+        mod_names = [mod_name for mod_name in my_list if os.path.isdir(os.path.join(command_modules_dir, mod_name))
+                     and not mod_name.startswith('__')]
+        return mod_names
+
+    mod_names = _get_all_mod_names()
+    values = set()
+    for mod_name in mod_names:
+        if mod_name in ['keyvault', 'batch']:
+            continue
+        print(mod_name)
+        generate_commands_config(mod_name)

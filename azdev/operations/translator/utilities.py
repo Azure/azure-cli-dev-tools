@@ -1,4 +1,5 @@
 from knack.deprecation import Deprecated
+from knack.cli import CLI
 from collections import OrderedDict
 from six import string_types
 import json
@@ -140,3 +141,15 @@ class AZDevTransValidator(AZDevTransNode):
             raise NotImplementedError()
         return key, value
 
+
+def process_factory_kwargs(factory_kwargs, convert_cli_ctx=True):
+    kwargs = {}
+    for k, v in factory_kwargs.items():
+        if isinstance(v, CLI) and convert_cli_ctx:
+            v = '$cli_ctx'
+        kwargs[k] = v
+    try:
+        json.dumps(kwargs)
+    except Exception:
+        raise TypeError('factory kwargs cannot dump to json')
+    return kwargs

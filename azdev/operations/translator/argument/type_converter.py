@@ -1,0 +1,77 @@
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+from collections import OrderedDict
+from azdev.operations.translator.utilities import AZDevTransNode, process_factory_kwargs
+
+
+class AZDevTransArgumentTypeConverter(AZDevTransNode):
+    key = 'type'
+
+    def __init__(self, converter):
+        self.converter = converter
+
+    def to_config(self, ctx):
+        raise NotImplementedError()
+
+
+class AZDevTransArgumentBuildInTypeConverter(AZDevTransArgumentTypeConverter):
+
+    def __init__(self, converter):
+        if converter not in (str, int, float, bool):
+            raise TypeError('Expect str, int, float or bool, Got "{}"'.format(converter))
+        super(AZDevTransArgumentBuildInTypeConverter, self).__init__(converter)
+
+    def to_config(self, ctx):
+        value = str(self.converter)
+        return self.key, value
+
+
+class AZDevTransArgumentFuncTypeConverter(AZDevTransArgumentTypeConverter):
+
+    def __init__(self, converter):
+        from azure.cli.core.translator.type_converter import AzFuncTypeConverter
+        if not isinstance(converter, AzFuncTypeConverter):
+            raise TypeError('Expect AzFuncTypeConverter, Got "{}"'.format(converter))
+        super(AZDevTransArgumentFuncTypeConverter, self).__init__(converter)
+        self.import_module = converter.import_module
+        self.import_name = converter.import_name
+
+    def to_config(self, ctx):
+        value = ctx.get_import_path(self.import_module, self.import_name)
+        return self.key, value
+
+
+class AZDevTransArgumentFuncTypeConverterByFactory(AZDevTransArgumentTypeConverter):
+
+    def __init__(self, converter):
+        from azure.cli.core.translator.type_converter import AzFuncTypeConverterByFactory
+        if not isinstance(converter, AzFuncTypeConverterByFactory):
+            raise TypeError('Expect AzFuncTypeConverterByFactory, Got "{}"'.format(converter))
+        super(AZDevTransArgumentFuncTypeConverterByFactory, self).__init__(converter)
+        self.import_module = converter.import_module
+        self.import_name = converter.import_name
+        self.kwargs = process_factory_kwargs(converter.kwargs)
+
+    def to_config(self, ctx):
+        value = OrderedDict()
+        value['factory'] = ctx.get_import_path(self.import_module, self.import_name)
+        kwargs = OrderedDict()
+        for k in sorted(list(self.kwargs.keys())):
+            kwargs[k] = self.kwargs[k]
+        value['kwargs'] = kwargs
+        return self.key, value
+
+
+def build_argument_type_converter(converter):
+    from azure.cli.core.translator.type_converter import AzFuncTypeConverter, AzFuncTypeConverterByFactory
+    if converter is None:
+        return None
+    if converter in (str, int, float, bool):
+        return AZDevTransArgumentBuildInTypeConverter(converter)
+    elif isinstance(converter, AzFuncTypeConverter):
+        return AZDevTransArgumentFuncTypeConverter(converter)
+    elif isinstance(converter, AzFuncTypeConverterByFactory):
+        return AZDevTransArgumentFuncTypeConverterByFactory(converter)
+
