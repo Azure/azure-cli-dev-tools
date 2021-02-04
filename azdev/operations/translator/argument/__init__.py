@@ -224,61 +224,105 @@ class AZDevTransArgument(AZDevTransNode):
         key = self.name
         value = OrderedDict()
 
+        arg_type_values = {}
         if not self.is_ignore and self.arg_type:
             ctx.set_art_type_reference_format(False)
+            _, arg_type_values = self.arg_type.to_config(ctx)
+            ctx.set_art_type_reference_format(True)
             k, v = self.arg_type.to_config(ctx)
             value[k] = v
+            ctx.unset_art_type_reference_format()
             ctx.unset_art_type_reference_format()
 
         if self.deprecate_info:
             k, v = self.deprecate_info.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.is_preview:
-            value['preview'] = self.is_preview
+            k = 'preview'
+            v = self.is_preview
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.is_experimental:
-            value['experimental'] = self.is_experimental
-
+            k = 'experimental'
+            v = self.is_experimental
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.min_api:
-            value['min-api'] = self.min_api
+            k = 'min-api'
+            v = self.min_api
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.max_api:
-            value['max-api'] = self.max_api
+            k = 'max-api'
+            v = self.max_api
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
 
         if self.is_ignore:
-            value['ignore'] = True
+            k = 'ignore'
+            v = True
+            value[k] = v
             return key, value
 
         if self.options_list:
             k, v = self.options_list.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
+
         if self.help:
             k, v = self.help.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
 
         if self.id_part:
-            value['id-part'] = self.id_part
+            k = 'id-part'
+            v = self.id_part
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.arg_group:
-            value['arg-group'] = self.arg_group
+            k = 'arg-group'
+            v = self.arg_group
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.nargs:
-            value['nargs'] = self.nargs
+            k = 'nargs'
+            v = self.nargs
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.required:
-            value['required'] = self.required
+            k = 'required'
+            v = self.required
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.choices:
-            value['choices'] = self.choices
+            k = 'choices'
+            v = self.choices
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.default:
-            value['default'] = self.default
+            k = 'default'
+            v = self.default
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.action:
             k, v = self.action.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.validator:
             k, v = self.validator.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.completer:
             k, v = self.completer.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.local_context_attribute:
             k, v = self.local_context_attribute.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.type_converter:
             k, v = self.type_converter.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         return key, value

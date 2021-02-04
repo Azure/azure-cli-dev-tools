@@ -3,9 +3,8 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
-from .utilities import AZDevTransNode, process_factory_kwargs
 from collections import OrderedDict
-from azdev.operations.translator.utilities import AZDevTransDeprecateInfo, AZDevTransValidator, AZDevTransNode
+from azdev.operations.translator.utilities import AZDevTransDeprecateInfo, AZDevTransValidator, AZDevTransNode, process_factory_kwargs
 
 
 class AZDevTransArgType(AZDevTransNode):
@@ -37,7 +36,14 @@ class AZDevTransArgTypeByFactory(AZDevTransArgType):
         value['factory'] = ctx.get_import_path(self.import_module, self.import_name)
         kwargs = OrderedDict()
         for k in sorted(list(self.kwargs.keys())):
-            kwargs[k] = self.kwargs[k]
+            v = self.kwargs[k]
+            if isinstance(v, dict):
+                if '_type' in v:
+                    if v['_type'] == 'Enum':
+                        v = ctx.get_enum_inport_path(module_name=v['module'], name=v['name'])
+                    else:
+                        raise NotImplementedError()
+            kwargs[k] = v
         value['kwargs'] = kwargs
         return self.key, value
 
@@ -247,13 +253,21 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
             k, v = self.deprecate_info.to_config(ctx)
             value[k] = v
         if self.is_preview:
-            value['preview'] = self.is_preview
+            k = 'preview'
+            v = self.is_preview
+            value[k] = v
         if self.is_experimental:
-            value['experimental'] = self.is_experimental
+            k = 'experimental'
+            v = self.is_experimental
+            value[k] = v
         if self.min_api:
-            value['min-api'] = self.min_api
+            k = 'min-api'
+            v = self.min_api
+            value[k] = v
         if self.max_api:
-            value['max-api'] = self.max_api
+            k = 'max-api'
+            v = self.max_api
+            value[k] = v
 
         if self.options_list:
             k, v = self.options_list.to_config(ctx)
@@ -263,17 +277,29 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
             value[k] = v
 
         if self.id_part:
-            value['id-part'] = self.id_part
+            k = 'id-part'
+            v = self.id_part
+            value[k] = v
         if self.arg_group:
-            value['arg-group'] = self.arg_group
+            k = 'arg-group'
+            v = self.arg_group
+            value[k] = v
         if self.nargs:
-            value['nargs'] = self.nargs
+            k = 'nargs'
+            v = self.nargs
+            value[k] = v
         if self.required:
-            value['required'] = self.required
+            k = 'required'
+            v = self.required
+            value[k] = v
         if self.choices:
-            value['choices'] = self.choices
+            k = 'choices'
+            v = self.choices
+            value[k] = v
         if self.default:
-            value['default'] = self.default
+            k = 'default'
+            v = self.default
+            value[k] = v
         if self.action:
             k, v = self.action.to_config(ctx)
             value[k] = v

@@ -47,6 +47,11 @@ class ConfigurationCtx:
         # TODO: FIXME
         return path
 
+    def get_enum_inport_path(self, module_name, name):
+        # TODO: Checkout module_name
+        path = name
+        return path
+
 
 class AZDevTransNode:
 
