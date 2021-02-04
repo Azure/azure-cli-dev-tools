@@ -7,7 +7,6 @@
 import importlib
 import os
 from collections import defaultdict, OrderedDict
-import yaml
 import json
 
 from knack.cli import CLI
@@ -192,10 +191,10 @@ def generate_commands_config(mod_name, output_path=None, overwrite=False, profil
     parser = AZDevTransModuleParser(profile=profile)
     parser.load_module(module)
     root = parser.build_commands_tree()
-    # commands_config = parser.convert_commands_to_config(root)
-    # examples_config = parser.convert_examples_to_config(root)
-    # write_configuration(commands_config, 'commands', mod_path, output_path, profile, overwrite)
-    # write_configuration(examples_config, 'examples', mod_path, output_path, profile, overwrite)
+    commands_config = parser.convert_commands_to_config(root)
+    examples_config = parser.convert_examples_to_config(root)
+    write_configuration(commands_config, 'commands', mod_path, output_path, profile, overwrite)
+    write_configuration(examples_config, 'examples', mod_path, output_path, profile, overwrite)
 
 
 def _get_extension_module_input_name(ext_dir):
@@ -244,18 +243,19 @@ def write_configuration(data, file_name, mod_path, output_dir, profile, overwrit
     ensure_dir(os.path.dirname(output_path))
 
     json_path = "{}.json".format(output_path)
-    yaml_path = "{}.yaml".format(output_path)
     if os.path.exists(json_path) and not overwrite:
         raise CLIError("{} file {} already exists.".format(json_path))
-    if os.path.exists(yaml_path) and not overwrite:
-        raise CLIError("{} file {} already exists.".format(yaml_path))
     with open(json_path, 'w') as fw:
         json.dump(data, fw, indent=2)
     print("Output File Success: {}".format(json_path))
-    with open(json_path, 'r') as fr:
-        with open(yaml_path, 'w') as fw:
-            yaml.dump(json.load(fr), fw)
-    print("Output File Success: {}".format(yaml_path))
+
+    # yaml_path = "{}.yaml".format(output_path)
+    # if os.path.exists(yaml_path) and not overwrite:
+    #     raise CLIError("{} file {} already exists.".format(yaml_path))
+    # with open(json_path, 'r') as fr:
+    #     with open(yaml_path, 'w') as fw:
+    #         yaml.dump(json.load(fr), fw)
+    # print("Output File Success: {}".format(yaml_path))
 
 
 if __name__ == "__main__":

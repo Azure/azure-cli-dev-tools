@@ -15,7 +15,7 @@ class AZDevTransArgType(AZDevTransNode):
         from azure.cli.core.translator.arg_type import AzArgType
         if not isinstance(arg_type, AzArgType):
             raise TypeError('Expect AzArgType type, Got "{}"'.format(type(arg_type)))
-        self.arg_type = arg_type
+        self._arg_type = arg_type
 
     def to_config(self, ctx):
         raise NotImplementedError()
@@ -53,6 +53,7 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
         self.register_name = arg_type.register_name
 
         type_settings = arg_type.settings
+        self._parse_arg_type(type_settings)
 
         self._parse_deprecate_info(type_settings)
         self._parse_is_preview(type_settings)
@@ -221,12 +222,75 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
     def _parse_arg_type(self, type_settings):
         arg_type = type_settings.get('arg_type', None)
         self.arg_type = build_arg_type(arg_type)
-        if isinstance(self.arg_type, AZDevTransArgTypeInstance):
-            print(self.arg_type)
+        if self.arg_type is not None and not isinstance(self.arg_type, AZDevTransArgTypeByFactory):
+            raise TypeError("Expect AzArgTypeByFactory type, Got '{}'".format(self.arg_type))
 
     def to_config(self, ctx):
-        # TODO:
-        return self.key, None
+        reference_format = ctx.art_type_reference_format
+        if reference_format:
+            value = "${}".format(self.register_name)
+            return self.key, value
+
+        value = OrderedDict()
+        if self.dest:
+            value['dest'] = self.dest
+
+        if self.arg_type:
+            if not isinstance(self.arg_type, AZDevTransArgTypeByFactory):
+                raise TypeError("Expect AzArgTypeByFactory type, Got '{}'".format(self.arg_type))
+            ctx.set_art_type_reference_format(False)
+            k, v = self.arg_type.to_config(ctx)
+            value[k] = v
+            ctx.unset_art_type_reference_format()
+
+        if self.deprecate_info:
+            k, v = self.deprecate_info.to_config(ctx)
+            value[k] = v
+        if self.is_preview:
+            value['preview'] = self.is_preview
+        if self.is_experimental:
+            value['experimental'] = self.is_experimental
+        if self.min_api:
+            value['min-api'] = self.min_api
+        if self.max_api:
+            value['max-api'] = self.max_api
+
+        if self.options_list:
+            k, v = self.options_list.to_config(ctx)
+            value[k] = v
+        if self.help:
+            k, v = self.help.to_config(ctx)
+            value[k] = v
+
+        if self.id_part:
+            value['id-part'] = self.id_part
+        if self.arg_group:
+            value['arg-group'] = self.arg_group
+        if self.nargs:
+            value['nargs'] = self.nargs
+        if self.required:
+            value['required'] = self.required
+        if self.choices:
+            value['choices'] = self.choices
+        if self.default:
+            value['default'] = self.default
+        if self.action:
+            k, v = self.action.to_config(ctx)
+            value[k] = v
+        if self.validator:
+            k, v = self.validator.to_config(ctx)
+            value[k] = v
+        if self.completer:
+            k, v = self.completer.to_config(ctx)
+            value[k] = v
+        if self.local_context_attribute:
+            k, v = self.local_context_attribute.to_config(ctx)
+            value[k] = v
+        if self.type_converter:
+            k, v = self.type_converter.to_config(ctx)
+            value[k] = v
+
+        return self.key, value
 
 
 def build_arg_type(arg_type):

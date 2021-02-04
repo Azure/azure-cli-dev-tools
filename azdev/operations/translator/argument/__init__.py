@@ -223,6 +223,13 @@ class AZDevTransArgument(AZDevTransNode):
     def to_config(self, ctx):
         key = self.name
         value = OrderedDict()
+
+        if not self.is_ignore and self.arg_type:
+            ctx.set_art_type_reference_format(False)
+            k, v = self.arg_type.to_config(ctx)
+            value[k] = v
+            ctx.unset_art_type_reference_format()
+
         if self.deprecate_info:
             k, v = self.deprecate_info.to_config(ctx)
             value[k] = v

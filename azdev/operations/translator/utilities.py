@@ -5,7 +5,6 @@ from six import string_types
 import json
 from enum import Enum
 from collections.abc import KeysView, ValuesView
-import inspect
 
 
 class _MockCliCtx:
@@ -22,7 +21,23 @@ class _MockCliCtx:
 class ConfigurationCtx:
 
     def __init__(self):
+        self._arg_type_reference_format_queue = []
         pass
+
+    def set_art_type_reference_format(self, to_reference_format):
+        assert isinstance(to_reference_format, bool)
+        self._arg_type_reference_format_queue.append(to_reference_format)
+
+    @property
+    def art_type_reference_format(self):
+        if len(self._arg_type_reference_format_queue) > 0:
+            return self._arg_type_reference_format_queue[-1]
+        else:
+            raise ValueError('arg_type_reference_format_queue is empty')
+
+    def unset_art_type_reference_format(self):
+        if len(self._arg_type_reference_format_queue) > 0:
+            self._arg_type_reference_format_queue.pop()
 
     def get_import_path(self, module_name, name):
         path = "{}#{}".format(module_name, name)
