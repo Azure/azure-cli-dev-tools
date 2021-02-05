@@ -22,6 +22,7 @@ from azdev.operations.translator.command import AZDevTransCommand
 from azdev.operations.translator.command_group import AZDevTransCommandGroup
 from azdev.operations.translator.utilities import ConfigurationCtx
 from azdev.operations.translator.arg_type import AZDevTransArgTypeInstance
+import datetime
 
 logger = get_logger(__name__)
 
@@ -124,6 +125,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
 
     def convert_commands_to_config(self, root, ctx):
         config = OrderedDict()
+        config['created'] = str(datetime.datetime.now())
         if ctx.imports:
             config['imports'] = ctx.imports
         k, v = root.to_config(ctx)
@@ -133,6 +135,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
     def convert_examples_to_config(self, root, ctx):
         k, v = root.to_example_config(ctx)
         config = OrderedDict()
+        config['created'] = str(datetime.datetime.now())
         config[k] = v
         return config
 
