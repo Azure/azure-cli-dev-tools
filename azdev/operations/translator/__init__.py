@@ -17,9 +17,9 @@ from knack.arguments import ArgumentRegistry
 
 from azdev.operations.extensions import list_extensions
 from azdev.utilities import get_cli_repo_path
-from azdev.operations.translator.argument import AZDevTransArgument
-from azdev.operations.translator.command import AZDevTransCommand
-from azdev.operations.translator.command_group import AZDevTransCommandGroup
+from azdev.operations.translator.argument import build_argument
+from azdev.operations.translator.command import build_command
+from azdev.operations.translator.command_group import build_command_group
 from azdev.operations.translator.utilities import ConfigurationCtx
 from azdev.operations.translator.arg_type import AZDevTransArgTypeInstance
 import datetime
@@ -118,7 +118,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
         return command_table, command_loader.command_group_table, command_loader
 
     def build_commands_tree(self):
-        root = AZDevTransCommandGroup(name='az', full_name='', parent_group=None, table_instance=None)
+        root = build_command_group(name='az', full_name='', parent_group=None, table_instance=None)
         self._add_sub_command_groups(parent_group=root, prefix='')
         self._add_sub_commands(parent_group=root, prefix='')
         return root
@@ -147,7 +147,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
 
             if prefix == ' '.join(key_words[:-1]):
                 name = key_words[-1]
-                group = AZDevTransCommandGroup(
+                group = build_command_group(
                     name=name, parent_group=parent_group, full_name=full_name,
                     table_instance=self.command_group_table[full_name]
                 )
@@ -170,7 +170,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
             if prefix == ' '.join(key_words[:-1]):
                 name = key_words[-1]
                 table_instance = self.command_table[full_name]
-                command = AZDevTransCommand(
+                command = build_command(
                     name=name, parent_group=parent_group, full_name=full_name,
                     table_instance=table_instance
                 )
@@ -203,7 +203,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
         for arg_name, arg in command_args.items():
             if arg_name in ['cmd', 'properties_to_set', 'properties_to_add', 'properties_to_remove', 'force_string', 'no_wait', '_cache']:
                 continue
-            command.sub_arguments[arg_name] = AZDevTransArgument(arg_name, parent_command=command, table_instance=arg)
+            command.sub_arguments[arg_name] = build_argument(arg_name, parent_command=command, table_instance=arg)
 
         registered_arg_types = command.registered_arg_types
         for arg_name, arg in command.sub_arguments.items():

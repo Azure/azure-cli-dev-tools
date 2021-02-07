@@ -3,7 +3,8 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 from knack.deprecation import Deprecated
-from azdev.operations.translator.utilities import AZDevTransDeprecateInfo, AZDevTransNode
+from azdev.operations.translator.utilities import build_deprecate_info, AZDevTransNode
+from azdev.operations.translator.utilities.deprecate_info import AZDevTransDeprecateInfo
 
 
 class AZDevTransArgumentOptions(AZDevTransNode):
@@ -16,7 +17,7 @@ class AZDevTransArgumentOptions(AZDevTransNode):
             if not isinstance(option, str):
                 if not isinstance(option, Deprecated):
                     raise TypeError('Expect Deprecated. Got "{}"'.format(type(option)))
-                option = AZDevTransDeprecateInfo(option)
+                option = build_deprecate_info(option)
                 option_str = option.target
             else:
                 option_str = option

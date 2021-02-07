@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 from collections import OrderedDict
-from azdev.operations.translator.utilities import AZDevTransNode, process_factory_kwargs
+from azdev.operations.translator.utilities import AZDevTransNode
 
 
 class AZDevTransArgumentCompleter(AZDevTransNode):
@@ -43,7 +43,7 @@ class AZDevTransArgumentFuncCompleterByFactory(AZDevTransArgumentCompleter):
         super(AZDevTransArgumentFuncCompleterByFactory, self).__init__(completer)
         self.import_module = completer.import_module
         self.import_name = completer.import_name
-        self.kwargs = process_factory_kwargs(completer.kwargs)
+        self.kwargs = self.process_factory_kwargs(completer.kwargs)
 
     def to_config(self, ctx):
         value = OrderedDict()
@@ -64,7 +64,7 @@ class AZDevTransArgumentExternalCompleterByFactory(AZDevTransArgumentCompleter):
         super(AZDevTransArgumentExternalCompleterByFactory, self).__init__(completer)
         self.import_module = completer.import_module
         self.import_name = completer.import_name
-        self.kwargs = process_factory_kwargs(completer.kwargs)
+        self.kwargs = self.process_factory_kwargs(completer.kwargs)
 
     def to_config(self, ctx):
         value = OrderedDict()

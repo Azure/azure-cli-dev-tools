@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 from collections import OrderedDict
-from azdev.operations.translator.utilities import AZDevTransNode, process_factory_kwargs
+from azdev.operations.translator.utilities import AZDevTransNode
 
 
 class AZDevTransArgumentTypeConverter(AZDevTransNode):
@@ -52,7 +52,7 @@ class AZDevTransArgumentFuncTypeConverterByFactory(AZDevTransArgumentTypeConvert
         super(AZDevTransArgumentFuncTypeConverterByFactory, self).__init__(converter)
         self.import_module = converter.import_module
         self.import_name = converter.import_name
-        self.kwargs = process_factory_kwargs(converter.kwargs)
+        self.kwargs = self.process_factory_kwargs(converter.kwargs)
 
     def to_config(self, ctx):
         value = OrderedDict()

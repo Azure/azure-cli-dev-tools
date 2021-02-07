@@ -2,64 +2,35 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
-
+from knack.arguments import IgnoreAction
 from collections import OrderedDict
 from azdev.operations.translator.utilities import build_deprecate_info, build_validator, AZDevTransNode
+import argparse
+from azdev.operations.translator.arg_type import build_arg_type
+from ._help import build_argument_help
+from ._options import build_argument_options_list
+from ._action import build_argument_action
+from ._completer import build_argument_completer
+from ._type_converter import build_argument_type_converter
+from ._local_context_attribute import build_argument_local_context_attribute
 
 
-class AZDevTransArgType(AZDevTransNode):
-    key = 'arg_type'
+class AZDevTransArgument(AZDevTransNode):
+    # supported: 'deprecate_info', 'is_preview', 'is_experimental', 'dest', 'help', 'options_list', 'action', 'arg_group', 'arg_type', 'choices', 'default', 'completer', 'configured_default', 'const', 'id_part', 'local_context_attribute', 'max_api', 'min_api', 'nargs',  'required', 'type', 'validator'
+    # ignored: 'metavar', 'operation_group', 'resource_type', 'dest'
+    # invalid: 'option_list', 'metave', ' FilesCompleter'
+    # TODO CHECK: option_strings, default_value_source, custom_command_type, command_type
 
-    def __init__(self, arg_type):
-        from azure.cli.core.translator.arg_type import AzArgType
-        if not isinstance(arg_type, AzArgType):
-            raise TypeError('Expect AzArgType type, Got "{}"'.format(type(arg_type)))
-        self._arg_type = arg_type
+    def __init__(self, name, parent_command, table_instance):
+        self.name = name
+        self.parent_command = parent_command
 
-    def to_config(self, ctx):
-        raise NotImplementedError()
+        type_settings = table_instance.type.settings
+        if 'arg_type' in type_settings:
+            # Block storage has_header arg_type: https://github.com/Azure/azure-cli/blob/dd891a940b3a15751ecfbf71b62a1aafb1cfe608/src/azure-cli/azure/cli/command_modules/storage/_params.py#L887
+            raise TypeError("Not support nested arg_type")
 
-
-class AZDevTransArgTypeByFactory(AZDevTransArgType):
-
-    def __init__(self, arg_type):
-        from azure.cli.core.translator.arg_type import AzArgTypeByFactory
-        if not isinstance(arg_type, AzArgTypeByFactory):
-            raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
-        super(AZDevTransArgTypeByFactory, self).__init__(arg_type)
-        self.import_module = arg_type.import_module
-        self.import_name = arg_type.import_name
-        self.kwargs = self.process_factory_kwargs(arg_type.kwargs)
-
-    def to_config(self, ctx):
-        value = OrderedDict()
-        value['factory'] = ctx.get_import_path(self.import_module, self.import_name)
-        kwargs = OrderedDict()
-        for k in sorted(list(self.kwargs.keys())):
-            v = self.kwargs[k]
-            if isinstance(v, dict):
-                if '_type' in v:
-                    if v['_type'] == 'Enum':
-                        v = ctx.get_enum_import_path(module_name=v['module'], name=v['name'])
-                    else:
-                        raise NotImplementedError()
-            kwargs[k] = v
-        value['kwargs'] = kwargs
-        return self.key, value
-
-
-class AZDevTransArgTypeInstance(AZDevTransArgType):
-
-    def __init__(self, arg_type):
-        from azure.cli.core.translator.arg_type import AzArgTypeInstance
-        if not isinstance(arg_type, AzArgTypeInstance):
-            raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
-        super(AZDevTransArgTypeInstance, self).__init__(arg_type)
-        self.import_module = arg_type.import_module
-        self.register_name = arg_type.register_name
-
-        type_settings = arg_type.settings
-        self._parse_arg_type(type_settings)
+        self.arg_type = None
 
         self._parse_deprecate_info(type_settings)
         self._parse_is_preview(type_settings)
@@ -71,6 +42,9 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
         self._parse_max_api(type_settings)
         self._parse_min_api(type_settings)
 
+        if self._parse_is_ignore(type_settings):
+            return
+
         self._parse_options_list(type_settings)
         self._parse_arg_group(type_settings)
 
@@ -78,6 +52,7 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
         self._parse_choices(type_settings)
         self._parse_nargs(type_settings)
         self._parse_default(type_settings)
+        self._parse_arg_type(type_settings)
 
         self._parse_id_part(type_settings)
         self._parse_required(type_settings)
@@ -98,17 +73,27 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
 
     def _parse_dest(self, type_settings):
         dest = type_settings.get('dest', None)
-        self.dest = dest
+        assert dest == self.name
 
     def _parse_help(self, type_settings):
-        from azdev.operations.translator.argument import build_argument_help
         help_description = type_settings.get('help', None)
         assert help_description is None or isinstance(help_description, str)
-        help_data = dict()
+
+        help_data = {}
+        if self.options_list is None:
+            options = ['--{}'.format(self.name).replace('_', '-')]
+        else:
+            options = list(self.options_list.options.keys())
+        options = set(options)
+        for key, value in self.parent_command.parameters_help_data.items():
+            if set(key.split()).isdisjoint(options):
+                continue
+            assert not help_data
+            help_data = value
+
         self.help = build_argument_help(help_description, help_data)
 
     def _parse_options_list(self, type_settings):
-        from azdev.operations.translator.argument import build_argument_options_list
         options_list = type_settings.get('options_list', None)
         if options_list is not None and len(options_list) == 0:
             options_list = None
@@ -134,6 +119,14 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
         default = type_settings.get('default', None)
         if default == '':
             default = None
+        # TODO: custom function signature always has default value. FYI private_link_primary in network
+        # if default is not None:
+        #     if self.choices is not None:
+        #         if isinstance(default, list):
+        #             for value in default:
+        #                 assert value in self.choices
+        #         else:
+        #             assert default in self.choices
         self.default = default
 
     def _parse_configured_default(self, type_settings):
@@ -171,6 +164,12 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
         assert isinstance(is_experimental, bool)
         self.is_experimental = is_experimental
 
+    def _parse_is_ignore(self, type_settings):
+        self.is_ignore = False
+        if type_settings.get('action', None) == IgnoreAction and type_settings.get('help', None) == argparse.SUPPRESS:
+            self.is_ignore = True
+        return self.is_ignore
+
     def _parse_max_api(self, type_settings):
         max_api = type_settings.get('max_api', None)
         assert max_api is None or isinstance(max_api, str)
@@ -198,7 +197,6 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
         self.validator = build_validator(validator)
 
     def _parse_action(self, type_settings):
-        from azdev.operations.translator.argument import build_argument_action
         action = type_settings.get('action', None)
         if isinstance(action, str):
             action = action.strip()
@@ -207,125 +205,128 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
         self.action = build_argument_action(action)
 
     def _parse_completer(self, type_settings):
-        from azdev.operations.translator.argument import build_argument_completer
         completer = type_settings.get('completer', None)
         self.completer = build_argument_completer(completer)
 
     def _parse_local_context_attribute(self, type_settings):
-        from azdev.operations.translator.argument import build_argument_local_context_attribute
         local_context_attribute = type_settings.get('local_context_attribute', None)
         self.local_context_attribute = build_argument_local_context_attribute(local_context_attribute)
 
     def _parse_type_converter(self, type_settings):
-        from azdev.operations.translator.argument import build_argument_type_converter
         type_converter = type_settings.get('type', None)
         self.type_converter = build_argument_type_converter(type_converter)
 
     def _parse_arg_type(self, type_settings):
-        arg_type = type_settings.get('arg_type', None)
+        arg_type = type_settings.get('_arg_type', None)
         self.arg_type = build_arg_type(arg_type)
-        if self.arg_type is not None and not isinstance(self.arg_type, AZDevTransArgTypeByFactory):
-            raise TypeError("Expect AzArgTypeByFactory type, Got '{}'".format(self.arg_type))
 
     def to_config(self, ctx):
-        reference_format = ctx.art_type_reference_format
-        if reference_format:
-            value = "${}".format(self.register_name)
-            return self.key, value
-
+        key = self.name
         value = OrderedDict()
-        if self.dest:
-            value['dest'] = self.dest
 
+        arg_type_values = {}
         if self.arg_type:
-            if not isinstance(self.arg_type, AZDevTransArgTypeByFactory):
-                raise TypeError("Expect AzArgTypeByFactory type, Got '{}'".format(self.arg_type))
             ctx.set_art_type_reference_format(False)
+            _, arg_type_values = self.arg_type.to_config(ctx)
+            ctx.set_art_type_reference_format(True)
             k, v = self.arg_type.to_config(ctx)
             value[k] = v
+            ctx.unset_art_type_reference_format()
             ctx.unset_art_type_reference_format()
 
         if self.deprecate_info:
             k, v = self.deprecate_info.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.is_preview:
             k = 'preview'
             v = self.is_preview
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.is_experimental:
             k = 'experimental'
             v = self.is_experimental
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.min_api:
             k = 'min-api'
             v = self.min_api
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.max_api:
             k = 'max-api'
             v = self.max_api
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
+
+        if self.is_ignore:
+            k = 'ignore'
+            v = True
             value[k] = v
+            return key, value
 
         if self.options_list:
             k, v = self.options_list.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
+
         if self.help:
             k, v = self.help.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
 
         if self.id_part:
             k = 'id-part'
             v = self.id_part
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.arg_group:
             k = 'arg-group'
             v = self.arg_group
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.nargs:
             k = 'nargs'
             v = self.nargs
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.required:
             k = 'required'
             v = self.required
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.choices:
             k = 'choices'
             v = self.choices
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.default:
             k = 'default'
             v = self.default
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.action:
             k, v = self.action.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.validator:
             k, v = self.validator.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.completer:
             k, v = self.completer.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.local_context_attribute:
             k, v = self.local_context_attribute.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
         if self.type_converter:
             k, v = self.type_converter.to_config(ctx)
-            value[k] = v
+            if arg_type_values.get(k, None) != v:
+                value[k] = v
+        return key, value
 
-        return self.register_name, value
 
-
-def build_arg_type(arg_type):
-    from azure.cli.core.translator.arg_type import AzArgType, AzArgTypeInstance, AzArgTypeByFactory
-    if arg_type is None:
-        return None
-
-    if not isinstance(arg_type, AzArgType):
-        raise TypeError("Expect str or AzArgType type, got '{}'".format(arg_type))
-    if isinstance(arg_type, AzArgTypeInstance):
-        return AZDevTransArgTypeInstance(arg_type)
-    elif isinstance(arg_type, AzArgTypeByFactory):
-        return AZDevTransArgTypeByFactory(arg_type)
-    else:
-        raise NotImplementedError()
-
+def build_argument(name, parent_command, table_instance):
+    return AZDevTransArgument(name, parent_command, table_instance)
