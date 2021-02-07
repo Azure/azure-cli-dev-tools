@@ -214,7 +214,12 @@ class AZDevTransModuleParser(CLICommandsLoader):
                 registered_arg_types[arg_type.register_name][arg_name] = arg_type
 
 
-def generate_commands_config(mod_name, output_path=None, overwrite=False, profile='latest', is_extension=False):
+def generate_commands_config(mod_name,
+                             output_path=None,
+                             overwrite=False,
+                             profile='latest',
+                             is_extension=False,
+                             compact=False):
     module, mod_path = _get_module(mod_name, is_extension)
     parser = AZDevTransModuleParser(profile=profile)
     parser.load_module(module)
@@ -241,8 +246,8 @@ def generate_commands_config(mod_name, output_path=None, overwrite=False, profil
     commands_config = parser.convert_commands_to_config(root, ctx)
     ctx = ConfigurationCtx(module=module)
     examples_config = parser.convert_examples_to_config(root, ctx)
-    write_configuration(commands_config, 'commands', mod_path, output_path, profile, overwrite)
-    write_configuration(examples_config, 'examples', mod_path, output_path, profile, overwrite)
+    write_configuration(commands_config, 'commands', mod_path, output_path, profile, overwrite, compact)
+    write_configuration(examples_config, 'examples', mod_path, output_path, profile, overwrite, compact)
 
 
 def _get_extension_module_input_name(ext_dir):
@@ -284,26 +289,23 @@ def _get_module(mod_name, is_extension):
         raise CLIError("Cannot Find module {}".format(mod_name))
 
 
-def write_configuration(data, file_name, mod_path, output_dir, profile, overwrite):
+def write_configuration(data, file_name, mod_path, output_dir, profile, overwrite, compact):
     if output_dir is None:
         output_dir = os.path.join(mod_path, 'configuration')
     output_path = os.path.join(output_dir, profile, file_name)
     ensure_dir(os.path.dirname(output_path))
 
-    json_path = "{}.json".format(output_path)
+    if compact:
+        json_path = "{}.min.json".format(output_path)
+    else:
+        json_path = "{}.json".format(output_path)
     if os.path.exists(json_path) and not overwrite:
         raise CLIError("{} file {} already exists.".format(json_path))
     with open(json_path, 'w') as fw:
-        json.dump(data, fw, indent=2)
+        json.dump(data, fw,
+                  indent=None if compact else 2,
+                  separators=(',', ':') if compact else None)
     print("Output File Success: {}".format(json_path))
-
-    # yaml_path = "{}.yaml".format(output_path)
-    # if os.path.exists(yaml_path) and not overwrite:
-    #     raise CLIError("{} file {} already exists.".format(yaml_path))
-    # with open(json_path, 'r') as fr:
-    #     with open(yaml_path, 'w') as fw:
-    #         yaml.dump(json.load(fr), fw)
-    # print("Output File Success: {}".format(yaml_path))
 
 
 # if __name__ == "__main__":

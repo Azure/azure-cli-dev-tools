@@ -219,3 +219,4 @@ def load_arguments(self, _):
         c.argument('profile', help='The profile to generate, default value is: latest')     # different profiles will use different configurations.
         c.argument('overwrite', arg_type=get_three_state_flag(), help='Overwrite existing config file.')
         c.argument('is_extension', arg_type=get_three_state_flag(), help='Whether the module is an extension.')
+        c.argument('compact', arg_type=get_three_state_flag(), help='Output in compact format.')
