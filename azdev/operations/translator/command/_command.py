@@ -14,6 +14,7 @@ from ._transform import build_command_transform
 from ._table_transformer import build_command_table_transformer
 from ._exception_handler import build_exception_handler
 from ._resource_type import build_command_resource_type
+from ._confirmation import build_command_confirmation
 
 
 class AZDevTransCommand(AZDevTransNode):
@@ -78,10 +79,7 @@ class AZDevTransCommand(AZDevTransNode):
             self.is_experimental = False
 
     def _parse_confirmation(self, table_instance):
-        if table_instance.confirmation:
-            self.confirmation = True
-        else:
-            self.confirmation = False
+        self.confirmation = build_command_confirmation(table_instance.confirmation)
 
     def _parse_no_wait(self, table_instance):
         self.no_wait = build_command_no_wait(table_instance.supports_no_wait, table_instance.no_wait_param)
@@ -138,9 +136,12 @@ class AZDevTransCommand(AZDevTransNode):
         description = table_instance.description
         if callable(description):
             description = description()
+
         assert isinstance(description, str)
         help_data = _load_help_file(self.full_name)
         self.help = build_command_help(description, help_data)
+        if not self.help:
+            print('Command "{}" miss help.'.format(self.full_name))
 
         examples = None
         if help_data:
@@ -212,7 +213,8 @@ class AZDevTransCommand(AZDevTransNode):
             value['client-arg-name'] = self.client_arg_name
 
         if self.confirmation:
-            value['confirmation'] = self.confirmation
+            k, v = self.confirmation.to_config(ctx)
+            value[k] = v
         if self.no_wait:
             k, v = self.no_wait.to_config(ctx)
             value[k] = v

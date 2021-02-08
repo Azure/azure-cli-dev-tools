@@ -36,4 +36,6 @@ class AZDevTransArgumentHelp(AZDevTransNode):
 
 
 def build_argument_help(help_description, help_data):
+    if not help_description and not help_data:
+        return None
     return AZDevTransArgumentHelp(help_description, help_data)

@@ -15,7 +15,7 @@ from azdev.operations.translator.argument import build_argument
 from azdev.operations.translator.command import build_command
 from azdev.operations.translator.command_group import build_command_group
 from azdev.operations.translator.utilities import AZDevTransConfigurationCtx, AZDevTransCtx, default_core_imports
-from azdev.operations.translator.arg_type import AZDevTransArgTypeInstance
+from azdev.operations.translator.arg_type import AZDevTransRegisteredArgType
 from azdev.operations.translator.module_parser import AZDevTransModuleParser
 
 EXTENSIONS_MOD_PREFIX = 'azext_'

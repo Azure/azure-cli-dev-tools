@@ -12,7 +12,7 @@ from azdev.operations.translator.argument import build_argument
 from azdev.operations.translator.command import build_command
 from azdev.operations.translator.command_group import build_command_group
 from azdev.operations.translator.utilities import AZDevTransCtx
-from azdev.operations.translator.arg_type import AZDevTransArgTypeInstance
+from azdev.operations.translator.arg_type import AZDevTransRegisteredArgType
 import datetime
 
 
@@ -162,7 +162,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
 
         registered_arg_types = command.registered_arg_types
         for arg_name, arg in command.sub_arguments.items():
-            if arg.arg_type is not None and isinstance(arg.arg_type, AZDevTransArgTypeInstance):
+            if arg.arg_type is not None and isinstance(arg.arg_type, AZDevTransRegisteredArgType):
                 arg_type = arg.arg_type
                 if arg_type.register_name not in registered_arg_types:
                     registered_arg_types[arg_type.register_name] = {}

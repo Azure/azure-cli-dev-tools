@@ -48,14 +48,13 @@ class AZDevTransArgTypeByFactory(AZDevTransArgType):
         return self.key, value
 
 
-class AZDevTransArgTypeInstance(AZDevTransArgType):
+class AZDevTransRegisteredArgType(AZDevTransArgType):
 
     def __init__(self, arg_type):
-        from azure.cli.core.translator.arg_type import AzArgTypeInstance
-        if not isinstance(arg_type, AzArgTypeInstance):
+        from azure.cli.core.translator.arg_type import AzRegisteredArgType
+        if not isinstance(arg_type, AzRegisteredArgType):
             raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
-        super(AZDevTransArgTypeInstance, self).__init__(arg_type)
-        self.import_module = arg_type.import_module
+        super(AZDevTransRegisteredArgType, self).__init__(arg_type)
         self.register_name = arg_type.register_name
 
         type_settings = arg_type.settings
@@ -316,14 +315,14 @@ class AZDevTransArgTypeInstance(AZDevTransArgType):
 
 
 def build_arg_type(arg_type):
-    from azure.cli.core.translator.arg_type import AzArgType, AzArgTypeInstance, AzArgTypeByFactory
+    from azure.cli.core.translator.arg_type import AzArgType, AzRegisteredArgType, AzArgTypeByFactory
     if arg_type is None:
         return None
 
     if not isinstance(arg_type, AzArgType):
         raise TypeError("Expect str or AzArgType type, got '{}'".format(arg_type))
-    if isinstance(arg_type, AzArgTypeInstance):
-        return AZDevTransArgTypeInstance(arg_type)
+    if isinstance(arg_type, AzRegisteredArgType):
+        return AZDevTransRegisteredArgType(arg_type)
     elif isinstance(arg_type, AzArgTypeByFactory):
         return AZDevTransArgTypeByFactory(arg_type)
     else:

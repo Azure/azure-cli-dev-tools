@@ -90,7 +90,6 @@ class AZDevTransArgument(AZDevTransNode):
                 continue
             assert not help_data
             help_data = value
-
         self.help = build_argument_help(help_description, help_data)
 
     def _parse_options_list(self, type_settings):

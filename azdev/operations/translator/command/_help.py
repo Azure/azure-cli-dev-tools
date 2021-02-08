@@ -20,7 +20,8 @@ class AZDevTransCommandHelp(AZDevTransNode):
             self.short_summary = description
 
         if help_data:
-            assert help_data['type'].lower() == 'command'
+            if help_data['type'].lower() != 'command':
+                raise TypeError('help type is not equal to "command"')
             short_summary = help_data.get('short-summary', None)
             long_summary = help_data.get('long-summary', None)
             if short_summary:
@@ -44,4 +45,6 @@ class AZDevTransCommandHelp(AZDevTransNode):
 
 
 def build_command_help(help_description, help_data):
+    if not help_description and not help_data:
+        return None
     return AZDevTransCommandHelp(help_description, help_data)

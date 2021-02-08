@@ -3,6 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 from azdev.operations.translator.utilities import AZDevTransNode
+from collections import OrderedDict
 
 
 class AZDevTransBaseResourceType(AZDevTransNode):
@@ -24,6 +25,8 @@ class AZDevTransResourceType(AZDevTransBaseResourceType):
                 type(resource_type)))
         super(AZDevTransResourceType, self).__init__(resource_type)
         self.name = resource_type.name
+        self.import_prefix = resource_type.import_prefix
+        self.client_name = resource_type.client_name
 
     def to_config(self, ctx):
         value = self.name
@@ -38,10 +41,15 @@ class AZDevTransCustomResourceType(AZDevTransBaseResourceType):
             raise TypeError('Resource type is not an instant of "ResourceType", get "{}"'.format(
                 type(resource_type)))
         super(AZDevTransCustomResourceType, self).__init__(resource_type)
+        self.import_prefix = resource_type.import_prefix
+        self.client_name = resource_type.client_name
 
     def to_config(self, ctx):
         # TODO: add support for custom resource type
-        raise NotImplementedError()
+        value = OrderedDict()
+        value['import_prefix'] = self.import_prefix
+        value['client_name'] = self.client_name
+        return self.key, value
 
 
 def build_command_resource_type(resource_type):

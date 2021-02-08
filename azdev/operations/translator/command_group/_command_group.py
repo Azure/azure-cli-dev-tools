@@ -59,8 +59,11 @@ class AZDevTransCommandGroup(AZDevTransNode):
             hp = None
         else:
             help_data = _load_help_file(self.full_name)
-            assert help_data is not None
-            hp = build_command_group_help(help_data)
+            if help_data is None:
+                print('Command group: "{}" miss help data.'.format(self.full_name))
+                hp = None
+            else:
+                hp = build_command_group_help(help_data)
         self.help = hp
 
     def to_config(self, ctx):

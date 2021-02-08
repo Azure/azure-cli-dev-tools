@@ -12,3 +12,4 @@ from ._transform import build_command_transform
 from ._table_transformer import build_command_table_transformer
 from ._exception_handler import build_exception_handler
 from ._resource_type import build_command_resource_type
+from ._confirmation import build_command_confirmation
