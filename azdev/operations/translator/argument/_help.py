@@ -26,7 +26,7 @@ class AZDevTransArgumentHelp(AZDevTransNode):
         if self.short_summary:
             value['short-summary'] = self.short_summary
         if self.long_summary:
-            value['long-summary'] = self.long_summary
+            value['long-summary'] = self.long_summary.splitlines()
         if self.populator_commands:
             value['populator-commands'] = self.populator_commands
 

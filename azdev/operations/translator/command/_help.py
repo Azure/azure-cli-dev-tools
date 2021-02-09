@@ -37,8 +37,7 @@ class AZDevTransCommandHelp(AZDevTransNode):
         if self.short_summary:
             value['short-summary'] = self.short_summary
         if self.long_summary:
-            value['long-summary'] = self.long_summary
-
+            value['long-summary'] = self.long_summary.splitlines()
         if set(value.keys()) == {"short-summary"}:
             value = value['short-summary']
         return key, value

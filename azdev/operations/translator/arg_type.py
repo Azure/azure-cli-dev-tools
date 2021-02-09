@@ -55,6 +55,7 @@ class AZDevTransRegisteredArgType(AZDevTransArgType):
         if not isinstance(arg_type, AzRegisteredArgType):
             raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
         super(AZDevTransRegisteredArgType, self).__init__(arg_type)
+        self.import_module = arg_type.import_module     # TODO: use this to distinguish internal use arg_type or external use arg_type
         self.register_name = arg_type.register_name
 
         type_settings = arg_type.settings
