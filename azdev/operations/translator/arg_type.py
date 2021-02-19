@@ -16,49 +16,8 @@ class AZDevTransArgType(AZDevTransNode):
             raise TypeError('Expect AzArgType type, Got "{}"'.format(type(arg_type)))
         self._arg_type = arg_type
 
-    def to_config(self, ctx):
-        raise NotImplementedError()
-
-
-class AZDevTransArgTypeByFactory(AZDevTransArgType):
-
-    def __init__(self, arg_type):
-        from azure.cli.core.translator.arg_type import AzArgTypeByFactory
-        if not isinstance(arg_type, AzArgTypeByFactory):
-            raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
-        super(AZDevTransArgTypeByFactory, self).__init__(arg_type)
-        self.import_module = arg_type.import_module
-        self.import_name = arg_type.import_name
-        self.kwargs = self.process_factory_kwargs(arg_type.kwargs)
-
-    def to_config(self, ctx):
-        value = OrderedDict()
-        value['factory'] = ctx.get_import_path(self.import_module, self.import_name)
-        kwargs = OrderedDict()
-        for k in sorted(list(self.kwargs.keys())):
-            v = self.kwargs[k]
-            if isinstance(v, dict):
-                if '_type' in v:
-                    if v['_type'] == 'Enum':
-                        v = ctx.get_enum_import_path(module_name=v['module'], name=v['name'])
-                    else:
-                        raise NotImplementedError()
-            kwargs[k] = v
-        value['kwargs'] = kwargs
-        return self.key, value
-
-
-class AZDevTransRegisteredArgType(AZDevTransArgType):
-
-    def __init__(self, arg_type):
-        from azure.cli.core.translator.arg_type import AzRegisteredArgType
-        if not isinstance(arg_type, AzRegisteredArgType):
-            raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
-        super(AZDevTransRegisteredArgType, self).__init__(arg_type)
-        self.import_module = arg_type.import_module     # TODO: use this to distinguish internal use arg_type or external use arg_type
-        self.register_name = arg_type.register_name
-
-        type_settings = arg_type.settings
+    def _parse_settings(self):
+        type_settings = self._arg_type.settings
         self._parse_arg_type(type_settings)
 
         self._parse_deprecate_info(type_settings)
@@ -228,11 +187,9 @@ class AZDevTransRegisteredArgType(AZDevTransArgType):
             raise TypeError("Expect AzArgTypeByFactory type, Got '{}'".format(self.arg_type))
 
     def to_config(self, ctx):
-        reference_format = ctx.art_type_reference_format
-        if reference_format:
-            value = "${}".format(self.register_name)
-            return self.key, value
+        raise NotImplementedError()
 
+    def _get_setting_value(self, ctx):
         value = OrderedDict()
         if self.dest:
             value['dest'] = self.dest
@@ -312,7 +269,64 @@ class AZDevTransRegisteredArgType(AZDevTransArgType):
             k, v = self.type_converter.to_config(ctx)
             value[k] = v
 
-        return self.register_name, value
+        return value
+
+
+class AZDevTransArgTypeByFactory(AZDevTransArgType):
+
+    def __init__(self, arg_type):
+        from azure.cli.core.translator.arg_type import AzArgTypeByFactory
+        if not isinstance(arg_type, AzArgTypeByFactory):
+            raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
+        super(AZDevTransArgTypeByFactory, self).__init__(arg_type)
+        self.import_module = arg_type.import_module
+        self.import_name = arg_type.import_name
+        self.kwargs = self.process_factory_kwargs(arg_type.kwargs)
+        self._parse_settings()
+
+    def to_config(self, ctx):
+        value = OrderedDict()
+        value['factory'] = ctx.get_import_path(self.import_module, self.import_name)
+        kwargs = OrderedDict()
+        for k in sorted(list(self.kwargs.keys())):
+            v = self.kwargs[k]
+            if isinstance(v, dict):
+                if '_type' in v:
+                    if v['_type'] == 'Enum':
+                        v = ctx.get_enum_import_path(module_name=v['module'], name=v['name'])
+                    else:
+                        raise NotImplementedError()
+            kwargs[k] = v
+        value['kwargs'] = kwargs
+        reference_format = ctx.art_type_reference_format
+        if reference_format:
+            setting_value = self._get_setting_value(ctx)
+            return self.key, value, setting_value
+        else:
+            return self.key, value
+
+
+class AZDevTransRegisteredArgType(AZDevTransArgType):
+
+    def __init__(self, arg_type):
+        from azure.cli.core.translator.arg_type import AzRegisteredArgType
+        if not isinstance(arg_type, AzRegisteredArgType):
+            raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
+        super(AZDevTransRegisteredArgType, self).__init__(arg_type)
+        self.import_module = arg_type.import_module     # TODO: use this to distinguish internal use arg_type or external use arg_type
+        self.register_name = arg_type.register_name
+        self._parse_settings()
+
+    def to_config(self, ctx):
+        setting_value = self._get_setting_value(ctx)
+
+        reference_format = ctx.art_type_reference_format
+        if reference_format:
+            value = "${}".format(self.register_name)
+            return self.key, value, setting_value
+        else:
+            value = setting_value
+            return self.register_name, value
 
 
 def build_arg_type(arg_type):

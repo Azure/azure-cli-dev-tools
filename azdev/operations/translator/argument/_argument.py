@@ -228,12 +228,9 @@ class AZDevTransArgument(AZDevTransNode):
 
         arg_type_values = {}
         if self.arg_type:
-            ctx.set_art_type_reference_format(False)
-            _, arg_type_values = self.arg_type.to_config(ctx)
             ctx.set_art_type_reference_format(True)
-            k, v = self.arg_type.to_config(ctx)
+            k, v, arg_type_values = self.arg_type.to_config(ctx)
             value[k] = v
-            ctx.unset_art_type_reference_format()
             ctx.unset_art_type_reference_format()
 
         if self.deprecate_info:
