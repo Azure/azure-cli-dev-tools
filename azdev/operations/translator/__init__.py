@@ -92,6 +92,7 @@ def _write_configuration(data, file_name, mod_path, output_dir, profile, overwri
         raise CLIError("{} file {} already exists.".format(json_path))
     with open(json_path, 'w') as fw:
         json.dump(data, fw,
+                  allow_nan=False,
                   indent=None if compact else 2,
                   separators=(',', ':') if compact else None)
     print("Output File Success: {}".format(json_path))

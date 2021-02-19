@@ -7,6 +7,7 @@ from collections import OrderedDict
 from azdev.operations.translator.utilities import build_deprecate_info, build_validator, AZDevTransNode
 import argparse
 from azdev.operations.translator.arg_type import build_arg_type
+from math import isnan
 from ._help import build_argument_help
 from ._options import build_argument_options_list
 from ._action import build_argument_action
@@ -118,6 +119,8 @@ class AZDevTransArgument(AZDevTransNode):
         default = type_settings.get('default', None)
         if default == '':
             default = None
+        if isinstance(default, float) and isnan(default):
+            raise ValueError("Not support default value: float('nan')")
         # TODO: custom function signature always has default value. FYI private_link_primary in network
         # if default is not None:
         #     if self.choices is not None:
