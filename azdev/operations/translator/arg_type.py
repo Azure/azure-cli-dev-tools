@@ -8,7 +8,7 @@ from azdev.operations.translator.utilities import build_deprecate_info, build_va
 
 
 class AZDevTransArgType(AZDevTransNode):
-    key = 'arg_type'
+    key = 'arg-type'
 
     def __init__(self, arg_type):
         from azure.cli.core.translator.arg_type import AzArgType

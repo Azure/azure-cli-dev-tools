@@ -61,8 +61,10 @@ class AZDevTransCtx(CLI):
 
 class AZDevTransConfigurationCtx:
 
-    def __init__(self, module, imports=None):
+    def __init__(self, cli_ctx, module, imports=None):
+        self._cli_ctx = cli_ctx
         self._arg_type_reference_format_queue = []
+        self._command_sdk_queue = []
         self._output_arg_types = set()
         self._module_name = module.__name__
         self.imports = imports or {}
@@ -83,6 +85,25 @@ class AZDevTransConfigurationCtx:
     def unset_art_type_reference_format(self):
         if len(self._arg_type_reference_format_queue) > 0:
             self._arg_type_reference_format_queue.pop()
+        else:
+            raise ValueError('arg_type_reference_format_queue is empty')
+
+    def set_command_sdk(self, sdk):
+        self._command_sdk_queue.append(sdk)
+
+    @property
+    def current_command_sdk(self):
+        if len(self._command_sdk_queue) > 0:
+            command_sdk = self._command_sdk_queue[-1]
+        else:
+            command_sdk = None
+        return command_sdk
+
+    def unset_command_sdk(self):
+        if len(self._command_sdk_queue) > 0:
+            self._command_sdk_queue.pop()
+        else:
+            raise ValueError('command_resource_type_and_operation_group_queue is empty')
 
     def get_import_path(self, module_name, name):
         path = "{}#{}".format(module_name, name)
@@ -99,10 +120,47 @@ class AZDevTransConfigurationCtx:
         if path in self._reversed_imports:
             path = '${}'.format(self._reversed_imports[path])
         elif path.startswith(self._module_name):
-            path = path.replace(self._module_name, '')
+            path = path.replace(self._module_name, '@')
+        else:
+            versioned_sdk_path = self.get_versioned_sdk_path()
+            if versioned_sdk_path and path.startswith(versioned_sdk_path):
+                path = path.replace(self._module_name, '@SDK')
         return path
 
+    # def get_operation(self, ):
+    
+    def get_model(self, model_name):
+        from azure.cli.core.profiles import get_sdk
+        resource_type = self.current_command_sdk.resource_type if self.current_command_sdk else None
+        operation_group = self.current_command_sdk.operation_group if self.current_command_sdk else None
+        return get_sdk(self._cli_ctx, resource_type, model_name, mod='models', operation_group=operation_group)
+
+    def get_api_version(self, resource_type, operation_group):
+        from azure.cli.core.profiles._shared import _ApiVersions, get_api_version
+        api_version = get_api_version(self._cli_ctx.cloud.profile, resource_type)
+        if api_version is None:
+            return None
+        if isinstance(api_version, _ApiVersions):
+            if operation_group is None:
+                raise ValueError("operation_group is required for resource type '{}'".format(resource_type))
+            api_version = getattr(api_version, operation_group)
+        return api_version
+
+    def get_versioned_sdk_path(self):
+        from azure.cli.core.profiles._shared import get_versioned_sdk_path
+        if self.current_command_sdk is None:
+            return None
+        return get_versioned_sdk_path(api_profile=self._cli_ctx.cloud.profile,
+                                      resource_type=self.current_command_sdk.resource_type,
+                                      operation_group=self.current_command_sdk.operation_group)
+
     def get_enum_import_path(self, module_name, name):
-        # TODO: Checkout module_name
-        path = name
-        return path
+        path = "{}#{}".format(module_name, name)
+        if self.current_command_sdk is not None:
+            enum_cls = self.get_model(model_name=name)
+            if enum_cls and str(enum_cls.__module__) == module_name:
+                path = "@SDK.models#{}".format(name)
+                return path
+            elif not enum_cls:
+                print("Enum cannot find in SDK models, use full path: {}".format(path))
+        return self.simplify_import_path(path)

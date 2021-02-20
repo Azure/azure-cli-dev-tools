@@ -22,7 +22,8 @@ class AZDevTransNode:
                 v = {
                     '_type': 'Enum',
                     'module': v.__module__,
-                    'name': v.__name__
+                    'name': v.__name__,
+                    'values': [x.value for x in v],
                 }
             elif isinstance(v, KeysView):
                 # TODO: Not support this. Handle TYPE_CLIENT_MAPPING to enum
@@ -30,6 +31,6 @@ class AZDevTransNode:
             kwargs[k] = v
         try:
             json.dumps(kwargs)
-        except Exception:
-            raise TypeError('factory kwargs cannot dump to json')
+        except Exception as ex:
+            raise TypeError('factory kwargs cannot dump to json') from ex
         return kwargs

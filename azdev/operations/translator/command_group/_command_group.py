@@ -15,11 +15,14 @@ class AZDevTransCommandGroup(AZDevTransNode):
     # 'custom_command_type', 'transform', 'validator', 'exception_handler', 'supports_no_wait', 'min_api', 'max_api',
     # 'resource_type', 'operation_group', 'client_factory'
 
+    UNDEFINED_SDK = ""
+
     def __init__(self, name, parent_group, full_name, table_instance):
         self.name = name
         self.parent_group = parent_group
         self.full_name = full_name
         self.registered_arg_types = {}
+        self.sdk = self.UNDEFINED_SDK
 
         self.sub_groups = {}
         self.sub_commands = {}
@@ -85,7 +88,12 @@ class AZDevTransCommandGroup(AZDevTransNode):
             k, v = self.help.to_config(ctx)
             value[k] = v
 
+        if self.sdk:
+            k, v = self.sdk.to_config(ctx)
+            value[k] = v
+
         if self.registered_arg_types:
+            ctx.set_command_sdk(sdk=self.sdk)
             output_arg_types = OrderedDict()
             for register_name in sorted(list(self.registered_arg_types.keys())):
                 if ctx.is_output_arg_type(register_name):
@@ -100,28 +108,34 @@ class AZDevTransCommandGroup(AZDevTransNode):
                 output_arg_types[k] = v
                 ctx.unset_art_type_reference_format()
                 ctx.add_output_arg_type(register_name)
+            ctx.unset_command_sdk()
             if len(output_arg_types) > 0:
-                value['argument_types'] = output_arg_types
+                value['argument-types'] = output_arg_types
 
         if self.sub_commands:
+            ctx.set_command_sdk(sdk=self.sdk)
             sub_commands = OrderedDict()
             for sub_command_name in sorted(list(self.sub_commands.keys())):
                 k, v = self.sub_commands[sub_command_name].to_config(ctx)
                 if v is None:
                     continue
                 sub_commands[k] = v
+            ctx.unset_command_sdk()
             if len(sub_commands) > 0:
                 value['commands'] = sub_commands
 
         if self.sub_groups:
+            ctx.set_command_sdk(sdk=self.sdk)
             sub_groups = OrderedDict()
             for sub_group_name in sorted(list(self.sub_groups.keys())):
                 k, v = self.sub_groups[sub_group_name].to_config(ctx)
                 if v is None:
                     continue
                 sub_groups[k] = v
+            ctx.unset_command_sdk()
             if len(sub_groups) > 0:
                 value['command-groups'] = sub_groups
+
         if 'commands' not in value and 'command-groups' not in value:
             return key, None
         return key, value

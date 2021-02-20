@@ -28,12 +28,13 @@ def generate_commands_config(mod_name,
                              is_extension=False,
                              compact=False):
     module, mod_path = _get_module(mod_name, is_extension)
-    parser = AZDevTransModuleParser(profile=profile)
+    cli_ctx = AZDevTransCtx(profile)
+    parser = AZDevTransModuleParser(cli_ctx=cli_ctx)
     parser.load_module(module)
     root = parser.build_commands_tree()
-    ctx = AZDevTransConfigurationCtx(module=module, imports=default_core_imports)
+    ctx = AZDevTransConfigurationCtx(cli_ctx=cli_ctx, module=module, imports=default_core_imports)
     commands_config = parser.convert_commands_to_config(root, ctx)
-    ctx = AZDevTransConfigurationCtx(module=module)
+    ctx = AZDevTransConfigurationCtx(cli_ctx=cli_ctx, module=module)
     examples_config = parser.convert_examples_to_config(root, ctx)
     _write_configuration(commands_config, 'commands', mod_path, output_path, profile, overwrite, compact)
     _write_configuration(examples_config, 'examples', mod_path, output_path, profile, overwrite, compact)

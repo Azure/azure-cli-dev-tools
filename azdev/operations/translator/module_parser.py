@@ -11,15 +11,14 @@ from knack.arguments import ArgumentRegistry
 from azdev.operations.translator.argument import build_argument
 from azdev.operations.translator.command import build_command
 from azdev.operations.translator.command_group import build_command_group
-from azdev.operations.translator.utilities import AZDevTransCtx
 from azdev.operations.translator.arg_type import AZDevTransRegisteredArgType
 import datetime
 
 
 class AZDevTransModuleParser(CLICommandsLoader):
 
-    def __init__(self, cli_ctx=None, profile=None, **kwargs):
-        cli_ctx = cli_ctx or AZDevTransCtx(profile)
+    def __init__(self, cli_ctx=None, **kwargs):
+        cli_ctx = cli_ctx
         super(AZDevTransModuleParser, self).__init__(cli_ctx=cli_ctx, **kwargs)
         self.cmd_to_loader_map = {}
 
@@ -111,6 +110,19 @@ class AZDevTransModuleParser(CLICommandsLoader):
                 self._add_sub_command_groups(parent_group=group, prefix=sub_prefix)
                 self._add_sub_commands(parent_group=group, prefix=sub_prefix)
 
+        command_sdk_counter = {}
+        for sub_command_name, sub_command_group in parent_group.sub_groups.items():
+            sdk = sub_command_group.sdk
+            if sdk not in command_sdk_counter:
+                command_sdk_counter[sdk] = 0
+            command_sdk_counter[sdk] += 1
+        max_count = 0
+        for sdk, count in command_sdk_counter.items():
+            if count > max_count:
+                max_count = count
+                parent_group.sdk = sdk
+
+        # register arg_types used in sub command groups
         registered_arg_types = parent_group.registered_arg_types
         for sub_command_name, sub_command_group in parent_group.sub_groups.items():
             for register_name, arg_types in sub_command_group.registered_arg_types.items():
@@ -132,6 +144,21 @@ class AZDevTransModuleParser(CLICommandsLoader):
                 self._add_sub_arguments(command=command, table_instance=table_instance)
                 parent_group.sub_commands[name] = command
 
+        # setup parent_group resource_type and operation_group by sub commands if they are not defined
+        if parent_group.sdk == parent_group.UNDEFINED_SDK:
+            command_sdk_counter = {}
+            for sub_command_name, sub_command in parent_group.sub_commands.items():
+                sdk = sub_command.sdk
+                if sdk not in command_sdk_counter:
+                    command_sdk_counter[sdk] = 0
+                command_sdk_counter[sdk] += 1
+            max_count = 0
+            for sdk, count in command_sdk_counter.items():
+                if count > max_count:
+                    max_count = count
+                    parent_group.sdk = sdk
+
+        # register arg_types used in sub commands
         registered_arg_types = parent_group.registered_arg_types
         for sub_command_name, sub_command in parent_group.sub_commands.items():
             for register_name, arg_types in sub_command.registered_arg_types.items():

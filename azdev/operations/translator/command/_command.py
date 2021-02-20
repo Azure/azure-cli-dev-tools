@@ -13,15 +13,15 @@ from ._operation import build_command_operation
 from ._transform import build_command_transform
 from ._table_transformer import build_command_table_transformer
 from ._exception_handler import build_exception_handler
-from ._resource_type import build_command_resource_type
+from ._sdk import build_command_sdk
 from ._confirmation import build_command_confirmation
 
 
 class AZDevTransCommand(AZDevTransNode):
     # supported: 'confirmation', 'no_wait_param', 'supports_no_wait', 'is_preview', 'preview_info', 'is_experimental', 'experimental_info', 'deprecate_info',
-    # 'table_transformer', 'exception_handler', 'client_factory', 'transform', 'validator', 'supports_local_cache', 'min_api', 'max_api',
+    # 'table_transformer', 'exception_handler', 'client_factory', 'transform', 'validator', 'supports_local_cache', 'min_api', 'max_api', 'resource_type', 'operation_group',
 
-    # PendingForDeprecation: 'client_arg_name', 'model_path', 'resource_type', 'operation_group',
+    # PendingForDeprecation: 'client_arg_name', 'model_path',
     # TODO: parse operation combine operation template and function name
 
     # ignored: 'doc_string_source', 'local_context_attribute', 'custom_command_type', 'command_type',
@@ -44,8 +44,9 @@ class AZDevTransCommand(AZDevTransNode):
 
         self._parse_min_api(table_instance)
         self._parse_max_api(table_instance)
-        self._parse_resource_type(table_instance)
-        self._parse_operation_group(table_instance)
+        self._parse_sdk(table_instance)
+        # self._parse_resource_type(table_instance)
+        # self._parse_operation_group(table_instance)
 
         self._parse_client_arg_name(table_instance)
 
@@ -123,14 +124,12 @@ class AZDevTransCommand(AZDevTransNode):
         assert max_api is None or isinstance(max_api, str)
         self.max_api = max_api
 
-    def _parse_resource_type(self, table_instance):
+    def _parse_sdk(self, table_instance):
         resource_type = table_instance.command_kwargs.get('resource_type', None)
-        self.resource_type = build_command_resource_type(resource_type)
-
-    def _parse_operation_group(self, table_instance):
+        if resource_type is None:
+            print('ResourceType miss: "{}"'.format(self.full_name))
         operation_group = table_instance.command_kwargs.get('operation_group', None)
-        assert operation_group is None or isinstance(operation_group, str)
-        self.operation_group = operation_group
+        self.sdk = build_command_sdk(resource_type, operation_group)
 
     def _parse_help_and_examples(self, table_instance):
         description = table_instance.description
@@ -198,11 +197,10 @@ class AZDevTransCommand(AZDevTransNode):
             k, v = self.help.to_config(ctx)
             value[k] = v
 
-        if self.resource_type:
-            k, v = self.resource_type.to_config(ctx)
+        if self.sdk:
+            k, v = self.sdk.to_config(ctx)
             value[k] = v
-        if self.operation_group:
-            value['operation-group'] = self.operation_group
+
         if self.operation:
             k, v = self.operation.to_config(ctx)
             value[k] = v
@@ -254,13 +252,15 @@ class AZDevTransCommand(AZDevTransNode):
                 ctx.unset_art_type_reference_format()
                 ctx.add_output_arg_type(register_name)
             if len(output_arg_types) > 0:
-                value['argument_types'] = output_arg_types
+                value['argument-types'] = output_arg_types
 
         if self.sub_arguments:
+            ctx.set_command_sdk(sdk=self.sdk)
             arguments = OrderedDict()
             for arg_name in sorted(list(self.sub_arguments.keys())):
                 k, v = self.sub_arguments[arg_name].to_config(ctx)
                 arguments[k] = v
+            ctx.unset_command_sdk()
             value['arguments'] = arguments
 
         return key, value
