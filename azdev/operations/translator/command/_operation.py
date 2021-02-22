@@ -27,7 +27,7 @@ class AZDevTransCommandOperation(AZDevTransBaseCommandOperation):
         self.operation = command_operation.operation
 
     def to_config(self, ctx):
-        value = ctx.simplify_import_path(self.operation)
+        value = ctx.get_operation_import_path(self.operation)
         return self.key, value
 
 
@@ -43,7 +43,7 @@ class AZDevTransWaitCommandOperation(AZDevTransBaseCommandOperation):
         self.operation = command_operation.operation
 
     def to_config(self, ctx):
-        value = ctx.simplify_import_path(self.operation)
+        value = ctx.get_operation_import_path(self.operation)
         return self.key, value
 
 
@@ -59,7 +59,7 @@ class AZDevTransShowCommandOperation(AZDevTransBaseCommandOperation):
         self.operation = command_operation.operation
 
     def to_config(self, ctx):
-        value = ctx.simplify_import_path(self.operation)
+        value = ctx.get_operation_import_path(self.operation)
         return self.key, value
 
 
@@ -82,11 +82,11 @@ class AZDevTransGenericUpdateCommandOperation(AZDevTransBaseCommandOperation):
 
     def to_config(self, ctx):
         value = OrderedDict()
-        value['getter-operation'] = ctx.simplify_import_path(self.getter_operation)
-        value['setter-operation'] = ctx.simplify_import_path(self.setter_operation)
+        value['getter-operation'] = ctx.get_operation_import_path(self.getter_operation)
+        value['setter-operation'] = ctx.get_operation_import_path(self.setter_operation)
         value['setter-arg-name'] = self.setter_arg_name
         if self.custom_function_operation:
-            value['custom-function-operation'] = ctx.simplify_import_path(self.custom_function_operation)
+            value['custom-function-operation'] = ctx.get_operation_import_path(self.custom_function_operation)
         if self.child_collection_prop_name:
             child_value = OrderedDict()
             child_value['collection-prop-name'] = self.child_collection_prop_name

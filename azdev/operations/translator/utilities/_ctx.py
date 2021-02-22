@@ -119,15 +119,28 @@ class AZDevTransConfigurationCtx:
     def simplify_import_path(self, path):
         if path in self._reversed_imports:
             path = '${}'.format(self._reversed_imports[path])
-        elif path.startswith(self._module_name):
-            path = path.replace(self._module_name, '@')
         else:
             versioned_sdk_path = self.get_versioned_sdk_path()
             if versioned_sdk_path and path.startswith(versioned_sdk_path):
-                path = path.replace(self._module_name, '@SDK')
+                path = path.replace(versioned_sdk_path, '@SDK')
+            elif path.startswith(self._module_name):
+                path = path.replace(self._module_name, '@')
         return path
 
-    # def get_operation(self, ):
+    def get_operation_import_path(self, path):
+        assert self.current_command_sdk is not None
+        path = path.replace(self.current_command_sdk.resource_type.import_prefix, self.get_versioned_sdk_path())
+        return self.simplify_import_path(path)
+
+    def get_enum_import_path(self, module_name, name):
+        path = "{}#{}".format(module_name, name)
+        if self.current_command_sdk is not None:
+            enum_cls = self.get_model(model_name=name)
+            if enum_cls and str(enum_cls.__module__) == module_name:
+                path = "{}.models#{}".format(self.get_versioned_sdk_path(), name)
+            elif not enum_cls:
+                print("Enum cannot find in SDK models, use full path: {}".format(path))
+        return self.simplify_import_path(path)
     
     def get_model(self, model_name):
         from azure.cli.core.profiles import get_sdk
@@ -153,14 +166,3 @@ class AZDevTransConfigurationCtx:
         return get_versioned_sdk_path(api_profile=self._cli_ctx.cloud.profile,
                                       resource_type=self.current_command_sdk.resource_type,
                                       operation_group=self.current_command_sdk.operation_group)
-
-    def get_enum_import_path(self, module_name, name):
-        path = "{}#{}".format(module_name, name)
-        if self.current_command_sdk is not None:
-            enum_cls = self.get_model(model_name=name)
-            if enum_cls and str(enum_cls.__module__) == module_name:
-                path = "@SDK.models#{}".format(name)
-                return path
-            elif not enum_cls:
-                print("Enum cannot find in SDK models, use full path: {}".format(path))
-        return self.simplify_import_path(path)
