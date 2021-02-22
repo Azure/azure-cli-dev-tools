@@ -27,6 +27,7 @@ def generate_commands_config(mod_name,
                              is_extension=False,
                              compact=False):
     hook_azure_cli_core()
+    os.environ['AZURE_GENERATE_COMMAND_CONFIG'] = 'True'
     module, mod_path = _get_module(mod_name, is_extension)
     cli_ctx = AZDevTransCtx(profile)
     parser = AZDevTransModuleParser(cli_ctx=cli_ctx)
@@ -44,8 +45,7 @@ def _get_extension_module_input_name(ext_dir):
     pos_mods = [n for n in os.listdir(ext_dir)
                 if n.startswith(EXTENSIONS_MOD_PREFIX) and os.path.isdir(os.path.join(ext_dir, n))]
     if len(pos_mods) != 1:
-        raise AssertionError("Expected 1 module to load starting with "
-                             "'{}': got {}".format(EXTENSIONS_MOD_PREFIX, pos_mods))
+        raise ValueError("Expected 1 module to load starting with '{}': got {}".format(EXTENSIONS_MOD_PREFIX, pos_mods))
     return pos_mods[0]
 
 
