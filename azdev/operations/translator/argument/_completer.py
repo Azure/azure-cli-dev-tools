@@ -10,7 +10,7 @@ class AZDevTransArgumentCompleter(AZDevTransNode):
     key = 'completer'
 
     def __init__(self, completer):
-        from azure.cli.core.translator.completer import AzCompleter
+        from azdev.operations.translator.hook.completer import AzCompleter
         if not isinstance(completer, AzCompleter):
             raise TypeError("Expect AzFuncCompleter, got '{}'".format(completer))
         self.completer = completer
@@ -22,7 +22,7 @@ class AZDevTransArgumentCompleter(AZDevTransNode):
 class AZDevTransArgumentFuncCompleter(AZDevTransArgumentCompleter):
 
     def __init__(self, completer):
-        from azure.cli.core.translator.completer import AzFuncCompleter
+        from azdev.operations.translator.hook.completer import AzFuncCompleter
         if not isinstance(completer, AzFuncCompleter):
             raise TypeError("Expect AzFuncCompleter, got '{}'".format(completer))
         super(AZDevTransArgumentFuncCompleter, self).__init__(completer)
@@ -37,7 +37,7 @@ class AZDevTransArgumentFuncCompleter(AZDevTransArgumentCompleter):
 class AZDevTransArgumentFuncCompleterByFactory(AZDevTransArgumentCompleter):
 
     def __init__(self, completer):
-        from azure.cli.core.translator.completer import AzFuncCompleterByFactory
+        from azdev.operations.translator.hook.completer import AzFuncCompleterByFactory
         if not isinstance(completer, AzFuncCompleterByFactory):
             raise TypeError("Expect AzFuncCompleterByFactory, got '{}'".format(completer))
         super(AZDevTransArgumentFuncCompleterByFactory, self).__init__(completer)
@@ -58,7 +58,7 @@ class AZDevTransArgumentFuncCompleterByFactory(AZDevTransArgumentCompleter):
 class AZDevTransArgumentExternalCompleterByFactory(AZDevTransArgumentCompleter):
 
     def __init__(self, completer):
-        from azure.cli.core.translator.completer import AzExternalCompleterByFactory
+        from azdev.operations.translator.hook.completer import AzExternalCompleterByFactory
         if not isinstance(completer, AzExternalCompleterByFactory):
             raise TypeError("Expect AzExternalCompleterByFactory, got '{}'".format(completer))
         super(AZDevTransArgumentExternalCompleterByFactory, self).__init__(completer)
@@ -77,7 +77,7 @@ class AZDevTransArgumentExternalCompleterByFactory(AZDevTransArgumentCompleter):
 
 
 def build_argument_completer(completer):
-    from azure.cli.core.translator.completer import AzCompleter, AzFuncCompleter, AzFuncCompleterByFactory, \
+    from azdev.operations.translator.hook.completer import AzCompleter, AzFuncCompleter, AzFuncCompleterByFactory, \
         AzExternalCompleterByFactory
     if completer is None:
         return None

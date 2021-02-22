@@ -1,8 +1,7 @@
-# -----------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for
-# license information.
-# -----------------------------------------------------------------------------
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
 
 import importlib
 import os
@@ -17,7 +16,7 @@ from azdev.operations.translator.command_group import build_command_group
 from azdev.operations.translator.utilities import AZDevTransConfigurationCtx, AZDevTransCtx, default_core_imports
 from azdev.operations.translator.arg_type import AZDevTransRegisteredArgType
 from azdev.operations.translator.module_parser import AZDevTransModuleParser
-
+from azdev.operations.translator.hook import hook_azure_cli_core
 EXTENSIONS_MOD_PREFIX = 'azext_'
 
 
@@ -27,6 +26,7 @@ def generate_commands_config(mod_name,
                              profile='latest',
                              is_extension=False,
                              compact=False):
+    hook_azure_cli_core()
     module, mod_path = _get_module(mod_name, is_extension)
     cli_ctx = AZDevTransCtx(profile)
     parser = AZDevTransModuleParser(cli_ctx=cli_ctx)

@@ -9,7 +9,7 @@ class AZDevTransTransform(AZDevTransNode):
     key = 'transform'
 
     def __init__(self, transform):
-        from azure.cli.core.translator.transformer import AzTransformer
+        from azdev.operations.translator.hook.transformer import AzTransformer
         if not isinstance(transform, AzTransformer):
             raise TypeError('Transform is not an instance of "AzTransformer", get "{}"'.format(
                 type(transform)))
@@ -22,7 +22,7 @@ class AZDevTransTransform(AZDevTransNode):
 class AZDevTransFuncTransform(AZDevTransTransform):
 
     def __init__(self, transform):
-        from azure.cli.core.translator.transformer import AzFuncTransformer
+        from azdev.operations.translator.hook.transformer import AzFuncTransformer
         if not isinstance(transform, AzFuncTransformer):
             raise TypeError('Transform is not an instance of "AzFuncTransformer", get "{}"'.format(
                 type(transform)))
@@ -36,7 +36,7 @@ class AZDevTransFuncTransform(AZDevTransTransform):
 
 
 def build_command_transform(transform):
-    from azure.cli.core.translator.transformer import AzTransformer, AzFuncTransformer
+    from azdev.operations.translator.hook.transformer import AzTransformer, AzFuncTransformer
     if transform is None:
         return None
     if not isinstance(transform, AzTransformer):

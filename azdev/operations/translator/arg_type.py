@@ -11,7 +11,7 @@ class AZDevTransArgType(AZDevTransNode):
     key = 'arg-type'
 
     def __init__(self, arg_type):
-        from azure.cli.core.translator.arg_type import AzArgType
+        from azdev.operations.translator.hook.arg_type import AzArgType
         if not isinstance(arg_type, AzArgType):
             raise TypeError('Expect AzArgType type, Got "{}"'.format(type(arg_type)))
         self._arg_type = arg_type
@@ -275,7 +275,7 @@ class AZDevTransArgType(AZDevTransNode):
 class AZDevTransArgTypeByFactory(AZDevTransArgType):
 
     def __init__(self, arg_type):
-        from azure.cli.core.translator.arg_type import AzArgTypeByFactory
+        from azdev.operations.translator.hook.arg_type import AzArgTypeByFactory
         if not isinstance(arg_type, AzArgTypeByFactory):
             raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
         super(AZDevTransArgTypeByFactory, self).__init__(arg_type)
@@ -309,7 +309,7 @@ class AZDevTransArgTypeByFactory(AZDevTransArgType):
 class AZDevTransRegisteredArgType(AZDevTransArgType):
 
     def __init__(self, arg_type):
-        from azure.cli.core.translator.arg_type import AzRegisteredArgType
+        from azdev.operations.translator.hook.arg_type import AzRegisteredArgType
         if not isinstance(arg_type, AzRegisteredArgType):
             raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
         super(AZDevTransRegisteredArgType, self).__init__(arg_type)
@@ -330,7 +330,7 @@ class AZDevTransRegisteredArgType(AZDevTransArgType):
 
 
 def build_arg_type(arg_type):
-    from azure.cli.core.translator.arg_type import AzArgType, AzRegisteredArgType, AzArgTypeByFactory
+    from azdev.operations.translator.hook.arg_type import AzArgType, AzRegisteredArgType, AzArgTypeByFactory
     if arg_type is None:
         return None
 

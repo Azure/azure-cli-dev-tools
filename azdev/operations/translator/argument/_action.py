@@ -11,7 +11,7 @@ class AZDevTransArgumentAction(AZDevTransNode):
     key = 'action'
 
     def __init__(self, action):
-        from azure.cli.core.translator.action import AzAction
+        from azdev.operations.translator.hook.action import AzAction
         if not isinstance(action, str) and not issubclass(action, AzAction):
             raise TypeError("Expect str or AzAction type, got '{}'".format(action))
         self.action = action
@@ -35,7 +35,7 @@ class AZDevTransArgumentActionByStr(AZDevTransArgumentAction):
 class AZDevTransArgumentClsAction(AZDevTransArgumentAction):
 
     def __init__(self, action):
-        from azure.cli.core.translator.action import AzClsAction
+        from azdev.operations.translator.hook.action import AzClsAction
         if not issubclass(action, AzClsAction):
             raise TypeError("Expect str or AzClsAction type, got '{}'".format(action))
         super(AZDevTransArgumentClsAction, self).__init__(action)
@@ -50,7 +50,7 @@ class AZDevTransArgumentClsAction(AZDevTransArgumentAction):
 class AZDevTransArgumentClsActionByFactory(AZDevTransArgumentAction):
 
     def __init__(self, action):
-        from azure.cli.core.translator.action import AzClsActionByFactory
+        from azdev.operations.translator.hook.action import AzClsActionByFactory
         if not issubclass(action, AzClsActionByFactory):
             raise TypeError("Expect str or AzClsActionByFactory type, got '{}'".format(action))
         super(AZDevTransArgumentClsActionByFactory, self).__init__(action)
@@ -69,7 +69,7 @@ class AZDevTransArgumentClsActionByFactory(AZDevTransArgumentAction):
 
 
 def build_argument_action(action):
-    from azure.cli.core.translator.action import AzAction, AzClsAction, AzClsActionByFactory
+    from azdev.operations.translator.hook.action import AzAction, AzClsAction, AzClsActionByFactory
     if action is None:
         return None
 

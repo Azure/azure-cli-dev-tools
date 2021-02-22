@@ -9,7 +9,7 @@ class AZDevTransExceptionHandler(AZDevTransNode):
     key = 'exception-handler'
 
     def __init__(self, exception_handler):
-        from azure.cli.core.translator.exception_handler import AzExceptionHandler
+        from azdev.operations.translator.hook.exception_handler import AzExceptionHandler
         if not isinstance(exception_handler, AzExceptionHandler):
             raise TypeError('Exception handler is not an instance of "AzExceptionHandler", get "{}"'.format(
                 type(exception_handler)))
@@ -22,7 +22,7 @@ class AZDevTransExceptionHandler(AZDevTransNode):
 class AZDevTransFuncExceptionHandler(AZDevTransExceptionHandler):
 
     def __init__(self, exception_handler):
-        from azure.cli.core.translator.exception_handler import AzFuncExceptionHandler
+        from azdev.operations.translator.hook.exception_handler import AzFuncExceptionHandler
         if not isinstance(exception_handler, AzFuncExceptionHandler):
             raise TypeError('Exception handler is not an instance of "AzFuncExceptionHandler", get "{}"'.format(
                 type(exception_handler)))
@@ -36,7 +36,7 @@ class AZDevTransFuncExceptionHandler(AZDevTransExceptionHandler):
 
 
 def build_exception_handler(exception_handler):
-    from azure.cli.core.translator.exception_handler import AzExceptionHandler, AzFuncExceptionHandler
+    from azdev.operations.translator.hook.exception_handler import AzExceptionHandler, AzFuncExceptionHandler
     if exception_handler is None:
         return None
     if not isinstance(exception_handler, AzExceptionHandler):

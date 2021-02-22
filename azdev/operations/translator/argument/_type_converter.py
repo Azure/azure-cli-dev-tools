@@ -31,7 +31,7 @@ class AZDevTransArgumentBuildInTypeConverter(AZDevTransArgumentTypeConverter):
 class AZDevTransArgumentFuncTypeConverter(AZDevTransArgumentTypeConverter):
 
     def __init__(self, converter):
-        from azure.cli.core.translator.type_converter import AzFuncTypeConverter
+        from azdev.operations.translator.hook.type_converter import AzFuncTypeConverter
         if not isinstance(converter, AzFuncTypeConverter):
             raise TypeError('Expect AzFuncTypeConverter, Got "{}"'.format(converter))
         super(AZDevTransArgumentFuncTypeConverter, self).__init__(converter)
@@ -46,7 +46,7 @@ class AZDevTransArgumentFuncTypeConverter(AZDevTransArgumentTypeConverter):
 class AZDevTransArgumentFuncTypeConverterByFactory(AZDevTransArgumentTypeConverter):
 
     def __init__(self, converter):
-        from azure.cli.core.translator.type_converter import AzFuncTypeConverterByFactory
+        from azdev.operations.translator.hook.type_converter import AzFuncTypeConverterByFactory
         if not isinstance(converter, AzFuncTypeConverterByFactory):
             raise TypeError('Expect AzFuncTypeConverterByFactory, Got "{}"'.format(converter))
         super(AZDevTransArgumentFuncTypeConverterByFactory, self).__init__(converter)
@@ -65,7 +65,7 @@ class AZDevTransArgumentFuncTypeConverterByFactory(AZDevTransArgumentTypeConvert
 
 
 def build_argument_type_converter(converter):
-    from azure.cli.core.translator.type_converter import AzFuncTypeConverter, AzFuncTypeConverterByFactory
+    from azdev.operations.translator.hook.type_converter import AzFuncTypeConverter, AzFuncTypeConverterByFactory
     if converter is None:
         return None
     if converter in (str, int, float, bool):

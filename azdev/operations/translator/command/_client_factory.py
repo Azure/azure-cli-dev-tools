@@ -9,7 +9,7 @@ class AZDevTransClientFactory(AZDevTransNode):
     key = "client-factory"
 
     def __init__(self, client_factory):
-        from azure.cli.core.translator.client_factory import AzClientFactory
+        from azdev.operations.translator.hook.client_factory import AzClientFactory
         if not isinstance(client_factory, AzClientFactory):
             raise TypeError('Client factory is not an instance of "AzClientFactory", get "{}"'.format(
                 type(client_factory)))
@@ -22,7 +22,7 @@ class AZDevTransClientFactory(AZDevTransNode):
 class AZDevTransFuncClientFactory(AZDevTransClientFactory):
 
     def __init__(self, client_factory):
-        from azure.cli.core.translator.client_factory import AzFuncClientFactory
+        from azdev.operations.translator.hook.client_factory import AzFuncClientFactory
         if not isinstance(client_factory, AzFuncClientFactory):
             raise TypeError('Client factory is not an instance of "AzFuncClientFactory", get "{}"'.format(
                 type(client_factory)))
@@ -36,7 +36,7 @@ class AZDevTransFuncClientFactory(AZDevTransClientFactory):
 
 
 def build_client_factory(client_factory):
-    from azure.cli.core.translator.client_factory import AzClientFactory, AzFuncClientFactory
+    from azdev.operations.translator.hook.client_factory import AzClientFactory, AzFuncClientFactory
     if client_factory is None:
         return None
     if not isinstance(client_factory, AzClientFactory):

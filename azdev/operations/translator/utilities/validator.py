@@ -22,7 +22,7 @@ class AZDevTransFuncValidator(AZDevTransValidator):
 
     def __init__(self, validator):
         from azure.cli.core.util import get_arg_list
-        from azure.cli.core.translator.validator import AzFuncValidator
+        from azdev.operations.translator.hook.validator import AzFuncValidator
         if not isinstance(validator, AzFuncValidator):
             raise TypeError('Validator is not an instance of "AzValidator", get "{}"'.format(
                 type(validator)))
@@ -40,7 +40,7 @@ class AZDevTransFuncValidatorByFactory(AZDevTransValidator):
 
     def __init__(self, validator):
         from azure.cli.core.util import get_arg_list
-        from azure.cli.core.translator.validator import AzFuncValidatorByFactory
+        from azdev.operations.translator.hook.validator import AzFuncValidatorByFactory
         if not isinstance(validator, AzFuncValidatorByFactory):
             raise TypeError('Validator is not an instance of "AzFuncValidatorByFactory", get "{}"'.format(
                 type(validator)))
@@ -63,7 +63,7 @@ class AZDevTransFuncValidatorByFactory(AZDevTransValidator):
 def build_validator(validator):
     if validator is None:
         return None
-    from azure.cli.core.translator.validator import AzValidator, AzFuncValidator, AzFuncValidatorByFactory
+    from azdev.operations.translator.hook.validator import AzValidator, AzFuncValidator, AzFuncValidatorByFactory
     if not isinstance(validator, AzValidator):
         raise TypeError('Validator is not an instance of "AzValidator", get "{}"'.format(
             type(validator)))

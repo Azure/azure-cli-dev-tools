@@ -9,7 +9,7 @@ class AZDevTransTableTransformer(AZDevTransNode):
     key = 'table-transformer'
 
     def __init__(self, table_transformer):
-        from azure.cli.core.translator.transformer import AzTransformer
+        from azdev.operations.translator.hook.transformer import AzTransformer
         if not isinstance(table_transformer, str) and not isinstance(table_transformer, AzTransformer):
             raise TypeError('Table transform is not a string or an instance of "AzTransformer", get "{}"'.format(
                 type(table_transformer)))
@@ -22,7 +22,7 @@ class AZDevTransTableTransformer(AZDevTransNode):
 class AZDevTransStrTableTransformer(AZDevTransTableTransformer):
 
     def __init__(self, table_transformer):
-        from azure.cli.core.translator.transformer import AzFuncTransformer
+        from azdev.operations.translator.hook.transformer import AzFuncTransformer
         if not isinstance(table_transformer, str) and not isinstance(table_transformer, AzFuncTransformer):
             raise TypeError('Table transform is not a string, get "{}"'.format(
                 type(table_transformer)))
@@ -38,7 +38,7 @@ class AZDevTransStrTableTransformer(AZDevTransTableTransformer):
 class AZDevTransFuncTableTransformer(AZDevTransTableTransformer):
 
     def __init__(self, table_transformer):
-        from azure.cli.core.translator.transformer import AzFuncTransformer
+        from azdev.operations.translator.hook.transformer import AzFuncTransformer
         if not isinstance(table_transformer, AzFuncTransformer):
             raise TypeError('Table transform is not an instance of "AzFuncTransformer", get "{}"'.format(
                 type(table_transformer)))
@@ -52,7 +52,7 @@ class AZDevTransFuncTableTransformer(AZDevTransTableTransformer):
 
 
 def build_command_table_transformer(table_transformer):
-    from azure.cli.core.translator.transformer import AzTransformer, AzFuncTransformer
+    from azdev.operations.translator.hook.transformer import AzTransformer, AzFuncTransformer
     if isinstance(table_transformer, str):
         table_transformer = table_transformer.strip()
         if not table_transformer:
