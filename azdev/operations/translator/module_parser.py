@@ -86,8 +86,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
         config = OrderedDict()
         config['version'] = self.VERSION
         config['created'] = str(datetime.datetime.now())
-        if ctx.imports:
-            config['imports'] = ctx.imports
+        config['reference'] = ctx.used_reference    # it's empty at first, but will be filled after to_config.
         k, v = root.to_config(ctx)
         config[k] = v
         return config

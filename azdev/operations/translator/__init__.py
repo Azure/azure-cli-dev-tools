@@ -13,7 +13,7 @@ from azdev.utilities import get_cli_repo_path
 from azdev.operations.translator.argument import build_argument
 from azdev.operations.translator.command import build_command
 from azdev.operations.translator.command_group import build_command_group
-from azdev.operations.translator.utilities import AZDevTransConfigurationCtx, AZDevTransCtx, default_core_imports
+from azdev.operations.translator.utilities import AZDevTransConfigurationCtx, AZDevTransCtx
 from azdev.operations.translator.arg_type import AZDevTransRegisteredArgType
 from azdev.operations.translator.module_parser import AZDevTransModuleParser
 from azdev.operations.translator.hook import hook_azure_cli_core
@@ -33,7 +33,7 @@ def generate_commands_config(mod_name,
     parser = AZDevTransModuleParser(cli_ctx=cli_ctx)
     parser.load_module(module)
     root = parser.build_commands_tree()
-    ctx = AZDevTransConfigurationCtx(cli_ctx=cli_ctx, module=module, imports=default_core_imports)
+    ctx = AZDevTransConfigurationCtx(cli_ctx=cli_ctx, module=module)
     commands_config = parser.convert_commands_to_config(root, ctx)
     ctx = AZDevTransConfigurationCtx(cli_ctx=cli_ctx, module=module)
     examples_config = parser.convert_examples_to_config(root, ctx)

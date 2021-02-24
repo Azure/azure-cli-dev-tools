@@ -7,7 +7,7 @@ from collections import defaultdict
 from knack.cli import CLI
 from knack.util import CLIError
 
-default_core_imports = {
+default_core_reference = {
     'get_three_state_action': 'azure.cli.core.commands.parameters#get_three_state_action',
     'get_three_state_flag': 'azure.cli.core.commands.parameters#get_three_state_flag',
     'get_enum_type': 'azure.cli.core.commands.parameters#get_enum_type',
@@ -61,15 +61,16 @@ class AZDevTransCtx(CLI):
 
 class AZDevTransConfigurationCtx:
 
-    def __init__(self, cli_ctx, module, imports=None):
+    def __init__(self, cli_ctx, module, reference=default_core_reference):
         self._cli_ctx = cli_ctx
         self._arg_type_reference_format_queue = []
         self._command_sdk_queue = []
         self._output_arg_types = set()
         self._module_name = module.__name__
-        self.imports = imports or {}
-        self._reversed_imports = dict([(v, k) for k, v in self.imports.items()])
-        assert len(self.imports) == len(self._reversed_imports)
+        self.used_reference = {}
+        self._reference = reference or {}
+        self._reversed_reference = dict([(v, k) for k, v in self._reference.items()])
+        assert len(self._reference) == len(self._reversed_reference)
 
     def set_art_type_reference_format(self, to_reference_format):
         assert isinstance(to_reference_format, bool)
@@ -117,8 +118,10 @@ class AZDevTransConfigurationCtx:
         return register_name in self._output_arg_types
 
     def simplify_import_path(self, path):
-        if path in self._reversed_imports:
-            path = '${}'.format(self._reversed_imports[path])
+        if path in self._reversed_reference:
+            reference_name = self._reversed_reference[path]
+            self.used_reference[reference_name] = path
+            path = '${}'.format(reference_name)
         else:
             versioned_sdk_path = self.get_versioned_sdk_path()
             if versioned_sdk_path and path.startswith(versioned_sdk_path):
