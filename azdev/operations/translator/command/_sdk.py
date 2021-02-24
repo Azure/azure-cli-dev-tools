@@ -46,7 +46,8 @@ class AZDevTransSDK(AZDevTransBaseSDK):
         value['resource-type'] = self.name
         if self.operation_group:
             value['operation-group'] = self.operation_group
-        value['api-version'] = ctx.get_api_version(self.resource_type, self.operation_group)
+        if ctx.is_multi_api_sdk(self.resource_type):
+            value['api-version'] = ctx.get_api_version(self.resource_type, self.operation_group)
         return self.key, value
 
 

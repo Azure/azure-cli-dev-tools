@@ -17,6 +17,8 @@ import datetime
 
 class AZDevTransModuleParser(CLICommandsLoader):
 
+    VERSION = "0.1.0"
+
     def __init__(self, cli_ctx=None, **kwargs):
         cli_ctx = cli_ctx
         super(AZDevTransModuleParser, self).__init__(cli_ctx=cli_ctx, **kwargs)
@@ -64,6 +66,9 @@ class AZDevTransModuleParser(CLICommandsLoader):
             else:
                 raise CLIError("Module is missing `COMMAND_LOADER_CLS` entry.")
         command_loader = loader_cls(cli_ctx=self.cli_ctx)
+        if not command_loader.supported_resource_type():
+            raise CLIError('Not supported resource type "{}" for current profile "{}"'.format(
+                command_loader._get_resource_type(), self.cli_ctx.cloud.profile))
         command_table = command_loader.load_command_table(None)
         if command_table:
             for cmd in list(command_table.keys()):
@@ -79,6 +84,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
 
     def convert_commands_to_config(self, root, ctx):
         config = OrderedDict()
+        config['version'] = self.VERSION
         config['created'] = str(datetime.datetime.now())
         if ctx.imports:
             config['imports'] = ctx.imports
@@ -89,6 +95,7 @@ class AZDevTransModuleParser(CLICommandsLoader):
     def convert_examples_to_config(self, root, ctx):
         k, v = root.to_example_config(ctx)
         config = OrderedDict()
+        config['version'] = self.VERSION
         config['created'] = str(datetime.datetime.now())
         config[k] = v
         return config

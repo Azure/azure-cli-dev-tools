@@ -148,8 +148,14 @@ class AZDevTransConfigurationCtx:
         operation_group = self.current_command_sdk.operation_group if self.current_command_sdk else None
         return get_sdk(self._cli_ctx, resource_type, model_name, mod='models', operation_group=operation_group)
 
+    def is_multi_api_sdk(self, resource_type):
+        from azure.cli.core.profiles._shared import AZURE_API_PROFILES
+        return bool(AZURE_API_PROFILES[self._cli_ctx.cloud.profile].get(resource_type, None))
+
     def get_api_version(self, resource_type, operation_group):
         from azure.cli.core.profiles._shared import _ApiVersions, get_api_version
+        if not self.is_multi_api_sdk(resource_type):
+            return None
         api_version = get_api_version(self._cli_ctx.cloud.profile, resource_type)
         if api_version is None:
             return None
@@ -160,9 +166,16 @@ class AZDevTransConfigurationCtx:
         return api_version
 
     def get_versioned_sdk_path(self):
-        from azure.cli.core.profiles._shared import get_versioned_sdk_path
         if self.current_command_sdk is None:
             return None
-        return get_versioned_sdk_path(api_profile=self._cli_ctx.cloud.profile,
-                                      resource_type=self.current_command_sdk.resource_type,
-                                      operation_group=self.current_command_sdk.operation_group)
+
+        api_version = self.get_api_version(
+            resource_type=self.current_command_sdk.resource_type,
+            operation_group=self.current_command_sdk.operation_group)
+        if not api_version:
+            return self.current_command_sdk.resource_type.import_prefix
+
+        return '{}.v{}'.format(
+            self.current_command_sdk.resource_type.import_prefix,
+            api_version.replace('-', '_').replace('.', '_')
+        )
