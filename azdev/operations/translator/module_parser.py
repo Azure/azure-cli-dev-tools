@@ -40,12 +40,15 @@ class AZDevTransModuleParser(CLICommandsLoader):
                 super(AZDevArgumentContext, self).__init__(*args, **kwargs)
 
             def _handle_experimentals(self, argument_dest, **kwargs):
+                # Don't add additional properties for experimental arguments
                 return kwargs
 
             def _handle_previews(self, argument_dest, **kwargs):
+                # Don't add additional properties for preview arguments
                 return kwargs
 
             def _handle_deprecations(self, argument_dest, **kwargs):
+                # Don't add deprecation properties for deprecated arguments
                 return kwargs.get('action', None)
 
         return AZDevArgumentContext
