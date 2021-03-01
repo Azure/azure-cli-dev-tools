@@ -10,8 +10,8 @@ class AZDevTransArgumentCompleter(AZDevTransNode):
     key = 'completer'
 
     def __init__(self, completer):
-        from azdev.operations.translator.hook.completer import AzCompleter
-        if not isinstance(completer, AzCompleter):
+        from azdev.operations.translator.hook.completer import AZCompleter
+        if not isinstance(completer, AZCompleter):
             raise TypeError("Expect AzFuncCompleter, got '{}'".format(completer))
         self.completer = completer
 
@@ -22,8 +22,8 @@ class AZDevTransArgumentCompleter(AZDevTransNode):
 class AZDevTransArgumentFuncCompleter(AZDevTransArgumentCompleter):
 
     def __init__(self, completer):
-        from azdev.operations.translator.hook.completer import AzFuncCompleter
-        if not isinstance(completer, AzFuncCompleter):
+        from azdev.operations.translator.hook.completer import AZCompleterFunc
+        if not isinstance(completer, AZCompleterFunc):
             raise TypeError("Expect AzFuncCompleter, got '{}'".format(completer))
         super(AZDevTransArgumentFuncCompleter, self).__init__(completer)
         self.import_module = completer.import_module
@@ -37,8 +37,8 @@ class AZDevTransArgumentFuncCompleter(AZDevTransArgumentCompleter):
 class AZDevTransArgumentFuncCompleterByFactory(AZDevTransArgumentCompleter):
 
     def __init__(self, completer):
-        from azdev.operations.translator.hook.completer import AzFuncCompleterByFactory
-        if not isinstance(completer, AzFuncCompleterByFactory):
+        from azdev.operations.translator.hook.completer import AZCompleterByFactory
+        if not isinstance(completer, AZCompleterByFactory):
             raise TypeError("Expect AzFuncCompleterByFactory, got '{}'".format(completer))
         super(AZDevTransArgumentFuncCompleterByFactory, self).__init__(completer)
         self.import_module = completer.import_module
@@ -58,8 +58,8 @@ class AZDevTransArgumentFuncCompleterByFactory(AZDevTransArgumentCompleter):
 class AZDevTransArgumentExternalCompleterByFactory(AZDevTransArgumentCompleter):
 
     def __init__(self, completer):
-        from azdev.operations.translator.hook.completer import AzExternalCompleterByFactory
-        if not isinstance(completer, AzExternalCompleterByFactory):
+        from azdev.operations.translator.hook.completer import AZExternalCompleterByFactory
+        if not isinstance(completer, AZExternalCompleterByFactory):
             raise TypeError("Expect AzExternalCompleterByFactory, got '{}'".format(completer))
         super(AZDevTransArgumentExternalCompleterByFactory, self).__init__(completer)
         self.import_module = completer.import_module
@@ -77,17 +77,17 @@ class AZDevTransArgumentExternalCompleterByFactory(AZDevTransArgumentCompleter):
 
 
 def build_argument_completer(completer):
-    from azdev.operations.translator.hook.completer import AzCompleter, AzFuncCompleter, AzFuncCompleterByFactory, \
-        AzExternalCompleterByFactory
+    from azdev.operations.translator.hook.completer import AZCompleter, AZCompleterFunc, AZCompleterByFactory, \
+        AZExternalCompleterByFactory
     if completer is None:
         return None
-    if not isinstance(completer, AzCompleter):
+    if not isinstance(completer, AZCompleter):
         raise TypeError("Expect AzCompleter type, got '{}'".format(completer))
-    if isinstance(completer, AzFuncCompleter):
+    if isinstance(completer, AZCompleterFunc):
         return AZDevTransArgumentFuncCompleter(completer)
-    elif isinstance(completer, AzFuncCompleterByFactory):
+    elif isinstance(completer, AZCompleterByFactory):
         return AZDevTransArgumentFuncCompleterByFactory(completer)
-    elif isinstance(completer, AzExternalCompleterByFactory):
+    elif isinstance(completer, AZExternalCompleterByFactory):
         return AZDevTransArgumentExternalCompleterByFactory(completer)
     else:
         raise NotImplementedError()

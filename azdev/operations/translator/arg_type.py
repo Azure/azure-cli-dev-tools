@@ -11,8 +11,8 @@ class AZDevTransArgType(AZDevTransNode):
     key = 'arg-type'
 
     def __init__(self, arg_type):
-        from azdev.operations.translator.hook.arg_type import AzArgType
-        if not isinstance(arg_type, AzArgType):
+        from azdev.operations.translator.hook.arg_type import AZArgType
+        if not isinstance(arg_type, AZArgType):
             raise TypeError('Expect AzArgType type, Got "{}"'.format(type(arg_type)))
         self._arg_type = arg_type
 
@@ -275,8 +275,8 @@ class AZDevTransArgType(AZDevTransNode):
 class AZDevTransArgTypeByFactory(AZDevTransArgType):
 
     def __init__(self, arg_type):
-        from azdev.operations.translator.hook.arg_type import AzArgTypeByFactory
-        if not isinstance(arg_type, AzArgTypeByFactory):
+        from azdev.operations.translator.hook.arg_type import AZArgTypeByFactory
+        if not isinstance(arg_type, AZArgTypeByFactory):
             raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
         super(AZDevTransArgTypeByFactory, self).__init__(arg_type)
         self.import_module = arg_type.import_module
@@ -309,8 +309,8 @@ class AZDevTransArgTypeByFactory(AZDevTransArgType):
 class AZDevTransRegisteredArgType(AZDevTransArgType):
 
     def __init__(self, arg_type):
-        from azdev.operations.translator.hook.arg_type import AzRegisteredArgType
-        if not isinstance(arg_type, AzRegisteredArgType):
+        from azdev.operations.translator.hook.arg_type import AZRegisteredArgType
+        if not isinstance(arg_type, AZRegisteredArgType):
             raise TypeError('Expect AzArgTypeInstance type, Got "{}"'.format(type(arg_type)))
         super(AZDevTransRegisteredArgType, self).__init__(arg_type)
         self.import_module = arg_type.import_module     # TODO: use this to distinguish internal use arg_type or external use arg_type
@@ -330,15 +330,15 @@ class AZDevTransRegisteredArgType(AZDevTransArgType):
 
 
 def build_arg_type(arg_type):
-    from azdev.operations.translator.hook.arg_type import AzArgType, AzRegisteredArgType, AzArgTypeByFactory
+    from azdev.operations.translator.hook.arg_type import AZArgType, AZRegisteredArgType, AZArgTypeByFactory
     if arg_type is None:
         return None
 
-    if not isinstance(arg_type, AzArgType):
+    if not isinstance(arg_type, AZArgType):
         raise TypeError("Expect str or AzArgType type, got '{}'".format(arg_type))
-    if isinstance(arg_type, AzRegisteredArgType):
+    if isinstance(arg_type, AZRegisteredArgType):
         return AZDevTransRegisteredArgType(arg_type)
-    elif isinstance(arg_type, AzArgTypeByFactory):
+    elif isinstance(arg_type, AZArgTypeByFactory):
         return AZDevTransArgTypeByFactory(arg_type)
     else:
         raise NotImplementedError()

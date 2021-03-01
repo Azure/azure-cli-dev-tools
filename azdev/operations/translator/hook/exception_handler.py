@@ -6,7 +6,7 @@ import types
 import inspect
 
 
-class AzExceptionHandler:
+class AZExceptionHandler:
 
     def __call__(self, *args, **kwargs):
         raise NotImplementedError()
@@ -15,7 +15,7 @@ class AzExceptionHandler:
         raise NotImplementedError()
 
 
-class AzFuncExceptionHandler(AzExceptionHandler):
+class AZExceptionHandlerFunc(AZExceptionHandler):
 
     def __init__(self, func):
         if not isinstance(func, types.FunctionType):
@@ -31,5 +31,5 @@ class AzFuncExceptionHandler(AzExceptionHandler):
         return "{}#{}".format(self.import_module, self.import_name)
 
 
-def func_exception_handler_wrapper(func):
-    return AzFuncExceptionHandler(func)
+def exception_handler_func(func):
+    return AZExceptionHandlerFunc(func)

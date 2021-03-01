@@ -9,8 +9,8 @@ class AZDevTransExceptionHandler(AZDevTransNode):
     key = 'exception-handler'
 
     def __init__(self, exception_handler):
-        from azdev.operations.translator.hook.exception_handler import AzExceptionHandler
-        if not isinstance(exception_handler, AzExceptionHandler):
+        from azdev.operations.translator.hook.exception_handler import AZExceptionHandler
+        if not isinstance(exception_handler, AZExceptionHandler):
             raise TypeError('Exception handler is not an instance of "AzExceptionHandler", get "{}"'.format(
                 type(exception_handler)))
         self.exception_handler = exception_handler
@@ -22,8 +22,8 @@ class AZDevTransExceptionHandler(AZDevTransNode):
 class AZDevTransFuncExceptionHandler(AZDevTransExceptionHandler):
 
     def __init__(self, exception_handler):
-        from azdev.operations.translator.hook.exception_handler import AzFuncExceptionHandler
-        if not isinstance(exception_handler, AzFuncExceptionHandler):
+        from azdev.operations.translator.hook.exception_handler import AZExceptionHandlerFunc
+        if not isinstance(exception_handler, AZExceptionHandlerFunc):
             raise TypeError('Exception handler is not an instance of "AzFuncExceptionHandler", get "{}"'.format(
                 type(exception_handler)))
         super(AZDevTransFuncExceptionHandler, self).__init__(exception_handler)
@@ -36,13 +36,13 @@ class AZDevTransFuncExceptionHandler(AZDevTransExceptionHandler):
 
 
 def build_exception_handler(exception_handler):
-    from azdev.operations.translator.hook.exception_handler import AzExceptionHandler, AzFuncExceptionHandler
+    from azdev.operations.translator.hook.exception_handler import AZExceptionHandler, AZExceptionHandlerFunc
     if exception_handler is None:
         return None
-    if not isinstance(exception_handler, AzExceptionHandler):
+    if not isinstance(exception_handler, AZExceptionHandler):
         raise TypeError('Exception handler is not an instance of "AzExceptionHandler", get "{}"'.format(
             type(exception_handler)))
-    if isinstance(exception_handler, AzFuncExceptionHandler):
+    if isinstance(exception_handler, AZExceptionHandlerFunc):
         return AZDevTransFuncExceptionHandler(exception_handler)
     else:
         raise NotImplementedError()

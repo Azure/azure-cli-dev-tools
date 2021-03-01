@@ -11,8 +11,8 @@ class AZDevTransArgumentAction(AZDevTransNode):
     key = 'action'
 
     def __init__(self, action):
-        from azdev.operations.translator.hook.action import AzAction
-        if not isinstance(action, str) and not issubclass(action, AzAction):
+        from azdev.operations.translator.hook.action import AZAction
+        if not isinstance(action, str) and not issubclass(action, AZAction):
             raise TypeError("Expect str or AzAction type, got '{}'".format(action))
         self.action = action
 
@@ -35,8 +35,8 @@ class AZDevTransArgumentActionByStr(AZDevTransArgumentAction):
 class AZDevTransArgumentClsAction(AZDevTransArgumentAction):
 
     def __init__(self, action):
-        from azdev.operations.translator.hook.action import AzClsAction
-        if not issubclass(action, AzClsAction):
+        from azdev.operations.translator.hook.action import AZActionClass
+        if not issubclass(action, AZActionClass):
             raise TypeError("Expect str or AzClsAction type, got '{}'".format(action))
         super(AZDevTransArgumentClsAction, self).__init__(action)
         self.import_module = action.import_module
@@ -50,8 +50,8 @@ class AZDevTransArgumentClsAction(AZDevTransArgumentAction):
 class AZDevTransArgumentClsActionByFactory(AZDevTransArgumentAction):
 
     def __init__(self, action):
-        from azdev.operations.translator.hook.action import AzClsActionByFactory
-        if not issubclass(action, AzClsActionByFactory):
+        from azdev.operations.translator.hook.action import AZActionClassByFactory
+        if not issubclass(action, AZActionClassByFactory):
             raise TypeError("Expect str or AzClsActionByFactory type, got '{}'".format(action))
         super(AZDevTransArgumentClsActionByFactory, self).__init__(action)
         self.import_module = action.import_module
@@ -69,17 +69,17 @@ class AZDevTransArgumentClsActionByFactory(AZDevTransArgumentAction):
 
 
 def build_argument_action(action):
-    from azdev.operations.translator.hook.action import AzAction, AzClsAction, AzClsActionByFactory
+    from azdev.operations.translator.hook.action import AZAction, AZActionClass, AZActionClassByFactory
     if action is None:
         return None
 
     if isinstance(action, str):
         return AZDevTransArgumentActionByStr(action)
-    elif not isinstance(action, type) or not issubclass(action, AzAction):
+    elif not isinstance(action, type) or not issubclass(action, AZAction):
         raise TypeError("Expect str or AzAction type, got '{}'".format(action))
-    elif issubclass(action, AzClsAction):
+    elif issubclass(action, AZActionClass):
         return AZDevTransArgumentClsAction(action)
-    elif issubclass(action, AzClsActionByFactory):
+    elif issubclass(action, AZActionClassByFactory):
         return AZDevTransArgumentClsActionByFactory(action)
     else:
         raise NotImplementedError()

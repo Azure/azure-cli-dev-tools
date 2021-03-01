@@ -22,8 +22,8 @@ class AZDevTransFuncValidator(AZDevTransValidator):
 
     def __init__(self, validator):
         from azure.cli.core.util import get_arg_list
-        from azdev.operations.translator.hook.validator import AzFuncValidator
-        if not isinstance(validator, AzFuncValidator):
+        from azdev.operations.translator.hook.validator import AZValidatorFunc
+        if not isinstance(validator, AZValidatorFunc):
             raise TypeError('Validator is not an instance of "AzValidator", get "{}"'.format(
                 type(validator)))
         arg_list = get_arg_list(validator.func)
@@ -40,8 +40,8 @@ class AZDevTransFuncValidatorByFactory(AZDevTransValidator):
 
     def __init__(self, validator):
         from azure.cli.core.util import get_arg_list
-        from azdev.operations.translator.hook.validator import AzFuncValidatorByFactory
-        if not isinstance(validator, AzFuncValidatorByFactory):
+        from azdev.operations.translator.hook.validator import AZValidatorByFactory
+        if not isinstance(validator, AZValidatorByFactory):
             raise TypeError('Validator is not an instance of "AzFuncValidatorByFactory", get "{}"'.format(
                 type(validator)))
         arg_list = get_arg_list(validator.instance)
@@ -63,14 +63,14 @@ class AZDevTransFuncValidatorByFactory(AZDevTransValidator):
 def build_validator(validator):
     if validator is None:
         return None
-    from azdev.operations.translator.hook.validator import AzValidator, AzFuncValidator, AzFuncValidatorByFactory
-    if not isinstance(validator, AzValidator):
+    from azdev.operations.translator.hook.validator import AZValidator, AZValidatorFunc, AZValidatorByFactory
+    if not isinstance(validator, AZValidator):
         raise TypeError('Validator is not an instance of "AzValidator", get "{}"'.format(
             type(validator)))
 
-    if isinstance(validator, AzFuncValidator):
+    if isinstance(validator, AZValidatorFunc):
         return AZDevTransFuncValidator(validator)
-    elif isinstance(validator, AzFuncValidatorByFactory):
+    elif isinstance(validator, AZValidatorByFactory):
         return AZDevTransFuncValidatorByFactory(validator)
     else:
         raise NotImplementedError()

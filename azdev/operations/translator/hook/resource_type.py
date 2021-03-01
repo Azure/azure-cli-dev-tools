@@ -5,11 +5,11 @@
 from azure.cli.core.profiles import CustomResourceType
 
 
-class AzRegisteredCustomResourceType(CustomResourceType):
+class AZRegisteredCustomResourceType(CustomResourceType):
     def __init__(self, register_name, import_prefix, client_name):
         self.register_name = register_name
-        super(AzRegisteredCustomResourceType, self).__init__(import_prefix=import_prefix, client_name=client_name)
+        super(AZRegisteredCustomResourceType, self).__init__(import_prefix=import_prefix, client_name=client_name)
 
 
 def register_custom_resource_type(register_name, import_prefix, client_name):
-    return AzRegisteredCustomResourceType(register_name, import_prefix, client_name)
+    return AZRegisteredCustomResourceType(register_name, import_prefix, client_name)

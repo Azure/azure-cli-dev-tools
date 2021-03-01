@@ -7,7 +7,7 @@ import inspect
 import types
 
 
-class AzTypeConverter:
+class AZTypeConverter:
 
     def __call__(self, value):
         raise NotImplementedError()
@@ -16,7 +16,7 @@ class AzTypeConverter:
         raise NotImplementedError()
 
 
-class AzFuncTypeConverter(AzTypeConverter):
+class AZTypeConverterFunc(AZTypeConverter):
 
     def __init__(self, func):
         if not isinstance(func, types.FunctionType):
@@ -32,7 +32,7 @@ class AzFuncTypeConverter(AzTypeConverter):
         return "{}#{}".format(self.import_module, self.import_name)
 
 
-class AzFuncTypeConverterByFactory(AzTypeConverter):
+class AZTypeConverterByFactory(AZTypeConverter):
 
     def __init__(self, factory, args, kwargs):
         if isinstance(factory, types.FunctionType):     # support a factory function which return value is callable
@@ -65,11 +65,11 @@ class AzFuncTypeConverterByFactory(AzTypeConverter):
         return "{}#{}".format(self.import_module, self.import_name)
 
 
-def func_type_converter_wrapper(func):
-    return AzFuncTypeConverter(func)
+def type_converter_func(func):
+    return AZTypeConverterFunc(func)
 
 
-def func_type_converter_factory_wrapper(factory):
+def type_converter_by_factory(factory):
     def wrapper(*args, **kwargs):
-        return AzFuncTypeConverterByFactory(factory, args, kwargs)
+        return AZTypeConverterByFactory(factory, args, kwargs)
     return wrapper

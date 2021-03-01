@@ -6,7 +6,7 @@ import types
 import inspect
 
 
-class AzTransformer:
+class AZTransformer:
 
     def __call__(self, result):
         raise NotImplementedError()
@@ -15,7 +15,7 @@ class AzTransformer:
         raise NotImplementedError()
 
 
-class AzFuncTransformer(AzTransformer):
+class AZTransformerFunc(AZTransformer):
 
     def __init__(self, func):
         if not isinstance(func, types.FunctionType):
@@ -31,5 +31,5 @@ class AzFuncTransformer(AzTransformer):
         return "{}#{}".format(self.import_module, self.import_name)
 
 
-def func_transformer_wrapper(func):
-    return AzFuncTransformer(func)
+def transformer_func(func):
+    return AZTransformerFunc(func)

@@ -7,19 +7,19 @@ import inspect
 import types
 
 
-class AzAction:
+class AZAction:
     pass
 
 
-class AzClsAction(AzAction):
+class AZActionClass(AZAction):
     pass
 
 
-class AzClsActionByFactory(AzAction):
+class AZActionClassByFactory(AZAction):
     pass
 
 
-def cls_action_wrapper(action_cls):
+def action_class(action_cls):
     if not issubclass(action_cls, argparse.Action):
         raise TypeError("{} is not a subclass of argparse.Action".format(action_cls.__name__))
     name = action_cls.__name__
@@ -29,11 +29,11 @@ def cls_action_wrapper(action_cls):
     dct['import_module'] = inspect.getmodule(action_cls).__name__
     dct['import_name'] = action_cls.__name__
 
-    bases = (*bases, AzClsAction)
+    bases = (*bases, AZActionClass)
     return type(name, bases, dct)
 
 
-def cls_action_factory_wrapper(factory):
+def action_class_by_factory(factory):
     if not isinstance(factory, types.FunctionType):
         raise TypeError('Expect function type, Got "{}"'.format(factory))
 
@@ -55,6 +55,6 @@ def cls_action_factory_wrapper(factory):
         dct['import_name'] = factory.__name__
         dct['kwargs'] = kwargs
 
-        bases = (*bases, AzClsActionByFactory)
+        bases = (*bases, AZActionClassByFactory)
         return type(name, bases, dct)
     return wrapper

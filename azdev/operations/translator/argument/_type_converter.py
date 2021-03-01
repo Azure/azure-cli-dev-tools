@@ -31,8 +31,8 @@ class AZDevTransArgumentBuildInTypeConverter(AZDevTransArgumentTypeConverter):
 class AZDevTransArgumentFuncTypeConverter(AZDevTransArgumentTypeConverter):
 
     def __init__(self, converter):
-        from azdev.operations.translator.hook.type_converter import AzFuncTypeConverter
-        if not isinstance(converter, AzFuncTypeConverter):
+        from azdev.operations.translator.hook.type_converter import AZTypeConverterFunc
+        if not isinstance(converter, AZTypeConverterFunc):
             raise TypeError('Expect AzFuncTypeConverter, Got "{}"'.format(converter))
         super(AZDevTransArgumentFuncTypeConverter, self).__init__(converter)
         self.import_module = converter.import_module
@@ -46,8 +46,8 @@ class AZDevTransArgumentFuncTypeConverter(AZDevTransArgumentTypeConverter):
 class AZDevTransArgumentFuncTypeConverterByFactory(AZDevTransArgumentTypeConverter):
 
     def __init__(self, converter):
-        from azdev.operations.translator.hook.type_converter import AzFuncTypeConverterByFactory
-        if not isinstance(converter, AzFuncTypeConverterByFactory):
+        from azdev.operations.translator.hook.type_converter import AZTypeConverterByFactory
+        if not isinstance(converter, AZTypeConverterByFactory):
             raise TypeError('Expect AzFuncTypeConverterByFactory, Got "{}"'.format(converter))
         super(AZDevTransArgumentFuncTypeConverterByFactory, self).__init__(converter)
         self.import_module = converter.import_module
@@ -65,13 +65,13 @@ class AZDevTransArgumentFuncTypeConverterByFactory(AZDevTransArgumentTypeConvert
 
 
 def build_argument_type_converter(converter):
-    from azdev.operations.translator.hook.type_converter import AzFuncTypeConverter, AzFuncTypeConverterByFactory
+    from azdev.operations.translator.hook.type_converter import AZTypeConverterFunc, AZTypeConverterByFactory
     if converter is None:
         return None
     if converter in (str, int, float, bool):
         return AZDevTransArgumentBuildInTypeConverter(converter)
-    elif isinstance(converter, AzFuncTypeConverter):
+    elif isinstance(converter, AZTypeConverterFunc):
         return AZDevTransArgumentFuncTypeConverter(converter)
-    elif isinstance(converter, AzFuncTypeConverterByFactory):
+    elif isinstance(converter, AZTypeConverterByFactory):
         return AZDevTransArgumentFuncTypeConverterByFactory(converter)
 

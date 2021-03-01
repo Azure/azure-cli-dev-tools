@@ -6,7 +6,7 @@ import inspect
 import types
 
 
-class AzClientFactory:
+class AZClientFactory:
 
     def __call__(self, *args, **kwargs):
         raise NotImplementedError()
@@ -15,7 +15,7 @@ class AzClientFactory:
         raise NotImplementedError()
 
 
-class AzFuncClientFactory(AzClientFactory):
+class AZClientFactoryFunc(AZClientFactory):
 
     def __init__(self, func):
         if not isinstance(func, types.FunctionType):
@@ -31,5 +31,5 @@ class AzFuncClientFactory(AzClientFactory):
         return "{}#{}".format(self.import_module, self.import_name)
 
 
-def func_client_factory_wrapper(func):
-    return AzFuncClientFactory(func)
+def client_factory_func(func):
+    return AZClientFactoryFunc(func)

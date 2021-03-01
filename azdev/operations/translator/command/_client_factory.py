@@ -9,8 +9,8 @@ class AZDevTransClientFactory(AZDevTransNode):
     key = "client-factory"
 
     def __init__(self, client_factory):
-        from azdev.operations.translator.hook.client_factory import AzClientFactory
-        if not isinstance(client_factory, AzClientFactory):
+        from azdev.operations.translator.hook.client_factory import AZClientFactory
+        if not isinstance(client_factory, AZClientFactory):
             raise TypeError('Client factory is not an instance of "AzClientFactory", get "{}"'.format(
                 type(client_factory)))
         self.client_factory = client_factory
@@ -22,8 +22,8 @@ class AZDevTransClientFactory(AZDevTransNode):
 class AZDevTransFuncClientFactory(AZDevTransClientFactory):
 
     def __init__(self, client_factory):
-        from azdev.operations.translator.hook.client_factory import AzFuncClientFactory
-        if not isinstance(client_factory, AzFuncClientFactory):
+        from azdev.operations.translator.hook.client_factory import AZClientFactoryFunc
+        if not isinstance(client_factory, AZClientFactoryFunc):
             raise TypeError('Client factory is not an instance of "AzFuncClientFactory", get "{}"'.format(
                 type(client_factory)))
         super(AZDevTransFuncClientFactory, self).__init__(client_factory)
@@ -36,13 +36,13 @@ class AZDevTransFuncClientFactory(AZDevTransClientFactory):
 
 
 def build_client_factory(client_factory):
-    from azdev.operations.translator.hook.client_factory import AzClientFactory, AzFuncClientFactory
+    from azdev.operations.translator.hook.client_factory import AZClientFactory, AZClientFactoryFunc
     if client_factory is None:
         return None
-    if not isinstance(client_factory, AzClientFactory):
+    if not isinstance(client_factory, AZClientFactory):
         raise TypeError('Client factory is not an instance of "AzClientFactory", get "{}"'.format(
             type(client_factory)))
-    if isinstance(client_factory, AzFuncClientFactory):
+    if isinstance(client_factory, AZClientFactoryFunc):
         return AZDevTransFuncClientFactory(client_factory)
     else:
         raise NotImplementedError()

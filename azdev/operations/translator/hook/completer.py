@@ -6,7 +6,7 @@ import inspect
 import types
 
 
-class AzCompleter:
+class AZCompleter:
 
     def __call__(self, **kwargs):
         raise NotImplementedError()
@@ -28,7 +28,7 @@ class AzCompleter:
         return kwargs
 
 
-class AzFuncCompleter(AzCompleter):
+class AZCompleterFunc(AZCompleter):
 
     def __init__(self, func):
         if not isinstance(func, types.FunctionType):
@@ -47,7 +47,7 @@ class AzFuncCompleter(AzCompleter):
         return "{}#{}".format(self.import_module, self.import_name)
 
 
-class AzFuncCompleterByFactory(AzCompleter):
+class AZCompleterByFactory(AZCompleter):
 
     def __init__(self, factory, args, kwargs):
         if isinstance(factory, types.FunctionType):     # support a factory function which return value is callable
@@ -82,7 +82,7 @@ class AzFuncCompleterByFactory(AzCompleter):
         return "{}#{}".format(self.import_module, self.import_name)
 
 
-class AzExternalCompleterByFactory(AzCompleter):
+class AZExternalCompleterByFactory(AZCompleter):
 
     def __init__(self, factory, args, kwargs):
         from azure.cli.core.translator import external_completer
@@ -115,15 +115,15 @@ class AzExternalCompleterByFactory(AzCompleter):
         return "{}#{}".format(self.import_module, self.import_name)
 
 
-def func_completer_wrapper(func):
-    return AzFuncCompleter(func)
+def completer_func(func):
+    return AZCompleterFunc(func)
 
 
-def completer_factory_wrapper(factory):
+def completer_by_factory(factory):
     def wrapper(*args, **kwargs):
-        return AzFuncCompleterByFactory(factory, args, kwargs)
+        return AZCompleterByFactory(factory, args, kwargs)
     return wrapper
 
 
 def build_external_completer_instance(cls, args, kwargs):
-    return AzExternalCompleterByFactory(cls, args, kwargs)
+    return AZExternalCompleterByFactory(cls, args, kwargs)

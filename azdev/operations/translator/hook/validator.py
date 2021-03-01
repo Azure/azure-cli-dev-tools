@@ -6,7 +6,7 @@ import inspect
 import types
 
 
-class AzValidator:
+class AZValidator:
 
     def __call__(self, cmd, namespace):
         raise NotImplementedError()
@@ -28,7 +28,7 @@ class AzValidator:
         return kwargs
 
 
-class AzFuncValidator(AzValidator):
+class AZValidatorFunc(AZValidator):
 
     def __init__(self, func):
         if not isinstance(func, types.FunctionType):
@@ -45,7 +45,7 @@ class AzFuncValidator(AzValidator):
         return "{}#{}".format(self.import_module, self.import_name)
 
 
-class AzFuncValidatorByFactory(AzValidator):
+class AZValidatorByFactory(AZValidator):
 
     def __init__(self, factory, args, kwargs):
         if isinstance(factory, types.FunctionType):     # support a factory function which return value is callable
@@ -78,11 +78,11 @@ class AzFuncValidatorByFactory(AzValidator):
         return "{}#{}".format(self.import_module, self.import_name)
 
 
-def func_validator_wrapper(func):
-    return AzFuncValidator(func)
+def validator_func(func):
+    return AZValidatorFunc(func)
 
 
-def validator_factory_wrapper(factory):
+def validator_by_factory(factory):
     def wrapper(*args, **kwargs):
-        return AzFuncValidatorByFactory(factory, args, kwargs)
+        return AZValidatorByFactory(factory, args, kwargs)
     return wrapper
