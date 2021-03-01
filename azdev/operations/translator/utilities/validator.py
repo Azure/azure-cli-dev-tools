@@ -74,4 +74,3 @@ def build_validator(validator):
         return AZDevTransValidatorByFactory(validator)
     else:
         raise NotImplementedError()
-

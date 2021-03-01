@@ -22,7 +22,6 @@ class AZDevTransCommand(AZDevTransNode):
     # 'table_transformer', 'exception_handler', 'client_factory', 'transform', 'validator', 'supports_local_cache', 'min_api', 'max_api', 'resource_type', 'operation_group',
 
     # PendingForDeprecation: 'client_arg_name', 'model_path',
-    # TODO: parse operation combine operation template and function name
 
     # ignored: 'doc_string_source', 'local_context_attribute', 'custom_command_type', 'command_type',
 

@@ -87,8 +87,7 @@ def build_command_sdk(resource_type, operation_group):
         # used for extensions. it will call register_resource_type.
         return AZDevTransVendorSDK(resource_type, operation_group)
     elif resource_type == PROFILE_TYPE:
-        # used only in commands: ad sp | ad app | feature
-        # TODO:
+        # TODO: used in commands: ad sp | ad app | feature
         raise NotImplementedError()
     else:
         raise NotImplementedError()

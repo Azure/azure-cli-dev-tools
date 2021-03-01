@@ -20,7 +20,7 @@ class AZDevTransArgument(AZDevTransNode):
     # supported: 'deprecate_info', 'is_preview', 'is_experimental', 'dest', 'help', 'options_list', 'action', 'arg_group', 'arg_type', 'choices', 'default', 'completer', 'configured_default', 'const', 'id_part', 'local_context_attribute', 'max_api', 'min_api', 'nargs',  'required', 'type', 'validator'
     # ignored: 'metavar', 'operation_group', 'resource_type', 'dest'
     # invalid: 'option_list', 'metave', ' FilesCompleter'
-    # TODO CHECK: option_strings, default_value_source, custom_command_type, command_type
+    # TODO CHECK: option_strings, default_value_source,
 
     def __init__(self, name, parent_command, table_instance):
         self.name = name
@@ -121,14 +121,6 @@ class AZDevTransArgument(AZDevTransNode):
             default = None
         if isinstance(default, float) and isnan(default):
             raise ValueError("Not support default value: float('nan')")
-        # TODO: custom function signature always has default value. FYI private_link_primary in network
-        # if default is not None:
-        #     if self.choices is not None:
-        #         if isinstance(default, list):
-        #             for value in default:
-        #                 assert value in self.choices
-        #         else:
-        #             assert default in self.choices
         self.default = default
 
     def _parse_configured_default(self, type_settings):

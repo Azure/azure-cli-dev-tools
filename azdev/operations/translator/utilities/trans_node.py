@@ -26,7 +26,7 @@ class AZDevTransNode:
                     'values': [x.value for x in v],
                 }
             elif isinstance(v, KeysView):
-                # TODO: Not support this. Handle TYPE_CLIENT_MAPPING to enum
+                # TODO: Not support this. Needs to handle TYPE_CLIENT_MAPPING to enum in network
                 v = list(v)
             kwargs[k] = v
         try:
