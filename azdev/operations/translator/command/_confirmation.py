@@ -5,7 +5,7 @@
 from azdev.operations.translator.utilities import AZDevTransNode
 
 
-class AZDevCommandConfirmation(AZDevTransNode):
+class AZDevTransCommandConfirmation(AZDevTransNode):
     key = 'confirmation'
 
     def __init__(self, confirmation):
@@ -15,25 +15,25 @@ class AZDevCommandConfirmation(AZDevTransNode):
         raise NotImplementedError()
 
 
-class AZDevBoolCommandConfirmation(AZDevCommandConfirmation):
+class AZDevTransCommandConfirmationBool(AZDevTransCommandConfirmation):
 
     def __init__(self, confirmation):
         if not isinstance(confirmation, bool):
             raise TypeError('Expect bool value, got "{}"'.format(confirmation))
-        super(AZDevBoolCommandConfirmation, self).__init__(confirmation)
+        super(AZDevTransCommandConfirmationBool, self).__init__(confirmation)
 
     def to_config(self, ctx):
         return self.key, self.confirmation
 
 
-class AZDevStrCommandConfirmation(AZDevCommandConfirmation):
+class AZDevTransCommandConfirmationStr(AZDevTransCommandConfirmation):
 
     key = 'confirmation'
 
     def __init__(self, confirmation):
         if not isinstance(confirmation, str):
             raise TypeError('Expect str value, got "{}"'.format(confirmation))
-        super(AZDevStrCommandConfirmation, self).__init__(confirmation)
+        super(AZDevTransCommandConfirmationStr, self).__init__(confirmation)
 
     def to_config(self, ctx):
         return self.key, self.confirmation
@@ -44,9 +44,9 @@ def build_command_confirmation(confirmation):
         return None
 
     if isinstance(confirmation, bool):
-        return AZDevBoolCommandConfirmation(confirmation)
+        return AZDevTransCommandConfirmationBool(confirmation)
     elif isinstance(confirmation, str):
-        return AZDevStrCommandConfirmation(confirmation)
+        return AZDevTransCommandConfirmationStr(confirmation)
     else:
         # 'az extension add' ext_add_has_confirmed
         raise NotImplementedError()

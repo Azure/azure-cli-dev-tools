@@ -18,7 +18,7 @@ class AZDevTransValidator(AZDevTransNode):
         raise NotImplementedError()
 
 
-class AZDevTransFuncValidator(AZDevTransValidator):
+class AZDevTransValidatorFunc(AZDevTransValidator):
 
     def __init__(self, validator):
         from azure.cli.core.util import get_arg_list
@@ -27,7 +27,7 @@ class AZDevTransFuncValidator(AZDevTransValidator):
             raise TypeError('Validator is not an instance of "AzValidator", get "{}"'.format(
                 type(validator)))
         arg_list = get_arg_list(validator.func)
-        super(AZDevTransFuncValidator, self).__init__(validator, arg_list)
+        super(AZDevTransValidatorFunc, self).__init__(validator, arg_list)
         self.import_module = validator.import_module
         self.import_name = validator.import_name
 
@@ -36,7 +36,7 @@ class AZDevTransFuncValidator(AZDevTransValidator):
         return self.key, value
 
 
-class AZDevTransFuncValidatorByFactory(AZDevTransValidator):
+class AZDevTransValidatorByFactory(AZDevTransValidator):
 
     def __init__(self, validator):
         from azure.cli.core.util import get_arg_list
@@ -45,7 +45,7 @@ class AZDevTransFuncValidatorByFactory(AZDevTransValidator):
             raise TypeError('Validator is not an instance of "AzFuncValidatorByFactory", get "{}"'.format(
                 type(validator)))
         arg_list = get_arg_list(validator.instance)
-        super(AZDevTransFuncValidatorByFactory, self).__init__(validator, arg_list)
+        super(AZDevTransValidatorByFactory, self).__init__(validator, arg_list)
         self.import_module = validator.import_module
         self.import_name = validator.import_name
         self.kwargs = self.process_factory_kwargs(validator.kwargs)
@@ -69,9 +69,9 @@ def build_validator(validator):
             type(validator)))
 
     if isinstance(validator, AZValidatorFunc):
-        return AZDevTransFuncValidator(validator)
+        return AZDevTransValidatorFunc(validator)
     elif isinstance(validator, AZValidatorByFactory):
-        return AZDevTransFuncValidatorByFactory(validator)
+        return AZDevTransValidatorByFactory(validator)
     else:
         raise NotImplementedError()
 

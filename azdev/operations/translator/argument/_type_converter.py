@@ -16,25 +16,25 @@ class AZDevTransArgumentTypeConverter(AZDevTransNode):
         raise NotImplementedError()
 
 
-class AZDevTransArgumentBuildInTypeConverter(AZDevTransArgumentTypeConverter):
+class AZDevTransArgumentTypeConverterBuildIn(AZDevTransArgumentTypeConverter):
 
     def __init__(self, converter):
         if converter not in (str, int, float, bool):
             raise TypeError('Expect str, int, float or bool, Got "{}"'.format(converter))
-        super(AZDevTransArgumentBuildInTypeConverter, self).__init__(converter)
+        super(AZDevTransArgumentTypeConverterBuildIn, self).__init__(converter)
 
     def to_config(self, ctx):
         value = str(self.converter)
         return self.key, value
 
 
-class AZDevTransArgumentFuncTypeConverter(AZDevTransArgumentTypeConverter):
+class AZDevTransArgumentTypeConverterFunc(AZDevTransArgumentTypeConverter):
 
     def __init__(self, converter):
         from azdev.operations.translator.hook.type_converter import AZTypeConverterFunc
         if not isinstance(converter, AZTypeConverterFunc):
             raise TypeError('Expect AzFuncTypeConverter, Got "{}"'.format(converter))
-        super(AZDevTransArgumentFuncTypeConverter, self).__init__(converter)
+        super(AZDevTransArgumentTypeConverterFunc, self).__init__(converter)
         self.import_module = converter.import_module
         self.import_name = converter.import_name
 
@@ -43,13 +43,13 @@ class AZDevTransArgumentFuncTypeConverter(AZDevTransArgumentTypeConverter):
         return self.key, value
 
 
-class AZDevTransArgumentFuncTypeConverterByFactory(AZDevTransArgumentTypeConverter):
+class AZDevTransArgumentTypeConverterByFactory(AZDevTransArgumentTypeConverter):
 
     def __init__(self, converter):
         from azdev.operations.translator.hook.type_converter import AZTypeConverterByFactory
         if not isinstance(converter, AZTypeConverterByFactory):
             raise TypeError('Expect AzFuncTypeConverterByFactory, Got "{}"'.format(converter))
-        super(AZDevTransArgumentFuncTypeConverterByFactory, self).__init__(converter)
+        super(AZDevTransArgumentTypeConverterByFactory, self).__init__(converter)
         self.import_module = converter.import_module
         self.import_name = converter.import_name
         self.kwargs = self.process_factory_kwargs(converter.kwargs)
@@ -69,9 +69,9 @@ def build_argument_type_converter(converter):
     if converter is None:
         return None
     if converter in (str, int, float, bool):
-        return AZDevTransArgumentBuildInTypeConverter(converter)
+        return AZDevTransArgumentTypeConverterBuildIn(converter)
     elif isinstance(converter, AZTypeConverterFunc):
-        return AZDevTransArgumentFuncTypeConverter(converter)
+        return AZDevTransArgumentTypeConverterFunc(converter)
     elif isinstance(converter, AZTypeConverterByFactory):
-        return AZDevTransArgumentFuncTypeConverterByFactory(converter)
+        return AZDevTransArgumentTypeConverterByFactory(converter)
 

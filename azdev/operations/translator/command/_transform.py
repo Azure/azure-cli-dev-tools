@@ -19,14 +19,14 @@ class AZDevTransTransform(AZDevTransNode):
         raise NotImplementedError()
 
 
-class AZDevTransFuncTransform(AZDevTransTransform):
+class AZDevTransTransformFunc(AZDevTransTransform):
 
     def __init__(self, transform):
         from azdev.operations.translator.hook.transformer import AZTransformerFunc
         if not isinstance(transform, AZTransformerFunc):
             raise TypeError('Transform is not an instance of "AzFuncTransformer", get "{}"'.format(
                 type(transform)))
-        super(AZDevTransFuncTransform, self).__init__(transform)
+        super(AZDevTransTransformFunc, self).__init__(transform)
         self.import_module = transform.import_module
         self.import_name = transform.import_name
 
@@ -44,6 +44,6 @@ def build_command_transform(transform):
             type(transform)))
 
     if isinstance(transform, AZTransformerFunc):
-        return AZDevTransFuncTransform(transform)
+        return AZDevTransTransformFunc(transform)
     else:
         raise NotImplementedError()

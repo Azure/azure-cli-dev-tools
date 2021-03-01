@@ -19,13 +19,13 @@ class AZDevTransArgumentCompleter(AZDevTransNode):
         raise NotImplementedError()
 
 
-class AZDevTransArgumentFuncCompleter(AZDevTransArgumentCompleter):
+class AZDevTransArgumentCompleterFunc(AZDevTransArgumentCompleter):
 
     def __init__(self, completer):
         from azdev.operations.translator.hook.completer import AZCompleterFunc
         if not isinstance(completer, AZCompleterFunc):
             raise TypeError("Expect AzFuncCompleter, got '{}'".format(completer))
-        super(AZDevTransArgumentFuncCompleter, self).__init__(completer)
+        super(AZDevTransArgumentCompleterFunc, self).__init__(completer)
         self.import_module = completer.import_module
         self.import_name = completer.import_name
 
@@ -34,13 +34,13 @@ class AZDevTransArgumentFuncCompleter(AZDevTransArgumentCompleter):
         return self.key, value
 
 
-class AZDevTransArgumentFuncCompleterByFactory(AZDevTransArgumentCompleter):
+class AZDevTransArgumentCompleterByFactory(AZDevTransArgumentCompleter):
 
     def __init__(self, completer):
         from azdev.operations.translator.hook.completer import AZCompleterByFactory
         if not isinstance(completer, AZCompleterByFactory):
             raise TypeError("Expect AzFuncCompleterByFactory, got '{}'".format(completer))
-        super(AZDevTransArgumentFuncCompleterByFactory, self).__init__(completer)
+        super(AZDevTransArgumentCompleterByFactory, self).__init__(completer)
         self.import_module = completer.import_module
         self.import_name = completer.import_name
         self.kwargs = self.process_factory_kwargs(completer.kwargs)
@@ -84,9 +84,9 @@ def build_argument_completer(completer):
     if not isinstance(completer, AZCompleter):
         raise TypeError("Expect AzCompleter type, got '{}'".format(completer))
     if isinstance(completer, AZCompleterFunc):
-        return AZDevTransArgumentFuncCompleter(completer)
+        return AZDevTransArgumentCompleterFunc(completer)
     elif isinstance(completer, AZCompleterByFactory):
-        return AZDevTransArgumentFuncCompleterByFactory(completer)
+        return AZDevTransArgumentCompleterByFactory(completer)
     elif isinstance(completer, AZExternalCompleterByFactory):
         return AZDevTransArgumentExternalCompleterByFactory(completer)
     else:

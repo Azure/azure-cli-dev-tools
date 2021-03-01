@@ -32,13 +32,13 @@ class AZDevTransArgumentActionByStr(AZDevTransArgumentAction):
         return self.key, value
 
 
-class AZDevTransArgumentClsAction(AZDevTransArgumentAction):
+class AZDevTransArgumentActionClass(AZDevTransArgumentAction):
 
     def __init__(self, action):
         from azdev.operations.translator.hook.action import AZActionClass
         if not issubclass(action, AZActionClass):
             raise TypeError("Expect str or AzClsAction type, got '{}'".format(action))
-        super(AZDevTransArgumentClsAction, self).__init__(action)
+        super(AZDevTransArgumentActionClass, self).__init__(action)
         self.import_module = action.import_module
         self.import_name = action.import_name
 
@@ -47,13 +47,13 @@ class AZDevTransArgumentClsAction(AZDevTransArgumentAction):
         return self.key, value
 
 
-class AZDevTransArgumentClsActionByFactory(AZDevTransArgumentAction):
+class AZDevTransArgumentActionClassByFactory(AZDevTransArgumentAction):
 
     def __init__(self, action):
         from azdev.operations.translator.hook.action import AZActionClassByFactory
         if not issubclass(action, AZActionClassByFactory):
             raise TypeError("Expect str or AzClsActionByFactory type, got '{}'".format(action))
-        super(AZDevTransArgumentClsActionByFactory, self).__init__(action)
+        super(AZDevTransArgumentActionClassByFactory, self).__init__(action)
         self.import_module = action.import_module
         self.import_name = action.import_name
         self.kwargs = self.process_factory_kwargs(action.kwargs)
@@ -78,8 +78,8 @@ def build_argument_action(action):
     elif not isinstance(action, type) or not issubclass(action, AZAction):
         raise TypeError("Expect str or AzAction type, got '{}'".format(action))
     elif issubclass(action, AZActionClass):
-        return AZDevTransArgumentClsAction(action)
+        return AZDevTransArgumentActionClass(action)
     elif issubclass(action, AZActionClassByFactory):
-        return AZDevTransArgumentClsActionByFactory(action)
+        return AZDevTransArgumentActionClassByFactory(action)
     else:
         raise NotImplementedError()

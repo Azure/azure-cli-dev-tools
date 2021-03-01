@@ -19,14 +19,14 @@ class AZDevTransClientFactory(AZDevTransNode):
         raise NotImplementedError()
 
 
-class AZDevTransFuncClientFactory(AZDevTransClientFactory):
+class AZDevTransClientFactoryFunc(AZDevTransClientFactory):
 
     def __init__(self, client_factory):
         from azdev.operations.translator.hook.client_factory import AZClientFactoryFunc
         if not isinstance(client_factory, AZClientFactoryFunc):
             raise TypeError('Client factory is not an instance of "AzFuncClientFactory", get "{}"'.format(
                 type(client_factory)))
-        super(AZDevTransFuncClientFactory, self).__init__(client_factory)
+        super(AZDevTransClientFactoryFunc, self).__init__(client_factory)
         self.import_module = client_factory.import_module
         self.import_name = client_factory.import_name
 
@@ -43,6 +43,6 @@ def build_client_factory(client_factory):
         raise TypeError('Client factory is not an instance of "AzClientFactory", get "{}"'.format(
             type(client_factory)))
     if isinstance(client_factory, AZClientFactoryFunc):
-        return AZDevTransFuncClientFactory(client_factory)
+        return AZDevTransClientFactoryFunc(client_factory)
     else:
         raise NotImplementedError()
