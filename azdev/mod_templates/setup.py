@@ -33,9 +33,9 @@ CLASSIFIERS = [
 ]
 
 # TODO: Add any additional SDK dependencies here
-DEPENDENCIES = [
+DEPENDENCIES = {% if dependencies %}[
     {{ dependencies|join(',\n    '|safe) }}
-]
+]{% else %}[]{% endif %}
 
 with open('README.rst', 'r', encoding='utf-8') as f:
     README = f.read()
@@ -49,8 +49,8 @@ setup(
     # TODO: Update author and email, if applicable
     author='Microsoft Corporation',
     author_email='azpycli@microsoft.com',
-    # TODO: consider pointing directly to your source code instead of the generic repo
-    url='https://github.com/Azure/{{ 'azure-cli-extensions' if is_ext else 'azure-cli' }}',
+    # TODO: change to your extension source code repo if the code will not be put in azure-cli-extensions repo
+    url='https://github.com/Azure/{% if is_ext %}azure-cli-extensions/tree/master/src/{{ pkg_name }}{% else %}azure-cli{% endif %}',
     long_description=README + '\n\n' + HISTORY,
     license='MIT',
     classifiers=CLASSIFIERS,

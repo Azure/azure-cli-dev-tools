@@ -224,7 +224,6 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
     # determine dependencies
     dependencies = []
     if is_ext:
-        dependencies.append("'azure-cli-core'")
         if required_sdk:
             _download_vendored_sdk(
                 required_sdk,
