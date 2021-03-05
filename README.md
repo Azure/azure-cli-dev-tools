@@ -26,6 +26,23 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     - For Azure CLI: https://github.com/Azure/azure-cli
     - For Azure CLI Extensions: https://github.com/Azure/azure-cli-extensions
     - Any other repository that you might have access to that contains CLI extensions.
+
+    After forking `azure-cli`, follow the below commands to set up:
+    ```Shell
+    # Clone your forked repository
+    git clone git@github.com:your-github-name/azure-cli.git
+    cd azure-cli
+    # Add the Azure/azure-cli repository
+    git remote add upstream git@github.com:Azure/azure-cli.git
+    # Reset the default dev branch to track dev branch of Azure/azure-cli so you can use it to track the latest azure-cli code.
+    git branch dev -u upstream/dev
+    # Develop with a new branch
+    git co -b feature_branch
+    ...
+    # When code is ready, push it to your forked repository and submit a PR to merge into the dev branch of Azure/azure-cli repository.
+    git push -u origin feature_branch
+    ```
+    You can do the same for `azure-cli-extensions` except that the default branch for it is `master`, run `git branch master -u upstream/master` instead.
 3. Create a new virtual environment for Python in the root of your clone. You can do this by running:
 
     Python 3.6+ (all platforms):
@@ -54,13 +71,40 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     source env/bin/activate
     ```
 
-5. Install `azdev` by running:
-  `pip install azdev`
+5. Prepare and install `azdev`
+
+   If you're on Linux, install the dependency packages first by running:
+
+   For apt packages:
+   ```Bash
+   sudo apt install gcc python3-dev
+   ```
+   For rpm packages:
+   ```Bash
+   sudo yum install gcc python3-devel 
+   ```
+
+   Otherwise you will have `psutil` installation issues (#269) when you setup `azure-cli` later.
+  
+   Upgrade `pip` on all platforms:
+   ```
+   python -m pip install -U pip
+   ```
+   Install `azdev`:
+   ```
+   pip install azdev
+   ```
 
 6. Complete setup by running:
-  `azdev setup`
+   ```
+   azdev setup
+   ```
   
-  This will launch the interactive setup process. To see non-interactive options run `azdev setup -h`.
+   This will launch the interactive setup process. You can also run with non-interactive options:
+   ```
+   azdev setup -c -r /path/to/azure-cli-extensions
+   ```
+   To see more non-interactive options run `azdev setup -h`.
 
 ## Reporting issues and feedback
 
