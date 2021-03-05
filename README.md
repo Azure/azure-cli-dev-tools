@@ -21,7 +21,7 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
 
 ## Setting up your development environment
 
-1. Install Python 3.6/3.7/3.8 from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7. Currently Python 3.9 is not recommended to use.
+1. Install Python 3.6/3.7/3.8 from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7. Currently it's not recommended to use Python 3.9.
 2. Fork and clone the repository or repositories you wish to develop for.
     - For Azure CLI: https://github.com/Azure/azure-cli
     - For Azure CLI Extensions: https://github.com/Azure/azure-cli-extensions
