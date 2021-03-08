@@ -30,14 +30,14 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     After forking `azure-cli`, follow the below commands to set up:
     ```Shell
     # Clone your forked repository
-    git clone git@github.com:your-github-name/azure-cli.git
+    git clone git@github.com:<your-github-name>/azure-cli.git
     cd azure-cli
     # Add the Azure/azure-cli repository
     git remote add upstream git@github.com:Azure/azure-cli.git
     # Reset the default dev branch to track dev branch of Azure/azure-cli so you can use it to track the latest azure-cli code.
     git branch dev -u upstream/dev
     # Develop with a new branch
-    git co -b feature_branch
+    git checkout -b feature_branch
     ...
     # When code is ready, push it to your forked repository and submit a PR to merge into the dev branch of Azure/azure-cli repository.
     git push -u origin feature_branch
@@ -104,7 +104,44 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
    ```
    azdev setup -c -r /path/to/azure-cli-extensions
    ```
-   To see more non-interactive options run `azdev setup -h`.
+   To see more non-interactive options, run `azdev setup -h`.
+
+## Authoring commands and tests
+
+If you are building commands based on a REST API SPEC from [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs), you can leverage [autorest.az](https://github.com/Azure/autorest.az) to generate the commands. Otherwise you can run the following commands to create a code template:
+```
+azdev extension create <extension-name>
+```
+or
+```
+azdev cli create <module-name>
+```
+
+If you are working on an extension, before you can run its command, you need to install the extension from the source code by running:
+```
+azdev extension add <extension-name>
+```
+
+Run `--help` with your command groups or commands for a quick check on the command interface and help messages.
+
+For instructions on manually writing the commands and tests, see more in [Authoring Command Modules](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules), [Authoring Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md) and [Authoring Tests](https://github.com/Azure/azure-cli/blob/dev/doc/authoring_tests.md).
+
+## Style, Linter check and testing
+1. Check code style (pylint and PEP8):
+    ```
+    azdev style <extension-name/module-name>
+    ```
+2. Run static code checks of the CLI command table:
+    ```
+    azdev linter <extension-name/module-name>
+    ```
+3. Record or replay CLI tests:
+    ```
+    azdev test <extension-name/module-name>
+    ```
+
+    By default, test is running in `once` mode. If there are no corresponding recording files (in yaml format), it will run live tests and generate recording files. If recording files are found, the tests will be run in `playback` mode against the recording files. You can use `--live` to force a test run in `live` mode and regenerate the recording files.
+
 
 ## Reporting issues and feedback
 
