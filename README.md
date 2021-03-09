@@ -126,7 +126,7 @@ Run `--help` with your command groups or commands for a quick check on the comma
 
 For instructions on manually writing the commands and tests, see more in [Authoring Command Modules](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules), [Authoring Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md) and [Authoring Tests](https://github.com/Azure/azure-cli/blob/dev/doc/authoring_tests.md).
 
-## Style, Linter check and testing
+## Style, linter check and testing
 1. Check code style (pylint and PEP8):
     ```
     azdev style <extension-name/module-name>
