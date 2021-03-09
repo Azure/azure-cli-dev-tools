@@ -122,12 +122,12 @@ If you are working on an extension, before you can run its command, you need to 
 azdev extension add <extension-name>
 ```
 
-Run `--help` with your command groups or commands for a quick check on the command interface and help messages.
+Run `az <command> --help` with your command groups or commands for a quick check on the command interface and help messages.
 
 For instructions on manually writing the commands and tests, see more in [Authoring Command Modules](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules), [Authoring Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md) and [Authoring Tests](https://github.com/Azure/azure-cli/blob/dev/doc/authoring_tests.md).
 
 ## Style, linter check and testing
-1. Check code style (pylint and PEP8):
+1. Check code style (Pylint and PEP8):
     ```
     azdev style <extension-name/module-name>
     ```
