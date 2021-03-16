@@ -38,9 +38,6 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     git branch dev -u upstream/dev
     # Develop with a new branch
     git checkout -b feature_branch
-    ...
-    # When code is ready, push it to your forked repository and submit a PR to merge into the dev branch of Azure/azure-cli repository.
-    git push -u origin feature_branch
     ```
     You can do the same for `azure-cli-extensions` except that the default branch for it is `master`, run `git branch master -u upstream/master` instead.
 3. Create a new virtual environment for Python in the root of your clone. You can do this by running:
@@ -142,6 +139,13 @@ For instructions on manually writing the commands and tests, see more in [Author
 
     By default, test is running in `once` mode. If there are no corresponding recording files (in yaml format), it will run live tests and generate recording files. If recording files are found, the tests will be run in `playback` mode against the recording files. You can use `--live` to force a test run in `live` mode and regenerate the recording files.
 
+## Submitting a pull request to merge the code
+
+1. After committing your code locally, push it to your forked repository:
+    ```
+    git push -u origin feature_branch
+    ```
+2. Submit a PR to merge from the `feature_branch` of your repository into the default branch of [Azure/azure-cli](https://github.com/Azure/azure-cli) or [Azure/azure-cli-extensions](https://github.com/Azure/azure-cli-extensions) repositories. See [Submitting Pull Requests](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules#submitting-pull-requests) and [Publish Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md#publish) for more details.
 
 ## Reporting issues and feedback
 
