@@ -35,7 +35,7 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     # Add the Azure/azure-cli repository
     git remote add upstream git@github.com:Azure/azure-cli.git
     # Reset the default dev branch to track dev branch of Azure/azure-cli so you can use it to track the latest azure-cli code.
-    git branch dev -u upstream/dev
+    git branch dev --set-upstream-to upstream/dev
     # Develop with a new branch
     git checkout -b feature_branch
     ```
@@ -99,9 +99,9 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
   
    This will launch the interactive setup process. You can also run with non-interactive options:
    ```
-   azdev setup -c -r /path/to/azure-cli-extensions
+   azdev setup --cli --repo /path/to/azure-cli-extensions
    ```
-   To see more non-interactive options, run `azdev setup -h`.
+   To see more non-interactive options, run `azdev setup --help`.
 
 ## Authoring commands and tests
 
@@ -121,7 +121,10 @@ azdev extension add <extension-name>
 
 Run `az <command> --help` with your command groups or commands for a quick check on the command interface and help messages.
 
-For instructions on manually writing the commands and tests, see more in [Authoring Command Modules](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules), [Authoring Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md) and [Authoring Tests](https://github.com/Azure/azure-cli/blob/dev/doc/authoring_tests.md).
+For instructions on manually writing the commands and tests, see more in 
+- [Authoring Command Modules](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules)
+- [Authoring Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md)
+- [Authoring Tests](https://github.com/Azure/azure-cli/blob/dev/doc/authoring_tests.md)
 
 ## Style, linter check and testing
 1. Check code style (Pylint and PEP8):
@@ -143,7 +146,7 @@ For instructions on manually writing the commands and tests, see more in [Author
 
 1. After committing your code locally, push it to your forked repository:
     ```
-    git push -u origin feature_branch
+    git push --set-upstream origin feature_branch
     ```
 2. Submit a PR to merge from the `feature_branch` of your repository into the default branch of [Azure/azure-cli](https://github.com/Azure/azure-cli) or [Azure/azure-cli-extensions](https://github.com/Azure/azure-cli-extensions) repositories. See [Submitting Pull Requests](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules#submitting-pull-requests) and [Publish Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md#publish) for more details.
 
