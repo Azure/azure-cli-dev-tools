@@ -30,16 +30,21 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     After forking `azure-cli`, follow the below commands to set up:
     ```Shell
     # Clone your forked repository
-    git clone git@github.com:<your-github-name>/azure-cli.git
+    git clone https://github.com/<your-github-name>/azure-cli.git
+
     cd azure-cli
     # Add the Azure/azure-cli repository
-    git remote add upstream git@github.com:Azure/azure-cli.git
+    git remote add upstream https://github.com/Azure/azure-cli.git
     # Reset the default dev branch to track dev branch of Azure/azure-cli so you can use it to track the latest azure-cli code.
     git branch dev --set-upstream-to upstream/dev
     # Develop with a new branch
-    git checkout -b feature_branch
+    git checkout -b <feature_branch>
     ```
     You can do the same for `azure-cli-extensions` except that the default branch for it is `master`, run `git branch master -u upstream/master` instead.
+
+    To cache your GitHub credentials in Git, you can use a [cache helper](https://docs.github.com/github/using-git/caching-your-github-credentials-in-git). If you or your organization has MFA enabled, please create a [Personal Access Token](https://docs.github.com/github/authenticating-to-github/creating-a-personal-access-token) and use it as the password to login when prompted by the cache helper.
+
+    If you prefer to [clone with SSH](https://docs.github.com/github/using-git/which-remote-url-should-i-use#cloning-with-ssh-urls), remember to [generate SSH keys](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) on each computer you use to push or pull from GitHub and [add them to your GitHub account](https://docs.github.com/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account).
 3. Create a new virtual environment for Python in the root of your clone. You can do this by running:
 
     Python 3.6+ (all platforms):
@@ -146,7 +151,7 @@ For instructions on manually writing the commands and tests, see more in
 
 1. After committing your code locally, push it to your forked repository:
     ```
-    git push --set-upstream origin feature_branch
+    git push --set-upstream origin <feature_branch>
     ```
 2. Submit a PR to merge from the `feature_branch` of your repository into the default branch of [Azure/azure-cli](https://github.com/Azure/azure-cli) or [Azure/azure-cli-extensions](https://github.com/Azure/azure-cli-extensions) repositories. See [Submitting Pull Requests](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules#submitting-pull-requests) and [Publish Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md#publish) for more details.
 
