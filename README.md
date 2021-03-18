@@ -33,8 +33,9 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     git clone https://github.com/<your-github-name>/azure-cli.git
 
     cd azure-cli
-    # Add the Azure/azure-cli repository
+    # Add the Azure/azure-cli repository as upstream
     git remote add upstream https://github.com/Azure/azure-cli.git
+    git fetch upstream
     # Reset the default dev branch to track dev branch of Azure/azure-cli so you can use it to track the latest azure-cli code.
     git branch dev --set-upstream-to upstream/dev
     # Develop with a new branch
