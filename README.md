@@ -104,7 +104,7 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
   
    This will launch the interactive setup process. You can also run with non-interactive options:
    ```
-   azdev setup --cli --repo /path/to/azure-cli-extensions
+   azdev setup --cli /path/to/azure-cli --repo /path/to/azure-cli-extensions
    ```
    To see more non-interactive options, run `azdev setup --help`.
 
