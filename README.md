@@ -41,11 +41,11 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     # Develop with a new branch
     git checkout -b <feature_branch>
     ```
-    You can do the same for `azure-cli-extensions` except that the default branch for it is `master`, run `git branch master -u upstream/master` instead.
+    You can do the same for `azure-cli-extensions` except that the default branch for it is `master`, run `git branch master --set-upstream-to upstream/master` instead.
 
-    To cache your GitHub credentials in Git, you can use a [cache helper](https://docs.github.com/github/using-git/caching-your-github-credentials-in-git). If you or your organization has MFA enabled, please create a [Personal Access Token](https://docs.github.com/github/authenticating-to-github/creating-a-personal-access-token) and use it as the password to login when prompted by the cache helper.
+    See [Authenticating with GitHub from Git](https://docs.github.com/github/getting-started-with-github/set-up-git#next-steps-authenticating-with-github-from-git) about caching your GitHub credentials in Git which is needed when you push the code.
 
-    If you prefer to [clone with SSH](https://docs.github.com/github/using-git/which-remote-url-should-i-use#cloning-with-ssh-urls), remember to [generate SSH keys](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) on each computer you use to push or pull from GitHub and [add them to your GitHub account](https://docs.github.com/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account).
+    
 3. Create a new virtual environment for Python in the root of your clone. You can do this by running:
 
     Python 3.6+ (all platforms):
