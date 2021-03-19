@@ -26,6 +26,26 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     - For Azure CLI: https://github.com/Azure/azure-cli
     - For Azure CLI Extensions: https://github.com/Azure/azure-cli-extensions
     - Any other repository that you might have access to that contains CLI extensions.
+
+    After forking `azure-cli`, follow the below commands to set up:
+    ```Shell
+    # Clone your forked repository
+    git clone https://github.com/<your-github-name>/azure-cli.git
+
+    cd azure-cli
+    # Add the Azure/azure-cli repository as upstream
+    git remote add upstream https://github.com/Azure/azure-cli.git
+    git fetch upstream
+    # Reset the default dev branch to track dev branch of Azure/azure-cli so you can use it to track the latest azure-cli code.
+    git branch dev --set-upstream-to upstream/dev
+    # Develop with a new branch
+    git checkout -b <feature_branch>
+    ```
+    You can do the same for `azure-cli-extensions` except that the default branch for it is `master`, run `git branch master --set-upstream-to upstream/master` instead.
+
+    See [Authenticating with GitHub from Git](https://docs.github.com/github/getting-started-with-github/set-up-git#next-steps-authenticating-with-github-from-git) about caching your GitHub credentials in Git which is needed when you push the code.
+
+    
 3. Create a new virtual environment for Python in the root of your clone. You can do this by running:
 
     Python 3.6+ (all platforms):
@@ -54,13 +74,87 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     source env/bin/activate
     ```
 
-5. Install `azdev` by running:
-  `pip install azdev`
+5. Prepare and install `azdev`
+
+   If you're on Linux, install the dependency packages first by running:
+
+   For apt packages:
+   ```Bash
+   sudo apt install gcc python3-dev
+   ```
+   For rpm packages:
+   ```Bash
+   sudo yum install gcc python3-devel 
+   ```
+
+   Otherwise you will have `psutil` installation issues (#269) when you setup `azure-cli` later.
+  
+   Upgrade `pip` on all platforms:
+   ```
+   python -m pip install -U pip
+   ```
+   Install `azdev`:
+   ```
+   pip install azdev
+   ```
 
 6. Complete setup by running:
-  `azdev setup`
+   ```
+   azdev setup
+   ```
   
-  This will launch the interactive setup process. To see non-interactive options run `azdev setup -h`.
+   This will launch the interactive setup process. You can also run with non-interactive options:
+   ```
+   azdev setup --cli /path/to/azure-cli --repo /path/to/azure-cli-extensions
+   ```
+   To see more non-interactive options, run `azdev setup --help`.
+
+## Authoring commands and tests
+
+If you are building commands based on a REST API SPEC from [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs), you can leverage [autorest.az](https://github.com/Azure/autorest.az) to generate the commands. Otherwise you can run the following commands to create a code template:
+```
+azdev extension create <extension-name>
+```
+or
+```
+azdev cli create <module-name>
+```
+
+If you are working on an extension, before you can run its command, you need to install the extension from the source code by running:
+```
+azdev extension add <extension-name>
+```
+
+Run `az <command> --help` with your command groups or commands for a quick check on the command interface and help messages.
+
+For instructions on manually writing the commands and tests, see more in 
+- [Authoring Command Modules](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules)
+- [Authoring Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md)
+- [Authoring Tests](https://github.com/Azure/azure-cli/blob/dev/doc/authoring_tests.md)
+
+## Style, linter check and testing
+1. Check code style (Pylint and PEP8):
+    ```
+    azdev style <extension-name/module-name>
+    ```
+2. Run static code checks of the CLI command table:
+    ```
+    azdev linter <extension-name/module-name>
+    ```
+3. Record or replay CLI tests:
+    ```
+    azdev test <extension-name/module-name>
+    ```
+
+    By default, test is running in `once` mode. If there are no corresponding recording files (in yaml format), it will run live tests and generate recording files. If recording files are found, the tests will be run in `playback` mode against the recording files. You can use `--live` to force a test run in `live` mode and regenerate the recording files.
+
+## Submitting a pull request to merge the code
+
+1. After committing your code locally, push it to your forked repository:
+    ```
+    git push --set-upstream origin <feature_branch>
+    ```
+2. Submit a PR to merge from the `feature_branch` of your repository into the default branch of [Azure/azure-cli](https://github.com/Azure/azure-cli) or [Azure/azure-cli-extensions](https://github.com/Azure/azure-cli-extensions) repositories. See [Submitting Pull Requests](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules#submitting-pull-requests) and [Publish Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md#publish) for more details.
 
 ## Reporting issues and feedback
 
