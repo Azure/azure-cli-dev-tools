@@ -272,7 +272,7 @@ def build_extensions(extensions, dist_dir='dist'):
 
 def publish_extensions(extensions, storage_account, storage_account_key, storage_container,
                        dist_dir='dist', update_index=False, yes=False):
-    from azure.storage.blob import BlockBlobService
+    from azure.multiapi.storage.v2018_11_09.blob import BlockBlobService
 
     heading('Publish Extensions')
 
