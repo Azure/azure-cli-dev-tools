@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.30
+++++++
+* Change azure-storage-blob dependency (#290)
+
 0.1.29
 ++++++
 * `azdev linter`: Remove the prefix dashes in option length calculation (#284)
