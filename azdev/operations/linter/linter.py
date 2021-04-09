@@ -181,6 +181,7 @@ class Linter(object):  # pylint: disable=too-many-public-methods
             return command_name
         return False
 
+
 # pylint: disable=too-many-instance-attributes
 class LinterManager(object):
 
