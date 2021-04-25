@@ -79,7 +79,7 @@ setup(
     ],
     extras_require={
         ":python_version<'3.0'": ['pylint==1.9.2', 'futures'],
-        ":python_version>='3.0'": ['pylint==2.3.0']
+        ":python_version>='3.0'": ['pylint==2.3.0', 'astroid==2.4.2']   # pylint 2.3 doesn't support astroid 2.5
     },
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
