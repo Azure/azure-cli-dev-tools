@@ -124,7 +124,10 @@ def _copy_vendored_sdk(src_path, dest_path):
     import shutil
 
     try:
-        client_location = find_files(src_path, '_version.py')[0]
+        version_files = find_files(src_path, 'version.py')
+        if not version_files:
+            version_files = find_files(src_path, '_version.py')
+        client_location = version_files[0]
     except IndexError:
         raise CLIError('Unable to find client files.')
 
