@@ -67,6 +67,8 @@ setup(
         'jinja2',
         'knack',
         'mock',
+        'pylint==2.3.0',
+        'astroid==2.4.2',   # pylint 2.3 doesn't support astroid 2.5
         'pytest>=5.0.0',
         'pytest-xdist', # depends on pytest-forked
         'pyyaml',
@@ -77,10 +79,6 @@ setup(
         'azure-multiapi-storage',
         'isort==4.3.21'
     ],
-    extras_require={
-        ":python_version<'3.0'": ['pylint==1.9.2', 'futures'],
-        ":python_version>='3.0'": ['pylint==2.3.0', 'astroid==2.4.2']   # pylint 2.3 doesn't support astroid 2.5
-    },
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
         'azdev.mod_templates': ['*.*'],
