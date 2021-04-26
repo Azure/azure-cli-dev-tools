@@ -16,7 +16,7 @@ from azdev.utilities import (
 logger = get_logger(__name__)
 
 
-class Data(object):
+class Data:
     def __init__(self, **kw):
         self.__dict__.update(kw)
         if 'properties' in self.__dict__:

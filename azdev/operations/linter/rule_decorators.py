@@ -8,7 +8,7 @@ from knack.util import CLIError
 from .linter import RuleError, LinterSeverity
 
 
-class BaseRule(object):
+class BaseRule:
 
     def __init__(self, severity):
         if severity not in LinterSeverity:

@@ -46,9 +46,8 @@ def _get_azext_metadata(ext_dir):
 def get_ext_metadata(ext_dir, ext_file, ext_name):
     # Modification of https://github.com/Azure/azure-cli/blob/dev/src/azure-cli-core/azure/cli/core/extension.py#L89
     WHL_METADATA_FILENAME = 'metadata.json'
-    zip_ref = zipfile.ZipFile(ext_file, 'r')
-    zip_ref.extractall(ext_dir)
-    zip_ref.close()
+    with zipfile.ZipFile(ext_file, 'r') as zip_ref:
+        zip_ref.extractall(ext_dir)
     metadata = {}
     dist_info_dirs = [f for f in os.listdir(ext_dir) if f.endswith('.dist-info')]
     azext_metadata = _get_azext_metadata(ext_dir)

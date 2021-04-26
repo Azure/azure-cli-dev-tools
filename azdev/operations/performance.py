@@ -162,6 +162,7 @@ def benchmark(commands=None, runs=20):
     for raw_command in commands:
         logger.info("Measuring %s...", raw_command)
 
+        # pylint: disable=consider-using-with
         pool = multiprocessing.Pool(multiprocessing.cpu_count(), _benchmark_process_pool_init)
 
         # try/except like this because of a bug of Python multiprocessing.Pool (https://bugs.python.org/issue8296)

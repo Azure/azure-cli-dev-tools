@@ -13,7 +13,7 @@ from azdev.completer import get_test_completion
 from azdev.operations.linter import linter_severity_choices
 
 
-class Flag(object):
+class Flag:
     """ Place holder to be used for optionals that take 0 or more arguments """
 
 

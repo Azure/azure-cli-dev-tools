@@ -61,23 +61,21 @@ setup(
         'azdev.utilities',
     ],
     install_requires=[
+        'azure-multiapi-storage',
         'docutils',
         'flake8',
         'gitpython',
         'jinja2',
         'knack',
         'mock',
-        'pylint==2.3.0',
-        'astroid==2.4.2',   # pylint 2.3 doesn't support astroid 2.5
+        'pylint==2.8.0',
+        'pytest-xdist',  # depends on pytest-forked
         'pytest>=5.0.0',
-        'pytest-xdist', # depends on pytest-forked
         'pyyaml',
         'requests',
         'sphinx==1.6.7',
         'tox',
-        'wheel==0.30.0',
-        'azure-multiapi-storage',
-        'isort==4.3.21'
+        'wheel==0.30.0'
     ],
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
