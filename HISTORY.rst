@@ -3,6 +3,11 @@
 Release History
 ===============
 
+0.1.31
+++++++
+* `azdev style`: Fix `pylint` by pinning `astroid` to 2.4.2 (#294)
+* Fix `_copy_vendored_sdk` for Track 2 SDK (#293)
+
 0.1.30
 ++++++
 * Change azure-storage-blob dependency (#290)
