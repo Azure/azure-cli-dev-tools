@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.32
+++++++
+* Bump `pylint` to 2.8.0 (#295)
+
 0.1.31
 ++++++
 * `azdev style`: Fix `pylint` by pinning `astroid` to 2.4.2 (#294)
