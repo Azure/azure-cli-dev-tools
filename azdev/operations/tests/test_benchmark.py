@@ -131,8 +131,8 @@ class TestBenchmark(TestCase):
     #     """
 
     #     with mock.patch(
-    #         "multiprocessing.pool.Pool.map_async",  # pylint: disable=bad-continuation
-    #         lambda self, _, iterable, chunksize=None, callback=None, error_callback=None: _MockedMapResultCounter(  # pylint: disable=bad-continuation
+    #         "multiprocessing.pool.Pool.map_async",
+    #         lambda self, _, iterable, chunksize=None, callback=None, error_callback=None: _MockedMapResultCounter(
     #             _, iterable,
     #         ),
     #     ):
@@ -142,13 +142,13 @@ class TestBenchmark(TestCase):
 
     def test_benchmark_with_help_command(self):
         with mock.patch(
-            "azdev.operations.performance._benchmark_cmd_timer",  # pylint: disable=bad-continuation
-            return_value=1,  # pylint: disable=bad-continuation
+            "azdev.operations.performance._benchmark_cmd_timer",
+            return_value=1,
         ), mock.patch(
             "multiprocessing.pool.Pool.map_async",
             lambda self, func, iterable, chunksize=None, callback=None, error_callback=None: _MockedPoolMapResult(
                 func, iterable
-            ),  # pylint: disable=bad-continuation
+            ),
         ):
 
             commands = ["network applicaiton-gateway create -h", "version", "find"]
@@ -158,8 +158,8 @@ class TestBenchmark(TestCase):
 
     def test_benchmark_in_actual_running(self):
         with mock.patch(
-            "multiprocessing.pool.Pool.map_async",  # pylint: disable=bad-continuation
-            lambda self, func, iterable, chunksize=None, callback=None, error_callback=None: _MockedPoolMapResult(  # pylint: disable=bad-continuation
+            "multiprocessing.pool.Pool.map_async",
+            lambda self, func, iterable, chunksize=None, callback=None, error_callback=None: _MockedPoolMapResult(
                 func, iterable
             ),
         ):
@@ -182,8 +182,8 @@ class TestBenchmark(TestCase):
 
     def test_benchmark_with_specific_runs(self):
         with mock.patch(
-            "multiprocessing.pool.Pool.map_async",  # pylint: disable=bad-continuation
-            lambda self, func, iterable, chunksize=None, callback=None, error_callback=None: _MockedPoolMapResult(  # pylint: disable=bad-continuation
+            "multiprocessing.pool.Pool.map_async",
+            lambda self, func, iterable, chunksize=None, callback=None, error_callback=None: _MockedPoolMapResult(
                 func, iterable
             ),
         ):
@@ -207,11 +207,11 @@ class TestBenchmark(TestCase):
     #         time.sleep(2)
 
     #     with mock.patch(
-    #         "azdev.operations.performance._benchmark_cmd_timer",  # pylint: disable=bad-continuation
-    #         side_effect=mocked_benchmark_timeout_func,  # pylint: disable=bad-continuation
+    #         "azdev.operations.performance._benchmark_cmd_timer",
+    #         side_effect=mocked_benchmark_timeout_func,
     #     ), mock.patch(
-    #         "multiprocessing.pool.Pool.map_async",  # pylint: disable=bad-continuation
-    #         lambda self, func, iterable, chunksize=None, callback=None, error_callback=None: _MockedPoolMapResult(  # pylint: disable=bad-continuation
+    #         "multiprocessing.pool.Pool.map_async",
+    #         lambda self, func, iterable, chunksize=None, callback=None, error_callback=None: _MockedPoolMapResult(
     #             func, iterable
     #         ),
     #     ):

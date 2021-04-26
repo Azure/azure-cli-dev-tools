@@ -1,17 +1,14 @@
 [MESSAGES CONTROL]
 # For all codes, run 'pylint --list-msgs' or go to 'http://pylint-messages.wikidot.com/all-codes'
 disable=
-    invalid-name,
-    fixme,
-    missing-docstring,
-    too-many-arguments,
-    too-few-public-methods,
     cyclic-import,
-    useless-object-inheritance,
-    useless-import-alias,
-    useless-suppression,
+    fixme,
     import-outside-toplevel,
-    wrong-import-order
+    invalid-name,
+    missing-docstring,
+    raise-missing-from,
+    too-few-public-methods,
+    too-many-arguments,
 
 [TYPECHECK]
 # For Azure CLI extensions, we ignore some import errors as they'll be available in the environment of the CLI

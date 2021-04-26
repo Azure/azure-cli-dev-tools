@@ -153,7 +153,7 @@ def run_pylint(modules, checkers=None, env=None, disable_all=False, enable=None)
             return None
         logger.debug("Using rcfile file: %s", rcfile)
         logger.debug("Running on %s: %s", desc, "\n".join(paths))
-        command = "pylint {} --ignore vendored_sdks,privates --rcfile={} -j {}".format(
+        command = "pylint {} --ignore vendored_sdks,privates --rcfile={} --jobs {}".format(
             " ".join(paths), rcfile, multiprocessing.cpu_count()
         )
         if checkers is not None:

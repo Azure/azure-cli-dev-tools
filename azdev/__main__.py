@@ -24,13 +24,13 @@ class AzDevCommandsLoader(CLICommandsLoader):
         from azdev.commands import load_command_table
 
         load_command_table(self, args)
-        return super(AzDevCommandsLoader, self).load_command_table(args)
+        return super().load_command_table(args)
 
     def load_arguments(self, command):
         from azdev.params import load_arguments
 
         load_arguments(self, command)
-        super(AzDevCommandsLoader, self).load_arguments(command)
+        super().load_arguments(command)
 
 
 def main():

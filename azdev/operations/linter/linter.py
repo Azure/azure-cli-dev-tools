@@ -38,7 +38,7 @@ class LinterSeverity(Enum):
         return sorted(LinterSeverity, key=lambda sev: sev.value)
 
 
-class Linter(object):  # pylint: disable=too-many-public-methods
+class Linter:  # pylint: disable=too-many-public-methods
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None):
         self._all_yaml_help = help_file_entries
         self._loaded_help = loaded_help
@@ -169,7 +169,7 @@ class Linter(object):  # pylint: disable=too-many-public-methods
 
 
 # pylint: disable=too-many-instance-attributes
-class LinterManager(object):
+class LinterManager:
 
     _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params'}
 
@@ -323,7 +323,7 @@ class RuleError(Exception):
     pass  # pylint: disable=unnecessary-pass
 
 
-class LinterScope(object):
+class LinterScope:
     """
     Linter Context manager. used when calling a rule function. Allows substitution of main linter for a linter
     that takes into account any applicable exclusions, if applicable.
