@@ -6,6 +6,49 @@ trigger:
     include:
     - '*'
 jobs:
+- job: ExtractMetadata
+  displayName: 'Extract Metadata'
+  condition: succeeded()
+  pool:
+    vmImage: 'ubuntu-18.04'
+  steps:
+  - task: Bash@3
+    displayName: 'Extract Version'
+    inputs:
+      targetType: 'filePath'
+      filePath: scripts/ci/extract_version.sh
+
+  - task: PublishPipelineArtifact@0
+    displayName: 'Publish Artifact: metadata'
+    inputs:
+      TargetPath: $(Build.ArtifactStagingDirectory)
+      ArtifactName: metadata
+
+- job: BuildPythonWheel
+  displayName: 'Build Python Wheel'
+
+  dependsOn: ExtractMetadata
+  condition: succeeded()
+  pool:
+    vmImage: 'ubuntu-18.04'
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python 3.8'
+    inputs:
+      versionSpec: 3.8
+
+  - task: Bash@3
+    displayName: 'Run Wheel Build Script'
+    inputs:
+      targetType: 'filePath'
+      filePath: scripts/ci/build.sh
+
+  - task: PublishPipelineArtifact@0
+    displayName: 'Publish Artifact: pypi'
+    inputs:
+      TargetPath: $(Build.ArtifactStagingDirectory)
+      ArtifactName: pypi
+
 - job: Unittest
   timeoutInMinutes: 10
 

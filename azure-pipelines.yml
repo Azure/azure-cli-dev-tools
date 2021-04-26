@@ -64,9 +64,9 @@ jobs:
     vmImage: 'ubuntu-18.04'
   steps:
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.7'
+    displayName: 'Use Python 3.8'
     inputs:
-      versionSpec: 3.7
+      versionSpec: 3.8
 
   - task: Bash@3
     displayName: 'Run Wheel Build Script'
