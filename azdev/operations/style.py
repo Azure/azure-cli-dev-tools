@@ -74,32 +74,27 @@ def check_style(modules=None, pylint=False, pep8=False, git_source=None, git_tar
         pylint = True
 
     exit_code_sum = 0
-    if pep8:
-        pep8_result = _run_pep8(selected_modules)
-        exit_code_sum += pep8_result.exit_code
 
     if pylint:
         pylint_result = run_pylint(selected_modules)
         exit_code_sum += pylint_result.exit_code
 
-    display('')
-    subheading('Results')
+        if pylint_result.error:
+            display('Pylint: PASSED')
+            logger.error(pylint_result.error.output.decode('utf-8'))
+            logger.error('Pylint: FAILED\n')
+        else:
+            display('Pylint: PASSED\n')
 
-    # print success messages first
-    if pep8_result and not pep8_result.error:
-        display('Flake8: PASSED')
-    if pylint_result and not pylint_result.error:
-        display('Pylint: PASSED')
+    if pep8:
+        pep8_result = _run_pep8(selected_modules)
+        exit_code_sum += pep8_result.exit_code
 
-    display('')
-
-    # print error messages last
-    if pep8_result and pep8_result.error:
-        logger.error(pep8_result.error.output.decode('utf-8'))
-        logger.error('Flake8: FAILED\n')
-    if pylint_result and pylint_result.error:
-        logger.error(pylint_result.error.output.decode('utf-8'))
-        logger.error('Pylint: FAILED\n')
+        if pep8_result.error:
+            logger.error(pep8_result.error.output.decode('utf-8'))
+            logger.error('Flake8: FAILED\n')
+        else:
+            display('Flake8: PASSED\n')
 
     sys.exit(exit_code_sum)
 
@@ -153,7 +148,7 @@ def run_pylint(modules, checkers=None, env=None, disable_all=False, enable=None)
             return None
         logger.debug("Using rcfile file: %s", rcfile)
         logger.debug("Running on %s: %s", desc, "\n".join(paths))
-        command = "pylint {} --ignore vendored_sdks,privates --rcfile={} --jobs {}".format(
+        command = "pylint {} --rcfile={} --jobs {}".format(
             " ".join(paths), rcfile, multiprocessing.cpu_count()
         )
         if checkers is not None:

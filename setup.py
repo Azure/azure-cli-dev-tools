@@ -68,7 +68,7 @@ setup(
         'jinja2',
         'knack',
         'mock',
-        'pylint==2.8.0',
+        'pylint==2.8.2',
         'pytest-xdist',  # depends on pytest-forked
         'pytest>=5.0.0',
         'pyyaml',
