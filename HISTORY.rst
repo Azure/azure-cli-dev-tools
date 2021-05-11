@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.33
+++++++
+* Bump `pylint` to 2.8.2 and move `--ignore` to `pylintrc` file (#301)
+
 0.1.32
 ++++++
 * Bump `pylint` to 2.8.0 (#295)
