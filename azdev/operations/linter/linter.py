@@ -65,6 +65,7 @@ class Linter:  # pylint: disable=too-many-public-methods
                 for word in command_group.split():
                     prefix_name = "{} {}".format(prefix_name, word).strip()
                     if prefix_name in added_command_groups:
+                        # if the parent command group is added continue
                         continue
                     added_command_groups.add(prefix_name)
                     self._command_groups.append(prefix_name)
