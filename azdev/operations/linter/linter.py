@@ -46,7 +46,7 @@ class Linter:  # pylint: disable=too-many-public-methods
         self._parameters = {}
         self._help_file_entries = set(help_file_entries.keys())
         self._command_parser = command_loader.cli_ctx.invocation.parser
-
+        self._command_groups = []
         for command_name, command in self._command_loader.command_table.items():
             self._parameters[command_name] = set()
             for name in command.arguments:
@@ -58,7 +58,18 @@ class Linter:  # pylint: disable=too-many-public-methods
 
     @property
     def command_groups(self):
-        return self._command_loader.command_group_table.keys()
+        if not self._command_groups:
+            added_command_groups = set()
+            for command_group in self._command_loader.command_group_table.keys():
+                prefix_name = ""
+                for word in command_group.split():
+                    prefix_name = "{} {}".format(prefix_name, word).strip()
+                    if prefix_name in added_command_groups:
+                        # if the parent command group is added continue
+                        continue
+                    added_command_groups.add(prefix_name)
+                    self._command_groups.append(prefix_name)
+        return self._command_groups
 
     @property
     def help_file_entries(self):
@@ -139,6 +150,9 @@ class Linter:  # pylint: disable=too-many-public-methods
             deprecate_info = group_kwargs.get('deprecate_info', None)
             if deprecate_info:
                 return deprecate_info.expired()
+        except KeyError:
+            # ignore command_group_name which is not in command_group_table.
+            pass
         except AttributeError:
             # Items with only token presence in the command table will not have any data. They can't be expired.
             pass

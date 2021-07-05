@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.34
+++++++
+* `azdev linter`: support to detect commmand groups which are missing in command_group_table.
+
 0.1.33
 ++++++
 * Bump `pylint` to 2.8.2 and move `--ignore` to `pylintrc` file (#301)
