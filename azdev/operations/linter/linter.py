@@ -150,8 +150,8 @@ class Linter:  # pylint: disable=too-many-public-methods
             deprecate_info = group_kwargs.get('deprecate_info', None)
             if deprecate_info:
                 return deprecate_info.expired()
-        # ignore command_group_name which is not in command_group_table.
         except KeyError:
+            # ignore command_group_name which is not in command_group_table.
             pass
         except AttributeError:
             # Items with only token presence in the command table will not have any data. They can't be expired.
