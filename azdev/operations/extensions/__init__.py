@@ -24,6 +24,8 @@ logger = get_logger(__name__)
 def add_extension(extensions):
 
     ext_paths = get_ext_repo_paths()
+    if not ext_paths or ext_paths == ['_NONE_']:
+        raise CLIError('Extension repo path is empty. Please try `azdev extension repo add` to add an extension repo')
     all_extensions = find_files(ext_paths, 'setup.py')
 
     if extensions == ['*']:
@@ -246,6 +248,8 @@ def update_extension_index(extensions):
 
 def build_extensions(extensions, dist_dir='dist'):
     ext_paths = get_ext_repo_paths()
+    if not ext_paths or ext_paths == ['_NONE_']:
+        raise CLIError('Extension repo path is empty. Please try `azdev extension repo add` to add an extension repo')
     all_extensions = find_files(ext_paths, 'setup.py')
 
     paths_to_build = []
