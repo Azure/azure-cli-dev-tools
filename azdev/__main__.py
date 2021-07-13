@@ -15,7 +15,7 @@ from azdev.utilities import get_azdev_config_dir
 class AzDevCli(CLI):
 
     def get_cli_version(self):
-        from . import __VERSION__
+        from azdev import __VERSION__
         return __VERSION__
 
 
