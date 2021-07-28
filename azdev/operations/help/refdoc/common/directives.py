@@ -5,7 +5,7 @@
 import copy
 import argparse
 from os.path import expanduser
-from mock import patch
+from unittest.mock import patch
 
 from docutils import nodes
 from docutils.statemachine import ViewList
