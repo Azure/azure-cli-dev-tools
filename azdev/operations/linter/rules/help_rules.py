@@ -7,7 +7,7 @@
 import shlex
 
 import re
-import mock
+from unittest import mock
 
 from knack.log import get_logger
 
