@@ -58,14 +58,14 @@ def _install_cli(cli_path, deps=None):
     if not cli_path:
         # install public CLI off PyPI if no repo found
         pip_cmd('install --upgrade azure-cli', "Installing `azure-cli`...")
-        pip_cmd('install git+https://github.com/Azure/azure-cli@master#subdirectory=src/azure-cli-testsdk',
+        pip_cmd('install git+https://github.com/Azure/azure-cli@main#subdirectory=src/azure-cli-testsdk',
                 "Installing `azure-cli-testsdk`...")
         return
     if cli_path == 'EDGE':
         # install the public edge build
         pip_cmd('install --pre azure-cli --extra-index-url https://azurecliprod.blob.core.windows.net/edge',
                 "Installing `azure-cli` edge build...")
-        pip_cmd('install git+https://github.com/Azure/azure-cli@master#subdirectory=src/azure-cli-testsdk',
+        pip_cmd('install git+https://github.com/Azure/azure-cli@main#subdirectory=src/azure-cli-testsdk',
                 "Installing `azure-cli-testsdk`...")
         return
 
