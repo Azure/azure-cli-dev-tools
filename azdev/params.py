@@ -54,6 +54,13 @@ def load_arguments(self, _):
         c.argument('last_failed', options_list='--lf', action='store_true', help='Re-run the last tests that failed.')
         c.argument('no_exit_first', options_list='--no-exitfirst', action='store_true', help='Do not exit on first error or failed test')
         c.argument('mark', help='Select tests with this mark. You can add @pytest.mark.custom_mark to a test')
+        
+        # Coverage arguments
+        c.argument('coverage', options_list=["--coverage", "-c"], help='Run coverage during tests and print coverage report. Also generates a static html report at htmlcov/. Required to use any other coverage arguments. Note that this will likely slow down testing.', arg_group='Coverage')
+        c.argument('no_htmlcov', help="Do not generate an html coverage report.", arg_group='Coverage')
+        c.argument('append_coverage', help='Instead of overwritting any existing coverage data, append new coverage data. Useful for combining coverage data accross multiple test runs.', arg_group='Coverage')
+        c.argument('coverage_path', help='Overwrites the path of files to include in coverage. If unset, the path defaults to the Azure CLI root directory set via \"azdev setup\"', arg_group='Coverage')
+        c.argument('open_coverage', help='Automatically load html coverage report in (default) browser when done.', arg_group='Coverage')
 
         # CI parameters
         c.argument('cli_ci',
