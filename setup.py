@@ -70,7 +70,6 @@ setup(
         'knack',
         'pylint==2.8.2',
         'pytest-xdist',  # depends on pytest-forked
-        # 'pytest>=5.0.0',
         'pyyaml',
         'requests',
         'sphinx==1.6.7',

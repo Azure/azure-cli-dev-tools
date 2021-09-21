@@ -24,7 +24,7 @@ from azdev.utilities import (
     ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
-    get_path_table, require_virtual_env, get_name_index)
+    get_path_table, require_virtual_env, get_name_index, call)
 from .pytest_runner import get_test_runner
 from .profile_context import ProfileContext, current_profile
 from .incremental_strategy import CLIAzureDevOpsContext
@@ -120,15 +120,24 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
                                  last_failed=last_failed,
                                  no_exit_first=no_exit_first,
                                  mark=mark, coverage=coverage, 
-                                 no_htmlcov=no_htmlcov, append_coverage=append_coverage, 
+                                 append_coverage=append_coverage, 
                                  coverage_path=coverage_path)
         exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
+
+    html_exit_code = 1
+    if coverage and not no_htmlcov:
+        logger.info('Running: coverage html')
+        html_exit_code = call("coverage html")
 
     if coverage and open_coverage:
         if no_htmlcov:
             raise ArgumentUsageError("Cannot use --no-htmlcov with --open-coverage")
+        
         report_path = os.path.realpath("htmlcov/index.html")
-        if not os.path.isfile(report_path):
+        
+        if html_exit_code == 1:
+            logger.warn("Could not open coverage HTML report because it was not generated")
+        elif not os.path.isfile(report_path):
             logger.warn("No such file: {} . Cannot open html coverage report".format(report_path))
         else:
             webbrowser.open('file://' + report_path)
