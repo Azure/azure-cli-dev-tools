@@ -11,7 +11,8 @@ from knack.log import get_logger
 from azdev.utilities import call, get_cli_repo_path
 
 
-def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark, coverage=False, append_coverage=False, coverage_path=None):
+def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark,
+                    coverage=False, append_coverage=False, coverage_path=None):
     """Create a pytest execution method"""
     def _run(test_paths, pytest_args):
 
@@ -42,10 +43,10 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark, covera
             else:
                 path = coverage_path
             arguments.append("--cov=\"{}\"".format(path))
-            
+
             if append_coverage:
                 arguments.append("--cov-append")
-        else: 
+        else:
             arguments.append("--no-cov")
 
         cmd = 'pytest {}'.format(' '.join(arguments))

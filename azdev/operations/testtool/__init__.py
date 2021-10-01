@@ -11,10 +11,10 @@ import os
 import re
 from subprocess import CalledProcessError
 import sys
+import webbrowser
 
 from knack.log import get_logger
 from knack.util import CLIError
-import webbrowser
 
 from azdev.utilities import (
     display, output, heading, subheading,
@@ -34,8 +34,8 @@ logger = get_logger(__name__)
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None,
               no_exit_first=False, mark=None,
-              git_source=None, git_target=None, git_repo=None,
-              cli_ci=False, coverage=False, no_htmlcov=False, append_coverage=False, coverage_path=None, open_coverage=False):
+              git_source=None, git_target=None, git_repo=None, cli_ci=False,
+              coverage=False, no_htmlcov=False, append_coverage=False, coverage_path=None, open_coverage=False):
 
     if (no_htmlcov or append_coverage or coverage_path or open_coverage) and not coverage:
         raise CLIError("Cannot use a coverage command without coverage enabled. Use --coverage or -c")
@@ -134,9 +134,9 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
         report_path = os.path.realpath("htmlcov/index.html")
 
         if html_exit_code == 1:
-            logger.warn("Could not open coverage HTML report because it was not generated")
+            logger.warning("Could not open coverage HTML report because it was not generated")
         elif not os.path.isfile(report_path):
-            logger.warn("No such file: {} . Cannot open html coverage report".format(report_path))
+            logger.warning("No such file: %s . Cannot open html coverage report", report_path)
         else:
             webbrowser.open('file://' + report_path)
 
