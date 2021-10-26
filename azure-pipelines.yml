@@ -9,7 +9,7 @@ jobs:
 - job: Tox
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-18.04'
+    vmImage: 'ubuntu-20.04'
   strategy:
     matrix:
       Python36:
@@ -24,6 +24,9 @@ jobs:
       Python39:
         python.version: '3.9'
         tox_env: 'py39'
+      Python310:
+        python.version: '3.10'
+        tox_env: 'py310'
   steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python $(python.version)'
@@ -41,7 +44,7 @@ jobs:
   displayName: 'Extract Metadata'
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-18.04'
+    vmImage: 'ubuntu-20.04'
   steps:
   - task: Bash@3
     displayName: 'Extract Version'
@@ -61,12 +64,12 @@ jobs:
   dependsOn: ExtractMetadata
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-18.04'
+    vmImage: 'ubuntu-20.04'
   steps:
   - task: UsePythonVersion@0
-    displayName: 'Use Python 3.8'
+    displayName: 'Use Python 3.9'
     inputs:
-      versionSpec: 3.8
+      versionSpec: 3.9
 
   - task: Bash@3
     displayName: 'Run Wheel Build Script'

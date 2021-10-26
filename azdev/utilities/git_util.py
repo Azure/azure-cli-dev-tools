@@ -35,8 +35,8 @@ def filter_by_git_diff(selected_modules, git_source, git_target, git_repo):
             to_remove[key].append(name)
 
     # remove the unchanged modules
-    for key in to_remove:
-        for name in to_remove[key]:
+    for key, value in to_remove.items():
+        for name in value:
             selected_modules[key].pop(name)
     logger.info('Filtered out: %s', to_remove)
 

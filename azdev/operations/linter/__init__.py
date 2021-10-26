@@ -81,7 +81,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
     # filter down to only modules that have changed based on git diff
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
 
-    if not any((selected_modules[x] for x in selected_modules)):
+    if not any(selected_modules.values()):
         logger.warning('No commands selected to check.')
 
     selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
@@ -96,7 +96,8 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
     for path in selected_mod_paths:
         exclusion_path = os.path.join(path, 'linter_exclusions.yml')
         if os.path.isfile(exclusion_path):
-            mod_exclusions = yaml.safe_load(open(exclusion_path))
+            with open(exclusion_path) as f:
+                mod_exclusions = yaml.safe_load(f)
             merge_exclusion(exclusions, mod_exclusions or {})
 
     global_exclusion_paths = [os.path.join(get_cli_repo_path(), 'linter_exclusions.yml')]
@@ -107,7 +108,8 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         pass
     for path in global_exclusion_paths:
         if os.path.isfile(path):
-            mod_exclusions = yaml.safe_load(open(path))
+            with open(path) as f:
+                mod_exclusions = yaml.safe_load(f)
             merge_exclusion(exclusions, mod_exclusions or {})
 
     start = time.time()

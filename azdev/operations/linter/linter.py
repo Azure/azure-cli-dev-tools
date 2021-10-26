@@ -240,7 +240,8 @@ class LinterManager:
 
         if paths:
             ci_exclusions_path = os.path.join(paths[0], 'ci_exclusions.yml')
-            self._ci_exclusions = yaml.safe_load(open(ci_exclusions_path)) or {}
+            with open(ci_exclusions_path) as f:
+                self._ci_exclusions = yaml.safe_load(f) or {}
 
         # find all defined rules and check for name conflicts
         found_rules = set()
@@ -279,10 +280,15 @@ class LinterManager:
             exclusion_paths = [os.path.join(repo_path, 'linter_exclusions.yml') for repo_path in repo_paths]
             for exclusion_path in exclusion_paths:
                 if not os.path.isfile(exclusion_path):
-                    open(exclusion_path, 'a').close()
-                exclusions = yaml.safe_load(open(exclusion_path)) or {}
+                    with open(exclusion_path, 'a'):
+                        pass
+
+                with open(exclusion_path) as f:
+                    exclusions = yaml.safe_load(f) or {}
                 exclusions.update(self._violiations)
-                yaml.safe_dump(exclusions, open(exclusion_path, 'w'))
+
+                with open(exclusion_path, 'w') as f:
+                    yaml.safe_dump(exclusions, f)
 
         colorama.deinit()
         return self.exit_code
