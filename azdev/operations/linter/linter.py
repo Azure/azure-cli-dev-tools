@@ -312,6 +312,7 @@ class LinterManager:
                         else:
                             sev_color = CYAN
 
+                        # pylint: disable=duplicate-string-formatting-argument
                         print('- {} FAIL{} - {}{}{} severity: {}'.format(RED, RESET, sev_color,
                                                                          severity_str, RESET, rule_name,))
                         for violation_msg, entity_name, name in violations:
