@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.36
+++++++
+* Remove colorama reference (#321)
+
 0.1.35
 ++++++
 * Support Python 3.10 (#319)
