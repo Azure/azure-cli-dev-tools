@@ -130,7 +130,7 @@ class AbstractHelpGenDirective(Directive):
                 group_registry = ArgumentGroupRegistry(
                     [p.group_name for p in help_file.parameters if p.group_name])
 
-                for arg in sorted(help_file.parameters, key=lambda p: group_registry.get_group_priority(p.group_name) + str(not p.required) + p.name):  # pylint: disable=line-too-long
+                for arg in sorted(help_file.parameters, key=lambda p: group_registry.get_group_priority(p.group_name) + str(not p.required) + p.name):  # pylint: disable=line-too-long, cell-var-from-loop
                     yield '{}.. cliarg:: {}'.format(self._INDENT, arg.name)
                     yield ''
                     yield '{}:required: {}'.format(self._DOUBLE_INDENT, arg.required)

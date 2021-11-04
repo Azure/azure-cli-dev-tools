@@ -9,6 +9,8 @@ disable=
     raise-missing-from,
     too-few-public-methods,
     too-many-arguments,
+    consider-using-f-string,
+    unspecified-encoding
 
 [TYPECHECK]
 # For Azure CLI extensions, we ignore some import errors as they'll be available in the environment of the CLI
