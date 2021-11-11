@@ -113,7 +113,6 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'statistics diff-command-tables') as c:
         c.argument('table_path', help='command table json file')
         c.argument('diff_table_path', help='command table json file to diff')
-
     # endregion
 
     with ArgumentsContext(self, 'command-change meta-export') as c:
@@ -129,6 +128,11 @@ def load_arguments(self, _):
         c.argument('output_type', choices=diff_export_format_choices(), default=diff_export_format_choices()[0],
                    help='format to print diff and suggest message')
         c.argument('output_file', help='command meta diff json file path to store')
+
+    # region cmdcov
+    with ArgumentsContext(self, 'cmdcov') as c:
+        c.positional('modules', modules_type)
+    # endregion
 
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')
