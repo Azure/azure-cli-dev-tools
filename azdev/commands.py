@@ -31,6 +31,9 @@ def load_command_table(self, _):
         g.command('list-command-table', 'list_command_table')
         g.command('diff-command-tables', 'diff_command_tables')
 
+    with CommandGroup(self, '', operation_group('cmdcov')) as g:
+        g.command('cmdcov', 'run_cmdcov')
+
     with CommandGroup(self, 'verify', operation_group('pypi')) as g:
         g.command('history', 'check_history')
 

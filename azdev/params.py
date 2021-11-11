@@ -115,6 +115,11 @@ def load_arguments(self, _):
 
     # endregion
 
+    # region cmdcov
+    with ArgumentsContext(self, 'cmdcov') as c:
+        c.positional('modules', modules_type)
+    # endregion
+
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')
 
