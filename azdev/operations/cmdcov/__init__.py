@@ -5,22 +5,22 @@
 # -----------------------------------------------------------------------------
 
 import os
-import sys
-import time
-import yaml
-
-from knack.help_files import helps
-from knack.log import get_logger
-from knack.util import CLIError
-
-from azdev.utilities import (
-    heading, subheading, display, get_path_table, require_azure_cli, filter_by_git_diff)
-from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
-from azdev.operations.style import run_pylint
-
-from .util import filter_modules, merge_exclusion
-
-logger = get_logger(__name__)
+# import sys
+# import time
+# import yaml
+#
+# from knack.help_files import helps
+# from knack.log import get_logger
+# from knack.util import CLIError
+#
+# from azdev.utilities import (
+#     heading, subheading, display, get_path_table, require_azure_cli, filter_by_git_diff)
+# from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
+# from azdev.operations.style import run_pylint
+#
+# from .util import filter_modules, merge_exclusion
+#
+# logger = get_logger(__name__)
 # CHECKERS_PATH = 'azdev.operations.linter.pylint_checkers'
 
 # def run_cmdcov():
@@ -138,14 +138,19 @@ def run_cmdcov(modules=None, rule_types=None, rules=None, ci_exclusions=None,
     if not command_loader.command_table:
         logger.warning('No commands selected to check.')
     display('command_loader: {}\n'.format(command_loader))
-    display('help_file_entries: {}\n'.format(help_file_entries))
-    display('loaded_help: {}\n'.format(loaded_help))
-    display('exclusions: {}\n'.format(exclusions))
-    display('rules: {}\n'.format(rules))
-    display('ci_exclusions: {}\n'.format(ci_exclusions))
-    display('min_severity: {}\n'.format(min_severity))
-    display('update_global_exclusion: {}\n'.format(update_global_exclusion))
-    display('rule_types: {}\n'.format(rule_types))
+
+    # all_test_commands = _get_all_commands(selected_mod_names, loaded_help)
+    all_tested_commands = _get_all_tested_commands(selected_mod_names, selected_mod_paths)
+    # _detect_commands(all_test_commands, all_tested_commands)
+
+    # display('help_file_entries: {}\n'.format(help_file_entries))
+    # display('loaded_help: {}\n'.format(loaded_help))
+    # display('exclusions: {}\n'.format(exclusions))
+    # display('rules: {}\n'.format(rules))
+    # display('ci_exclusions: {}\n'.format(ci_exclusions))
+    # display('min_severity: {}\n'.format(min_severity))
+    # display('update_global_exclusion: {}\n'.format(update_global_exclusion))
+    # display('rule_types: {}\n'.format(rule_types))
     # Instantiate and run Linter
     # linter_manager = LinterManager(command_loader=command_loader,
     #                                help_file_entries=help_file_entries,
@@ -190,3 +195,62 @@ def run_cmdcov(modules=None, rule_types=None, rules=None, ci_exclusions=None,
 #
 # def linter_severity_choices():
 #     return [str(severity.name).lower() for severity in LinterSeverity]
+
+def _get_all_commands(selected_mod_names, loaded_help):
+    # get all modules
+    # selected_mod_names = ['acr']
+    selected_mod_names = ['vm']
+    # get all submodule TODO
+    # {
+    #     'vm': [1,2,3],
+    #     'network': [1,2,3]
+    #  }
+    all_test_commands = {m: [] for m in selected_mod_names}
+    for x, y in loaded_help.items():
+        if x.split()[0] in selected_mod_names:
+            if hasattr(y, 'command_source') and y.command_source in selected_mod_names:
+                for parameter in y.parameters:
+                    for opt in parameter.name_source:
+                        if opt.startswith('-'):
+                            all_test_commands[y.command_source].append(f'{y.command} {opt}')
+    return all_test_commands
+
+def _get_all_tested_commands(selected_mod_names, selected_mod_path):
+    all_tested_commands = {m: [] for m in selected_mod_names}
+    selected_mod_path = ['d:\\code\\azure-cli\\src\\azure-cli\\azure\\cli\\command_modules\\vm']
+    for path in selected_mod_path:
+        test_dir = os.path.join(path, 'tests', 'latest')
+        files = filter(lambda f: f.startswith('test_'), os.listdir(test_dir))
+        for f in files:
+            with open(os.path.join(test_dir, f), 'r') as f:
+                lines = f.readlines()
+                # test_image_builder_commands.py 44
+                for line in lines:
+                    print(line)
+
+def test_regex():
+    lines=['        self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\'\n',
+           '                 \' --managed-image-destinations img_1=westus \' + out_3,\n',
+           '                 checks=[\n',
+           '                     self.check(\'name\', \'{tmpl_02}\'), self.check(\'provisioningState\', \'Succeeded\'),\n',
+           '                     self.check(\'length(distribute)\', 2),\n',
+           '                     self.check(\'distribute[0].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_1\'),\n',
+           '                     self.check(\'distribute[0].location\', \'westus\'),\n'
+           '                     self.check(\'distribute[0].runOutputName\', \'img_1\'),\n'
+           '                     self.check(\'distribute[0].type\', \'ManagedImage\'),\n'
+           '                     self.check(\'distribute[1].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_2\'),\n'
+           '                     self.check(\'distribute[1].location\', \'centralus\'),\n'
+           '                     self.check(\'distribute[1].runOutputName\', \'img_2\'),\n'
+           '                     self.check(\'distribute[1].type\', \'ManagedImage\'),\n'
+           '                     self.check(\'buildTimeoutInMinutes\', 22)\n'
+           '                 ])\n'
+           ]
+
+def _detect_commands(all_test_commands, all_tested_commands):
+    pass
+
+def _generate_html():
+    pass
+
+if __name__ == '__main__':
+    _get_all_tested_commands(['a'], ['b'])
