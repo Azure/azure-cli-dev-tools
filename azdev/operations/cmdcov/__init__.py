@@ -5,6 +5,8 @@
 # -----------------------------------------------------------------------------
 
 import os
+
+
 # import sys
 # import time
 # import yaml
@@ -33,9 +35,8 @@ import os
 def run_cmdcov(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
                min_severity=None, save_global_exclusion=False):
-
     require_azure_cli()
-#
+    #
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
     from azure.cli.core.file_util import (  # pylint: disable=import-error
         get_all_help, create_invoker_and_load_cmds_and_args)
@@ -71,7 +72,7 @@ def run_cmdcov(modules=None, rule_types=None, rules=None, ci_exclusions=None,
             for ext_path in get_ext_repo_paths():
                 if os.path.exists(os.path.join(ext_path, 'linter_exclusions.yml')):
                     os.remove(os.path.join(ext_path, 'linter_exclusions.yml'))
-#
+    #
     # filter down to only modules that have changed based on git diff
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
 
@@ -79,9 +80,9 @@ def run_cmdcov(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         logger.warning('No commands selected to check.')
 
     selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
-        list(selected_modules['ext'].keys())
+                         list(selected_modules['ext'].keys())
     selected_mod_paths = list(selected_modules['mod'].values()) + list(selected_modules['core'].values()) + \
-        list(selected_modules['ext'].values())
+                         list(selected_modules['ext'].values())
 
     if selected_mod_names:
         display('Modules: {}\n'.format(', '.join(selected_mod_names)))
@@ -215,42 +216,173 @@ def _get_all_commands(selected_mod_names, loaded_help):
                             all_test_commands[y.command_source].append(f'{y.command} {opt}')
     return all_test_commands
 
+
 def _get_all_tested_commands(selected_mod_names, selected_mod_path):
+    import re
+    import pprint
+    cmd_pattern = r'self.cmd\((?:\'|")(.*)(?:\'|")(.*)?\n'
+    # cmd_pattern = r'self.cmd\((?:\'|")(.*)(?:\'|")(?:\).*)?\n'
+    quo_pattern = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
+    end_pattern = r'(\)|checks=|,\n)'
+    selected_mod_names = ['vm']
     all_tested_commands = {m: [] for m in selected_mod_names}
     selected_mod_path = ['d:\\code\\azure-cli\\src\\azure-cli\\azure\\cli\\command_modules\\vm']
     for path in selected_mod_path:
         test_dir = os.path.join(path, 'tests', 'latest')
         files = filter(lambda f: f.startswith('test_'), os.listdir(test_dir))
         for f in files:
+            # if f != 'test_image_builder_commands.py':
+            # if f != 'test_vm_commands.py':
+            #     continue
             with open(os.path.join(test_dir, f), 'r') as f:
                 lines = f.readlines()
                 # test_image_builder_commands.py 44
-                for line in lines:
-                    print(line)
+                total_lines = len(lines)
+                row_num = 0
+                count = 1
+                while row_num < total_lines:
+                    if re.findall(cmd_pattern, lines[row_num]):
+                        command = re.findall(cmd_pattern, lines[row_num])[0][0]
+                        while row_num < total_lines and not re.findall(end_pattern, lines[row_num]):
+                            row_num += 1
+                            command += re.findall(quo_pattern, lines[row_num])[0][1]
+                        else:
+                            command = command + ' ' + str(count)
+                            all_tested_commands['vm'].append(command)
+                            row_num += 1
+                            count += 1
+                    else:
+                        row_num += 1
+    pprint.pprint(all_tested_commands['vm'], width=500)
+    print(len(all_tested_commands['vm']))
 
-def test_regex():
-    lines=['        self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\'\n',
-           '                 \' --managed-image-destinations img_1=westus \' + out_3,\n',
-           '                 checks=[\n',
-           '                     self.check(\'name\', \'{tmpl_02}\'), self.check(\'provisioningState\', \'Succeeded\'),\n',
-           '                     self.check(\'length(distribute)\', 2),\n',
-           '                     self.check(\'distribute[0].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_1\'),\n',
-           '                     self.check(\'distribute[0].location\', \'westus\'),\n'
-           '                     self.check(\'distribute[0].runOutputName\', \'img_1\'),\n'
-           '                     self.check(\'distribute[0].type\', \'ManagedImage\'),\n'
-           '                     self.check(\'distribute[1].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_2\'),\n'
-           '                     self.check(\'distribute[1].location\', \'centralus\'),\n'
-           '                     self.check(\'distribute[1].runOutputName\', \'img_2\'),\n'
-           '                     self.check(\'distribute[1].type\', \'ManagedImage\'),\n'
-           '                     self.check(\'buildTimeoutInMinutes\', 22)\n'
-           '                 ])\n'
-           ]
+
+def regex(line):
+    import re
+    cmd_pattern = r'self.cmd\(\'(.*)\'\n'
+    quo_pattern = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
+    end_pattern = r'(\)|checks=|,\n)'
+    command = ''
+    if re.findall(cmd_pattern, line):
+        command += re.findall(cmd_pattern, line)
+        while not re.findall(end_pattern, line):
+            command += re.findall(quo_pattern, line)
+            line += 1
+
+def regex2():
+    import re
+    lines = [
+        '        self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\'\n',
+        '                 \' --managed-image-destinations img_1=westus \' + out_3,\n',
+        '                 checks=[\n',
+        '                     self.check(\'name\', \'{tmpl_02}\'), self.check(\'provisioningState\', \'Succeeded\'),\n',
+        '                     self.check(\'length(distribute)\', 2),\n',
+        '                     self.check(\'distribute[0].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_1\'),\n',
+        '                     self.check(\'distribute[0].location\', \'westus\'),\n'
+        '                     self.check(\'distribute[0].runOutputName\', \'img_1\'),\n'
+        '                     self.check(\'distribute[0].type\', \'ManagedImage\'),\n'
+        '                     self.check(\'distribute[1].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_2\'),\n'
+        '                     self.check(\'distribute[1].location\', \'centralus\'),\n'
+        '                     self.check(\'distribute[1].runOutputName\', \'img_2\'),\n'
+        '                     self.check(\'distribute[1].type\', \'ManagedImage\'),\n'
+        '                     self.check(\'buildTimeoutInMinutes\', 22)\n'
+        '                 ])\n'
+        ]
+    # lines[0] = '        self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\'\n'
+    # pattern = r'.*self.cmd(.*)\n\''
+    # print(re.findall(pattern, lines[0]))
+    # lines0 = 'self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\'\n'
+    lines0 = '        self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\'\n'
+
+    # pattern = r'self.cmd\(\'(.*)\'\n'
+    # ['image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22']
+    # res = re.findall(pattern, lines0)
+
+    pattern = r'self.cmd\(\'(.*)\'(\))?\n'
+    # [('image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22','')]
+    res = re.findall(pattern, lines0)
+
+    print(res)
+    print('image builder creat' in res and '-n' in res[0][0])
+
+    lines1 = 'self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\')\n'
+
+    # pattern = r'self.cmd\(\'(.*)\'\)\n'
+    # ['image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22']
+    # res = re.findall(pattern, lines1)
+    pattern = r'self.cmd\(\'(.*)\'\n'
+    res = re.findall(pattern, lines0)
+
+    print(res)
+
+    # pattern = r'self.cmd\(\'(.*)\'(\))?\n'  # self.cmd pattern
+    # # [('image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22',')')]
+    # res = re.findall(pattern, lines1)
+    #
+    # print(res)
+    # print('image builder creat' in res and '-n' in res[0][0])
+    #
+    # lines2 = '                 \' --managed-image-destinations img_1=westus \' + out_3,\n'
+    # # pattern = r'\'.*\'.*\n'
+    # # pattern = r"'[^']+'"
+    # # pattern = r"([\"'])(?:\\\1|[^\1]+)*\1"
+    # pattern = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'  # 引号 pattern
+    # res = re.findall(pattern, lines2)
+    #
+    # lines3 = 'xxx,checks='
+    # lines4 = 'self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\')\n'
+    # # check= )
+    # lines5 = '                 \' --managed-image-destinations img_1=westus \' + out_3,\n'
+    # lines6 = '--attach-data-disks {data_disk} --data-disk-delete-option Detach --data-disk-sizes-gb 3 '
+    # lines7 = '    \'--os-disk-size-gb 100 --os-type linux --nsg-rule NONE\',\n'
+    # pattern = r'(\)|checks=|,\n)'  # end pattern
+    # res = re.findall(pattern, lines3)
+    # print(res)
+    # res = re.findall(pattern, lines4)
+    # print(res)
+    # res = re.findall(pattern, lines5)
+    # print(res)
+    # res = re.findall(pattern, lines6)
+    # print(res)
+    # res = re.findall(pattern, lines7)
+    # print(res)
+
+
+
 
 def _detect_commands(all_test_commands, all_tested_commands):
     pass
 
+
 def _generate_html():
     pass
 
+def regex3():
+    import re
+    line = '            self.cmd("role assignment create --assignee {assignee} --role {role} --scope {scope}")\n'
+    # cmd_pattern = r'self.cmd\((\'|")(.*)(\'|")\n'
+    # cmd_pattern = r'self.cmd\((\'|")(.*)(\'|")\)?\n'
+    # cmd_pattern = r'self.cmd\(\'(.*)\'\).*'
+    # cmd_pattern = r'self.cmd\((?:\'|")(.*)(?:\'|")(?:\).*)?\n'
+    cmd_pattern = r'self.cmd\((?:\'|")(.*)(?:\'|")(.*)?\n'
+    print(re.findall(cmd_pattern, line))
+    line = '            self.cmd("role assignment create --assignee {assignee} --role {role} --scope {scope}"\n'
+    print(re.findall(cmd_pattern, line))
+    line = '            self.cmd(\'role assignment create --assignee {assignee} --role {role} --scope {scope}\')\n'
+    print(re.findall(cmd_pattern, line))
+    line = '            self.cmd(\'role assignment create --assignee {assignee} --role {role} --scope {scope}\'\n'
+    print(re.findall(cmd_pattern, line))
+    line = 'abcdefg'
+    print(re.findall(cmd_pattern, line))
+    line = '     identity_id = self.cmd(\'identity create -g {rg} -n {ide}\').get_output_in_json()[\'clientId\']\n'
+    print(re.findall(cmd_pattern, line))
+    quo_pattern = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
+    line = '                 \' --managed-image-destinations img_1=westus \' + out_3,\n'
+    print(re.findall(quo_pattern, line))
+    line = '                 " --managed-image-destinations img_1=westus " + out_3,\n'
+    print(re.findall(quo_pattern, line))
+
 if __name__ == '__main__':
     _get_all_tested_commands(['a'], ['b'])
+    # regex2()
+    # regex3()
