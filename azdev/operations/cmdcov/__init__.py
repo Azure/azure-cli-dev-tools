@@ -247,6 +247,7 @@ def _get_all_tested_commands(selected_mod_names, selected_mod_path):
     # print(len(all_tested_commands[selected_mod_names[idx]]))
     return all_tested_commands
 
+
 def regex(line):
     import re
     cmd_pattern = r'self.cmd\(\'(.*)\'\n'
@@ -258,6 +259,7 @@ def regex(line):
         while not re.findall(end_pattern, line):
             command += re.findall(quo_pattern, line)
             line += 1
+
 
 def regex2():
     import re
@@ -337,6 +339,7 @@ def regex2():
     # res = re.findall(pattern, lines7)
     # print(res)
 
+
 def _run_commands_coverage(all_test_commands, all_tested_commands):
     import ast
     # module: vm
@@ -376,6 +379,7 @@ def _run_commands_coverage(all_test_commands, all_tested_commands):
     # pprint.pprint(all_untested_commands)
     return command_coverage, all_untested_commands
 
+
 def regex3():
     import re
     line = '            self.cmd("role assignment create --assignee {assignee} --role {role} --scope {scope}")\n'
@@ -400,6 +404,7 @@ def regex3():
     print(re.findall(quo_pattern, line))
     line = '                 " --managed-image-destinations img_1=westus " + out_3,\n'
     print(re.findall(quo_pattern, line))
+
 
 def _render_html(command_coverage, all_untested_commands):
     """
@@ -505,6 +510,7 @@ def _render_html(command_coverage, all_untested_commands):
         f.write(content)
     return html_path + '/index.html'
 
+
 def _render_child_html(module, command_coverage, all_untested_commands):
     """
     Return a HTML string
@@ -581,6 +587,7 @@ def _render_child_html(module, command_coverage, all_untested_commands):
     # logger.warning('Exit render()')
     return content
 
+
 def _render_css(html_path):
     content = """
 /* Component styles */
@@ -635,12 +642,54 @@ td.module, td.command {
     with open(f'{html_path}/component.css', 'w') as f:
         f.write(content)
 
+
 def get_html_path(date):
     root_path = get_azdev_repo_path()
     html_path = os.path.join(root_path, 'cmd_coverage', f'{date}')
     if not os.path.exists(html_path):
         os.makedirs(html_path)
     return html_path
+
+
+def get_container_name():
+    """
+    Generate container name in storage account. It is also an identifier of the pipeline run.
+    :return:
+    """
+    import datetime
+    import random
+    import string
+    logger.warning('Enter get_container_name()')
+    time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    random_id = ''.join(random.choice(string.digits) for _ in range(6))
+    name = time + '-' + random_id
+    logger.warning('Exit get_container_name()')
+    return name
+
+
+def upload_files(container, html_path, account_key):
+    """
+    Upload html and json files to container
+    :param container:
+    :return:
+    """
+    logger.warning('Enter upload_files()')
+
+    # Create container
+    cmd = 'az storage container create -n {} --account-name clitestresultstac --account-key {} --public-access container'.format(container, account_key)
+    os.system(cmd)
+
+    # Upload files
+    for root, dirs, files in os.walk(html_path):
+        for name in files:
+            if name.endswith('html') or name.endswith('css'):
+                fullpath = os.path.join(root, name)
+                cmd = 'az storage blob upload -f {} -c {} -n {} --account-name clitestresultstac'
+                cmd = cmd.format(fullpath, container, name)
+                logger.warning('Running: ' + cmd)
+                os.system(cmd)
+
+    logger.warning('Exit upload_files()')
 
 
 if __name__ == '__main__':
