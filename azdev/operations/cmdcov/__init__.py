@@ -431,6 +431,7 @@ def _render_html(command_coverage, all_untested_commands):
         <meta charset="UTF-8">
         <title>Detail</title>
         <link rel="stylesheet" type="text/css" href="component.css"/>
+        <link rel="shortcut icon" href="favicon.ico">
     </head>
 <body>
     <div class="container">
@@ -453,6 +454,8 @@ def _render_html(command_coverage, all_untested_commands):
                         <th>Tested</th>
                         <th>Untested</th>
                         <th>Percentage</th>
+                        <th>Percentage</th>
+                        <th>Percentage</th>
                         <th>Reports</th>
                     </tr>
                     </thead>
@@ -465,29 +468,108 @@ def _render_html(command_coverage, all_untested_commands):
                         <td>{}</td>
                         <td>{}</td>
                         <td>{}</td>
+
+    """.format(command_coverage['Total'][0], command_coverage['Total'][1], command_coverage['Total'][2])
+
+    if command_coverage['Total'][2] < '30%':
+        color = 'red'
+    elif command_coverage['Total'][2] < '60%':
+        color = 'orange'
+    else:
+        color = 'green'
+    percentage = command_coverage['Total'][2].split('.')[0]
+    table += """
+                        <td>
+                            <div class="single-chart">
+                                <svg viewBox="0 0 36 36" class="circular-chart {color}">
+                                    <path class="circle-bg"
+                                          d="M18 2.0845
+          a 15.9155 15.9155 0 0 1 0 31.831
+          a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                    <path class="circle"
+                                          stroke-dasharray="{percentage}, 100"
+                                          d="M18 2.0845
+          a 15.9155 15.9155 0 0 1 0 31.831
+          a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                    <text x="18" y="20.35" class="percentage">{percentage}%</text>
+                                </svg>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="progressbar">
+                                <div class="{color}" style="width: {percentage}%;">{percentage}%</div>
+                            </div>
+                        </td>                         
+    """.format(color=color, percentage=percentage)
+
+    table += """
                         <td>N/A</td>
                     </tr>
-    """.format(command_coverage['Total'][0], command_coverage['Total'][1], command_coverage['Total'][2])
+    """
 
     command_coverage.pop('Total')
 
     for module, coverage in command_coverage.items():
-        reports = '<a href="{module}.html">{module} coverage report</a> '.format(module=module)
-        child_html = _render_child_html(module, coverage, all_untested_commands[module])
-        with open(f'{html_path}/{module}.html', 'w') as f:
-            f.write(child_html)
-        try:
+        # feedback: []
+        # find: []
+        if coverage:
+            reports = '<a href="{module}.html">{module} coverage report</a> '.format(module=module)
+            child_html = _render_child_html(module, coverage, all_untested_commands[module])
+            with open(f'{html_path}/{module}.html', 'w') as f:
+                f.write(child_html)
+            try:
+                table += """
+                  <tr>
+                    <td>{}</td>
+                    <td>{}</td>
+                    <td>{}</td>
+                    <td>{}</td>
+                """.format(module, coverage[0], coverage[1], coverage[2])
+            except:
+                print('Exception3', module, coverage, reports)
+
+            try:
+                if coverage[2] < '30%':
+                    color = 'red'
+                elif coverage[2] < '60%':
+                    color = 'orange'
+                else:
+                    color = 'green'
+                percentage = coverage[2].split('.')[0]
+            except Exception as e:
+                print('coverage exception', coverage)
             table += """
-              <tr>
-                <td>{}</td>
-                <td>{}</td>
-                <td>{}</td>
-                <td>{}</td>
-                <td>{}</td>
-              </tr>
-            """.format(module, coverage[0], coverage[1], coverage[2], reports)
-        except:
-            print('Exception3', module, coverage, reports)
+                                <td>
+                                    <div class="single-chart">
+                                        <svg viewBox="0 0 36 36" class="circular-chart {color}">
+                                            <path class="circle-bg"
+                                                  d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                                            />
+                                            <path class="circle"
+                                                  stroke-dasharray="{percentage}, 100"
+                                                  d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                                            />
+                                            <text x="18" y="20.35" class="percentage">{percentage}%</text>
+                                        </svg>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="progressbar">
+                                        <div class="{color}" style="width: {percentage}%;">{percentage}%</div>
+                                    </div>
+                                </td>                         
+            """.format(color=color, percentage=percentage)
+
+            table += """
+                                <td>{}</td>
+                            </tr>
+            """.format(reports)
 
     table += """
                     </tbody>
@@ -508,6 +590,19 @@ def _render_html(command_coverage, all_untested_commands):
     # logger.warning('Exit render()')
     with open(f'{html_path}/index.html', 'w') as f:
         f.write(content)
+
+    # copy icon
+    import shutil
+    import sys
+    source = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'favicon.ico')
+    # adding exception handling
+    try:
+        shutil.copy(source, html_path)
+    except IOError as e:
+        print("Unable to copy %s" % e)
+    except:
+        print("Unexpected error:", sys.exc_info())
+
     return html_path + '/index.html'
 
 
@@ -535,6 +630,7 @@ def _render_child_html(module, command_coverage, all_untested_commands):
         <meta charset="UTF-8">
         <title>Detail</title>
         <link rel="stylesheet" type="text/css" href="component.css"/>
+        <link rel="shortcut icon" href="favicon.ico">
     </head>
     <body>
         <div class="container">
@@ -595,8 +691,8 @@ def _render_css(html_path):
 	line-height: 1.5em;
 	margin: 0 auto;
 	padding: 2em 0 3em;
-	width: 90%;
-	max-width: 1000px;
+	width: 100%;
+	max-width: 1200px;
 	overflow: hidden;
 }
 .component .contact {
@@ -638,6 +734,97 @@ td.module, td.command {
 	text-transform: capitalize;
 }
 
+.single-chart {
+  width: 100%;
+  justify-content: space-around ;
+}
+
+.circular-chart {
+  display: block;
+  margin: 0px auto;
+  max-width: 100%;
+  max-height: 50px;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+.circular-chart.red .circle {
+  stroke: red;
+}
+
+.circular-chart.orange .circle {
+  stroke: #ff9f00;
+}
+
+.circular-chart.green .circle {
+  stroke: #4CC790;
+}
+
+.circular-chart.blue .circle {
+  stroke: #3c9ee5;
+}
+
+.percentage {
+  fill: #666;
+  font-family: sans-serif;
+  font-size: 0.6em;
+  text-anchor: middle;
+}
+
+
+.progressbar {
+  background-color: #eee;
+  border-radius: 10px;
+  /* (height of inner div) / 2 + padding */
+  padding: 1px;
+}
+
+.progressbar .red {
+  background-color: red;
+  width: 40%;
+  /* Adjust with JavaScript */
+  height: 20px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.1em;
+}
+
+.progressbar .orange {
+  background-color: orange;
+  width: 40%;
+  /* Adjust with JavaScript */
+  height: 20px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.1em;
+}
+
+.progressbar .green {
+  background-color: green;
+  width: 40%;
+  /* Adjust with JavaScript */
+  height: 20px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.1em;
+}
     """
     with open(f'{html_path}/component.css', 'w') as f:
         f.write(content)
