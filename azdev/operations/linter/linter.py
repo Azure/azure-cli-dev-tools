@@ -10,7 +10,6 @@ from importlib import import_module
 from pkgutil import iter_modules
 from enum import Enum
 import yaml
-import colorama
 from knack.log import get_logger
 
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
@@ -240,7 +239,8 @@ class LinterManager:
 
         if paths:
             ci_exclusions_path = os.path.join(paths[0], 'ci_exclusions.yml')
-            self._ci_exclusions = yaml.safe_load(open(ci_exclusions_path)) or {}
+            with open(ci_exclusions_path) as f:
+                self._ci_exclusions = yaml.safe_load(f) or {}
 
         # find all defined rules and check for name conflicts
         found_rules = set()
@@ -254,7 +254,6 @@ class LinterManager:
                     found_rules.add(rule_name)
                     add_to_linter_func(self)
 
-        colorama.init()
         # run all rule-checks
         if run_help_files_entries and self._rules.get('help_file_entries'):
             self._run_rules('help_file_entries')
@@ -279,16 +278,25 @@ class LinterManager:
             exclusion_paths = [os.path.join(repo_path, 'linter_exclusions.yml') for repo_path in repo_paths]
             for exclusion_path in exclusion_paths:
                 if not os.path.isfile(exclusion_path):
-                    open(exclusion_path, 'a').close()
-                exclusions = yaml.safe_load(open(exclusion_path)) or {}
-                exclusions.update(self._violiations)
-                yaml.safe_dump(exclusions, open(exclusion_path, 'w'))
+                    with open(exclusion_path, 'a'):
+                        pass
 
-        colorama.deinit()
+                with open(exclusion_path) as f:
+                    exclusions = yaml.safe_load(f) or {}
+                exclusions.update(self._violiations)
+
+                with open(exclusion_path, 'w') as f:
+                    yaml.safe_dump(exclusions, f)
+
         return self.exit_code
 
     def _run_rules(self, rule_group):
-        from colorama import Fore
+        # https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#text-formatting
+        RED = '\x1b[31m'
+        GREEN = '\x1b[32m'
+        YELLOW = '\x1b[33m'
+        CYAN = '\x1b[36m'
+        RESET = '\x1b[39m'
         for rule_name, (rule_func, linter_callable, rule_severity) in self._rules.get(rule_group).items():
             severity_str = rule_severity.name
             # use new linter if needed
@@ -298,20 +306,21 @@ class LinterManager:
                     violations = sorted(rule_func()) or []
                     if violations:
                         if rule_severity == LinterSeverity.HIGH:
-                            sev_color = Fore.RED
+                            sev_color = RED
                         elif rule_severity == LinterSeverity.MEDIUM:
-                            sev_color = Fore.YELLOW
+                            sev_color = YELLOW
                         else:
-                            sev_color = Fore.CYAN
+                            sev_color = CYAN
 
-                        print('- {} FAIL{} - {}{}{} severity: {}'.format(Fore.RED, Fore.RESET, sev_color,
-                                                                         severity_str, Fore.RESET, rule_name,))
+                        # pylint: disable=duplicate-string-formatting-argument
+                        print('- {} FAIL{} - {}{}{} severity: {}'.format(RED, RESET, sev_color,
+                                                                         severity_str, RESET, rule_name,))
                         for violation_msg, entity_name, name in violations:
                             print(violation_msg)
                             self._save_violations(entity_name, name)
                         print()
                     else:
-                        print('- {} pass{}: {} '.format(Fore.GREEN, Fore.RESET, rule_name))
+                        print('- {} pass{}: {} '.format(GREEN, RESET, rule_name))
 
     def _linter_severity_is_applicable(self, rule_severity, rule_name):
         if self.min_severity.value > rule_severity.value:

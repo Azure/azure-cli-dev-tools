@@ -57,7 +57,7 @@ def check_style(modules=None, pylint=False, pep8=False, git_source=None, git_tar
     # filter down to only modules that have changed based on git diff
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
 
-    if not any((selected_modules[x] for x in selected_modules)):
+    if not any(selected_modules.values()):
         raise CLIError('No modules selected.')
 
     mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys())

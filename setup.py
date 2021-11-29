@@ -43,7 +43,8 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9'
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10'
     ],
     keywords='azure',
     python_requires='>=3.6',
@@ -68,7 +69,7 @@ setup(
         'gitpython',
         'jinja2',
         'knack',
-        'pylint==2.8.2',
+        'pylint==2.11.1',
         'pytest-xdist',  # depends on pytest-forked
         'pyyaml',
         'requests',

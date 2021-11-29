@@ -3,9 +3,20 @@
 Release History
 ===============
 
+0.1.36
+++++++
+* Remove colorama reference (#321)
+
+0.1.35
+++++++
+* Support Python 3.10 (#319)
+* Replace `master` branch by `main` branch (#315)
+* Drop `mock` library (#313)
+* Add extension repo missing error (#309)
+
 0.1.34
 ++++++
-* `azdev linter`: support to detect commmand groups which are missing in command_group_table.
+* `azdev linter`: support to detect commmand groups which are missing in command_group_table (#308)
 
 0.1.33
 ++++++

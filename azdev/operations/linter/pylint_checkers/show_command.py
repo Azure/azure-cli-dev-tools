@@ -26,7 +26,7 @@ class ShowCommandChecker(BaseChecker):
         try:
             if not (isinstance(node.args[0], astroid.node_classes.Const) and node.args[0].value == 'show'):
                 return
-            if node.func.attrname == 'command' or node.func.attrname == 'custom_command':
+            if node.func.attrname in ('command', 'custom_command'):
                 self.add_message(
                     'show-command', node=node,
                 )
