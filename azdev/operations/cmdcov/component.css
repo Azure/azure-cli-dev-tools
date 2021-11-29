@@ -1,0 +1,156 @@
+
+/* Component styles */
+.component {
+	line-height: 1.5em;
+	margin: 0 auto;
+	padding: 2em 0 3em;
+	width: 100%;
+	max-width: 1200px;
+	overflow: hidden;
+}
+.component .contact {
+	font-family: "Blokk", Arial, sans-serif;
+	color: #d3d3d3;
+}
+table {
+    border: 1px solid black;
+    border-collapse: collapse;
+    margin-bottom: 3em;
+    width: 100%;
+    background: #fff;
+}
+td, th {
+    border: 1px solid black;
+    padding: 0.75em 1.5em;
+    text-align: left;
+}
+	td.err {
+		background-color: #e992b9;
+		color: #fff;
+		font-size: 0.75em;
+		text-align: center;
+		line-height: 1;
+	}
+th {
+    background-color: #31bc86;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+}
+tbody th {
+	background-color: #2ea879;
+}
+tbody tr:hover {
+    background-color: rgba(129,208,177,.3);
+}
+td.module, td.command {
+	text-transform: capitalize;
+}
+
+.single-chart {
+  width: 100%;
+  justify-content: space-around ;
+}
+
+.circular-chart {
+  display: block;
+  margin: 0px auto;
+  max-width: 100%;
+  max-height: 50px;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+.circular-chart.red .circle {
+  stroke: #e71837;
+}
+
+.circular-chart.orange .circle {
+  stroke: #ff9f00;
+}
+
+.circular-chart.green .circle {
+  stroke: #4CC790;
+}
+
+.circular-chart.blue .circle {
+  stroke: #3c9ee5;
+}
+
+.circular-chart.gold .circle {
+  stroke: #ffd700;
+  fill: #ffd700;
+}
+
+.percentage {
+  fill: #666;
+  font-family: sans-serif;
+  font-size: 0.6em;
+  text-anchor: middle;
+}
+
+.medal {
+  width: 100px;
+  height: 60px;
+}
+.ribbon {
+  width: 40px;
+  height: 35px;
+  margin: 0 auto;
+  position: relative;
+}
+.ribbon:before,
+.ribbon:after {
+  content: '';
+  position: absolute;
+  width: 17.5px;
+  height: 100%;
+  top: 0;
+}
+.ribbon:before {
+  right: 0;
+  background: #30110E;
+  transform: skew(-28deg);
+}
+.ribbon:after {
+  background: #EF7E76;
+  transform: skew(28deg);
+}
+.coin {
+  border: 1px solid #CA5D3E;
+  border-radius: 50%;
+  background: #F0CD73;
+  width: 35px;
+  height: 35px;
+  position: relative;
+  margin: -7.5px auto 0 auto;
+  box-shadow: 0px 0px 3px 0px #989898;
+}
+.coin:after {
+  content: '';
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  width: 17.5px;
+  height: 17.5px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 9px #D9B867;
+}
