@@ -1,5 +1,7 @@
+import re
+
+
 def regex(line):
-    import re
     cmd_pattern = r'self.cmd\(\'(.*)\'\n'
     quo_pattern = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
     end_pattern = r'(\)|checks=|,\n)'
@@ -12,7 +14,6 @@ def regex(line):
 
 
 def regex2():
-    import re
     lines = [
         '        self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\'\n',
         '                 \' --managed-image-destinations img_1=westus \' + out_3,\n',
@@ -91,7 +92,6 @@ def regex2():
 
 
 def regex3():
-    import re
     line = '            self.cmd("role assignment create --assignee {assignee} --role {role} --scope {scope}")\n'
     # cmd_pattern = r'self.cmd\((\'|")(.*)(\'|")\n'
     # cmd_pattern = r'self.cmd\((\'|")(.*)(\'|")\)?\n'
@@ -114,3 +114,129 @@ def regex3():
     print(re.findall(quo_pattern, line))
     line = '                 " --managed-image-destinations img_1=westus " + out_3,\n'
     print(re.findall(quo_pattern, line))
+
+
+def regex4():
+    lines = [
+'        self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\'\n',
+'                 \' --managed-image-destinations img_1=westus \' + out_3,\n',
+'                 checks=[\n',
+'                     self.check(\'name\', \'{tmpl_02}\'), self.check(\'provisioningState\', \'Succeeded\'),\n',
+'                     self.check(\'length(distribute)\', 2),\n',
+'                     self.check(\'distribute[0].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_1\'),\n',
+'                     self.check(\'distribute[0].location\', \'westus\'),\n'
+'                     self.check(\'distribute[0].runOutputName\', \'img_1\'),\n'
+'                     self.check(\'distribute[0].type\', \'ManagedImage\'),\n'
+'                     self.check(\'distribute[1].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_2\'),\n'
+'                     self.check(\'distribute[1].location\', \'centralus\'),\n'
+'                     self.check(\'distribute[1].runOutputName\', \'img_2\'),\n'
+'                     self.check(\'distribute[1].type\', \'ManagedImage\'),\n'
+'                     self.check(\'buildTimeoutInMinutes\', 22)\n'
+'                 ])\n'
+'        self.cmd(\'aks list -g {resource_group}\', checks=[\n',
+'            self.check(\'[0].type\', \'{resource_type}\'),\n',
+'            StringContainCheck(aks_name),\n',
+'            StringContainCheck(resource_group)\n',
+'        ])\n',
+'    ipprefix_id = self.cmd(\n',
+'        \'az network public-ip prefix create -g {rg} -n {ipprefix_name} --location {location} --length 29\'). \\n',
+'        get_output_in_json().get("id")\n',
+'    create_cmd = \'aks create -g {resource_group} -n {name} -p {dns_name_prefix} --ssh-key-value {ssh_key_value} \' \\n',
+'                 \'-l {location} --service-principal {service_principal} --client-secret {client_secret} -k {k8s_version} \' \\n',
+'                 \'--node-vm-size {vm_size} \' \\n',
+'                 \'--tags scenario_test -c 1 --no-wait\'\n',
+'    update_cmd = \'aks update --resource-group={resource_group} --name={name} \' \\n',
+'                 \'--aad-admin-group-object-ids 00000000-0000-0000-0000-000000000002 \' \\n',
+'                 \'--aad-tenant-id 00000000-0000-0000-0000-000000000003 -o json\'\n',
+'    stop_cmd = \'aks stop --resource-group={resource_group} --name={name}\'\n',
+'    enable_cmd = \'aks enable-addons --addons confcom --resource-group={resource_group} --name={name} -o json\'\n',
+'    enable_autoscaler_cmd = \'aks update --resource-group={resource_group} --name={name} \' \\n',
+'                            \'--tags {tags} --enable-cluster-autoscaler --min-count 2 --max-count 5\'\n',
+'    disable_cmd = \'aks disable-addons --addons confcom --resource-group={resource_group} --name={name} -o json\'\n',
+'    disable_autoscaler_cmd = \'aks update --resource-group={resource_group} --name={name} \' \\n',
+'                             \'--tags {tags} --disable-cluster-autoscaler\'\n',
+'    browse_cmd = \'aks browse --resource-group={resource_group} --name={name} --listen-address=127.0.0.1 --listen-port=8080 --disable-browser\'\n',
+'    install_cmd = \'aks install-cli --client-version={} --install-location={} --base-src-url={} \' \\n',
+'                  \'--kubelogin-version={} --kubelogin-install-location={} --kubelogin-base-src-url={}\'.format(version,\n',
+'                                                                                                              ctl_temp_file,\n',
+'                                                                                                              "",\n',
+'                                                                                                              version,\n',
+'                                                                                                              login_temp_file,\n',
+'                                                                                                              "")\n',
+'    create_spot_node_pool_cmd = \'aks nodepool add \' \\n',
+'                                \'--resource-group={resource_group} \' \\n',
+'                                \'--cluster-name={name} \' \\n',
+'                                \'-n {spot_node_pool_name} \' \\n',
+'                                \'--priority Spot \' \\n',
+'                                \'--spot-max-price {spot_max_price} \' \\n',
+'                                \'-c 1\'\n',
+'    check_role_assignment_cmd = \'role assignment list --scope={vnet_subnet_id}\'\n',
+'    create_ppg_node_pool_cmd = \'aks nodepool add \' \\n',
+'                               \'--resource-group={resource_group} \' \\n',
+'                               \'--cluster-name={name} \' \\n',
+'                               \'-n {node_pool_name} \' \\n',
+'                               \'--ppg={ppg} \'\n',
+'    upgrade_node_image_only_cluster_cmd = \'aks upgrade \' \\n',
+'                                          \'-g {resource_group} \' \\n',
+'                                          \'-n {name} \' \\n',
+'                                          \'--node-image-only \' \\n',
+'                                          \'--yes\'\n',
+'    upgrade_node_image_only_nodepool_cmd = \'aks nodepool upgrade \' \\n',
+'                                           \'--resource-group={resource_group} \' \\n',
+'                                           \'--cluster-name={name} \' \\n',
+'                                           \'-n {node_pool_name} \' \\n',
+'                                           \'--node-image-only \' \\n',
+'                                           \'--no-wait\'\n',
+'    uptime_sla_cmd = \'aks update --resource-group={resource_group} --name={name} --uptime-sla --no-wait\'\n',
+'    get_nodepool_cmd = \'aks nodepool show \' \\n',
+'                       \'--resource-group={resource_group} \' \\n',
+'                       \'--cluster-name={name} \' \\n',
+'                       \'-n {node_pool_name} \'\n',
+'    no_uptime_sla_cmd = \'aks update --resource-group={resource_group} --name={name} --no-uptime-sla\'\n',
+    ]
+    CMD_PATTERN = [r'self.cmd\((?:\'|")(.*)(?:\'|")(.*)?\n', r'self.cmd\(\n', r'cmd = (?:\'|")(.*)(?:\'|")(.*)?']
+    QUO_PATTERN = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
+    END_PATTERN = r'(\)|checks=|,\n)' #  find to end
+    NOT_END_PATTERN = r'^(\s)+\'' #  not find to end
+    total_lines = len(lines)
+    row_num = 0
+    count = 1
+    all_tested_commands = []
+    while row_num < total_lines:
+        idx = None
+        if re.findall(CMD_PATTERN[0], lines[row_num]):
+            idx = 0
+        if idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
+            idx = 1
+        if idx is None and re.findall(CMD_PATTERN[2], lines[row_num]):
+            idx = 2
+        if idx is not None:
+            command = re.findall(CMD_PATTERN[idx], lines[row_num])[0][0]
+            while row_num < total_lines:
+                if (idx in [0, 1] and not re.findall(END_PATTERN, lines[row_num])) or \
+                   (idx == 2 and re.findall(NOT_END_PATTERN, lines[row_num])):
+                    row_num += 1
+                    try:
+                        command += re.findall(QUO_PATTERN, lines[row_num])[0][1]
+                    except Exception as e:
+                        # pass
+                        print('Exception1', row_num)
+                else:
+                    command = command + ' ' + str(count)
+                    all_tested_commands.append(command)
+                    row_num += 1
+                    count += 1
+                    break
+            else:
+                command = command + ' ' + str(count)
+                all_tested_commands.append(command)
+                row_num += 1
+                count += 1
+        else:
+            row_num += 1
+    from pprint import pprint
+    pprint(all_tested_commands, width=1000)
+
+
+if __name__ == '__main__':
+    regex4()
