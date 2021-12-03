@@ -20,8 +20,8 @@ from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths, get_azde
 from .util import filter_modules, merge_exclusion
 from .constant import (
     ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS,
-    CMD_PATTERN, QUO_PATTERN, END_PATTERN, EXCLUDE_MOD, RED, ORANGE, GREEN, BLUE, GOLD, RED_PCT, ORANGE_PCT,
-    GREEN_PCT, BLUE_PCT)
+    CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, EXCLUDE_MOD, RED, ORANGE, GREEN,
+    BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT)
 
 
 logger = get_logger(__name__)
@@ -156,6 +156,8 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, in
     all_test_commands = _get_all_commands(selected_mod_names, loaded_help)
     all_tested_commands = _get_all_tested_commands(selected_mod_names, selected_mod_paths)
     command_coverage, all_untested_commands = _run_commands_coverage(all_test_commands, all_tested_commands)
+    all_tested_cmd_from_file = _get_all_tested_commands_from_file()
+    command_coverage, all_untested_commands = _run_commands_coverage2(all_untested_commands, all_tested_cmd_from_file, command_coverage)
     html_file = _render_html(command_coverage, all_untested_commands)
 
     subheading('Results')
@@ -211,7 +213,7 @@ def _get_all_commands(selected_mod_names, loaded_help):
     wait_condition_parameters = WAIT_CONDITION_PARAMETERS
     other_parameters = OTHER_PARAMETERS
     exclude_parameters = exclude_parameters + global_parameters + generic_update_parameters + wait_condition_parameters + other_parameters
-
+    [i.sort() for i in exclude_parameters]
 
     all_test_commands = {m: [] for m in selected_mod_names}
     # like module vm have multiple command like vm vmss disk snapshot
@@ -220,9 +222,11 @@ def _get_all_commands(selected_mod_names, loaded_help):
         if hasattr(y, 'command_source') and y.command_source in selected_mod_names:
             for parameter in y.parameters:
                 opt_list = []
-                for opt in parameter.name_source:
-                    if opt.startswith('-') and opt not in exclude_parameters:
-                        opt_list.append(opt)
+                parameter.name_source.sort()
+                if parameter.name_source not in exclude_parameters:
+                    for opt in parameter.name_source:
+                        if opt.startswith('-'):
+                            opt_list.append(opt)
                 if opt_list:
                     all_test_commands[y.command_source].append(f'{y.command} {opt_list}')
 
@@ -236,18 +240,10 @@ def _get_all_tested_commands(selected_mod_names, selected_mod_path):
     :return: all_tested_commands
     """
     import re
-    cmd_pattern = CMD_PATTERN
-    quo_pattern = QUO_PATTERN
-    end_pattern = END_PATTERN
-    # selected_mod_names = ['vm']
     all_tested_commands = {m: [] for m in selected_mod_names}
-    # selected_mod_path = ['c:\\code\\azure-cli\\src\\azure-cli\\azure\\cli\\command_modules\\vm']
-    # selected_mod_path = ['d:\\code\\azure-cli\\src\\azure-cli\\azure\\cli\\command_modules\\vm']
     for idx, path in enumerate(selected_mod_path):
         test_dir = os.path.join(path, 'tests')
-        # test_dir = os.path.join(path, 'tests', 'latest')
-        files = find_files(test_dir, 'test_*.py')
-        # files = filter(lambda f: f.startswith('test_'), os.listdir(test_dir))
+        files = find_files(test_dir, '*.py')
         for f in files:
             # if f != 'test_image_builder_commands.py':
             # if f != 'test_vm_commands.py':
@@ -262,20 +258,41 @@ def _get_all_tested_commands(selected_mod_names, selected_mod_path):
                 row_num = 0
                 count = 1
                 while row_num < total_lines:
-                    if re.findall(cmd_pattern, lines[row_num]):
-                        command = re.findall(cmd_pattern, lines[row_num])[0][0]
-                        while row_num < total_lines and not re.findall(end_pattern, lines[row_num]):
-                            row_num += 1
-                            try:
-                                command += re.findall(quo_pattern, lines[row_num])[0][1]
-                            except Exception as e:
-                                # pass
-                                print('Exception1', row_num, selected_mod_names[idx], f)
+                    cmd_idx = None
+                    if re.findall(CMD_PATTERN[0], lines[row_num]):
+                        cmd_idx = 0
+                    if cmd_idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
+                        cmd_idx = 1
+                    if cmd_idx is None and re.findall(CMD_PATTERN[2], lines[row_num]):
+                        cmd_idx = 2
+                    if cmd_idx is None and re.findall(CMD_PATTERN[3], lines[row_num]):
+                        cmd_idx = 3
+                    if cmd_idx is not None:
+                        command = re.findall(CMD_PATTERN[cmd_idx], lines[row_num])[0]
+                        while row_num < total_lines:
+                            if (cmd_idx in [0, 1] and not re.findall(END_PATTERN, lines[row_num])) or \
+                               (cmd_idx == 2 and (row_num + 1) < total_lines and re.findall(NOT_END_PATTERN, lines[row_num + 1])):
+                                row_num += 1
+                                try:
+                                    command += re.findall(QUO_PATTERN, lines[row_num])[0][1]
+                                except Exception as e:
+                                    # pass
+                                    print('Exception1', row_num, selected_mod_names[idx], f)
+                            elif cmd_idx == 3 and (row_num + 1) < total_lines and not re.findall(DOCS_END_PATTERN, lines[row_num]):
+                                row_num += 1
+                                command += lines[row_num][:-1]
+                            else:
+                                command = command + ' ' + str(count)
+                                all_tested_commands[selected_mod_names[idx]].append(command)
+                                row_num += 1
+                                count += 1
+                                break
                         else:
                             command = command + ' ' + str(count)
                             all_tested_commands[selected_mod_names[idx]].append(command)
                             row_num += 1
                             count += 1
+                            break
                     else:
                         row_num += 1
     return all_tested_commands
@@ -286,11 +303,10 @@ def _run_commands_coverage(all_test_commands, all_tested_commands):
     :param all_test_commands:
     :param all_untested_commands:
     :return: command_coverage and all_untested_commands
+    module: vm
+    percentage: xx.xxx%
     """
     import ast
-    # module: vm
-    # percentage: xx.xx%
-    # all_untested_commands: {'vm': []}
     command_coverage = {'Total': [0, 0, 0]}
     all_untested_commands = {}
     for module in all_test_commands.keys():
@@ -301,22 +317,38 @@ def _run_commands_coverage(all_test_commands, all_tested_commands):
         for command in all_test_commands[module]:
             exist_flag = False
             prefix, opt_list = command.rsplit('[', maxsplit=1)[0], ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1])
-            for cmd in all_tested_commands[module]:
-                if prefix in cmd:
-                    for opt in opt_list:
-                        if opt in cmd:
-                            count += 1
-                            exist_flag = True
-                            if exist_flag:
-                                break
-                if exist_flag:
-                    break
+            if module == 'storage':
+                for cmd in all_tested_commands[module]:
+                    if prefix in cmd or \
+                            module == 'rdbms' and prefix.split(maxsplit=1)[1] in cmd:
+                        for opt in opt_list:
+                            if opt in cmd:
+                                count += 1
+                                exist_flag = True
+                                if exist_flag:
+                                    break
+                    if exist_flag:
+                        break
+                else:
+                    all_untested_commands[module].append(command)
             else:
-                all_untested_commands[module].append(command)
+                for cmd in all_tested_commands[module]:
+                    if prefix in cmd or \
+                       module == 'rdbms' and prefix.split(maxsplit=1)[1] in cmd:
+                        for opt in opt_list:
+                            if opt in cmd:
+                                count += 1
+                                exist_flag = True
+                                if exist_flag:
+                                    break
+                    if exist_flag:
+                        break
+                else:
+                    all_untested_commands[module].append(command)
         try:
             command_coverage[module] = [count, len(all_untested_commands[module]), f'{count / len(all_test_commands[module]):.3%}']
-        except:
-            print('Exception2', module)
+        except ZeroDivisionError:
+            command_coverage[module] = [0, 0, '100.000%']
         command_coverage['Total'][0] += count
         command_coverage['Total'][1] += len(all_untested_commands[module])
     command_coverage['Total'][2] = f'{command_coverage["Total"][0] / (command_coverage["Total"][0] + command_coverage["Total"][1]):.3%}'
@@ -568,18 +600,18 @@ def _get_color(coverage):
     :param coverage:
     :return: color and percentage
     """
+    percentage = int(round(float(coverage[2][:-1]), 0))
     try:
-        if coverage[2] < RED_PCT:
+        if percentage < RED_PCT:
             color = RED
-        elif coverage[2] < ORANGE_PCT:
+        elif percentage < ORANGE_PCT:
             color = ORANGE
-        elif coverage[2] < GREEN_PCT:
+        elif percentage < GREEN_PCT:
             color = GREEN
-        elif coverage[2] < BLUE_PCT:
+        elif percentage < BLUE_PCT:
             color = BLUE
         else:
             color = GOLD
-        percentage = coverage[2].split('.')[0]
     except Exception as e:
         print('coverage exception', coverage)
     return color, percentage
@@ -636,6 +668,53 @@ def upload_files(container, html_path, account_key):
                 os.system(cmd)
 
     logger.warning('Exit upload_files()')
+
+
+def _get_all_tested_commands_from_file():
+    with open(os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'tested_command.txt'), 'r') as f:
+        lines = f.readlines()
+    return lines
+
+
+def _run_commands_coverage2(all_untested_commands, all_tested_commands_from_file, command_coverage):
+    """
+    :param all_untest_commands: {[module]:[],}
+    :param all_tested_commands_from_file: []
+    :param command_coverage: {[module: [test, untested, pct]
+    :return: command_coverage and all_untested_commands
+    module: vm
+    percentage: xx.xxx%
+    """
+    import ast
+    total_tested = 0
+    total_untested = 0
+    for module in all_untested_commands.keys():
+        for cmd_idx, command in enumerate(all_untested_commands[module]):
+            exist_flag = False
+            prefix, opt_list = command.rsplit('[', maxsplit=1)[0], ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1])
+            for cmd in all_tested_commands_from_file:
+                if prefix in cmd:
+                    for opt in opt_list:
+                        if opt in cmd:
+                            command_coverage[module][0] += 1
+                            all_untested_commands[module].pop(cmd_idx)
+                            exist_flag = True
+                            if exist_flag:
+                                break
+                if exist_flag:
+                    break
+        try:
+            command_coverage[module][1] = len(all_untested_commands[module])
+            command_coverage[module][2] = f'{command_coverage[module][0] / (command_coverage[module][0] + command_coverage[module][1]):.3%}'
+        except ZeroDivisionError:
+            command_coverage[module] = [0, 0, '100.000%']
+        total_tested += command_coverage[module][0] if command_coverage[module] else 0
+        total_untested += command_coverage[module][1] if command_coverage[module] else 0
+    command_coverage['Total'][0] = total_tested
+    command_coverage['Total'][1] = total_untested
+    command_coverage['Total'][2] = f'{total_tested / (total_tested + total_untested):.3%}'
+    logger.warning(command_coverage)
+    return command_coverage, all_untested_commands
 
 
 if __name__ == '__main__':

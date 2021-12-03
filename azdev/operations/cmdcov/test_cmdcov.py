@@ -1,4 +1,5 @@
 import re
+from constant import (CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN)
 
 
 def regex(line):
@@ -193,31 +194,50 @@ def regex4():
 '                       \'--cluster-name={name} \' \\n',
 '                       \'-n {node_pool_name} \'\n',
 '    no_uptime_sla_cmd = \'aks update --resource-group={resource_group} --name={name} --no-uptime-sla\'\n',
+'        create_cmd = """storage account create -n {sc} -g {rg} -l eastus2euap --enable-files-adds --domain-name\n',
+'    {domain_name} --net-bios-domain-name {net_bios_domain_name} --forest-name {forest_name} --domain-guid\n',
+'    {domain_guid} --domain-sid {domain_sid} --azure-storage-sid {azure_storage_sid}"""\n',
+'        update_cmd = """storage account update -n {sc} -g {rg} --enable-files-adds --domain-name {domain_name}\n',
+'    --net-bios-domain-name {net_bios_domain_name} --forest-name {forest_name} --domain-guid {domain_guid}\n',
+'    --domain-sid {domain_sid} --azure-storage-sid {azure_storage_sid}"""\n',
+'        update_cmd = \'\'\'storage account update -n {sc} -g {rg} --enable-files-adds --domain-name {domain_name}\n',
+'    --net-bios-domain-name {net_bios_domain_name} --forest-name {forest_name} --domain-guid {domain_guid}\n',
+'    --domain-sid {domain_sid} --azure-storage-sid {azure_storage_sid}\'\'\'\n',
+'        create_cmd1 = \'az storage account create -n {} -g {} --routing-choice MicrosoftRouting --publish-microsoft-endpoint true\'.format('
+'        name1, resource_group)',
+'    test.cmd(\'az billing account list \'',
+'             \'--expand "soldTo,billingProfiles,billingProfiles/invoiceSections"\',',
+'             checks=[])',
     ]
-    CMD_PATTERN = [r'self.cmd\((?:\'|")(.*)(?:\'|")(.*)?\n', r'self.cmd\(\n', r'cmd = (?:\'|")(.*)(?:\'|")(.*)?']
-    QUO_PATTERN = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
-    END_PATTERN = r'(\)|checks=|,\n)' #  find to end
-    NOT_END_PATTERN = r'^(\s)+\'' #  not find to end
     total_lines = len(lines)
     row_num = 0
     count = 1
     all_tested_commands = []
     while row_num < total_lines:
-        idx = None
+        cmd_idx = None
         if re.findall(CMD_PATTERN[0], lines[row_num]):
-            idx = 0
-        if idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
-            idx = 1
-        if idx is None and re.findall(CMD_PATTERN[2], lines[row_num]):
-            idx = 2
-        if idx is not None:
-            command = re.findall(CMD_PATTERN[idx], lines[row_num])[0][0]
+            cmd_idx = 0
+        if cmd_idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
+            cmd_idx = 1
+        if cmd_idx is None and re.findall(CMD_PATTERN[2], lines[row_num]):
+            cmd_idx = 2
+        if cmd_idx is None and re.findall(CMD_PATTERN[3], lines[row_num]):
+            cmd_idx = 3
+        if cmd_idx is not None:
+            command = re.findall(CMD_PATTERN[cmd_idx], lines[row_num])[0]
             while row_num < total_lines:
-                if (idx in [0, 1] and not re.findall(END_PATTERN, lines[row_num])) or \
-                   (idx == 2 and re.findall(NOT_END_PATTERN, lines[row_num])):
+                if (cmd_idx in [0, 1] and not re.findall(END_PATTERN, lines[row_num])) or \
+                   (cmd_idx == 2 and (row_num + 1) < total_lines and re.findall(NOT_END_PATTERN, lines[row_num + 1])):
                     row_num += 1
                     try:
                         command += re.findall(QUO_PATTERN, lines[row_num])[0][1]
+                    except Exception as e:
+                        # pass
+                        print('Exception1', row_num)
+                elif cmd_idx == 3 and (row_num + 1) < total_lines and not re.findall(DOCS_END_PATTERN, lines[row_num]):
+                    row_num += 1
+                    try:
+                        command += lines[row_num][:-1]
                     except Exception as e:
                         # pass
                         print('Exception1', row_num)
