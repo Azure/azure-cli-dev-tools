@@ -1,25 +1,75 @@
 ENCODING = 'utf-8'
-GLOBAL_PARAMETERS = ['--debug', '--help', '-h', '--only-show-errors', '--output', '-o', '--query', '--query-examples',
-                        '--subscription', '--verbose']
-GENERIC_UPDATE_PARAMETERS = ['--add', '--force-string', '--remove', '--set']
-WAIT_CONDITION_PARAMETERS = ['--created', '--custom', '--deleted', '--exists', '--interval', '--timeout', '--updated']
+GLOBAL_PARAMETERS = [
+    ['--debug'],
+    ['--help', '-h'],
+    ['--only-show-errors'],
+    ['--output', '-o'],
+    ['--query'],
+    ['--query-examples'],
+    ['--subscription'],
+    ['--verbose'],
+]
+GENERIC_UPDATE_PARAMETERS = [
+    ['--add'],
+    ['--force-string'],
+    ['--remove'],
+    ['--set'],
+]
+WAIT_CONDITION_PARAMETERS = [
+    ['--created'],
+    ['--custom'],
+    ['--deleted'],
+    ['--exists'],
+    ['--interval'],
+    ['--timeout'],
+    ['--updated'],
+]
 OTHER_PARAMETERS = [
-        '--admin-username', '--admin-password',
-        '--capacity-reservation-group', '--capacity-reservation-name',
-        '--ids', '--ignore-errors',
-        '--location', '-l',
-        '--name', '-n', '--no-wait',
-        '--username', '-u',
-        '--password', '-p',
-        '--resource-group', '-g',
-        '--tags',
-        '--windows-admin-username', '--windows-admin-password',
-        '--yes', '-y',
-    ]
+    # batch
+    ['--account-name'], ['--account-key'], ['--account-endpoint'],
+    ['--ids'],
+    ['--ignore-errors'],
+    ['--location', '-l'],
+    ['--username', '-u'],
+    ['--password', '-p'],
+    ['--name', '-n'],
+    ['--no-wait'],
+    ['--resource-group', '-g'],
+    ['--tags'],
+    ['--yes', '-y'],
+]
 
-CMD_PATTERN = r'self.cmd\((?:\'|")(.*)(?:\'|")(.*)?\n'
+# storage
+# 'cloud show --query profile -otsv'
+# 'storage account keys list -n {} -g {} --query "key1" -otsv'
+# 'storage account keys list -n {} -g {} --query "[0].value" -otsv'
+# 'storage account show-connection-string -n {} -g {} --query connectionString -otsv'
+# 'storage account show -n {} -g {} --query id -otsv'
+# ' --auth-mode login'
+# '{} --account-name {} --account-key {}'
+# '{} --account-name {} --account-key {}'
+# 'storage container create -n {}'
+# 'storage share create -n {}'
+# 'storage fs create -n {}'
+
+
+CMD_PATTERN = [
+    # self.cmd( # test.cmd(
+    r'.\w{0,}cmd\(\n',
+    # self.cmd('xxxx or self.cmd("xxx or # test.cmd('
+    r'.\w{0,}cmd\((?:\'|")(.*)(?:\'|")',
+    # r'self.cmd\((?:\'|")(.*)(?:\'|")(?:.*)?\n',
+    # xxxcmd = '' or xxxcmd = "" or xxxcmd1
+    r'cmd\d* = (?:\'|"){1}([a-z]+.*)(?:\'|"){1}',
+    # r'self.cmd\(\n', r'cmd = (?:\'|")(.*)(?:\'|")(.*)?',
+    # xxxcmd = """ or xxxcmd = ''' or xxxcmd1
+    r'cmd\d* = (?:"{3}|\'{3})(.*)',
+]
 QUO_PATTERN = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
 END_PATTERN = r'(\)|checks=|,\n)'
+DOCS_END_PATTERN = r'"{3}$|\'{3}$'
+NOT_END_PATTERN = r'^(\s)+(\'|")'
+
 
 EXCLUDE_MOD = ['acs', 'apim', 'aro', 'batch', 'billing', 'cdn', 'cloud', 'dla', 'extension', 'hdinsight', 'lab',
                'marketplaceordering', 'profile', 'rdbms', 'relay', 'servicebus', 'storage']
@@ -31,8 +81,7 @@ GREEN = 'green'
 BLUE = 'blue'
 GOLD = 'gold'
 
-RED_PCT = '30%'
-ORANGE_PCT = '60%'
-GREEN_PCT = '80%'
-BLUE_PCT = '99%'
-
+RED_PCT = 30
+ORANGE_PCT = 60
+GREEN_PCT = 80
+BLUE_PCT = 99
