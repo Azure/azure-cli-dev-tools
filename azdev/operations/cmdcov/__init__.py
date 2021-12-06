@@ -28,8 +28,7 @@ logger = get_logger(__name__)
 
 
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches
-def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
-               save_global_exclusion=False):
+def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, level='command'):
     """
     :param modules:
     :param git_source:
@@ -50,7 +49,7 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, in
     if cli_only or ext_only:
         modules = None
 
-    selected_modules = get_path_table(include_only=modules, include_whl_extensions=include_whl_extensions)
+    selected_modules = get_path_table(include_only=modules)
 
     # filter down to only modules that have changed based on git diff
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
@@ -90,12 +89,12 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, in
     # format loaded help
     loaded_help = {data.command: data for data in loaded_help if data.command}
 
-    all_commands = _get_all_commands(selected_mod_names, loaded_help)
+    all_commands = _get_all_commands(selected_mod_names, loaded_help, level)
     all_tested_commands = _get_all_tested_commands(selected_mod_names, selected_mod_paths)
-    command_coverage, all_untested_commands = _run_commands_coverage(all_commands, all_tested_commands)
+    command_coverage, all_untested_commands = _run_commands_coverage(all_commands, all_tested_commands, level)
     all_tested_cmd_from_file = _get_all_tested_commands_from_file()
-    command_coverage, all_untested_commands = _run_commands_coverage_enhance(all_untested_commands, all_tested_cmd_from_file, command_coverage)
-    html_file = _render_html(command_coverage, all_untested_commands)
+    command_coverage, all_untested_commands = _run_commands_coverage_enhance(all_untested_commands, all_tested_cmd_from_file, command_coverage, level)
+    html_file = _render_html(command_coverage, all_untested_commands, level)
 
     subheading('Results')
     _browse(html_file)
@@ -137,7 +136,7 @@ def is_wsl():
     return platform_name == 'linux' and 'microsoft' in release
 
 
-def _get_all_commands(selected_mod_names, loaded_help):
+def _get_all_commands(selected_mod_names, loaded_help, level):
     """
     :param selected_mod_names:
     :param loaded_help:
@@ -151,19 +150,21 @@ def _get_all_commands(selected_mod_names, loaded_help):
     all_test_commands = {m: [] for m in selected_mod_names}
     # like module vm have multiple command like vm vmss disk snapshot
     for _, y in loaded_help.items():
-        # if x.split()[0] in selected_mod_names:
         if hasattr(y, 'command_source') and y.command_source in selected_mod_names or \
            hasattr(y, 'command_source') and hasattr(y.command_source, 'extension_name') and y.command_source.extension_name in selected_mod_names:
             module = y.command_source.extension_name if hasattr(y.command_source, 'extension_name') else y.command_source
-            for parameter in y.parameters:
-                opt_list = []
-                parameter.name_source.sort()
-                if parameter.name_source not in exclude_parameters:
-                    for opt in parameter.name_source:
-                        if opt.startswith('-'):
-                            opt_list.append(opt)
-                if opt_list:
-                    all_test_commands[module].append(f'{y.command} {opt_list}')
+            if level == 'argument':
+                for parameter in y.parameters:
+                    opt_list = []
+                    parameter.name_source.sort()
+                    if parameter.name_source not in exclude_parameters:
+                        for opt in parameter.name_source:
+                            if opt.startswith('-'):
+                                opt_list.append(opt)
+                    if opt_list:
+                        all_test_commands[module].append(f'{y.command} {opt_list}')
+            else:
+                all_test_commands[module].append(f'{y.command}')
 
     return all_test_commands
 
@@ -236,7 +237,7 @@ def _get_all_tested_commands_from_file():
     return lines
 
 
-def _run_commands_coverage(all_commands, all_tested_commands):
+def _run_commands_coverage(all_commands, all_tested_commands, level):
     """
     :param all_commands: All commands that need to be test
     :param all_tested_commands: All commands already tested
@@ -254,35 +255,27 @@ def _run_commands_coverage(all_commands, all_tested_commands):
         count = 0
         for command in all_commands[module]:
             exist_flag = False
-            prefix, opt_list = command.rsplit('[', maxsplit=1)[0], ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1])
-            if module == 'storage':
-                for cmd in all_tested_commands[module]:
-                    if prefix in cmd or \
-                            module == 'rdbms' and prefix.split(maxsplit=1)[1] in cmd:
+            prefix = command.rsplit('[', maxsplit=1)[0]
+            opt_list = ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1]) if level == 'argument' else []
+            for cmd in all_tested_commands[module]:
+                if prefix in cmd or \
+                        module == 'rdbms' and prefix.split(maxsplit=1)[1] in cmd:
+                    if level == 'argument':
                         for opt in opt_list:
                             if opt in cmd:
                                 count += 1
                                 exist_flag = True
                                 if exist_flag:
                                     break
-                    if exist_flag:
-                        break
-                else:
-                    all_untested_commands[module].append(command)
+                    else:
+                        count += 1
+                        exist_flag = True
+                        if exist_flag:
+                            break
+                if exist_flag:
+                    break
             else:
-                for cmd in all_tested_commands[module]:
-                    if prefix in cmd or \
-                       module == 'rdbms' and prefix.split(maxsplit=1)[1] in cmd:
-                        for opt in opt_list:
-                            if opt in cmd:
-                                count += 1
-                                exist_flag = True
-                                if exist_flag:
-                                    break
-                    if exist_flag:
-                        break
-                else:
-                    all_untested_commands[module].append(command)
+                all_untested_commands[module].append(command)
         try:
             command_coverage[module] = [count, len(all_untested_commands[module]), f'{count / len(all_commands[module]):.3%}']
         except ZeroDivisionError:
@@ -294,7 +287,7 @@ def _run_commands_coverage(all_commands, all_tested_commands):
     return command_coverage, all_untested_commands
 
 
-def _run_commands_coverage_enhance(all_untested_commands, all_tested_commands_from_file, command_coverage):
+def _run_commands_coverage_enhance(all_untested_commands, all_tested_commands_from_file, command_coverage, level):
     """
     :param all_untest_commands: {[module]:[],}
     :param all_tested_commands_from_file: []
@@ -309,16 +302,24 @@ def _run_commands_coverage_enhance(all_untested_commands, all_tested_commands_fr
     for module in all_untested_commands.keys():
         for cmd_idx, command in enumerate(all_untested_commands[module]):
             exist_flag = False
-            prefix, opt_list = command.rsplit('[', maxsplit=1)[0], ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1])
+            prefix = command.rsplit('[', maxsplit=1)[0]
+            opt_list = ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1]) if level == 'argument' else []
             for cmd in all_tested_commands_from_file:
                 if prefix in cmd:
-                    for opt in opt_list:
-                        if opt in cmd:
-                            command_coverage[module][0] += 1
-                            all_untested_commands[module].pop(cmd_idx)
-                            exist_flag = True
-                            if exist_flag:
-                                break
+                    if level == 'argument':
+                        for opt in opt_list:
+                            if opt in cmd:
+                                command_coverage[module][0] += 1
+                                all_untested_commands[module].pop(cmd_idx)
+                                exist_flag = True
+                                if exist_flag:
+                                    break
+                    else:
+                        command_coverage[module][0] += 1
+                        all_untested_commands[module].pop(cmd_idx)
+                        exist_flag = True
+                        if exist_flag:
+                            break
                 if exist_flag:
                     break
         try:
@@ -335,15 +336,15 @@ def _run_commands_coverage_enhance(all_untested_commands, all_tested_commands_fr
     return command_coverage, all_untested_commands
 
 
-def _render_html(command_coverage, all_untested_commands):
+def _render_html(command_coverage, all_untested_commands, level):
     """
     :param command_coverage:
     :param all_untested_commands:
     :return: Return a HTML string
     """
     import time
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    html_path = get_html_path(date.split()[0])
+    date = time.strftime("%Y%m%d-%H%M", time.localtime())
+    html_path = get_html_path(date, level)
     content = """
 <!DOCTYPE html>
 <html>
@@ -352,7 +353,7 @@ def _render_html(command_coverage, all_untested_commands):
         <title>CLI Command Coverage</title>
         <link rel="stylesheet" type="text/css" href="component.css"/>
         <link rel="shortcut icon" href="favicon.ico">
-        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
         <script type="text/javascript" src="./component.js"></script>
     </head>
 <body>
@@ -599,13 +600,13 @@ def _get_color(coverage):
     return color, percentage
 
 
-def get_html_path(date):
+def get_html_path(date, level):
     """
     :param date:
     :return: html_path
     """
     root_path = get_azdev_repo_path()
-    html_path = os.path.join(root_path, 'cmd_coverage', f'{date}')
+    html_path = os.path.join(root_path, 'cmd_coverage', level, f'{date}')
     if not os.path.exists(html_path):
         os.makedirs(html_path)
     return html_path
