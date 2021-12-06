@@ -46,6 +46,7 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
     ext_only = modules == ['EXT']
+    enable_cli_own = True if cli_only or modules is None else False
     if cli_only or ext_only:
         modules = None
 
@@ -94,7 +95,7 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
     command_coverage, all_untested_commands = _run_commands_coverage(all_commands, all_tested_commands, level)
     all_tested_cmd_from_file = _get_all_tested_commands_from_file()
     command_coverage, all_untested_commands = _run_commands_coverage_enhance(all_untested_commands, all_tested_cmd_from_file, command_coverage, level)
-    html_file = _render_html(command_coverage, all_untested_commands, level)
+    html_file = _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
 
     subheading('Results')
     _browse(html_file)
@@ -336,15 +337,16 @@ def _run_commands_coverage_enhance(all_untested_commands, all_tested_commands_fr
     return command_coverage, all_untested_commands
 
 
-def _render_html(command_coverage, all_untested_commands, level):
+def _render_html(command_coverage, all_untested_commands, level, enable_cli_own):
     """
     :param command_coverage:
     :param all_untested_commands:
     :return: Return a HTML string
     """
     import time
-    date = time.strftime("%Y%m%d-%H%M", time.localtime())
-    html_path = get_html_path(date, level)
+    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    path_date = '-'.join(date.replace(':', '-').split())
+    html_path = get_html_path(path_date, level)
     content = """
 <!DOCTYPE html>
 <html>
@@ -358,16 +360,32 @@ def _render_html(command_coverage, all_untested_commands, level):
     </head>
 <body>
     <div class="container">
-        <div class="component">
-            <h1>CLI Command Coverage Report</h1>
-            <h2>Date: {}</h2>
-    """.format(date)
+        <header>
+            <h1>CLI Command Coverage Report
+                <span>This is the command coverage report of CLI. Scroll down to see the every module coverage.<br>
+                Any question please contact Azure Cli Team.</span>
+            </h1>
+"""
+
+    if enable_cli_own:
+        content += """
+            <nav class="button">
+                <a class="current-page" href="index.html">ALL</a>
+                <a href="index2.html">CLI OWN</a>'
+            </nav>
+        """
+    else:
+        content += """
+            <nav class="button">
+                <a href="index.html">ALL</a>
+            </nav>
+        """
 
     content += """
-                <h2>Tested: {}, Untested: {}, Percentage: {}</h2>
-                <p>This is the command coverage report of CLI. Scroll down to see the every module coverage.<br>
-                    Any question please contact Azure Cli Team.</p>
-    """.format(command_coverage['Total'][0], command_coverage['Total'][1], command_coverage['Total'][2])
+        </header>
+        <div class="component">
+            <h3>Date: {}</h3>
+    """.format(date)
 
     table = """
                 <table>
@@ -408,7 +426,7 @@ def _render_html(command_coverage, all_untested_commands, level):
         # find: []
         if coverage:
             reports = '<a href="{module}.html">{module} coverage report</a> '.format(module=module)
-            child_html = _render_child_html(module, coverage, all_untested_commands[module])
+            child_html = _render_child_html(module, coverage, all_untested_commands[module], enable_cli_own)
             with open(f'{html_path}/{module}.html', 'w', encoding='utf-8') as f:
                 f.write(child_html)
             try:
@@ -464,7 +482,7 @@ def _render_html(command_coverage, all_untested_commands, level):
     return index_html
 
 
-def _render_child_html(module, command_coverage, all_untested_commands):
+def _render_child_html(module, command_coverage, all_untested_commands, enable_cli_own):
     """
     :param module:
     :param command_coverage:
@@ -485,18 +503,35 @@ def _render_child_html(module, command_coverage, all_untested_commands):
     </head>
     <body>
         <div class="container">
-            <div class="component">
-                <h1>{module} Command Coverage Report</h1>
-                <h2>Date: {date}</h2>
-    """.format(module=module, date=date)
+            <header>
+                <h1>{module} Command Coverage Report
+                    <span>This is the command coverage report of {module}. Scroll down to see the every module coverage.<br>
+                    Any question please contact Azure Cli Team.</span>
+                </h1>
+
+    """.format(module=module[0].upper()+module[1:].lower())
+
+    if enable_cli_own:
+        content += """
+                <nav class="button">
+                    <a class="current-page" href="index.html">ALL</a>
+                    <a href="index2.html">CLI OWN</a>
+                </nav>
+        """
+    else:
+        content += """
+                <nav class="button">
+                    <a href="index.html">ALL</a>
+                </nav>
+        """
 
     try:
         content += """
-                    <h2>Tested: {}, Untested: {}, Percentage: {}</h2>
-                    <p>This is command coverage report of {} module. Scroll down to see the details.<br>
-                        Any question please contact Azure Cli Team.<br>
-                        <a href="index.html" title="Back to Summary">Back to Homepage</a>.</p>
-        """.format(command_coverage[0], command_coverage[1], command_coverage[2], module)
+            </header>
+            <div class="component">
+                <h3>Date: {}</h3>
+                <h3>Tested: {}, Untested: {}, Percentage: {}</h3>
+        """.format(date, command_coverage[0], command_coverage[1], command_coverage[2], module)
     except:
         print('Exception4', command_coverage, module)
 
@@ -523,7 +558,7 @@ def _render_child_html(module, command_coverage, all_untested_commands):
                 </table>
                 <p class="contact">This is command coverage report of {} module.<br>
                     Any question please contact Azure Cli Team.<br>
-                    <a href="index.html" title="Back to Summary">Back to Homepage</a>.</p>
+                </p>
             </div>
         </div><!-- /container -->
     </body>
