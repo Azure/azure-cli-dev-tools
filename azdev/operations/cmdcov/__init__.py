@@ -344,15 +344,6 @@ def _render_html(command_coverage, all_untested_commands):
     import time
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     html_path = get_html_path(date.split()[0])
-    # css path
-    source = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'component.css')
-    # adding exception handling
-    try:
-        shutil.copy(source, html_path)
-    except IOError as e:
-        print("Unable to copy css file %s" % e)
-    except:
-        print("Unexpected error:", sys.exc_info())
     content = """
 <!DOCTYPE html>
 <html>
@@ -361,6 +352,8 @@ def _render_html(command_coverage, all_untested_commands):
         <title>CLI Command Coverage</title>
         <link rel="stylesheet" type="text/css" href="component.css"/>
         <link rel="shortcut icon" href="favicon.ico">
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="./component.js"></script>
     </head>
 <body>
     <div class="container">
@@ -379,12 +372,12 @@ def _render_html(command_coverage, all_untested_commands):
                 <table>
                     <thead>
                     <tr>
-                        <th>Module</th>
-                        <th>Tested</th>
-                        <th>Untested</th>
-                        <th>Percentage</th>
-                        <th>Percentage</th>
-                        <th>Reports</th>
+                        <th id="th0" onclick="SortTable(this)" class="as">Module</th>
+                        <th id="th1" onclick="SortTable(this)" class="as">Tested</th>
+                        <th id="th2" onclick="SortTable(this)" class="as">Untested</th>
+                        <th id="th3" onclick="SortTable(this)" class="as">Percentage</th>
+                        <th id="th4" onclick="SortTable(this)" class="as">Percentage</th>
+                        <th id="th5" onclick="SortTable(this)" class="as">Reports</th>
                     </tr>
                     </thead>
     """
@@ -392,10 +385,10 @@ def _render_html(command_coverage, all_untested_commands):
     table += """
                     <tbody>
                     <tr>
-                        <td>Total</td>
-                        <td>{}</td>
-                        <td>{}</td>
-                        <td>{}</td>
+                        <td name="td0">Total</td>
+                        <td name="td1">{}</td>
+                        <td name="td2">{}</td>
+                        <td name="td3">{}</td>
 
     """.format(command_coverage['Total'][0], command_coverage['Total'][1], command_coverage['Total'][2])
 
@@ -403,7 +396,7 @@ def _render_html(command_coverage, all_untested_commands):
     table = _render_td(table, color, percentage)
 
     table += """
-                        <td>N/A</td>
+                        <td name="td5">N/A</td>
                     </tr>
     """
 
@@ -420,10 +413,10 @@ def _render_html(command_coverage, all_untested_commands):
             try:
                 table += """
                   <tr>
-                    <td>{}</td>
-                    <td>{}</td>
-                    <td>{}</td>
-                    <td>{}</td>
+                    <td name="td0">{}</td>
+                    <td name="td1">{}</td>
+                    <td name="td2">{}</td>
+                    <td name="td3">{}</td>
                 """.format(module, coverage[0], coverage[1], coverage[2])
             except:
                 print('Exception3', module, coverage, reports)
@@ -432,7 +425,7 @@ def _render_html(command_coverage, all_untested_commands):
             table = _render_td(table, color, percentage)
 
             table += """
-                                <td>{}</td>
+                                <td name="td5">{}</td>
                             </tr>
             """.format(reports)
 
@@ -454,15 +447,18 @@ def _render_html(command_coverage, all_untested_commands):
     with open(index_html, 'w', encoding='utf-8') as f:
         f.write(content)
 
-    # copy icon
-    source = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'favicon.ico')
-    # adding exception handling
+    # copy source
+    css_source = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'component.css')
+    ico_source = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'favicon.ico')
+    js_source = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'component.js')
     try:
-        shutil.copy(source, html_path)
+        shutil.copy(css_source, html_path)
+        shutil.copy(ico_source, html_path)
+        shutil.copy(js_source, html_path)
     except IOError as e:
-        print("Unable to copy %s" % e)
+        logger.error("Unable to copy file %s" % e)
     except:
-        print("Unexpected error:", sys.exc_info())
+        logger.error("Unexpected error:", sys.exc_info())
 
     return index_html
 
@@ -544,11 +540,13 @@ def _render_td(table, color, percentage):
     """
     if color == 'N/A':
         table += """
-                    <td style="text-align: center">N/A</td>
+                    <td name="td4">
+                        <div style="text-align: center">N/A</div>
+                    </td>
         """
     elif color != 'gold':
         table += """
-                                        <td>
+                                        <td name="td4">
                                             <div class="single-chart">
                                                 <svg viewBox="0 0 36 36" class="circular-chart {color}">
                                                     <path class="circle-bg"
@@ -569,7 +567,7 @@ def _render_td(table, color, percentage):
                     """.format(color=color, percentage=percentage)
     else:
         table += """
-                        <td class="medal">
+                        <td name="td4" class="medal">
                             <div class="ribbon"></div>
                             <div class="coin"></div>
                         </td>
