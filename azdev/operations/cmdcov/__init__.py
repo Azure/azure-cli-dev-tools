@@ -180,9 +180,6 @@ def _get_all_tested_commands(selected_mod_names, selected_mod_path):
         test_dir = os.path.join(path, 'tests')
         files = find_files(test_dir, '*.py')
         for f in files:
-            # if f != 'test_image_builder_commands.py':
-            # if f != 'test_vm_commands.py':
-            #     continue
             with open(os.path.join(test_dir, f), 'r', encoding='utf-8') as f:
                 try:
                     lines = f.readlines()
