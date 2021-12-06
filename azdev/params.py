@@ -132,6 +132,7 @@ def load_arguments(self, _):
     # region cmdcov
     with ArgumentsContext(self, 'cmdcov') as c:
         c.positional('modules', modules_type)
+        c.argument('level', choices=['command', 'argument'], help='Run command coverage in command level or argument level.')
     # endregion
 
     with ArgumentsContext(self, 'perf') as c:
