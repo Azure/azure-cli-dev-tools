@@ -32,14 +32,14 @@ function sortStrDesc(a, b)
 function sortTextAS(a, b)
 {
     if (a==='N/A'){
-        a = 0
+        a = -1
     } else if (a===''){
         a = 100
     } else {
         a = parseFloat(a.substr(0,a.length-1))
     }
     if (b==='N/A'){
-        b = 0
+        b = -1
     } else if (b===''){
         b = 100
     } else {
@@ -55,14 +55,14 @@ function sortTextAS(a, b)
 function sortTextDesc(a, b)
 {
     if (a==='N/A'){
-        a = 0
+        a = -1
     } else if (a===''){
         a = 100
     }  else {
         a = parseFloat(a.substr(0,a.length-1))
     }
     if (b==='N/A'){
-        b = 0
+        b = -1
     } else if (b===''){
         b = 100
     }  else {
