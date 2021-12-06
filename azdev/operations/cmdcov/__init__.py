@@ -145,18 +145,16 @@ def _get_all_commands(selected_mod_names, loaded_help):
     """
     # selected_mod_names = ['vm']
     exclude_parameters = []
-    global_parameters = GLOBAL_PARAMETERS
-    generic_update_parameters = GENERIC_UPDATE_PARAMETERS
-    wait_condition_parameters = WAIT_CONDITION_PARAMETERS
-    other_parameters = OTHER_PARAMETERS
-    exclude_parameters = exclude_parameters + global_parameters + generic_update_parameters + wait_condition_parameters + other_parameters
+    exclude_parameters += GLOBAL_PARAMETERS + GENERIC_UPDATE_PARAMETERS + GENERIC_UPDATE_PARAMETERS + OTHER_PARAMETERS
     [i.sort() for i in exclude_parameters]
 
     all_test_commands = {m: [] for m in selected_mod_names}
     # like module vm have multiple command like vm vmss disk snapshot
     for _, y in loaded_help.items():
         # if x.split()[0] in selected_mod_names:
-        if hasattr(y, 'command_source') and y.command_source in selected_mod_names:
+        if hasattr(y, 'command_source') and y.command_source in selected_mod_names or \
+           hasattr(y, 'command_source') and hasattr(y.command_source, 'extension_name') and y.command_source.extension_name in selected_mod_names:
+            module = y.command_source.extension_name if hasattr(y.command_source, 'extension_name') else y.command_source
             for parameter in y.parameters:
                 opt_list = []
                 parameter.name_source.sort()
@@ -165,7 +163,7 @@ def _get_all_commands(selected_mod_names, loaded_help):
                         if opt.startswith('-'):
                             opt_list.append(opt)
                 if opt_list:
-                    all_test_commands[y.command_source].append(f'{y.command} {opt_list}')
+                    all_test_commands[module].append(f'{y.command} {opt_list}')
 
     return all_test_commands
 
@@ -291,7 +289,7 @@ def _run_commands_coverage(all_commands, all_tested_commands):
         try:
             command_coverage[module] = [count, len(all_untested_commands[module]), f'{count / len(all_commands[module]):.3%}']
         except ZeroDivisionError:
-            command_coverage[module] = [0, 0, '100.000%']
+            command_coverage[module] = [0, 0, 'N/A']
         command_coverage['Total'][0] += count
         command_coverage['Total'][1] += len(all_untested_commands[module])
     command_coverage['Total'][2] = f'{command_coverage["Total"][0] / (command_coverage["Total"][0] + command_coverage["Total"][1]):.3%}'
@@ -330,7 +328,7 @@ def _run_commands_coverage_enhance(all_untested_commands, all_tested_commands_fr
             command_coverage[module][1] = len(all_untested_commands[module])
             command_coverage[module][2] = f'{command_coverage[module][0] / (command_coverage[module][0] + command_coverage[module][1]):.3%}'
         except ZeroDivisionError:
-            command_coverage[module] = [0, 0, '100.000%']
+            command_coverage[module] = [0, 0, 'N/A']
         total_tested += command_coverage[module][0] if command_coverage[module] else 0
         total_untested += command_coverage[module][1] if command_coverage[module] else 0
     command_coverage['Total'][0] = total_tested
@@ -547,7 +545,11 @@ def _render_td(table, color, percentage):
     :param percentage:
     :return: Return a HTML table data
     """
-    if color != 'gold':
+    if color == 'N/A':
+        table += """
+                    <td style="text-align: center">N/A</td>
+        """
+    elif color != 'gold':
         table += """
                                         <td>
                                             <div class="single-chart">
@@ -583,9 +585,11 @@ def _get_color(coverage):
     :param coverage:
     :return: color and percentage
     """
-    percentage = int(round(float(coverage[2][:-1]), 0))
+    percentage = int(round(float(coverage[2][:-1]), 0)) if coverage[2] != 'N/A' else coverage[2]
     try:
-        if percentage < RED_PCT:
+        if percentage == 'N/A':
+            color = 'N/A'
+        elif percentage < RED_PCT:
             color = RED
         elif percentage < ORANGE_PCT:
             color = ORANGE
