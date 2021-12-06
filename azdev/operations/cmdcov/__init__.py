@@ -38,7 +38,6 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, in
     :return: None
     """
     require_azure_cli()
-    #
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
     from azure.cli.core.file_util import (  # pylint: disable=import-error
         get_all_help, create_invoker_and_load_cmds_and_args)
@@ -51,24 +50,7 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, in
     if cli_only or ext_only:
         modules = None
 
-    # needed to remove helps from azdev
-    azdev_helps = helps.copy()
-    exclusions = {}
     selected_modules = get_path_table(include_only=modules, include_whl_extensions=include_whl_extensions)
-
-    if cli_only:
-        selected_modules['ext'] = {}
-    if ext_only:
-        selected_modules['mod'] = {}
-        selected_modules['core'] = {}
-
-    # used to upsert global exclusion
-    update_global_exclusion = None
-    if save_global_exclusion and (cli_only or ext_only):
-        if cli_only:
-            update_global_exclusion = 'CLI'
-        elif ext_only:
-            update_global_exclusion = 'EXT'
 
     # filter down to only modules that have changed based on git diff
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
@@ -80,45 +62,18 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, in
     #                      list(selected_modules['ext'].keys())
     # selected_mod_paths = list(selected_modules['mod'].values()) + list(selected_modules['core'].values()) + \
     #                      list(selected_modules['ext'].values())
-
-    selected_mod_names = list(selected_modules['mod'].keys())
-    selected_mod_paths = list(selected_modules['mod'].values())
-    # exclude mod
-    # exclude_mod = EXCLUDE_MOD
-    # for mod in exclude_mod:
-    #     selected_mod_names.remove(mod)
-    #     selected_mod_paths.remove('c:\\code\\azure-cli\\src\\azure-cli\\azure\\cli\\command_modules\\{}'.format(mod))
-    # Other Errors TODO
-    # selected_mod_names.remove('appservice')
-    # selected_mod_paths.remove('c:\\code\\azure-cli\\src\\azure-cli\\azure\\cli\\command_modules\\appservice')
-    # selected_mod_names.remove('batchai')
-    # selected_mod_paths.remove('c:\\code\\azure-cli\\src\\azure-cli\\azure\\cli\\command_modules\\batchai')
-    # dir not exist TODO
-    # selected_mod_names.remove('interactive')
-    # selected_mod_paths.remove('c:\\code\\azure-cli\\src\\azure-cli\\azure\\cli\\command_modules\\interactive')
+    if cli_only:
+        selected_mod_names = list(selected_modules['mod'].keys())
+        selected_mod_paths = list(selected_modules['mod'].values())
+    elif ext_only:
+        selected_mod_names = list(selected_modules['ext'].keys())
+        selected_mod_paths = list(selected_modules['ext'].values())
+    else:
+        selected_mod_names = list(selected_modules['mod'].keys())
+        selected_mod_paths = list(selected_modules['mod'].values())
 
     if selected_mod_names:
         display('Modules: {}\n'.format(', '.join(selected_mod_names)))
-
-    # collect all rule exclusions
-    for path in selected_mod_paths:
-        exclusion_path = os.path.join(path, 'cmdcov_exclusions.yml')
-        if os.path.isfile(exclusion_path):
-            with open(exclusion_path, encoding='utf-8') as f:
-                mod_exclusions = yaml.safe_load(f)
-            merge_exclusion(exclusions, mod_exclusions or {})
-
-    global_exclusion_paths = [os.path.join(get_cli_repo_path(), 'cmdcov_exclusions.yml')]
-    try:
-        global_exclusion_paths.extend([os.path.join(path, 'cmdcov_exclusions.yml')
-                                       for path in (get_ext_repo_paths() or [])])
-    except CLIError:
-        pass
-    for path in global_exclusion_paths:
-        if os.path.isfile(path):
-            with open(path, encoding=ENCODING) as f:
-                mod_exclusions = yaml.safe_load(f)
-            merge_exclusion(exclusions, mod_exclusions or {})
 
     start = time.time()
     display('Initializing cmdcov with command table and help files...')
@@ -135,29 +90,11 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, in
     # format loaded help
     loaded_help = {data.command: data for data in loaded_help if data.command}
 
-    # load yaml help
-    help_file_entries = {}
-    for entry_name, help_yaml in helps.items():
-        # ignore help entries from azdev itself, unless it also coincides
-        # with a CLI or extension command name.
-        if entry_name in azdev_helps and entry_name not in command_loader.command_table:
-            continue
-        help_entry = yaml.safe_load(help_yaml)
-        help_file_entries[entry_name] = help_entry
-
-    # trim command table and help to just selected_modules
-    command_loader, help_file_entries = filter_modules(
-        command_loader, help_file_entries, modules=selected_mod_names, include_whl_extensions=include_whl_extensions)
-
-    if not command_loader.command_table:
-        logger.warning('No commands selected to check.')
-    display('command_loader: {}\n'.format(command_loader))
-
-    all_test_commands = _get_all_commands(selected_mod_names, loaded_help)
+    all_commands = _get_all_commands(selected_mod_names, loaded_help)
     all_tested_commands = _get_all_tested_commands(selected_mod_names, selected_mod_paths)
-    command_coverage, all_untested_commands = _run_commands_coverage(all_test_commands, all_tested_commands)
+    command_coverage, all_untested_commands = _run_commands_coverage(all_commands, all_tested_commands)
     all_tested_cmd_from_file = _get_all_tested_commands_from_file()
-    command_coverage, all_untested_commands = _run_commands_coverage2(all_untested_commands, all_tested_cmd_from_file, command_coverage)
+    command_coverage, all_untested_commands = _run_commands_coverage_enhance(all_untested_commands, all_tested_cmd_from_file, command_coverage)
     html_file = _render_html(command_coverage, all_untested_commands)
 
     subheading('Results')
@@ -298,10 +235,16 @@ def _get_all_tested_commands(selected_mod_names, selected_mod_path):
     return all_tested_commands
 
 
-def _run_commands_coverage(all_test_commands, all_tested_commands):
+def _get_all_tested_commands_from_file():
+    with open(os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'tested_command.txt'), 'r') as f:
+        lines = f.readlines()
+    return lines
+
+
+def _run_commands_coverage(all_commands, all_tested_commands):
     """
-    :param all_test_commands:
-    :param all_untested_commands:
+    :param all_commands: All commands that need to be test
+    :param all_tested_commands: All commands already tested
     :return: command_coverage and all_untested_commands
     module: vm
     percentage: xx.xxx%
@@ -309,12 +252,12 @@ def _run_commands_coverage(all_test_commands, all_tested_commands):
     import ast
     command_coverage = {'Total': [0, 0, 0]}
     all_untested_commands = {}
-    for module in all_test_commands.keys():
+    for module in all_commands.keys():
         command_coverage[module] = []
         all_untested_commands[module] = []
-    for module in all_test_commands.keys():
+    for module in all_commands.keys():
         count = 0
-        for command in all_test_commands[module]:
+        for command in all_commands[module]:
             exist_flag = False
             prefix, opt_list = command.rsplit('[', maxsplit=1)[0], ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1])
             if module == 'storage':
@@ -346,12 +289,53 @@ def _run_commands_coverage(all_test_commands, all_tested_commands):
                 else:
                     all_untested_commands[module].append(command)
         try:
-            command_coverage[module] = [count, len(all_untested_commands[module]), f'{count / len(all_test_commands[module]):.3%}']
+            command_coverage[module] = [count, len(all_untested_commands[module]), f'{count / len(all_commands[module]):.3%}']
         except ZeroDivisionError:
             command_coverage[module] = [0, 0, '100.000%']
         command_coverage['Total'][0] += count
         command_coverage['Total'][1] += len(all_untested_commands[module])
     command_coverage['Total'][2] = f'{command_coverage["Total"][0] / (command_coverage["Total"][0] + command_coverage["Total"][1]):.3%}'
+    logger.warning(command_coverage)
+    return command_coverage, all_untested_commands
+
+
+def _run_commands_coverage_enhance(all_untested_commands, all_tested_commands_from_file, command_coverage):
+    """
+    :param all_untest_commands: {[module]:[],}
+    :param all_tested_commands_from_file: []
+    :param command_coverage: {[module: [test, untested, pct]
+    :return: command_coverage and all_untested_commands
+    module: vm
+    percentage: xx.xxx%
+    """
+    import ast
+    total_tested = 0
+    total_untested = 0
+    for module in all_untested_commands.keys():
+        for cmd_idx, command in enumerate(all_untested_commands[module]):
+            exist_flag = False
+            prefix, opt_list = command.rsplit('[', maxsplit=1)[0], ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1])
+            for cmd in all_tested_commands_from_file:
+                if prefix in cmd:
+                    for opt in opt_list:
+                        if opt in cmd:
+                            command_coverage[module][0] += 1
+                            all_untested_commands[module].pop(cmd_idx)
+                            exist_flag = True
+                            if exist_flag:
+                                break
+                if exist_flag:
+                    break
+        try:
+            command_coverage[module][1] = len(all_untested_commands[module])
+            command_coverage[module][2] = f'{command_coverage[module][0] / (command_coverage[module][0] + command_coverage[module][1]):.3%}'
+        except ZeroDivisionError:
+            command_coverage[module] = [0, 0, '100.000%']
+        total_tested += command_coverage[module][0] if command_coverage[module] else 0
+        total_untested += command_coverage[module][1] if command_coverage[module] else 0
+    command_coverage['Total'][0] = total_tested
+    command_coverage['Total'][1] = total_untested
+    command_coverage['Total'][2] = f'{total_tested / (total_tested + total_untested):.3%}'
     logger.warning(command_coverage)
     return command_coverage, all_untested_commands
 
@@ -362,7 +346,6 @@ def _render_html(command_coverage, all_untested_commands):
     :param all_untested_commands:
     :return: Return a HTML string
     """
-    logger.warning('Enter render()')
     import time
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     html_path = get_html_path(date.split()[0])
@@ -668,53 +651,6 @@ def upload_files(container, html_path, account_key):
                 os.system(cmd)
 
     logger.warning('Exit upload_files()')
-
-
-def _get_all_tested_commands_from_file():
-    with open(os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'tested_command.txt'), 'r') as f:
-        lines = f.readlines()
-    return lines
-
-
-def _run_commands_coverage2(all_untested_commands, all_tested_commands_from_file, command_coverage):
-    """
-    :param all_untest_commands: {[module]:[],}
-    :param all_tested_commands_from_file: []
-    :param command_coverage: {[module: [test, untested, pct]
-    :return: command_coverage and all_untested_commands
-    module: vm
-    percentage: xx.xxx%
-    """
-    import ast
-    total_tested = 0
-    total_untested = 0
-    for module in all_untested_commands.keys():
-        for cmd_idx, command in enumerate(all_untested_commands[module]):
-            exist_flag = False
-            prefix, opt_list = command.rsplit('[', maxsplit=1)[0], ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1])
-            for cmd in all_tested_commands_from_file:
-                if prefix in cmd:
-                    for opt in opt_list:
-                        if opt in cmd:
-                            command_coverage[module][0] += 1
-                            all_untested_commands[module].pop(cmd_idx)
-                            exist_flag = True
-                            if exist_flag:
-                                break
-                if exist_flag:
-                    break
-        try:
-            command_coverage[module][1] = len(all_untested_commands[module])
-            command_coverage[module][2] = f'{command_coverage[module][0] / (command_coverage[module][0] + command_coverage[module][1]):.3%}'
-        except ZeroDivisionError:
-            command_coverage[module] = [0, 0, '100.000%']
-        total_tested += command_coverage[module][0] if command_coverage[module] else 0
-        total_untested += command_coverage[module][1] if command_coverage[module] else 0
-    command_coverage['Total'][0] = total_tested
-    command_coverage['Total'][1] = total_untested
-    command_coverage['Total'][2] = f'{total_tested / (total_tested + total_untested):.3%}'
-    logger.warning(command_coverage)
-    return command_coverage, all_untested_commands
 
 
 if __name__ == '__main__':
