@@ -85,10 +85,6 @@ tbody tr:hover {
     background-color: rgba(129,208,177,.3);
 }
 
-td.module, td.command {
-	text-transform: capitalize;
-}
-
 /* circle styles */
 .single-chart {
   width: 100%;
