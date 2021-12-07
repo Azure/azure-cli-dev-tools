@@ -85,3 +85,9 @@ RED_PCT = 30
 ORANGE_PCT = 60
 GREEN_PCT = 80
 BLUE_PCT = 99
+
+# https://github.com/Azure/azure-cli/blob/dev/.github/CODEOWNERS
+CLI_OWN_MODULES = ['cloud', 'container', 'databoxedge', 'keyvault', 'monitor', 'network',
+                   'privatedns', 'profile', 'resource', 'role', 'storage', 'vm']
+
+EXCLUDE_MODULES = ['extension', 'feedback', 'util']

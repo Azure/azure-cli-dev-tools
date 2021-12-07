@@ -21,7 +21,7 @@ from .util import filter_modules, merge_exclusion
 from .constant import (
     ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS,
     CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, EXCLUDE_MOD, RED, ORANGE, GREEN,
-    BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT)
+    BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES, EXCLUDE_MODULES)
 
 
 logger = get_logger(__name__)
@@ -45,10 +45,12 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
 
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
-    ext_only = modules == ['EXT']
+    # ext_only = modules == ['EXT']
     enable_cli_own = True if cli_only or modules is None else False
-    if cli_only or ext_only:
+    if cli_only:
         modules = None
+    # if cli_only or ext_only:
+    #     modules = None
 
     selected_modules = get_path_table(include_only=modules)
 
@@ -58,16 +60,16 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
     if not any(selected_modules.values()):
         logger.warning('No commands selected to check.')
 
-    # selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
-    #                      list(selected_modules['ext'].keys())
-    # selected_mod_paths = list(selected_modules['mod'].values()) + list(selected_modules['core'].values()) + \
-    #                      list(selected_modules['ext'].values())
+    for module in EXCLUDE_MODULES:
+        selected_modules['mod'] = {k:v for k,v in selected_modules['mod'].items() if k not in EXCLUDE_MODULES}
+        selected_modules['ext'] = {k:v for k,v in selected_modules['ext'].items() if k not in EXCLUDE_MODULES}
+
     if cli_only:
         selected_mod_names = list(selected_modules['mod'].keys())
         selected_mod_paths = list(selected_modules['mod'].values())
-    elif ext_only:
-        selected_mod_names = list(selected_modules['ext'].keys())
-        selected_mod_paths = list(selected_modules['ext'].values())
+    # elif ext_only:
+    #     selected_mod_names = list(selected_modules['ext'].keys())
+    #     selected_mod_paths = list(selected_modules['ext'].values())
     else:
         selected_mod_names = list(selected_modules['mod'].keys())
         selected_mod_paths = list(selected_modules['mod'].values())
@@ -95,8 +97,20 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
     command_coverage, all_untested_commands = _run_commands_coverage(all_commands, all_tested_commands, level)
     all_tested_cmd_from_file = _get_all_tested_commands_from_file()
     command_coverage, all_untested_commands = _run_commands_coverage_enhance(all_untested_commands, all_tested_cmd_from_file, command_coverage, level)
-    html_file = _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
-
+    html_file, date = _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
+    if enable_cli_own:
+        command_coverage = {k:v for k,v in command_coverage.items() if k in CLI_OWN_MODULES}
+        all_untested_commands = {k:v for k,v in all_untested_commands.items() if k in CLI_OWN_MODULES}
+        total_tested = 0
+        total_untested = 0
+        command_coverage['Total'] = [0, 0, 0]
+        for module in command_coverage.keys():
+            total_tested += command_coverage[module][0] if command_coverage[module] else 0
+            total_untested += command_coverage[module][1] if command_coverage[module] else 0
+        command_coverage['Total'][0] = total_tested
+        command_coverage['Total'][1] = total_untested
+        command_coverage['Total'][2] = f'{total_tested / (total_tested + total_untested):.3%}'
+        _render_cli_html(command_coverage, all_untested_commands, level, date)
     subheading('Results')
     _browse(html_file)
 
@@ -426,7 +440,7 @@ def _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
         # find: []
         if coverage:
             reports = '<a href="{module}.html">{module} coverage report</a> '.format(module=module)
-            child_html = _render_child_html(module, coverage, all_untested_commands[module], enable_cli_own)
+            child_html = _render_child_html(module, coverage, all_untested_commands[module], enable_cli_own, date)
             with open(f'{html_path}/{module}.html', 'w', encoding='utf-8') as f:
                 f.write(child_html)
             try:
@@ -479,19 +493,146 @@ def _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
     except:
         logger.error("Unexpected error:", sys.exc_info())
 
-    return index_html
+    return index_html, date
 
 
-def _render_child_html(module, command_coverage, all_untested_commands, enable_cli_own):
+def _render_cli_html(command_coverage, all_untested_commands, level, date, enable_cli_own=True):
+    """
+    :param command_coverage:
+    :param all_untested_commands:
+    :return: Return a HTML string
+    """
+    path_date = '-'.join(date.replace(':', '-').split())
+    html_path = get_html_path(path_date, level)
+    content = """
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>CLI Own Command Coverage</title>
+        <link rel="stylesheet" type="text/css" href="component.css"/>
+        <link rel="shortcut icon" href="favicon.ico">
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+        <script type="text/javascript" src="./component.js"></script>
+    </head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CLI Own Command Coverage Report
+                <span>This is the command coverage report of CLI Own. Scroll down to see the every module coverage.<br>
+                Any question please contact Azure Cli Team.</span>
+            </h1>
+            <nav class="button">
+                <a href="index.html">ALL</a>
+                <a class="current-page" href="index2.html">CLI OWN</a>'
+            </nav>
+"""
+
+    content += """
+        </header>
+        <div class="component">
+            <h3>Date: {}</h3>
+    """.format(date)
+
+    table = """
+                <table>
+                    <thead>
+                    <tr>
+                        <th id="th0" onclick="SortTable(this)" class="as">Module</th>
+                        <th id="th1" onclick="SortTable(this)" class="as">Tested</th>
+                        <th id="th2" onclick="SortTable(this)" class="as">Untested</th>
+                        <th id="th3" onclick="SortTable(this)" class="as">Percentage</th>
+                        <th id="th4" onclick="SortTable(this)" class="as">Percentage</th>
+                        <th id="th5" onclick="SortTable(this)" class="as">Reports</th>
+                    </tr>
+                    </thead>
+    """
+
+    table += """
+                    <tbody>
+                    <tr>
+                        <td name="td0">Total</td>
+                        <td name="td1">{}</td>
+                        <td name="td2">{}</td>
+                        <td name="td3">{}</td>
+
+    """.format(command_coverage['Total'][0], command_coverage['Total'][1], command_coverage['Total'][2])
+
+    color, percentage = _get_color(command_coverage['Total'])
+    table = _render_td(table, color, percentage)
+
+    table += """
+                        <td name="td5">N/A</td>
+                    </tr>
+    """
+
+    command_coverage.pop('Total')
+
+    for module, coverage in command_coverage.items():
+        # feedback: []
+        # find: []
+        if coverage:
+            reports = '<a href="{module}.html">{module} coverage report</a> '.format(module=module)
+            try:
+                table += """
+                  <tr>
+                    <td name="td0">{}</td>
+                    <td name="td1">{}</td>
+                    <td name="td2">{}</td>
+                    <td name="td3">{}</td>
+                """.format(module, coverage[0], coverage[1], coverage[2])
+            except:
+                print('Exception3', module, coverage, reports)
+
+            color, percentage = _get_color(coverage)
+            table = _render_td(table, color, percentage)
+
+            table += """
+                                <td name="td5">{}</td>
+                            </tr>
+            """.format(reports)
+
+    table += """
+                    </tbody>
+                </table>
+    """
+    content += table
+
+    content += """
+                <p class="contact">This is the command coverage report of CLI Own.<br>
+                    Any question please contact Azure Cli Team.</p>
+            </div>
+        </div><!-- /container -->
+    </body>
+</html>
+    """
+    index_html = os.path.join(html_path, 'index2.html')
+    with open(index_html, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+    # copy source
+    css_source = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'component.css')
+    ico_source = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'favicon.ico')
+    js_source = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'component.js')
+    try:
+        shutil.copy(css_source, html_path)
+        shutil.copy(ico_source, html_path)
+        shutil.copy(js_source, html_path)
+    except IOError as e:
+        logger.error("Unable to copy file %s" % e)
+    except:
+        logger.error("Unexpected error:", sys.exc_info())
+
+    return index_html, date
+
+
+def _render_child_html(module, command_coverage, all_untested_commands, enable_cli_own, date):
     """
     :param module:
     :param command_coverage:
     :param all_untested_commands:
     :return: Return a HTML string
     """
-    import time
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
     content = """
 <!DOCTYPE html>
 <html lang="en">
