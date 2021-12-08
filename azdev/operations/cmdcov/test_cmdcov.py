@@ -1,5 +1,5 @@
 import re
-from constant import (CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN)
+from .constant import (CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN)
 
 
 def regex(line):
@@ -117,7 +117,7 @@ def regex3():
     print(re.findall(quo_pattern, line))
 
 
-def regex4():
+def test_regex4():
     lines = [
 '        self.cmd(\'image builder create -n {tmpl_02} -g {rg} --identity {ide} --scripts {script} --image-source {img_src} --build-timeout 22\'\n',
 '                 \' --managed-image-destinations img_1=westus \' + out_3,\n',
@@ -208,6 +208,14 @@ def regex4():
 '    test.cmd(\'az billing account list \'',
 '             \'--expand "soldTo,billingProfiles,billingProfiles/invoiceSections"\',',
 '             checks=[])',
+'        runCommand = \'aks command invoke -g {resource_group} -n {name} -o json -c "kubectl get pods -A"\'',
+'        self.cmd(runCommand, [',
+'            self.check(\'provisioningState\', \'Succeeded\'),',
+'            self.check(\'exitCode\', 0),',
+'        ])',
+'    command = f\'afd origin-group update -g {resource_group_name} --profile-name {profile_name} \' ',
+'              f\'--origin-group-name {origin_group_name}\'',
+'        self.cmd(f"afd profile usage -g {resource_group} --profile-name {profile_name}", checks=usage_checks)',
     ]
     total_lines = len(lines)
     row_num = 0
@@ -256,7 +264,8 @@ def regex4():
             row_num += 1
     from pprint import pprint
     pprint(all_tested_commands, width=1000)
+    assert len(all_tested_commands) == 28
 
 
 if __name__ == '__main__':
-    regex4()
+    test_regex4()
