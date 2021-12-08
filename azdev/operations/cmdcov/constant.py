@@ -56,11 +56,10 @@ OTHER_PARAMETERS = [
 CMD_PATTERN = [
     # self.cmd( # test.cmd(
     r'.\w{0,}cmd\(\n',
-    # self.cmd('xxxx or self.cmd("xxx or # test.cmd('
-    r'.\w{0,}cmd\((?:\'|")(.*)(?:\'|")',
-    # r'self.cmd\((?:\'|")(.*)(?:\'|")(?:.*)?\n',
-    # xxxcmd = '' or xxxcmd = "" or xxxcmd1
-    r'cmd\d* = (?:\'|"){1}([a-z]+.*)(?:\'|"){1}',
+    # self.cmd('xxxx or self.cmd("xxx or test.cmd(' or fstring
+    r'.\w{0,}cmd\(f?(?:\'|")(.*)(?:\'|")',
+    # xxxcmd = '' or xxxcmd = "" or xxxcmd1 or ***Command or ***command or fstring
+    r'(?:cmd|command|Command)\d* = f?(?:\'|"){1}([a-z]+.*)(?:\'|"){1}',
     # r'self.cmd\(\n', r'cmd = (?:\'|")(.*)(?:\'|")(.*)?',
     # xxxcmd = """ or xxxcmd = ''' or xxxcmd1
     r'cmd\d* = (?:"{3}|\'{3})(.*)',
