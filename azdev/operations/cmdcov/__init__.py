@@ -6,18 +6,14 @@
 
 import os
 import time
-import yaml
 import shutil
 import sys
 
-from knack.help_files import helps
 from knack.log import get_logger
-from knack.util import CLIError
 
 from azdev.utilities import (
     heading, subheading, display, get_path_table, require_azure_cli, filter_by_git_diff)
-from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths, get_azdev_repo_path, find_files
-from .util import filter_modules, merge_exclusion
+from azdev.utilities.path import get_azdev_repo_path, find_files
 from .constant import (
     ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS,
     CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, EXCLUDE_MOD, RED, ORANGE, GREEN,
