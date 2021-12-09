@@ -287,5 +287,7 @@ helps['cmdcov'] = """
         - name: Check all CLI modules command coverage.
           text: azdev cmdcov CLI
         - name: Check one or serveral modules command coverage.
-          text: azdev codcov vm storage
+          text: azdev cmdcov vm storage
+        - name: Check CLI modules command argument coverage.
+          text: azdev cmdcov CLI --level argument
 """
