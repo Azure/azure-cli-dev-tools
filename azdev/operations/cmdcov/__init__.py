@@ -357,12 +357,13 @@ def _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     path_date = '-'.join(date.replace(':', '-').split())
     html_path = get_html_path(path_date, level)
+    description = 'Command' if level == 'command' else 'Command Argument'
     content = """
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>CLI Command Coverage</title>
+        <title>CLI {description} Coverage</title>
         <link rel="stylesheet" type="text/css" href="component.css"/>
         <link rel="shortcut icon" href="favicon.ico">
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -371,11 +372,11 @@ def _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
 <body>
     <div class="container">
         <header>
-            <h1>CLI Command Coverage Report
-                <span>This is the command coverage report of CLI. Scroll down to see the every module coverage.<br>
+            <h1>CLI {description} Coverage Report
+                <span>Please scroll down to see the every module coverage.<br>
                 Any question please contact Azure Cli Team.</span>
             </h1>
-"""
+""".format(description=description)
 
     if enable_cli_own:
         content += """
@@ -465,13 +466,13 @@ def _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
     content += table
 
     content += """
-                <p class="contact">This is the command coverage report of CLI.<br>
+                <p class="contact">This is the {} coverage report of CLI.<br>
                     Any question please contact Azure Cli Team.</p>
             </div>
         </div><!-- /container -->
     </body>
 </html>
-    """
+    """.format(description.lower())
     index_html = os.path.join(html_path, 'index.html')
     with open(index_html, 'w', encoding='utf-8') as f:
         f.write(content)
@@ -500,12 +501,13 @@ def _render_cli_html(command_coverage, all_untested_commands, level, date, enabl
     """
     path_date = '-'.join(date.replace(':', '-').split())
     html_path = get_html_path(path_date, level)
+    description = 'Command' if level == 'command' else 'Command Argument'
     content = """
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>CLI Own Command Coverage</title>
+        <title>CLI Own {description} Coverage</title>
         <link rel="stylesheet" type="text/css" href="component.css"/>
         <link rel="shortcut icon" href="favicon.ico">
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -514,15 +516,15 @@ def _render_cli_html(command_coverage, all_untested_commands, level, date, enabl
 <body>
     <div class="container">
         <header>
-            <h1>CLI Own Command Coverage Report
-                <span>This is the command coverage report of CLI Own. Scroll down to see the every module coverage.<br>
+            <h1>CLI Own {description} Coverage Report
+                <span>Please scroll down to see the every module coverage.<br>
                 Any question please contact Azure Cli Team.</span>
             </h1>
             <nav class="button">
                 <a href="index.html">ALL</a>
                 <a class="current-page" href="index2.html">CLI OWN</a>'
             </nav>
-"""
+""".format(description=description)
 
     content += """
         </header>
@@ -595,13 +597,13 @@ def _render_cli_html(command_coverage, all_untested_commands, level, date, enabl
     content += table
 
     content += """
-                <p class="contact">This is the command coverage report of CLI Own.<br>
+                <p class="contact">This is the {} coverage report of CLI Own.<br>
                     Any question please contact Azure Cli Team.</p>
             </div>
         </div><!-- /container -->
     </body>
 </html>
-    """
+    """.format(description)
     index_html = os.path.join(html_path, 'index2.html')
     with open(index_html, 'w', encoding='utf-8') as f:
         f.write(content)
@@ -641,8 +643,8 @@ def _render_child_html(module, command_coverage, all_untested_commands, enable_c
     <body>
         <div class="container">
             <header>
-                <h1>{module} Command Coverage Report
-                    <span>This is the command coverage report of {module}. Scroll down to see the every module coverage.<br>
+                <h1>{module} Coverage Report
+                    <span>This is the coverage report of {module}. Please scroll down to see the untested details.<br>
                     Any question please contact Azure Cli Team.</span>
                 </h1>
 
@@ -693,7 +695,7 @@ def _render_child_html(module, command_coverage, all_untested_commands, enable_c
     content += """
                     </tbody>
                 </table>
-                <p class="contact">This is command coverage report of {} module.<br>
+                <p class="contact">This is the coverage report of {} module.<br>
                     Any question please contact Azure Cli Team.<br>
                 </p>
             </div>
