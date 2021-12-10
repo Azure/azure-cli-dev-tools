@@ -17,7 +17,7 @@ from azdev.utilities.path import get_azdev_repo_path, find_files
 from .constant import (
     ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS,
     CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, EXCLUDE_MOD, RED, ORANGE, GREEN,
-    BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES, EXCLUDE_MODULES)
+    BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES, EXCLUDE_MODULES, EXCLUDE_COMMANDS)
 
 
 logger = get_logger(__name__)
@@ -161,8 +161,11 @@ def _get_all_commands(selected_mod_names, loaded_help, level):
     all_test_commands = {m: [] for m in selected_mod_names}
     # like module vm have multiple command like vm vmss disk snapshot
     for _, y in loaded_help.items():
-        if hasattr(y, 'command_source') and y.command_source in selected_mod_names or \
-           hasattr(y, 'command_source') and hasattr(y.command_source, 'extension_name') and y.command_source.extension_name in selected_mod_names:
+        if (hasattr(y, 'command_source') and
+            y.command_source in selected_mod_names) or \
+           (hasattr(y, 'command_source') and
+            asattr(y.command_source, 'extension_name') and
+            y.command_source.extension_name in selected_mod_names):
             module = y.command_source.extension_name if hasattr(y.command_source, 'extension_name') else y.command_source
             if level == 'argument':
                 for parameter in y.parameters:
@@ -173,9 +176,11 @@ def _get_all_commands(selected_mod_names, loaded_help, level):
                             if opt.startswith('-'):
                                 opt_list.append(opt)
                     if opt_list:
-                        all_test_commands[module].append(f'{y.command} {opt_list}')
+                        if y.command.split()[-1] not in EXCLUDE_COMMANDS:
+                            all_test_commands[module].append(f'{y.command} {opt_list}')
             else:
-                all_test_commands[module].append(f'{y.command}')
+                if y.command.split()[-1] not in EXCLUDE_COMMANDS:
+                    all_test_commands[module].append(f'{y.command}')
 
     return all_test_commands
 
