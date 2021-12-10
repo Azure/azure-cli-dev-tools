@@ -1,4 +1,6 @@
 ENCODING = 'utf-8'
+EXCLUDE_COMMANDS = ['wait']
+
 GLOBAL_PARAMETERS = [
     ['--debug'],
     ['--help', '-h'],
