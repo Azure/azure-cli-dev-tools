@@ -5,9 +5,10 @@
 # -----------------------------------------------------------------------------
 
 import os
-import time
 import shutil
 import sys
+import time
+import yaml
 
 from knack.log import get_logger
 
@@ -90,9 +91,11 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
 
     all_commands = _get_all_commands(selected_mod_names, loaded_help, level)
     all_tested_commands = _get_all_tested_commands(selected_mod_names, selected_mod_paths)
+    all_tested_commands = _get_all_tested_commands_from_record(selected_mod_names, selected_mod_paths, all_tested_commands)
+    # merge two list
     command_coverage, all_untested_commands = _run_commands_coverage(all_commands, all_tested_commands, level)
-    all_tested_cmd_from_file = _get_all_tested_commands_from_file()
-    command_coverage, all_untested_commands = _run_commands_coverage_enhance(all_untested_commands, all_tested_cmd_from_file, command_coverage, level)
+    all_tested_cmd_from_live = _get_all_tested_commands_from_live()
+    command_coverage, all_untested_commands = _run_commands_coverage_enhance(all_untested_commands, all_tested_cmd_from_live, command_coverage, level)
     html_file, date = _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
     if enable_cli_own:
         command_coverage = {k:v for k,v in command_coverage.items() if k in CLI_OWN_MODULES}
@@ -164,7 +167,7 @@ def _get_all_commands(selected_mod_names, loaded_help, level):
         if (hasattr(y, 'command_source') and
             y.command_source in selected_mod_names) or \
            (hasattr(y, 'command_source') and
-            asattr(y.command_source, 'extension_name') and
+            hasattr(y.command_source, 'extension_name') and
             y.command_source.extension_name in selected_mod_names):
             module = y.command_source.extension_name if hasattr(y.command_source, 'extension_name') else y.command_source
             if level == 'argument':
@@ -247,7 +250,31 @@ def _get_all_tested_commands(selected_mod_names, selected_mod_path):
     return all_tested_commands
 
 
-def _get_all_tested_commands_from_file():
+def _get_all_tested_commands_from_record(selected_mod_names, selected_mod_path, all_tested_commands):
+    """
+    :param selected_mod_names:
+    :param selected_mod_path:
+    :return: all_tested_commands
+    """
+    for idx, path in enumerate(selected_mod_path):
+        test_dir = os.path.join(path, 'tests')
+        files = find_files(test_dir, 'test*.yaml')
+        for f in files:
+            with open(os.path.join(test_dir, f)) as f:
+                print('loading yaml')
+                # safe_load can not determine a constructor for the tag: !!python/unicode
+                records = yaml.load(f, Loader=yaml.Loader) or {}
+                for record in records['interactions']:
+                    # ['acr agentpool create']
+                    command = record['request']['headers'].get('CommandName', [''])
+                    # ['-n -r']
+                    argument = record['request']['headers'].get('ParameterSetName', [''])
+                    cmd = command[0] + ' ' + argument[0]
+                    all_tested_commands[selected_mod_names[idx]].append(cmd)
+    return all_tested_commands
+
+
+def _get_all_tested_commands_from_live():
     with open(os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov', 'tested_command.txt'), 'r') as f:
         lines = f.readlines()
     return lines
