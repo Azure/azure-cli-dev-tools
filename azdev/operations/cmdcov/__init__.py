@@ -201,10 +201,7 @@ def _get_all_tested_commands(selected_mod_names, selected_mod_path):
         files = find_files(test_dir, '*.py')
         for f in files:
             with open(os.path.join(test_dir, f), 'r', encoding='utf-8') as f:
-                try:
-                    lines = f.readlines()
-                except Exception as e:
-                    print('readlines error', e, f)
+                lines = f.readlines()
                 # test_image_builder_commands.py 44
                 total_lines = len(lines)
                 row_num = 0
@@ -228,7 +225,7 @@ def _get_all_tested_commands(selected_mod_names, selected_mod_path):
                                 try:
                                     command += re.findall(QUO_PATTERN, lines[row_num])[0][1]
                                 except Exception as e:
-                                    # pass
+                                    # TODO
                                     print('Exception1', row_num, selected_mod_names[idx], f)
                             elif cmd_idx == 3 and (row_num + 1) < total_lines and not re.findall(DOCS_END_PATTERN, lines[row_num]):
                                 row_num += 1
@@ -261,7 +258,6 @@ def _get_all_tested_commands_from_record(selected_mod_names, selected_mod_path, 
         files = find_files(test_dir, 'test*.yaml')
         for f in files:
             with open(os.path.join(test_dir, f)) as f:
-                print('loading yaml')
                 # safe_load can not determine a constructor for the tag: !!python/unicode
                 records = yaml.load(f, Loader=yaml.Loader) or {}
                 for record in records['interactions']:
@@ -472,16 +468,13 @@ def _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
             child_html = _render_child_html(module, coverage, all_untested_commands[module], enable_cli_own, date)
             with open(f'{html_path}/{module}.html', 'w', encoding='utf-8') as f:
                 f.write(child_html)
-            try:
-                table += """
-                  <tr>
-                    <td name="td0">{}</td>
-                    <td name="td1">{}</td>
-                    <td name="td2">{}</td>
-                    <td name="td3">{}</td>
-                """.format(module, coverage[0], coverage[1], coverage[2])
-            except:
-                print('Exception3', module, coverage, reports)
+            table += """
+              <tr>
+                <td name="td0">{}</td>
+                <td name="td1">{}</td>
+                <td name="td2">{}</td>
+                <td name="td3">{}</td>
+            """.format(module, coverage[0], coverage[1], coverage[2])
 
             color, percentage = _get_color(coverage)
             table = _render_td(table, color, percentage)
@@ -603,16 +596,13 @@ def _render_cli_html(command_coverage, all_untested_commands, level, date, enabl
         # find: []
         if coverage:
             reports = '<a href="{module}.html">{module} coverage report</a> '.format(module=module)
-            try:
-                table += """
-                  <tr>
-                    <td name="td0">{}</td>
-                    <td name="td1">{}</td>
-                    <td name="td2">{}</td>
-                    <td name="td3">{}</td>
-                """.format(module, coverage[0], coverage[1], coverage[2])
-            except:
-                print('Exception3', module, coverage, reports)
+            table += """
+              <tr>
+                <td name="td0">{}</td>
+                <td name="td1">{}</td>
+                <td name="td2">{}</td>
+                <td name="td3">{}</td>
+            """.format(module, coverage[0], coverage[1], coverage[2])
 
             color, percentage = _get_color(coverage)
             table = _render_td(table, color, percentage)
@@ -696,15 +686,13 @@ def _render_child_html(module, command_coverage, all_untested_commands, enable_c
                 </nav>
         """
 
-    try:
-        content += """
-            </header>
-            <div class="component">
-                <h3>Date: {}</h3>
-                <h3>Tested: {}, Untested: {}, Percentage: {}</h3>
-        """.format(date, command_coverage[0], command_coverage[1], command_coverage[2], module)
-    except:
-        print('Exception4', command_coverage, module)
+    content += """
+        </header>
+        <div class="component">
+            <h3>Date: {}</h3>
+            <h3>Tested: {}, Untested: {}, Percentage: {}</h3>
+    """.format(date, command_coverage[0], command_coverage[1], command_coverage[2], module)
+
 
     content += """
                 <table>
@@ -788,21 +776,19 @@ def _get_color(coverage):
     :return: color and percentage
     """
     percentage = int(round(float(coverage[2][:-1]), 0)) if coverage[2] != 'N/A' else coverage[2]
-    try:
-        if percentage == 'N/A':
-            color = 'N/A'
-        elif percentage < RED_PCT:
-            color = RED
-        elif percentage < ORANGE_PCT:
-            color = ORANGE
-        elif percentage < GREEN_PCT:
-            color = GREEN
-        elif percentage < BLUE_PCT:
-            color = BLUE
-        else:
-            color = GOLD
-    except Exception as e:
-        print('coverage exception', coverage)
+    if percentage == 'N/A':
+        color = 'N/A'
+    elif percentage < RED_PCT:
+        color = RED
+    elif percentage < ORANGE_PCT:
+        color = ORANGE
+    elif percentage < GREEN_PCT:
+        color = GREEN
+    elif percentage < BLUE_PCT:
+        color = BLUE
+    else:
+        color = GOLD
+
     return color, percentage
 
 
