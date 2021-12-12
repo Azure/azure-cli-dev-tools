@@ -4,6 +4,7 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+
 import os
 import shutil
 import sys
@@ -43,7 +44,7 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
     # ext_only = modules == ['EXT']
-    enable_cli_own = True if cli_only or modules is None else False
+    enable_cli_own = bool(cli_only or modules is None)
     if cli_only:
         modules = None
     # if cli_only or ext_only:
@@ -58,8 +59,8 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
         logger.warning('No commands selected to check.')
 
     for module in EXCLUDE_MODULES:
-        selected_modules['mod'] = {k:v for k,v in selected_modules['mod'].items() if k not in EXCLUDE_MODULES}
-        selected_modules['ext'] = {k:v for k,v in selected_modules['ext'].items() if k not in EXCLUDE_MODULES}
+        selected_modules['mod'] = {k: v for k, v in selected_modules['mod'].items() if k not in EXCLUDE_MODULES}
+        selected_modules['ext'] = {k: v for k, v in selected_modules['ext'].items() if k not in EXCLUDE_MODULES}
 
     if cli_only:
         selected_mod_names = list(selected_modules['mod'].keys())
@@ -84,22 +85,23 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
 
     stop = time.time()
     logger.info('Commands and help loaded in %i sec', stop - start)
-    command_loader = az_cli.invocation.commands_loader
 
     # format loaded help
     loaded_help = {data.command: data for data in loaded_help if data.command}
 
     all_commands = _get_all_commands(selected_mod_names, loaded_help, level)
     all_tested_commands = _get_all_tested_commands(selected_mod_names, selected_mod_paths)
-    all_tested_commands = _get_all_tested_commands_from_record(selected_mod_names, selected_mod_paths, all_tested_commands)
+    all_tested_commands = _get_all_tested_commands_from_record(
+        selected_mod_names, selected_mod_paths, all_tested_commands)
     # merge two list
     command_coverage, all_untested_commands = _run_commands_coverage(all_commands, all_tested_commands, level)
     all_tested_cmd_from_live = _get_all_tested_commands_from_live()
-    command_coverage, all_untested_commands = _run_commands_coverage_enhance(all_untested_commands, all_tested_cmd_from_live, command_coverage, level)
+    command_coverage, all_untested_commands = _run_commands_coverage_enhance(
+        all_untested_commands, all_tested_cmd_from_live, command_coverage, level)
     html_file, date = _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
     if enable_cli_own:
-        command_coverage = {k:v for k,v in command_coverage.items() if k in CLI_OWN_MODULES}
-        all_untested_commands = {k:v for k,v in all_untested_commands.items() if k in CLI_OWN_MODULES}
+        command_coverage = {k: v for k, v in command_coverage.items() if k in CLI_OWN_MODULES}
+        all_untested_commands = {k: v for k, v in all_untested_commands.items() if k in CLI_OWN_MODULES}
         total_tested = 0
         total_untested = 0
         command_coverage['Total'] = [0, 0, 0]
@@ -109,7 +111,7 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
         command_coverage['Total'][0] = total_tested
         command_coverage['Total'][1] = total_untested
         command_coverage['Total'][2] = f'{total_tested / (total_tested + total_untested):.3%}'
-        _render_cli_html(command_coverage, all_untested_commands, level, date)
+        _render_cli_html(command_coverage, level, date)
     subheading('Results')
     _browse(html_file)
 
@@ -159,30 +161,27 @@ def _get_all_commands(selected_mod_names, loaded_help, level):
     # selected_mod_names = ['vm']
     exclude_parameters = []
     exclude_parameters += GLOBAL_PARAMETERS + GENERIC_UPDATE_PARAMETERS + GENERIC_UPDATE_PARAMETERS + OTHER_PARAMETERS
-    [i.sort() for i in exclude_parameters]
+    exclude_parameters = [sorted(i) for i in exclude_parameters]
 
     all_test_commands = {m: [] for m in selected_mod_names}
-    # like module vm have multiple command like vm vmss disk snapshot
+    # some module like vm have multiple command like vm vmss disk snapshot ...
+    # pylint: disable=too-many-nested-blocks
     for _, y in loaded_help.items():
         if (hasattr(y, 'command_source') and
-            y.command_source in selected_mod_names) or \
+                y.command_source in selected_mod_names) or \
            (hasattr(y, 'command_source') and
-            hasattr(y.command_source, 'extension_name') and
-            y.command_source.extension_name in selected_mod_names):
-            module = y.command_source.extension_name if hasattr(y.command_source, 'extension_name') else y.command_source
-            if level == 'argument':
-                for parameter in y.parameters:
-                    opt_list = []
-                    parameter.name_source.sort()
-                    if parameter.name_source not in exclude_parameters:
-                        for opt in parameter.name_source:
-                            if opt.startswith('-'):
-                                opt_list.append(opt)
-                    if opt_list:
-                        if y.command.split()[-1] not in EXCLUDE_COMMANDS:
-                            all_test_commands[module].append(f'{y.command} {opt_list}')
-            else:
-                if y.command.split()[-1] not in EXCLUDE_COMMANDS:
+                hasattr(y.command_source, 'extension_name') and
+                y.command_source.extension_name in selected_mod_names):
+            module = y.command_source.extension_name if hasattr(y.command_source, 'extension_name') \
+                else y.command_source
+            if y.command.split()[-1] not in EXCLUDE_COMMANDS:
+                if level == 'argument':
+                    for parameter in y.parameters:
+                        if sorted(parameter.name_source) not in exclude_parameters:
+                            opt_list = [opt for opt in parameter.name_source if opt.startswith('-')]
+                            if opt_list:
+                                all_test_commands[module].append(f'{y.command} {opt_list}')
+                else:
                     all_test_commands[module].append(f'{y.command}')
 
     return all_test_commands
@@ -207,27 +206,29 @@ def _get_all_tested_commands(selected_mod_names, selected_mod_path):
                 row_num = 0
                 count = 1
                 while row_num < total_lines:
-                    cmd_idx = None
+                    re_idx = None
                     if re.findall(CMD_PATTERN[0], lines[row_num]):
-                        cmd_idx = 0
-                    if cmd_idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
-                        cmd_idx = 1
-                    if cmd_idx is None and re.findall(CMD_PATTERN[2], lines[row_num]):
-                        cmd_idx = 2
-                    if cmd_idx is None and re.findall(CMD_PATTERN[3], lines[row_num]):
-                        cmd_idx = 3
-                    if cmd_idx is not None:
-                        command = re.findall(CMD_PATTERN[cmd_idx], lines[row_num])[0]
+                        re_idx = 0
+                    if re_idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
+                        re_idx = 1
+                    if re_idx is None and re.findall(CMD_PATTERN[2], lines[row_num]):
+                        re_idx = 2
+                    if re_idx is None and re.findall(CMD_PATTERN[3], lines[row_num]):
+                        re_idx = 3
+                    if re_idx is not None:
+                        command = re.findall(CMD_PATTERN[re_idx], lines[row_num])[0]
                         while row_num < total_lines:
-                            if (cmd_idx in [0, 1] and not re.findall(END_PATTERN, lines[row_num])) or \
-                               (cmd_idx == 2 and (row_num + 1) < total_lines and re.findall(NOT_END_PATTERN, lines[row_num + 1])):
+                            if (re_idx in [0, 1] and not re.findall(END_PATTERN, lines[row_num])) or \
+                               (re_idx == 2 and (row_num + 1) < total_lines and
+                                    re.findall(NOT_END_PATTERN, lines[row_num + 1])):
                                 row_num += 1
                                 try:
                                     command += re.findall(QUO_PATTERN, lines[row_num])[0][1]
-                                except Exception as e:
+                                except Exception as e:  # pylint: disable=broad-except
                                     # TODO
-                                    print('Exception1', row_num, selected_mod_names[idx], f)
-                            elif cmd_idx == 3 and (row_num + 1) < total_lines and not re.findall(DOCS_END_PATTERN, lines[row_num]):
+                                    print('Exception1', row_num, selected_mod_names[idx], f, e)
+                            elif re_idx == 3 and (row_num + 1) < total_lines \
+                                    and not re.findall(DOCS_END_PATTERN, lines[row_num]):
                                 row_num += 1
                                 command += lines[row_num][:-1]
                             else:
@@ -290,6 +291,7 @@ def _run_commands_coverage(all_commands, all_tested_commands, level):
     for module in all_commands.keys():
         command_coverage[module] = []
         all_untested_commands[module] = []
+    # pylint: disable=too-many-nested-blocks
     for module in all_commands.keys():
         count = 0
         for command in all_commands[module]:
@@ -316,12 +318,14 @@ def _run_commands_coverage(all_commands, all_tested_commands, level):
             else:
                 all_untested_commands[module].append(command)
         try:
-            command_coverage[module] = [count, len(all_untested_commands[module]), f'{count / len(all_commands[module]):.3%}']
+            command_coverage[module] = [count, len(all_untested_commands[module]),
+                                        f'{count / len(all_commands[module]):.3%}']
         except ZeroDivisionError:
             command_coverage[module] = [0, 0, 'N/A']
         command_coverage['Total'][0] += count
         command_coverage['Total'][1] += len(all_untested_commands[module])
-    command_coverage['Total'][2] = f'{command_coverage["Total"][0] / (command_coverage["Total"][0] + command_coverage["Total"][1]):.3%}'
+    command_coverage['Total'][2] = f'''{command_coverage["Total"][0] /
+                                        (command_coverage["Total"][0] + command_coverage["Total"][1]):.3%}'''
     logger.warning(command_coverage)
     return command_coverage, all_untested_commands
 
@@ -338,6 +342,7 @@ def _run_commands_coverage_enhance(all_untested_commands, all_tested_commands_fr
     import ast
     total_tested = 0
     total_untested = 0
+    # pylint: disable=too-many-nested-blocks
     for module in all_untested_commands.keys():
         for cmd_idx, command in enumerate(all_untested_commands[module]):
             exist_flag = False
@@ -363,7 +368,8 @@ def _run_commands_coverage_enhance(all_untested_commands, all_tested_commands_fr
                     break
         try:
             command_coverage[module][1] = len(all_untested_commands[module])
-            command_coverage[module][2] = f'{command_coverage[module][0] / (command_coverage[module][0] + command_coverage[module][1]):.3%}'
+            command_coverage[module][2] = f'''{command_coverage[module][0] /
+                                               (command_coverage[module][0] + command_coverage[module][1]):.3%}'''
         except ZeroDivisionError:
             command_coverage[module] = [0, 0, 'N/A']
         total_tested += command_coverage[module][0] if command_coverage[module] else 0
@@ -381,7 +387,6 @@ def _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
     :param all_untested_commands:
     :return: Return a HTML string
     """
-    import time
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     path_date = '-'.join(date.replace(':', '-').split())
     html_path = get_html_path(path_date, level)
@@ -511,14 +516,14 @@ def _render_html(command_coverage, all_untested_commands, level, enable_cli_own)
         shutil.copy(ico_source, html_path)
         shutil.copy(js_source, html_path)
     except IOError as e:
-        logger.error("Unable to copy file %s" % e)
-    except:
-        logger.error("Unexpected error:", sys.exc_info())
+        logger.error("Unable to copy file %s", e)
+    except Exception:  # pylint: disable=broad-except
+        logger.error("Unexpected error: %s", sys.exc_info())
 
     return index_html, date
 
 
-def _render_cli_html(command_coverage, all_untested_commands, level, date, enable_cli_own=True):
+def _render_cli_html(command_coverage, level, date):
     """
     :param command_coverage:
     :param all_untested_commands:
@@ -639,9 +644,9 @@ def _render_cli_html(command_coverage, all_untested_commands, level, date, enabl
         shutil.copy(ico_source, html_path)
         shutil.copy(js_source, html_path)
     except IOError as e:
-        logger.error("Unable to copy file %s" % e)
-    except:
-        logger.error("Unexpected error:", sys.exc_info())
+        logger.error("Unable to copy file %s", e)
+    except Exception:  # pylint: disable=broad-except
+        logger.error("Unexpected error: %s", sys.exc_info())
 
     return index_html, date
 
@@ -670,7 +675,7 @@ def _render_child_html(module, command_coverage, all_untested_commands, enable_c
                     Any question please contact Azure Cli Team.</span>
                 </h1>
 
-    """.format(module=module[0].upper()+module[1:].lower())
+    """.format(module=module[0].upper() + module[1:].lower())
 
     if enable_cli_own:
         content += """
@@ -691,8 +696,7 @@ def _render_child_html(module, command_coverage, all_untested_commands, enable_c
         <div class="component">
             <h3>Date: {}</h3>
             <h3>Tested: {}, Untested: {}, Percentage: {}</h3>
-    """.format(date, command_coverage[0], command_coverage[1], command_coverage[2], module)
-
+    """.format(date, command_coverage[0], command_coverage[1], command_coverage[2])
 
     content += """
                 <table>
@@ -758,7 +762,7 @@ def _render_td(table, color, percentage):
                                                     <text x="18" y="20.35" class="percentage">{percentage}%</text>
                                                 </svg>
                                             </div>
-                                        </td>                         
+                                        </td>
                     """.format(color=color, percentage=percentage)
     else:
         table += """
@@ -813,9 +817,9 @@ def get_container_name():
     import random
     import string
     logger.warning('Enter get_container_name()')
-    time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    container_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     random_id = ''.join(random.choice(string.digits) for _ in range(6))
-    name = time + '-' + random_id
+    name = container_time + '-' + random_id
     logger.warning('Exit get_container_name()')
     return name
 
@@ -829,17 +833,19 @@ def upload_files(container, html_path, account_key):
     logger.warning('Enter upload_files()')
 
     # Create container
-    cmd = 'az storage container create -n {} --account-name clitestresultstac --account-key {} --public-access container'.format(container, account_key)
+    cmd = 'az storage container create -n {} --account-name clitestresultstac --account-key {}' \
+          ' --public-access container'.format(container, account_key)
     os.system(cmd)
 
     # Upload files
     for root, dirs, files in os.walk(html_path):
+        logger.debug(dirs)
         for name in files:
             if name.endswith('html') or name.endswith('css'):
                 fullpath = os.path.join(root, name)
                 cmd = 'az storage blob upload -f {} -c {} -n {} --account-name clitestresultstac'
                 cmd = cmd.format(fullpath, container, name)
-                logger.warning('Running: ' + cmd)
+                logger.warning('Running: %s', cmd)
                 os.system(cmd)
 
     logger.warning('Exit upload_files()')
