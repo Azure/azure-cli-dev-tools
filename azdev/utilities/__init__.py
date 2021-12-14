@@ -34,7 +34,8 @@ from .display import (
 )
 from .git_util import (
     diff_branches,
-    filter_by_git_diff
+    filter_by_git_diff,
+    diff_branches_detail
 )
 from .path import (
     extract_module_name,
@@ -90,5 +91,6 @@ __all__ = [
     'get_path_table',
     'get_name_index',
     'require_virtual_env',
-    'require_azure_cli'
+    'require_azure_cli',
+    'diff_branches_detail',
 ]
