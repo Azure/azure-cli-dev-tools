@@ -12,6 +12,7 @@ from enum import Enum
 import yaml
 from knack.log import get_logger
 
+from azdev.utilities import diff_branches_detail
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 from .util import share_element, exclude_commands, LinterError
 
@@ -180,11 +181,15 @@ class Linter:  # pylint: disable=too-many-public-methods
             return help_entry.short_summary or help_entry.long_summary
         return help_entry
 
+    def get_command_test(self):
+        print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
+        diff_branches_detail(repo='D:\\code\\azure-cli', target='dev', source='20141')
+        return False
 
 # pylint: disable=too-many-instance-attributes
 class LinterManager:
 
-    _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params'}
+    _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params', 'commands_test'}
 
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, exclusions=None,
                  rule_inclusions=None, use_ci_exclusions=None, min_severity=None, update_global_exclusion=None):
@@ -234,7 +239,8 @@ class LinterManager:
     def exit_code(self):
         return self._exit_code
 
-    def run(self, run_params=None, run_commands=None, run_command_groups=None, run_help_files_entries=None):
+    def run(self, run_params=None, run_commands=None, run_command_groups=None,
+            run_help_files_entries=None, run_commands_test=None):
         paths = import_module('{}.rules'.format(PACKAGE_NAME)).__path__
 
         if paths:
@@ -256,9 +262,11 @@ class LinterManager:
 
         # run all rule-checks
         if run_help_files_entries and self._rules.get('help_file_entries'):
+            # print('help_file_entries')
             self._run_rules('help_file_entries')
 
         if run_command_groups and self._rules.get('command_groups'):
+            # print('command_groups')
             self._run_rules('command_groups')
 
         if run_commands and self._rules.get('commands'):
@@ -266,6 +274,9 @@ class LinterManager:
 
         if run_params and self._rules.get('params'):
             self._run_rules('params')
+
+        if run_commands_test and self._rules.get('commands_test'):
+            self._run_rules('commands_test')
 
         if not self.exit_code:
             print(os.linesep + 'No violations found for linter rules.')
@@ -297,13 +308,18 @@ class LinterManager:
         YELLOW = '\x1b[33m'
         CYAN = '\x1b[36m'
         RESET = '\x1b[39m'
+        # print('enter _run_rules')
         for rule_name, (rule_func, linter_callable, rule_severity) in self._rules.get(rule_group).items():
+            # print('enter_items')
             severity_str = rule_severity.name
             # use new linter if needed
             with LinterScope(self, linter_callable):
+                # print('enter_with')
                 # if the rule's severity is lower than the linter's severity skip it.
                 if self._linter_severity_is_applicable(rule_severity, rule_name):
+                    # print('enter violations', rule_func)
                     violations = sorted(rule_func()) or []
+                    # print('enter to find')
                     if violations:
                         if rule_severity == LinterSeverity.HIGH:
                             sev_color = RED
@@ -321,6 +337,7 @@ class LinterManager:
                         print()
                     else:
                         print('- {} pass{}: {} '.format(GREEN, RESET, rule_name))
+        # print('enter_end')
 
     def _linter_severity_is_applicable(self, rule_severity, rule_name):
         if self.min_severity.value > rule_severity.value:

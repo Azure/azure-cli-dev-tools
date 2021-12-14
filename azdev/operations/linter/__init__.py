@@ -161,9 +161,12 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         run_params=not rule_types or 'params' in rule_types,
         run_commands=not rule_types or 'commands' in rule_types,
         run_command_groups=not rule_types or 'command_groups' in rule_types,
-        run_help_files_entries=not rule_types or 'help_entries' in rule_types)
+        run_help_files_entries=not rule_types or 'help_entries' in rule_types,
+        run_commands_test=not rule_types or 'commands_test' in rule_types,
+    )
     display(os.linesep + 'Run custom pylint rules.')
     exit_code += pylint_rules(selected_modules)
+    print(exit_code)
     sys.exit(exit_code)
 
 

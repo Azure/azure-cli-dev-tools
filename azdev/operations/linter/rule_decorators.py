@@ -17,6 +17,32 @@ class BaseRule:
         self.severity = severity
 
 
+# command_test_rule run once
+class CommandTestRule(BaseRule):
+
+    def __call__(self, func):
+        def add_to_linter(linter_manager):
+            def wrapper():
+                linter = linter_manager.linter
+                # for command_name in linter.commands:
+                #     for parameter_name in linter.get_command_parameters(command_name):
+                # exclusion_parameters = linter_manager.exclusions.get(command_name, {}).get('parameters', {})
+                # exclusions = exclusion_parameters.get(parameter_name, {}).get('rule_exclusions', [])
+                exclusions = []
+                if func.__name__ not in exclusions:
+                    try:
+                        func(linter)
+                    except RuleError as ex:
+                        linter_manager.mark_rule_failure(self.severity)
+                        yield (_create_violation_msg(ex, 'repo, src, tgt'),
+                               ('src', 'tgt'),
+                               func.__name__)
+
+            linter_manager.add_rule('commands_test', func.__name__, wrapper, self.severity)
+
+        add_to_linter.linter_rule = True
+        return add_to_linter
+
 # help_file_entry_rule
 class HelpFileEntryRule(BaseRule):
 
@@ -68,7 +94,7 @@ def _get_decorator(func, rule_group, print_format, severity):
     def add_to_linter(linter_manager):
         def wrapper():
             linter = linter_manager.linter
-
+            # print('enter add to linter', len(getattr(linter, rule_group)))
             for iter_entity in getattr(linter, rule_group):
                 exclusions = linter_manager.exclusions.get(iter_entity, {}).get('rule_exclusions', [])
                 if func.__name__ not in exclusions:

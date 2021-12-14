@@ -90,5 +90,51 @@ def diff_branches(repo, target, source):
     logger.info('git --no-pager diff %s..%s --name-only -- .\n', target_commit, source_commit)
 
     diff_index = target_commit.diff(source_commit)
+    return [diff.b_path for diff in diff_index]
 
+def diff_branches_detail(repo, target, source):
+    """ Returns compare results of files that have changed in a given repo between two branches.
+        Only focus on these files: _params.py, commands.py, test_*.py """
+    try:
+        import git  # pylint: disable=unused-import,unused-variable
+        import git.exc as git_exc
+        import gitdb
+    except ImportError as ex:
+        raise CLIError(ex)
+
+    from git import Repo
+    try:
+        git_repo = Repo(repo)
+    except (git_exc.NoSuchPathError, git_exc.InvalidGitRepositoryError):
+        raise CLIError('invalid git repo: {}'.format(repo))
+
+    def get_commit(branch):
+        try:
+            return git_repo.commit(branch)
+        except gitdb.exc.BadName:
+            raise CLIError('usage error, invalid branch: {}'.format(branch))
+
+    if source:
+        source_commit = get_commit(source)
+    else:
+        source_commit = git_repo.head.commit
+    target_commit = get_commit(target)
+
+    logger.info('Filtering down to modules which have changed based on:')
+    logger.info('cd %s', repo)
+    logger.info('git --no-pager diff %s..%s --name-only -- .\n', target_commit, source_commit)
+
+    diff_index = target_commit.diff(source_commit)
+    from difflib import context_diff
+    from pprint import pprint
+    for diff in diff_index:
+        filename = diff.a_path.split('/')[-1].split('.')[0]
+        if 'params' in filename or 'commands' in filename or filename.startswith('test_'):
+            lines = list(context_diff(diff.a_blob.data_stream.read().decode("utf-8").splitlines(True),
+                         diff.b_blob.data_stream.read().decode("utf-8") .splitlines(True),
+                         'Original', 'Current'))
+        for line in lines:
+            pass
+        pprint(lines)
+        # print('enter')
     return [diff.b_path for diff in diff_index]
