@@ -5,6 +5,13 @@
 # -----------------------------------------------------------------------------
 
 ENCODING = 'utf-8'
+
+# https://github.com/Azure/azure-cli/blob/dev/.github/CODEOWNERS
+CLI_OWN_MODULES = ['cloud', 'container', 'databoxedge', 'keyvault', 'monitor', 'network',
+                   'privatedns', 'profile', 'resource', 'role', 'storage', 'vm']
+
+EXCLUDE_MODULES = ['extension', 'feedback', 'util']
+
 EXCLUDE_COMMANDS = ['wait']
 
 GLOBAL_PARAMETERS = [
@@ -47,20 +54,6 @@ OTHER_PARAMETERS = [
     ['--yes', '-y'],
 ]
 
-# storage
-# 'cloud show --query profile -otsv'
-# 'storage account keys list -n {} -g {} --query "key1" -otsv'
-# 'storage account keys list -n {} -g {} --query "[0].value" -otsv'
-# 'storage account show-connection-string -n {} -g {} --query connectionString -otsv'
-# 'storage account show -n {} -g {} --query id -otsv'
-# ' --auth-mode login'
-# '{} --account-name {} --account-key {}'
-# '{} --account-name {} --account-key {}'
-# 'storage container create -n {}'
-# 'storage share create -n {}'
-# 'storage fs create -n {}'
-
-
 CMD_PATTERN = [
     # self.cmd( # test.cmd(
     r'.\w{0,}cmd\(\n',
@@ -77,11 +70,6 @@ END_PATTERN = r'(\)|checks=|,\n)'
 DOCS_END_PATTERN = r'"{3}$|\'{3}$'
 NOT_END_PATTERN = r'^(\s)+(\'|")'
 
-
-EXCLUDE_MOD = ['acs', 'apim', 'aro', 'batch', 'billing', 'cdn', 'cloud', 'dla', 'extension', 'hdinsight', 'lab',
-               'marketplaceordering', 'profile', 'rdbms', 'relay', 'servicebus', 'storage']
-OWN_MOD = ['vm', 'network', 'storage']
-
 RED = 'red'
 ORANGE = 'orange'
 GREEN = 'green'
@@ -92,9 +80,3 @@ RED_PCT = 30
 ORANGE_PCT = 60
 GREEN_PCT = 80
 BLUE_PCT = 99
-
-# https://github.com/Azure/azure-cli/blob/dev/.github/CODEOWNERS
-CLI_OWN_MODULES = ['cloud', 'container', 'databoxedge', 'keyvault', 'monitor', 'network',
-                   'privatedns', 'profile', 'resource', 'role', 'storage', 'vm']
-
-EXCLUDE_MODULES = ['extension', 'feedback', 'util']
