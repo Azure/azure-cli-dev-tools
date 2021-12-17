@@ -1,0 +1,69 @@
+{% from "_macros.j2" import render_td %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>CLI {{ description }} Coverage</title>
+    <link rel="stylesheet" type="text/css" href="component.css"/>
+    <link rel="shortcut icon" href="favicon.ico">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="./component.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>CLI {{ description }} Coverage Report
+          <span>Please scroll down to see the every module coverage.<br>
+          Any question please contact Azure Cli Team.</span>
+        </h1>
+          {% if enable_cli_own == true -%}
+          <nav class="button">
+            <a class="current-page" href="index.html">ALL</a>
+            <a href="index2.html">CLI OWN</a>'
+          </nav>
+          {% else -%}
+          <nav class="button">
+            <a href="index.html">ALL</a>
+          </nav>
+          {% endif -%}
+      </header>
+        <div class="component">
+          <h3>Date: {{ date }}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th id="th0" onclick="SortTable(this)" class="as">Module</th>
+                <th id="th1" onclick="SortTable(this)" class="as">Tested</th>
+                <th id="th2" onclick="SortTable(this)" class="as">Untested</th>
+                <th id="th3" onclick="SortTable(this)" class="as">Percentage</th>
+                <th id="th4" onclick="SortTable(this)" class="as">Percentage</th>
+                <th id="th5" onclick="SortTable(this)" class="as">Reports</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td name="td0">Total</td>
+                <td name="td1">{{ Total[0] }}</td>
+                <td name="td2">{{ Total[1] }}</td>
+                <td name="td3">{{ Total[2] }}</td>
+                {{ render_td(Total[3]) }}
+                <td name="td5">N/A</td>
+              </tr>
+              {% for module, cov in command_coverage.items() %}
+              <tr>
+                <td name="td0">{{ module }}</td>
+                <td name="td1">{{ cov[0] }}</td>
+                <td name="td2">{{ cov[1] }}</td>
+                <td name="td3">{{ cov[2] }}</td>
+                {{ render_td(cov[3]) }}
+                <td name="td5"><a href="{{ module }}.html">{{ module }} coverage report</a></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <p class="contact">This is the {{ description.lower() }} coverage report of CLI.<br>
+                             Any question please contact Azure Cli Team.</p>
+        </div>
+    </div><!-- /container -->
+  </body>
+</html>
