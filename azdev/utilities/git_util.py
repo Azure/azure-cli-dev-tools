@@ -127,14 +127,47 @@ def diff_branches_detail(repo, target, source):
     diff_index = target_commit.diff(source_commit)
     from difflib import context_diff
     from pprint import pprint
+    import re
+    parameters = []
+    commands = []
+    all = []
     for diff in diff_index:
         filename = diff.a_path.split('/')[-1].split('.')[0]
-        if 'params' in filename or 'commands' in filename or filename.startswith('test_'):
-            lines = list(context_diff(diff.a_blob.data_stream.read().decode("utf-8").splitlines(True),
-                         diff.b_blob.data_stream.read().decode("utf-8") .splitlines(True),
+        pprint(filename)
+        if 'params' in filename :
+            pattern = r'\+\s+c.argument\((.*)\)'
+            lines = list(context_diff(diff.a_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.a_blob else [],
+                         diff.b_blob.data_stream.read().decode("utf-8") .splitlines(True) if diff.b_blob else [],
                          'Original', 'Current'))
-        for line in lines:
+            for line in lines:
+                ref = re.findall(pattern, line)
+                if ref:
+                    if 'options_list' in ref[0]:
+                        sub_pattern = r'options_list=(.*)'
+                        parameter = re.findall(sub_pattern, ref[0])[0].replace('\'', '"')
+                        parameters.append(json.loads(parameter))
+                    else:
+                        parameter = '--' + ref[0].split(',')[0].strip("'").replace('_', '-')
+                        parameters.append([parameter])
+        if 'commands' in filename:
+            pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
+            ref = re.findall(pattern, line)
+            if ref:
+                command = ref[0].split(',')[0].strip("'")
+                commands.append(command)
+        if filename.startswith('test_*.py'):
+            pattern = r'\+\s+(.*)'
+            ref = re.findall(pattern, line)
+            if ref:
+                all += ref
+        if filename.startswith('test_*.yaml'):
             pass
-        pprint(lines)
-        # print('enter')
-    return [diff.b_path for diff in diff_index]
+    for opt_list in parameters:
+        for opt in opt_list:
+            for code in all:
+                if opt in code:
+                    print(f'Find parameter {} test case in {}'opt_list, code)
+                    flag = True
+                    break
+            if flag:
+                break
