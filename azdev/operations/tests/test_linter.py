@@ -63,30 +63,49 @@ lines = [
     '+         ])',
 ]
 
+
 def test_regex():
     import re
+    import json
+    from pprint import pprint
+    parameters = []
+    commands = []
+    all = []
     for line in lines:
-        parameter = ''
-        command = ''
         pattern = r'\+\s+c.argument\((.*)\)'
         ref = re.findall(pattern, line)
         if ref:
             print(ref)
             if 'options_list' in ref[0]:
-                sub_pattern = r'options_list=\[(.*)\]'
-                parameter = re.findall(sub_pattern, ref[0])[0]
-                print('para', '[' + parameter + ']')
+                sub_pattern = r'options_list=(.*)'
+                parameter = re.findall(sub_pattern, ref[0])[0].replace('\'', '"')
+                parameters.append(json.loads(parameter))
             else:
                 parameter = '--' + ref[0].split(',')[0].strip("'").replace('_', '-')
-                print('para', parameter)
+                parameters.append([parameter])
         pattern2 = r'\+\s+g.(?:\w+)?command\((.*)\)'
         ref = re.findall(pattern2, line)
         if ref:
             print(ref)
             command = ref[0].split(',')[0].strip("'")
-            print('cmd', command)
-        if parameter or command:
-            pass
+            commands.append(command)
+        pattern3 = r'\+\s+(.*)'
+        ref = re.findall(pattern3, line)
+        if ref:
+            all += ref
+    pprint(all)
+    pprint(commands)
+    pprint(parameters)
+    flag = False
+    for opt_list in parameters:
+        for opt in opt_list:
+            for code in all:
+                if opt in code:
+                    print('True', opt_list, code)
+                    flag = True
+                    break
+            if flag:
+                break
 
 
 if __name__ == '__main__':
