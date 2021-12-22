@@ -128,18 +128,24 @@ def diff_branches_detail(repo, target, source):
     from difflib import context_diff
     from pprint import pprint
     import re
+    import json
     parameters = []
     commands = []
     all = []
+    flag = False
     for diff in diff_index:
-        filename = diff.a_path.split('/')[-1].split('.')[0]
+        filename = diff.a_path.split('/')[-1]
+        print('filename: ')
         pprint(filename)
-        if 'params' in filename :
+        if 'params' in filename or 'commands' in filename or re.findall(r'test_.*.py', filename):
             pattern = r'\+\s+c.argument\((.*)\)'
             lines = list(context_diff(diff.a_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.a_blob else [],
                          diff.b_blob.data_stream.read().decode("utf-8") .splitlines(True) if diff.b_blob else [],
                          'Original', 'Current'))
-            for line in lines:
+            # print("lines: ")
+            # pprint(lines)
+        for line in lines:
+            if 'params.py' in filename:
                 ref = re.findall(pattern, line)
                 if ref:
                     if 'options_list' in ref[0]:
@@ -149,25 +155,49 @@ def diff_branches_detail(repo, target, source):
                     else:
                         parameter = '--' + ref[0].split(',')[0].strip("'").replace('_', '-')
                         parameters.append([parameter])
-        if 'commands' in filename:
-            pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
-            ref = re.findall(pattern, line)
-            if ref:
-                command = ref[0].split(',')[0].strip("'")
-                commands.append(command)
-        if filename.startswith('test_*.py'):
-            pattern = r'\+\s+(.*)'
-            ref = re.findall(pattern, line)
-            if ref:
-                all += ref
-        if filename.startswith('test_*.yaml'):
-            pass
+            if 'commands.py' in filename:
+                pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
+                ref = re.findall(pattern, line)
+                if ref:
+                    command = ref[0].split(',')[0].strip("'")
+                    commands.append(command)
+            if re.findall(r'test_.*.py', filename):
+                pattern = r'\+\s+(.*)'
+                ref = re.findall(pattern, line)
+                if ref:
+                    all += ref
+        if re.findall(r'test_.*.yaml', filename):
+            import yaml
+            print('diff.a_path', diff.a_path)
+            from azdev.utilities.path import get_cli_repo_path
+            with open(os.path.join(get_cli_repo_path(), diff.a_path)) as f:
+                records = yaml.load(f, Loader=yaml.Loader) or {}
+                for record in records['interactions']:
+                    # ['acr agentpool create']
+                    command = record['request']['headers'].get('CommandName', [''])[0]
+                    # ['-n -r']
+                    argument = record['request']['headers'].get('ParameterSetName', [''])[0]
+                    if command or argument:
+                        all.append(command + ' ' + argument)
+    print('parameters: ', parameters)
+    print('commands: ', commands)
+    print('code: ')
+    pprint(all)
     for opt_list in parameters:
         for opt in opt_list:
             for code in all:
                 if opt in code:
-                    print(f'Find parameter {} test case in {}'opt_list, code)
+                    logger.debug('Find parameter {} test case in {}'.format(parameter, code))
                     flag = True
                     break
+            else:
+                logger.error('Not Found parameter: {} test case !'.format(parameter))
             if flag:
                 break
+    for command in commands:
+        for code in all:
+            if command in code:
+                logger.debug('Find command: {} test case in {}'.format(command, code))
+                break
+        else:
+            logger.error('Not Found command: {} test case !'.format(command))
