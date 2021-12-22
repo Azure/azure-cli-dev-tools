@@ -126,24 +126,20 @@ def diff_branches_detail(repo, target, source):
 
     diff_index = target_commit.diff(source_commit)
     from difflib import context_diff
-    from pprint import pprint
     import re
     import json
     parameters = []
     commands = []
     all = []
     flag = False
+    exec_state = True
     for diff in diff_index:
         filename = diff.a_path.split('/')[-1]
-        print('filename: ')
-        pprint(filename)
         if 'params' in filename or 'commands' in filename or re.findall(r'test_.*.py', filename):
             pattern = r'\+\s+c.argument\((.*)\)'
             lines = list(context_diff(diff.a_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.a_blob else [],
                          diff.b_blob.data_stream.read().decode("utf-8") .splitlines(True) if diff.b_blob else [],
                          'Original', 'Current'))
-            # print("lines: ")
-            # pprint(lines)
         for line in lines:
             if 'params.py' in filename:
                 ref = re.findall(pattern, line)
@@ -168,7 +164,6 @@ def diff_branches_detail(repo, target, source):
                     all += ref
         if re.findall(r'test_.*.yaml', filename):
             import yaml
-            print('diff.a_path', diff.a_path)
             from azdev.utilities.path import get_cli_repo_path
             with open(os.path.join(get_cli_repo_path(), diff.a_path)) as f:
                 records = yaml.load(f, Loader=yaml.Loader) or {}
@@ -179,10 +174,9 @@ def diff_branches_detail(repo, target, source):
                     argument = record['request']['headers'].get('ParameterSetName', [''])[0]
                     if command or argument:
                         all.append(command + ' ' + argument)
-    print('parameters: ', parameters)
-    print('commands: ', commands)
-    print('code: ')
-    pprint(all)
+    logger.debug('New add parameters: {}'.format(parameters))
+    logger.debug('New add commands: {}'.format(commands))
+    logger.debug('All added code: {}'.format(all))
     for opt_list in parameters:
         for opt in opt_list:
             for code in all:
@@ -192,6 +186,7 @@ def diff_branches_detail(repo, target, source):
                     break
             else:
                 logger.error('Not Found parameter: {} test case !'.format(parameter))
+                exec_state = False
             if flag:
                 break
     for command in commands:
@@ -201,3 +196,5 @@ def diff_branches_detail(repo, target, source):
                 break
         else:
             logger.error('Not Found command: {} test case !'.format(command))
+            exec_state = False
+    return exec_state
