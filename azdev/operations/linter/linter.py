@@ -182,7 +182,6 @@ class Linter:  # pylint: disable=too-many-public-methods
         return help_entry
 
     def get_command_test(self):
-        print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')
         diff_branches_detail(repo='D:\\code\\azure-cli', target='dev', source='20141')
         return False
 
