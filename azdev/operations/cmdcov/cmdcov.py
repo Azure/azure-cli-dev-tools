@@ -162,11 +162,12 @@ class CmdcovManager:
                     records = yaml.load(f, Loader=yaml.Loader) or {}
                     for record in records['interactions']:
                         # ['acr agentpool create']
-                        command = record['request']['headers'].get('CommandName', [''])
+                        command = record['request']['headers'].get('CommandName', [''])[0]
                         # ['-n -r']
-                        argument = record['request']['headers'].get('ParameterSetName', [''])
-                        cmd = command[0] + ' ' + argument[0]
-                        self.all_tested_commands[self.selected_mod_names[idx]].append(cmd)
+                        argument = record['request']['headers'].get('ParameterSetName', [''])[0]
+                        if command or argument:
+                            cmd = command + ' ' + argument
+                            self.all_tested_commands[self.selected_mod_names[idx]].append(cmd)
 
     def _get_all_tested_commands_from_live(self):
         with open(os.path.join(self.cmdcov_path, 'tested_command.txt'), 'r') as f:
