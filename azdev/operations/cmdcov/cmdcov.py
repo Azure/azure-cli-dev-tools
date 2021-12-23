@@ -77,9 +77,11 @@ class CmdcovManager:
         # some module like vm have multiple command like vm vmss disk snapshot ...
         # pylint: disable=too-many-nested-blocks
         for _, y in self.loaded_help.items():
-            if (hasattr(y, 'command_source') and
+            if (not y.deprecate_info and
+                hasattr(y, 'command_source') and
                 y.command_source in self.selected_mod_names) or \
-                    (hasattr(y, 'command_source') and
+                    (not y.deprecate_info and
+                     hasattr(y, 'command_source') and
                      hasattr(y.command_source, 'extension_name') and
                      y.command_source.extension_name in self.selected_mod_names):
                 module = y.command_source.extension_name if hasattr(y.command_source, 'extension_name') \
@@ -126,10 +128,12 @@ class CmdcovManager:
                                          re.findall(NOT_END_PATTERN, lines[row_num + 1])):
                                     row_num += 1
                                     try:
-                                        command += re.findall(QUO_PATTERN, lines[row_num])[0][1]
+                                        cmd = re.findall(QUO_PATTERN, lines[row_num])
+                                        if cmd:
+                                            command += cmd[0][1]
                                     except Exception as e:  # pylint: disable=broad-except
-                                        # TODO
-                                        print('Exception1', row_num, self.selected_mod_names[idx], f, e)
+                                        logger.debug('Unexpected Exception', row_num,
+                                                     self.selected_mod_names[idx], f, e)
                                 elif re_idx == 3 and (row_num + 1) < total_lines \
                                         and not re.findall(DOCS_END_PATTERN, lines[row_num]):
                                     row_num += 1
