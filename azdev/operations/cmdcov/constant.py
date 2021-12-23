@@ -12,7 +12,48 @@ CLI_OWN_MODULES = ['cloud', 'container', 'databoxedge', 'keyvault', 'monitor', '
 
 EXCLUDE_MODULES = ['extension', 'feedback', 'util']
 
-EXCLUDE_COMMANDS = ['wait']
+GLOBAL_EXCLUDE_COMMANDS = ['wait']
+
+EXCLUDE_COMMANDS = {
+    'network': [
+        # No bastion to test
+        'network bastion rdp',
+        'network bastion ssh',
+        'network bastion tunnel',
+        # No dns to test
+        'network dns record-set a list',
+        'network dns record-set aaaa delete',
+        'network dns record-set aaaa list',
+        'network dns record-set aaaa show',
+        'network dns record-set aaaa update',
+        'network dns record-set caa delete',
+        'network dns record-set caa list',
+        'network dns record-set caa show',
+        'network dns record-set caa update',
+        'network dns record-set cname list',
+        'network dns record-set cname show',
+        'network dns record-set mx delete',
+        'network dns record-set mx list',
+        'network dns record-set mx show',
+        'network dns record-set mx update',
+        'network dns record-set ns delete',
+        'network dns record-set ns list',
+        'network dns record-set ns update',
+        'network dns record-set ptr delete',
+        'network dns record-set ptr list',
+        'network dns record-set ptr show',
+        'network dns record-set ptr update',
+        'network dns record-set soa show',
+        'network dns record-set srv delete',
+        'network dns record-set srv list',
+        'network dns record-set srv show',
+        'network dns record-set srv update',
+        'network dns record-set txt delete',
+        'network dns record-set txt show',
+        'network dns record-set txt update'
+    ]
+}
+
 
 GLOBAL_PARAMETERS = [
     ['--debug'],
