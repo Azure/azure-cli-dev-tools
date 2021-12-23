@@ -131,6 +131,7 @@ def diff_branches_detail(repo, target, source):
     parameters = []
     commands = []
     all = []
+    lines = []
     flag = False
     exec_state = True
     for diff in diff_index:

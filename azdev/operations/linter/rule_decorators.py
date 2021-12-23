@@ -38,7 +38,7 @@ class CommandTestRule(BaseRule):
                                ('src', 'tgt'),
                                func.__name__)
 
-            linter_manager.add_rule('commands_test', func.__name__, wrapper, self.severity)
+            linter_manager.add_rule('command_coverage', func.__name__, wrapper, self.severity)
 
         add_to_linter.linter_rule = True
         return add_to_linter
