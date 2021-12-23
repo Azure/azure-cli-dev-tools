@@ -75,15 +75,15 @@ class CmdcovManager:
         exclude_parameters = [sorted(i) for i in exclude_parameters]
 
         # some module like vm have multiple command like vm vmss disk snapshot ...
-        # pylint: disable=too-many-nested-blocks
+        # pylint: disable=too-many-nested-blocks, too-many-boolean-expressions
         for _, y in self.loaded_help.items():
-            if (not y.deprecate_info and
-                hasattr(y, 'command_source') and
-                y.command_source in self.selected_mod_names) or \
-                    (not y.deprecate_info and
-                     hasattr(y, 'command_source') and
-                     hasattr(y.command_source, 'extension_name') and
-                     y.command_source.extension_name in self.selected_mod_names):
+            if (not y.deprecate_info
+                and hasattr(y, 'command_source')
+                and y.command_source in self.selected_mod_names) or \
+               (not y.deprecate_info
+                and hasattr(y, 'command_source')
+                and hasattr(y.command_source, 'extension_name')
+                and y.command_source.extension_name in self.selected_mod_names):
                 module = y.command_source.extension_name if hasattr(y.command_source, 'extension_name') \
                     else y.command_source
                 if y.command.split()[-1] not in EXCLUDE_COMMANDS:
@@ -101,6 +101,7 @@ class CmdcovManager:
         get all tested commands from test_*.py
         """
         import re
+        # pylint: disable=too-many-nested-blocks
         for idx, path in enumerate(self.selected_mod_paths):
             test_dir = os.path.join(path, 'tests')
             files = find_files(test_dir, '*.py')
@@ -127,13 +128,9 @@ class CmdcovManager:
                                         (re_idx == 2 and (row_num + 1) < total_lines and
                                          re.findall(NOT_END_PATTERN, lines[row_num + 1])):
                                     row_num += 1
-                                    try:
-                                        cmd = re.findall(QUO_PATTERN, lines[row_num])
-                                        if cmd:
-                                            command += cmd[0][1]
-                                    except Exception as e:  # pylint: disable=broad-except
-                                        logger.debug('Unexpected Exception', row_num,
-                                                     self.selected_mod_names[idx], f, e)
+                                    cmd = re.findall(QUO_PATTERN, lines[row_num])
+                                    if cmd:
+                                        command += cmd[0][1]
                                 elif re_idx == 3 and (row_num + 1) < total_lines \
                                         and not re.findall(DOCS_END_PATTERN, lines[row_num]):
                                     row_num += 1
