@@ -19,7 +19,6 @@ from .constant import (
     CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, RED, ORANGE, GREEN,
     BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES, EXCLUDE_COMMANDS)
 
-
 logger = get_logger(__name__)
 
 
@@ -77,13 +76,13 @@ class CmdcovManager:
         # some module like vm have multiple command like vm vmss disk snapshot ...
         # pylint: disable=too-many-nested-blocks, too-many-boolean-expressions
         for _, y in self.loaded_help.items():
-            if (not y.deprecate_info
-                and hasattr(y, 'command_source')
-                and y.command_source in self.selected_mod_names) or \
-               (not y.deprecate_info
-                and hasattr(y, 'command_source')
-                and hasattr(y.command_source, 'extension_name')
-                and y.command_source.extension_name in self.selected_mod_names):
+            if (not y.deprecate_info and
+                hasattr(y, 'command_source') and
+                y.command_source in self.selected_mod_names) or \
+                    (not y.deprecate_info and
+                     hasattr(y, 'command_source') and
+                     hasattr(y.command_source, 'extension_name') and
+                     y.command_source.extension_name in self.selected_mod_names):
                 module = y.command_source.extension_name if hasattr(y.command_source, 'extension_name') \
                     else y.command_source
                 if y.command.split()[-1] not in EXCLUDE_COMMANDS:
@@ -221,8 +220,8 @@ class CmdcovManager:
             self.command_coverage['Total'][0] += count
             self.command_coverage['Total'][1] += len(self.all_untested_commands[module])
         self.command_coverage['Total'][2] = f'''{self.command_coverage["Total"][0] /
-                                                (self.command_coverage["Total"][0] +
-                                                 self.command_coverage["Total"][1]):.3%}'''
+                                                 (self.command_coverage["Total"][0] +
+                                                  self.command_coverage["Total"][1]):.3%}'''
         logger.warning(self.command_coverage)
         return self.command_coverage
 
@@ -265,8 +264,8 @@ class CmdcovManager:
             try:
                 self.command_coverage[module][1] = len(untested_commands)
                 self.command_coverage[module][2] = f'''{self.command_coverage[module][0] /
-                                                   (self.command_coverage[module][0] +
-                                                    self.command_coverage[module][1]):.3%}'''
+                                                        (self.command_coverage[module][0] +
+                                                         self.command_coverage[module][1]):.3%}'''
             except ZeroDivisionError:
                 self.command_coverage[module] = [0, 0, 'N/A']
             total_tested += self.command_coverage[module][0] if self.command_coverage[module] else 0
@@ -433,6 +432,7 @@ class CmdcovManager:
     @staticmethod
     def _browse(uri, browser_name=None):  # throws ImportError, webbrowser.Error
         """Browse uri with named browser. Default browser is customizable by $BROWSER"""
+
         def is_wsl():
             # "Official" way of detecting WSL: https://github.com/Microsoft/WSL/issues/423#issuecomment-221627364
             # Run `uname -a` to get 'release' without python
