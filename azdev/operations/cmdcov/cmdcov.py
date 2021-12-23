@@ -17,7 +17,7 @@ from azdev.utilities.path import get_azdev_repo_path, find_files
 from .constant import (
     ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS,
     CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, RED, ORANGE, GREEN,
-    BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES, EXCLUDE_COMMANDS)
+    BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES, EXCLUDE_COMMANDS, GLOBAL_EXCLUDE_COMMANDS)
 
 logger = get_logger(__name__)
 
@@ -76,16 +76,16 @@ class CmdcovManager:
         # some module like vm have multiple command like vm vmss disk snapshot ...
         # pylint: disable=too-many-nested-blocks, too-many-boolean-expressions
         for _, y in self.loaded_help.items():
-            if (not y.deprecate_info and
-                hasattr(y, 'command_source') and
-                y.command_source in self.selected_mod_names) or \
-                    (not y.deprecate_info and
-                     hasattr(y, 'command_source') and
-                     hasattr(y.command_source, 'extension_name') and
-                     y.command_source.extension_name in self.selected_mod_names):
-                module = y.command_source.extension_name if hasattr(y.command_source, 'extension_name') \
-                    else y.command_source
-                if y.command.split()[-1] not in EXCLUDE_COMMANDS:
+            if hasattr(y, 'command_source') and y.command_source in self.selected_mod_names:
+                module = y.command_source
+            elif hasattr(y, 'command_source') and hasattr(y.command_source, 'extension_name') and \
+                    y.command_source.extension_name in self.selected_mod_names:
+                module = y.command_source.extension_name
+            else:
+                continue
+            if not y.deprecate_info:
+                if y.command.split()[-1] not in GLOBAL_EXCLUDE_COMMANDS and \
+                        y.command not in EXCLUDE_COMMANDS.get(module, []):
                     if self.level == 'argument':
                         for parameter in y.parameters:
                             if sorted(parameter.name_source) not in exclude_parameters:
