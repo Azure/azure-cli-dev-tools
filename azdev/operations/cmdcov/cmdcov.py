@@ -15,9 +15,9 @@ from jinja2 import FileSystemLoader, Environment
 from knack.log import get_logger
 from azdev.utilities.path import get_azdev_repo_path, find_files
 from .constant import (
-    ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS,
-    CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, RED, ORANGE, GREEN,
-    BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES, EXCLUDE_COMMANDS, GLOBAL_EXCLUDE_COMMANDS)
+    ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS, CMD_PATTERN,
+    QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, NUMBER_SIGN_PATTERN, RED, ORANGE, GREEN, BLUE, GOLD,
+    RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES, EXCLUDE_COMMANDS, GLOBAL_EXCLUDE_COMMANDS)
 
 logger = get_logger(__name__)
 
@@ -112,6 +112,9 @@ class CmdcovManager:
                     count = 1
                     while row_num < total_lines:
                         re_idx = None
+                        if re.findall(NUMBER_SIGN_PATTERN, lines[row_num]):
+                            row_num += 1
+                            continue
                         if re.findall(CMD_PATTERN[0], lines[row_num]):
                             re_idx = 0
                         if re_idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
@@ -349,6 +352,7 @@ class CmdcovManager:
         env = Environment(loader=j2_loader)
         j2_tmpl = env.get_template('./module.j2')
         content = j2_tmpl.render(module=module,
+                                 enable_cli_own=self.enable_cli_own,
                                  date=self.date,
                                  coverage=coverage,
                                  untested_commands=untested_commands)

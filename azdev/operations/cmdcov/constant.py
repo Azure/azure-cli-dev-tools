@@ -95,6 +95,7 @@ OTHER_PARAMETERS = [
     ['--yes', '-y'],
 ]
 
+
 CMD_PATTERN = [
     # self.cmd( # test.cmd(
     r'.\w{0,}cmd\(\n',
@@ -110,6 +111,8 @@ QUO_PATTERN = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
 END_PATTERN = r'(\)|checks=|,\n)'
 DOCS_END_PATTERN = r'"{3}$|\'{3}$'
 NOT_END_PATTERN = r'^(\s)+(\'|")'
+# (# xxxx)
+NUMBER_SIGN_PATTERN = r'^\s*#.*$'
 
 RED = 'red'
 ORANGE = 'orange'
