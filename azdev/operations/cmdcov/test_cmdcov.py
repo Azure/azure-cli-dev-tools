@@ -7,7 +7,7 @@
 # pylint: disable=line-too-long
 
 import re
-from .constant import (CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN)
+from .constant import (CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, NUMBER_SIGN_PATTERN)
 
 
 def regex(line):
@@ -133,15 +133,15 @@ def test_regex4():
         '                     self.check(\'name\', \'{tmpl_02}\'), self.check(\'provisioningState\', \'Succeeded\'),\n',
         '                     self.check(\'length(distribute)\', 2),\n',
         '                     self.check(\'distribute[0].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_1\'),\n',
-        '                     self.check(\'distribute[0].location\', \'westus\'),\n'
-        '                     self.check(\'distribute[0].runOutputName\', \'img_1\'),\n'
-        '                     self.check(\'distribute[0].type\', \'ManagedImage\'),\n'
-        '                     self.check(\'distribute[1].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_2\'),\n'
-        '                     self.check(\'distribute[1].location\', \'centralus\'),\n'
-        '                     self.check(\'distribute[1].runOutputName\', \'img_2\'),\n'
-        '                     self.check(\'distribute[1].type\', \'ManagedImage\'),\n'
-        '                     self.check(\'buildTimeoutInMinutes\', 22)\n'
-        '                 ])\n'
+        '                     self.check(\'distribute[0].location\', \'westus\'),\n',
+        '                     self.check(\'distribute[0].runOutputName\', \'img_1\'),\n',
+        '                     self.check(\'distribute[0].type\', \'ManagedImage\'),\n',
+        '                     self.check(\'distribute[1].imageId\', \'/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Compute/images/img_2\'),\n',
+        '                     self.check(\'distribute[1].location\', \'centralus\'),\n',
+        '                     self.check(\'distribute[1].runOutputName\', \'img_2\'),\n',
+        '                     self.check(\'distribute[1].type\', \'ManagedImage\'),\n',
+        '                     self.check(\'buildTimeoutInMinutes\', 22)\n',
+        '                 ])\n',
         '        self.cmd(\'aks list -g {resource_group}\', checks=[\n',
         '            self.check(\'[0].type\', \'{resource_type}\'),\n',
         '            StringContainCheck(aks_name),\n',
@@ -224,6 +224,8 @@ def test_regex4():
         '    command = f\'afd origin-group update -g {resource_group_name} --profile-name {profile_name} \' ',
         '              f\'--origin-group-name {origin_group_name}\'',
         '        self.cmd(f"afd profile usage -g {resource_group} --profile-name {profile_name}", checks=usage_checks)',
+        '        # self.cmd(f"afd profile usage -g {resource_group} --profile-name {profile_name}", checks=usage_checks)',
+        '        self.cmd(f"afd profile usage -g {resource_group} --profile-name {profile_name}", checks=usage_checks) #  xxx',
     ]
     total_lines = len(lines)
     row_num = 0
@@ -231,13 +233,13 @@ def test_regex4():
     all_tested_commands = []
     while row_num < total_lines:
         cmd_idx = None
-        if re.findall(CMD_PATTERN[0], lines[row_num]):
+        if re.findall(CMD_PATTERN[0], lines[row_num]) and not re.findall(NUMBER_SIGN_PATTERN, lines[row_num]):
             cmd_idx = 0
-        if cmd_idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
+        if cmd_idx is None and re.findall(CMD_PATTERN[1], lines[row_num]) and not re.findall(NUMBER_SIGN_PATTERN, lines[row_num]):
             cmd_idx = 1
-        if cmd_idx is None and re.findall(CMD_PATTERN[2], lines[row_num]):
+        if cmd_idx is None and re.findall(CMD_PATTERN[2], lines[row_num]) and not re.findall(NUMBER_SIGN_PATTERN, lines[row_num]):
             cmd_idx = 2
-        if cmd_idx is None and re.findall(CMD_PATTERN[3], lines[row_num]):
+        if cmd_idx is None and re.findall(CMD_PATTERN[3], lines[row_num]) and not re.findall(NUMBER_SIGN_PATTERN, lines[row_num]):
             cmd_idx = 3
         if cmd_idx is not None:
             command = re.findall(CMD_PATTERN[cmd_idx], lines[row_num])[0]
@@ -270,7 +272,7 @@ def test_regex4():
             row_num += 1
     from pprint import pprint
     pprint(all_tested_commands, width=1000)
-    assert len(all_tested_commands) == 28
+    assert len(all_tested_commands) == 29
 
 
 if __name__ == '__main__':
