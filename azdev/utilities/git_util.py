@@ -134,6 +134,8 @@ def diff_branches_detail(repo, target, source):
     lines = []
     flag = False
     exec_state = True
+    import yaml
+    from azdev.utilities.path import get_cli_repo_path
     for diff in diff_index:
         filename = diff.a_path.split('/')[-1]
         if 'params' in filename or 'commands' in filename or re.findall(r'test_.*.py', filename):
@@ -141,17 +143,50 @@ def diff_branches_detail(repo, target, source):
             lines = list(context_diff(diff.a_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.a_blob else [],
                          diff.b_blob.data_stream.read().decode("utf-8") .splitlines(True) if diff.b_blob else [],
                          'Original', 'Current'))
-        for line in lines:
+        for row_num, line in enumerate(lines):
             if 'params.py' in filename:
                 ref = re.findall(pattern, line)
                 if ref:
                     if 'options_list' in ref[0]:
-                        sub_pattern = r'options_list=(.*)'
-                        parameter = re.findall(sub_pattern, ref[0])[0].replace('\'', '"')
-                        parameters.append(json.loads(parameter))
+                        # TODO
+                        sub_pattern = r'options_list=(.*)[,)]'
+                        parameter = json.loads(re.findall(sub_pattern, ref[0])[0].replace('\'', '"'))
+                        # parameters.append(json.loads(parameter))
                     else:
-                        parameter = '--' + ref[0].split(',')[0].strip("'").replace('_', '-')
-                        parameters.append([parameter])
+                        parameter = ['--' + ref[0].split(',')[0].strip("'").replace('_', '-')]
+                        # parameters.append([parameter])
+                    offset = -1
+                    while row_num > 0:
+                        row_num -= 1
+                        # '--- 156,163 ----'
+                        sub_pattern = r'--- (\d{0,}),(?:\d{0,}) ----'
+                        idx = re.findall(sub_pattern, lines[row_num])
+                        offset += 1
+                        if idx:
+                            idx = int(idx[0]) + offset
+                            print('wzl wzl wzl wzl wzl', idx)
+                            break
+                    with open(os.path.join(get_cli_repo_path(), diff.a_path)) as f:
+                        params_lines = f.readlines()
+                    while idx > 0:
+                        idx -= 1
+                        # with self.argument_context(scope) as c:
+                        # with self.argument_context('') as c
+                        sub_pattern = r'with self.argument_context\(\'?(.*)\'?\)'
+                        command = re.findall(sub_pattern, params_lines[idx])
+                        if command:
+                            if command[0] != 'scope':
+                                print('wzl wzl wzl wzl wzl', command)
+                                command = [command.strip('')]
+                                break
+                            else:
+                                # for scope in ['disk', 'snapshot']:
+                                sub_pattern = r'for scope in (.*):'
+                                command = json.loads(re.findall(sub_pattern, params_lines[idx-1])[0].replace('\'', '"'))
+                                print('wzl wzl wzl wzl wzl', command)
+                                break
+                    parameters.append([command, parameter])
+                    print(parameters)
             if 'commands.py' in filename:
                 pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
                 ref = re.findall(pattern, line)
@@ -163,9 +198,7 @@ def diff_branches_detail(repo, target, source):
                 ref = re.findall(pattern, line)
                 if ref:
                     all += ref
-        if re.findall(r'test_.*.yaml', filename):
-            import yaml
-            from azdev.utilities.path import get_cli_repo_path
+        if re.findall(r'test_.*.yaml', filename) and os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
             with open(os.path.join(get_cli_repo_path(), diff.a_path)) as f:
                 records = yaml.load(f, Loader=yaml.Loader) or {}
                 for record in records['interactions']:
@@ -178,24 +211,25 @@ def diff_branches_detail(repo, target, source):
     logger.debug('New add parameters: {}'.format(parameters))
     logger.debug('New add commands: {}'.format(commands))
     logger.debug('All added code: {}'.format(all))
-    for opt_list in parameters:
-        for opt in opt_list:
-            for code in all:
-                if opt in code:
-                    logger.debug('Find parameter {} test case in {}'.format(parameter, code))
-                    flag = True
+    for commands, opt_list in parameters:
+        for command in commands:
+            for opt in opt_list:
+                for code in all:
+                    if command in code and opt in code:
+                        logger.debug('Find {} test case in {}'.format(command+' '+opt, code))
+                        flag = True
+                        break
+                else:
+                    logger.error('Not Found {} test case !'.format(command+' '+opt))
+                    exec_state = False
+                if flag:
                     break
-            else:
-                logger.error('Not Found parameter: {} test case !'.format(parameter))
-                exec_state = False
-            if flag:
-                break
     for command in commands:
         for code in all:
             if command in code:
-                logger.debug('Find command: {} test case in {}'.format(command, code))
+                logger.debug('Find {} test case in {}'.format(command, code))
                 break
         else:
-            logger.error('Not Found command: {} test case !'.format(command))
+            logger.error('Not Found {} test case !'.format(command))
             exec_state = False
     return exec_state
