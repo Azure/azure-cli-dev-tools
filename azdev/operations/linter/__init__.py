@@ -152,7 +152,10 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                                    rule_inclusions=rules,
                                    use_ci_exclusions=ci_exclusions,
                                    min_severity=min_severity,
-                                   update_global_exclusion=update_global_exclusion)
+                                   update_global_exclusion=update_global_exclusion,
+                                   git_source=git_source,
+                                   git_target=git_target,
+                                   git_repo=git_repo)
 
     subheading('Results')
     logger.info('Running linter: %i commands, %i help entries',
