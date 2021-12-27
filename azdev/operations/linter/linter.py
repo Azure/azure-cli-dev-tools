@@ -39,7 +39,8 @@ class LinterSeverity(Enum):
 
 
 class Linter:  # pylint: disable=too-many-public-methods
-    def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None):
+    def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, git_source=None, git_target=None,
+                 git_repo=None, exclusions=None):
         self._all_yaml_help = help_file_entries
         self._loaded_help = loaded_help
         self._command_loader = command_loader
@@ -51,6 +52,10 @@ class Linter:  # pylint: disable=too-many-public-methods
             self._parameters[command_name] = set()
             for name in command.arguments:
                 self._parameters[command_name].add(name)
+        self.git_source = git_source
+        self.git_target = git_target
+        self.git_repo = git_repo
+        self.exclusions = exclusions
 
     @property
     def commands(self):
@@ -182,7 +187,8 @@ class Linter:  # pylint: disable=too-many-public-methods
         return help_entry
 
     def get_command_coverage(self):
-        exec_state = diff_branches_detail(repo='C:\\code\\azure-cli', target='dev', source='20141')
+        exec_state = diff_branches_detail(repo=self.git_repo, target=self.git_target, source=self.git_source,
+                                          exclusions=self.exclusions)
         return exec_state
 
 # pylint: disable=too-many-instance-attributes
@@ -191,12 +197,14 @@ class LinterManager:
     _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params', 'command_coverage'}
 
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, exclusions=None,
-                 rule_inclusions=None, use_ci_exclusions=None, min_severity=None, update_global_exclusion=None):
+                 rule_inclusions=None, use_ci_exclusions=None, min_severity=None, update_global_exclusion=None,
+                 git_source=None, git_target=None, git_repo=None):
         # default to running only rules of the highest severity
         self.min_severity = min_severity or LinterSeverity.get_ordered_members()[-1]
-        self.linter = Linter(command_loader=command_loader, help_file_entries=help_file_entries,
-                             loaded_help=loaded_help)
         self._exclusions = exclusions or {}
+        self.linter = Linter(command_loader=command_loader, help_file_entries=help_file_entries,
+                             loaded_help=loaded_help, git_source=git_source, git_target=git_target, git_repo=git_repo,
+                             exclusions=self._exclusions)
         self._rules = {rule_type: {} for rule_type in LinterManager._RULE_TYPES}  # initialize empty rules
         self._ci_exclusions = {}
         self._rule_inclusions = rule_inclusions

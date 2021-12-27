@@ -92,7 +92,8 @@ def diff_branches(repo, target, source):
     diff_index = target_commit.diff(source_commit)
     return [diff.b_path for diff in diff_index]
 
-def diff_branches_detail(repo, target, source):
+
+def diff_branches_detail(repo, target, source, exclusions=None):
     """ Returns compare results of files that have changed in a given repo between two branches.
         Only focus on these files: _params.py, commands.py, test_*.py """
     try:
@@ -140,20 +141,23 @@ def diff_branches_detail(repo, target, source):
         filename = diff.a_path.split('/')[-1]
         if 'params' in filename or 'commands' in filename or re.findall(r'test_.*.py', filename):
             pattern = r'\+\s+c.argument\((.*)\)'
-            lines = list(context_diff(diff.a_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.a_blob else [],
-                         diff.b_blob.data_stream.read().decode("utf-8") .splitlines(True) if diff.b_blob else [],
-                         'Original', 'Current'))
+            lines = list(
+                context_diff(diff.a_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.a_blob else [],
+                             diff.b_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.b_blob else [],
+                             'Original', 'Current'))
         for row_num, line in enumerate(lines):
             if 'params.py' in filename:
                 ref = re.findall(pattern, line)
                 if ref:
+                    param_name = ref[0].split(',')[0].strip("'")
                     if 'options_list' in ref[0]:
                         # TODO
                         sub_pattern = r'options_list=(.*)[,)]'
-                        parameter = json.loads(re.findall(sub_pattern, ref[0])[0].replace('\'', '"'))
+                        params = json.loads(re.findall(sub_pattern, ref[0])[0].replace('\'', '"'))
                         # parameters.append(json.loads(parameter))
                     else:
-                        parameter = ['--' + ref[0].split(',')[0].strip("'").replace('_', '-')]
+
+                        params = ['--' + param_name.replace('_', '-')]
                         # parameters.append([parameter])
                     offset = -1
                     while row_num > 0:
@@ -164,39 +168,80 @@ def diff_branches_detail(repo, target, source):
                         offset += 1
                         if idx:
                             idx = int(idx[0]) + offset
-                            print('wzl wzl wzl wzl wzl', idx)
                             break
-                    with open(os.path.join(get_cli_repo_path(), diff.a_path)) as f:
-                        params_lines = f.readlines()
+                    with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
+                        param_lines = f.readlines()
                     while idx > 0:
                         idx -= 1
                         # with self.argument_context(scope) as c:
                         # with self.argument_context('') as c
                         sub_pattern = r'with self.argument_context\(\'?(.*)\'?\)'
-                        command = re.findall(sub_pattern, params_lines[idx])
-                        if command:
-                            if command[0] != 'scope':
-                                print('wzl wzl wzl wzl wzl', command)
-                                command = [command.strip('')]
+                        cmds = re.findall(sub_pattern, param_lines[idx])
+                        if cmds:
+                            if cmds[0] != 'scope':
+                                cmds = [cmds.strip('')]
                                 break
                             else:
                                 # for scope in ['disk', 'snapshot']:
                                 sub_pattern = r'for scope in (.*):'
-                                command = json.loads(re.findall(sub_pattern, params_lines[idx-1])[0].replace('\'', '"'))
-                                print('wzl wzl wzl wzl wzl', command)
+                                cmds = json.loads(re.findall(sub_pattern, param_lines[idx - 1])[0].replace('\'', '"'))
                                 break
-                    parameters.append([command, parameter])
-                    print(parameters)
+                    exclude_flag = False
+                    for k, v in exclusions.items():
+                        for cmd in cmds:
+                            if cmd in k:
+                                if 'parameters' in v:
+                                    for m, n in v['parameters'].items():
+                                        if param_name in m and 'missing_parameter_coverage' in n['rule_exclusions']:
+                                            exclude_flag = True
+                                            break
+                                elif 'rule_exclusions' in v:
+                                    if 'missing_command_coverage' in v['rule_exclusions']:
+                                        exclude_flag = True
+                                        break
+                            if exclude_flag:
+                                break
+                        if exclude_flag:
+                            break
+                    if not exclude_flag:
+                        parameters.append([cmds, params])
             if 'commands.py' in filename:
                 pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
                 ref = re.findall(pattern, line)
                 if ref:
                     command = ref[0].split(',')[0].strip("'")
-                    commands.append(command)
+                    offset = -1
+                    while row_num > 0:
+                        row_num -= 1
+                        # '--- 156,163 ----'
+                        sub_pattern = r'--- (\d{0,}),(?:\d{0,}) ----'
+                        idx = re.findall(sub_pattern, lines[row_num])
+                        offset += 1
+                        if idx:
+                            idx = int(idx[0]) + offset
+                            break
+                    with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
+                        cmd_lines = f.readlines()
+                    while idx > 0:
+                        idx -= 1
+                        # with self.command_group('local-context',
+                        sub_pattern = r'with self.command_group\(\'(.*)\','
+                        group = re.findall(sub_pattern, cmd_lines[idx])
+                        if group:
+                            cmd = group[0] + ' ' + command
+                            break
+                    for k, v in exclusions.items():
+                        if cmd in k and 'rule_exclusions' in v \
+                                and 'missing_command_coverage' in v['rule_exclusions']:
+                            break
+                    else:
+                        commands.append(cmd)
+
             if re.findall(r'test_.*.py', filename):
                 pattern = r'\+\s+(.*)'
+                NUMBER_SIGN_PATTERN = r'^\+\s*#.*$'
                 ref = re.findall(pattern, line)
-                if ref:
+                if ref and not re.findall(NUMBER_SIGN_PATTERN, line):
                     all += ref
         if re.findall(r'test_.*.yaml', filename) and os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
             with open(os.path.join(get_cli_repo_path(), diff.a_path)) as f:
@@ -211,25 +256,32 @@ def diff_branches_detail(repo, target, source):
     logger.debug('New add parameters: {}'.format(parameters))
     logger.debug('New add commands: {}'.format(commands))
     logger.debug('All added code: {}'.format(all))
+    print('New add parameters: {}'.format(parameters))
+    print('New add commands: {}'.format(commands))
+    print('All added code: {}'.format(all))
     for commands, opt_list in parameters:
         for command in commands:
             for opt in opt_list:
                 for code in all:
                     if command in code and opt in code:
-                        logger.debug('Find {} test case in {}'.format(command+' '+opt, code))
+                        logger.debug("Find '{}' test case in '{}'".format(command + ' ' + opt, code))
                         flag = True
                         break
                 else:
-                    logger.error('Not Found {} test case !'.format(command+' '+opt))
+                    logger.error("Can not find '{}' test case".format(command + ' ' + opt))
+                    logger.error("Please add some scenario tests for the new parameter")
+                    logger.error("Or add the new parameter in linter_exclusions.yml")
                     exec_state = False
                 if flag:
                     break
     for command in commands:
         for code in all:
             if command in code:
-                logger.debug('Find {} test case in {}'.format(command, code))
+                logger.debug("Find '{}' test case in '{}'".format(command, code))
                 break
         else:
-            logger.error('Not Found {} test case !'.format(command))
+            logger.error("Can not find '{}' test case".format(command))
+            logger.error("Please add some scenario tests for the new command")
+            logger.error("Or add the new command in linter_exclusions.yml")
             exec_state = False
     return exec_state

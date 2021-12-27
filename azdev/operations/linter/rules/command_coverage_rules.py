@@ -4,11 +4,11 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-from ..rule_decorators import CommandTestRule
+from ..rule_decorators import CommandCoverageRule
 from ..linter import RuleError, LinterSeverity
 
 
-@CommandTestRule(LinterSeverity.HIGH)
+@CommandCoverageRule(LinterSeverity.HIGH)
 def missing_command_coverage(linter):
     if not linter.get_command_coverage():
         raise RuleError('Missing Command Coverage')
