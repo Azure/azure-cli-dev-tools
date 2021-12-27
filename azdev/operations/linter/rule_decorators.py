@@ -18,25 +18,20 @@ class BaseRule:
 
 
 # command_test_rule run once
-class CommandTestRule(BaseRule):
+class CommandCoverageRule(BaseRule):
 
     def __call__(self, func):
         def add_to_linter(linter_manager):
             def wrapper():
                 linter = linter_manager.linter
-                # for command_name in linter.commands:
-                #     for parameter_name in linter.get_command_parameters(command_name):
-                # exclusion_parameters = linter_manager.exclusions.get(command_name, {}).get('parameters', {})
-                # exclusions = exclusion_parameters.get(parameter_name, {}).get('rule_exclusions', [])
-                exclusions = []
-                if func.__name__ not in exclusions:
-                    try:
-                        func(linter)
-                    except RuleError as ex:
-                        linter_manager.mark_rule_failure(self.severity)
-                        yield (_create_violation_msg(ex, 'repo, src, tgt'),
-                               ('src', 'tgt'),
-                               func.__name__)
+                try:
+                    func(linter)
+                except RuleError as ex:
+                    linter_manager.mark_rule_failure(self.severity)
+                    yield (_create_violation_msg(ex, 'repo: {}, src: {}, tgt: {}',
+                           linter.git_repo, linter.git_source, linter.git_target),
+                           (linter.git_source, linter.git_target),
+                           func.__name__)
 
             linter_manager.add_rule('command_coverage', func.__name__, wrapper, self.severity)
 
