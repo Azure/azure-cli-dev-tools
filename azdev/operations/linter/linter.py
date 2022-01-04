@@ -191,7 +191,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
 
     def get_command_coverage(self):
         diff_index = diff_branches_detail(repo=self.git_repo, target=self.git_target, source=self.git_source)
-        commands, parameters= self._detect_new_command(diff_index)
+        commands, parameters = self._detect_new_command(diff_index)
         all_tested_command = self._detect_tested_command(diff_index)
         return self._run_command_coverage(commands, parameters, all_tested_command)
 

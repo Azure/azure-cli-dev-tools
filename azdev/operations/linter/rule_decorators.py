@@ -38,6 +38,7 @@ class CommandCoverageRule(BaseRule):
         add_to_linter.linter_rule = True
         return add_to_linter
 
+
 # help_file_entry_rule
 class HelpFileEntryRule(BaseRule):
 
