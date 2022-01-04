@@ -9,18 +9,18 @@ import os
 import time
 import yaml
 
+from knack.log import get_logger
+from knack.util import CLIError
 from azdev.operations.constant import EXCLUDE_MODULES
 from azdev.utilities import (
     heading, display, get_path_table, require_azure_cli, filter_by_git_diff)
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
-from knack.log import get_logger
-from knack.util import CLIError
 from .cmdcov import CmdcovManager
 
 logger = get_logger(__name__)
 
 
-# pylint:disable=too-many-locals, too-many-statements, too-many-branches
+# pylint:disable=too-many-locals, too-many-statements, too-many-branches, duplicate-code
 def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, level='command'):
     """
     :param modules:
@@ -84,16 +84,17 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
     # format loaded help
     loaded_help = {data.command: data for data in loaded_help if data.command}
 
-    exclusions = {}
+    linter_exclusions = {}
 
-    # collect all rule exclusions
+    # collect rule exclusions from selected mod paths
     for path in selected_mod_paths:
-        exclusion_path = os.path.join(path, 'linter_exclusions.yml')
-        if os.path.isfile(exclusion_path):
-            with open(exclusion_path) as f:
+        mod_exclusion_path = os.path.join(path, 'linter_exclusions.yml')
+        if os.path.isfile(mod_exclusion_path):
+            with open(mod_exclusion_path) as f:
                 mod_exclusions = yaml.safe_load(f)
-            merge_exclusion(exclusions, mod_exclusions or {})
+            merge_exclusions(linter_exclusions, mod_exclusions or {})
 
+    # collect rule exclusions from global exclusion paths
     global_exclusion_paths = [os.path.join(get_cli_repo_path(), 'linter_exclusions.yml')]
     try:
         global_exclusion_paths.extend([os.path.join(path, 'linter_exclusions.yml')
@@ -104,18 +105,18 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
         if os.path.isfile(path):
             with open(path) as f:
                 mod_exclusions = yaml.safe_load(f)
-            merge_exclusion(exclusions, mod_exclusions or {})
+            merge_exclusions(linter_exclusions, mod_exclusions or {})
 
     cmdcov_manager = CmdcovManager(selected_mod_names=selected_mod_names,
                                    selected_mod_paths=selected_mod_paths,
                                    loaded_help=loaded_help,
                                    level=level,
                                    enable_cli_own=enable_cli_own,
-                                   exclusions=exclusions)
+                                   exclusions=linter_exclusions)
     cmdcov_manager.run()
 
 # pylint: disable=line-too-long
-def merge_exclusion(left_exclusion, right_exclusion):
+def merge_exclusions(left_exclusion, right_exclusion):
     for command_name, value in right_exclusion.items():
         for rule_name in value.get('rule_exclusions', []):
             left_exclusion.setdefault(command_name, {}).setdefault('rule_exclusions', []).append(rule_name)
