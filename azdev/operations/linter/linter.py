@@ -4,18 +4,20 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-import os
 import inspect
-from importlib import import_module
-from pkgutil import iter_modules
-from enum import Enum
+import json
+import os
+import re
 import yaml
-from knack.log import get_logger
 
+from .util import share_element, exclude_commands, LinterError
 from azdev.utilities import diff_branches_detail
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
-from .util import share_element, exclude_commands, LinterError
-
+from difflib import context_diff
+from enum import Enum
+from importlib import import_module
+from knack.log import get_logger
+from pkgutil import iter_modules
 
 PACKAGE_NAME = 'azdev.operations.linter'
 _logger = get_logger(__name__)
@@ -187,13 +189,253 @@ class Linter:  # pylint: disable=too-many-public-methods
         return help_entry
 
     def get_command_coverage(self):
-        exec_state = diff_branches_detail(repo=self.git_repo, target=self.git_target, source=self.git_source,
-                                          exclusions=self.exclusions)
+        diff_index = diff_branches_detail(repo=self.git_repo, target=self.git_target, source=self.git_source)
+        commands, parameters= self._detect_new_command(diff_index)
+        all_tested_command = self._detect_tested_command(diff_index)
+        return self._run_command_coverage(commands, parameters, all_tested_command)
+
+    def _detect_new_command(self, diff_index):
+        parameters = []
+        commands = []
+        lines = []
+        exclude_comands = []
+        exclude_parameters = []
+        for k, v in self.exclusions.items():
+            if 'parameters' in v:
+                for m, n in v['parameters'].items():
+                    if 'missing_parameter_coverage' in n['rule_exclusions']:
+                        exclude_parameters.append((k, m))
+            elif 'rule_exclusions' in v:
+                if 'missing_command_coverage' in v['rule_exclusions']:
+                    exclude_comands.append(k)
+        _logger.debug('exclude_parameters: {}'.format(exclude_parameters))
+        _logger.debug('exclude_comands: {}'.format(exclude_comands))
+        print('exclude_parameters: {}'.format(exclude_parameters))
+        print('exclude_comands: {}'.format(exclude_comands))
+
+        for diff in diff_index:
+            filename = diff.a_path.split('/')[-1]
+            if 'params' in filename or 'commands' in filename:
+                # Match ` + c.argument('xxx')`
+                pattern = r'\+\s+c.argument\((.*)\)'
+                lines = list(
+                    context_diff(diff.a_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.a_blob else [],
+                                 diff.b_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.b_blob else [],
+                                 'Original', 'Current'))
+            for row_num, line in enumerate(lines):
+                if 'params.py' in filename:
+                    ref = re.findall(pattern, line)
+                    if ref:
+                        param_name = ref[0].split(',')[0].strip("'")
+                        if 'options_list' in ref[0]:
+                            # Match ` options_list=xxx, or options_list=xxx)`
+                            sub_pattern = r'options_list=(.*)[,)]'
+                            params = json.loads(re.findall(sub_pattern, ref[0])[0].replace('\'', '"'))
+                        else:
+                            # if options_list not exist, generate by parameter name
+                            params = ['--' + param_name.replace('_', '-')]
+                        offset = -1
+                        while row_num > 0:
+                            row_num -= 1
+                            # Match row num '--- 156,163 ----'
+                            sub_pattern = r'--- (\d{0,}),(?:\d{0,}) ----'
+                            idx = re.findall(sub_pattern, lines[row_num])
+                            offset += 1
+                            if idx:
+                                idx = int(idx[0]) + offset
+                                break
+                        with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
+                            param_lines = f.readlines()
+                        while idx > 0:
+                            idx -= 1
+                            # Match `with self.argument_context(scope) as c:`
+                            # Match `with self.argument_context('') as c:`
+                            sub_pattern = r'with self.argument_context\(\'?(.*)\'?\)'
+                            cmds = re.findall(sub_pattern, param_lines[idx])
+                            if cmds:
+                                if cmds[0] != 'scope':
+                                    cmds = [cmds.strip('')]
+                                    break
+                                else:
+                                    # Match `for scope in ['disk', 'snapshot']`:
+                                    sub_pattern = r'for scope in (.*):'
+                                    cmds = json.loads(
+                                        re.findall(sub_pattern, param_lines[idx - 1])[0].replace('\'', '"'))
+                                    break
+                        exclude_flag = False
+                        for cmd in cmds:
+                            if cmd not in exclude_comands and \
+                                    not list(filter(lambda x: cmd in x[0] and param_name in x[1], exclude_parameters)):
+                                parameters.append([cmd, params])
+                                continue
+
+                if 'commands.py' in filename:
+                    # Match `+ g.command(xxx) or + g.show_command(xxx)`
+                    pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
+                    ref = re.findall(pattern, line)
+                    if ref:
+                        command = ref[0].split(',')[0].strip("'")
+                        offset = -1
+                        while row_num > 0:
+                            row_num -= 1
+                            # Match row num '--- 156,163 ----'
+                            sub_pattern = r'--- (\d{0,}),(?:\d{0,}) ----'
+                            idx = re.findall(sub_pattern, lines[row_num])
+                            offset += 1
+                            if idx:
+                                idx = int(idx[0]) + offset
+                                break
+                        with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
+                            cmd_lines = f.readlines()
+                        while idx > 0:
+                            idx -= 1
+                            # Match `with self.command_group('local-context',`
+                            sub_pattern = r'with self.command_group\(\'(.*)\','
+                            group = re.findall(sub_pattern, cmd_lines[idx])
+                            if group:
+                                cmd = group[0] + ' ' + command
+                                break
+                        if cmd not in exclude_comands:
+                            commands.append(cmd)
+        _logger.debug('New add parameters: {}'.format(parameters))
+        _logger.debug('New add commands: {}'.format(commands))
+        print('New add parameters: {}'.format(parameters))
+        print('New add commands: {}'.format(commands))
+        return commands, parameters
+
+    def _get_all_tested_commands_from_regex(self, lines):
+        """
+        get all tested commands from test_*.py
+        """
+        # TODO import from cmdcov
+        # from .constant import CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN
+        CMD_PATTERN = [
+            # self.cmd( # test.cmd(
+            r'.\w{0,}cmd\(\n',
+            # self.cmd('xxxx or self.cmd("xxx or test.cmd(' or fstring
+            r'.\w{0,}cmd\(f?(?:\'|")(.*)(?:\'|")',
+            # xxxcmd = '' or xxxcmd = "" or xxxcmd1 or ***Command or ***command or fstring
+            r'(?:cmd|command|Command)\d* = f?(?:\'|"){1}([a-z]+.*)(?:\'|"){1}',
+            # r'self.cmd\(\n', r'cmd = (?:\'|")(.*)(?:\'|")(.*)?',
+            # xxxcmd = """ or xxxcmd = ''' or xxxcmd1
+            r'cmd\d* = (?:"{3}|\'{3})(.*)',
+        ]
+        # Match content in '' or ""
+        QUO_PATTERN = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
+        # Match end: ) or checks= or ,\n
+        END_PATTERN = r'(\)|checks=|,\n)'
+        # Match doc string ''' or """
+        DOCS_END_PATTERN = r'"{3}$|\'{3}$'
+        # Match start with ' or "
+        NOT_END_PATTERN = r'^\+(\s)+(\'|")'
+        # (# xxxx)
+        NUMBER_SIGN_PATTERN = r'^\s*#.*$'
+        # pylint: disable=too-many-nested-blocks
+        all_tested_commands = []
+        total_lines = len(lines)
+        row_num = 0
+        count = 1
+        while row_num < total_lines:
+            re_idx = None
+            if re.findall(NUMBER_SIGN_PATTERN, lines[row_num]):
+                row_num += 1
+                continue
+            if re.findall(CMD_PATTERN[0], lines[row_num]):
+                re_idx = 0
+            if re_idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
+                re_idx = 1
+            if re_idx is None and re.findall(CMD_PATTERN[2], lines[row_num]):
+                re_idx = 2
+            if re_idx is None and re.findall(CMD_PATTERN[3], lines[row_num]):
+                re_idx = 3
+            if re_idx is not None:
+                command = re.findall(CMD_PATTERN[re_idx], lines[row_num])[0]
+                while row_num < total_lines:
+                    if (re_idx in [0, 1] and not re.findall(END_PATTERN, lines[row_num])) or \
+                            (re_idx == 2 and (row_num + 1) < total_lines and
+                             re.findall(NOT_END_PATTERN, lines[row_num + 1])):
+                        row_num += 1
+                        cmd = re.findall(QUO_PATTERN, lines[row_num])
+                        if cmd:
+                            command += cmd[0][1]
+                    elif re_idx == 3 and (row_num + 1) < total_lines \
+                            and not re.findall(DOCS_END_PATTERN, lines[row_num]):
+                        row_num += 1
+                        command += lines[row_num][:-1]
+                    else:
+                        command = command + ' ' + str(count)
+                        all_tested_commands.append(command)
+                        row_num += 1
+                        count += 1
+                        break
+                else:
+                    command = command + ' ' + str(count)
+                    all_tested_commands.append(command)
+                    row_num += 1
+                    count += 1
+                    break
+            else:
+                row_num += 1
+        return all_tested_commands
+
+    def _detect_tested_command(self, diff_index):
+        all_tested_command = []
+        # get tested command by regex
+        for diff in diff_index:
+            filename = diff.a_path.split('/')[-1]
+            if re.findall(r'test_.*.py', filename) and os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
+                with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
+                    lines = f.readlines()
+                ref = self._get_all_tested_commands_from_regex(lines)
+                all_tested_command += ref
+        # get tested command by recording file
+        if re.findall(r'test_.*.yaml', filename) and os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
+            with open(os.path.join(get_cli_repo_path(), diff.a_path)) as f:
+                records = yaml.load(f, Loader=yaml.Loader) or {}
+                for record in records['interactions']:
+                    # parse command ['acr agentpool create']
+                    command = record['request']['headers'].get('CommandName', [''])[0]
+                    # parse argument ['-n -r']
+                    argument = record['request']['headers'].get('ParameterSetName', [''])[0]
+                    if command or argument:
+                        all_tested_command.append(command + ' ' + argument)
+        _logger.debug('All tested command: {}'.format(all_tested_command))
+        print('All tested command: {}'.format(all_tested_command))
+        return all_tested_command
+
+    def _run_command_coverage(self, commands, parameters, all_tested_command):
+        flag = False
+        exec_state = True
+        for commands, opt_list in parameters:
+            for command in commands:
+                for opt in opt_list:
+                    for code in all_tested_command:
+                        if command in code and opt in code:
+                            _logger.debug("Find '{}' test case in '{}'".format(command + ' ' + opt, code))
+                            flag = True
+                            break
+                    else:
+                        _logger.error("Can not find '{}' test case".format(command + ' ' + opt))
+                        _logger.error("Please add some scenario tests for the new parameter")
+                        _logger.error("Or add the new parameter in linter_exclusions.yml")
+                        exec_state = False
+                    if flag:
+                        break
+        for command in commands:
+            for code in all_tested_command:
+                if command in code:
+                    _logger.debug("Find '{}' test case in '{}'".format(command, code))
+                    break
+            else:
+                _logger.error("Can not find '{}' test case".format(command))
+                _logger.error("Please add some scenario tests for the new command")
+                _logger.error("Or add the new command in linter_exclusions.yml")
+                exec_state = False
         return exec_state
+
 
 # pylint: disable=too-many-instance-attributes
 class LinterManager:
-
     _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params', 'command_coverage'}
 
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, exclusions=None,
@@ -337,7 +579,7 @@ class LinterManager:
 
                         # pylint: disable=duplicate-string-formatting-argument
                         print('- {} FAIL{} - {}{}{} severity: {}'.format(RED, RESET, sev_color,
-                                                                         severity_str, RESET, rule_name,))
+                                                                         severity_str, RESET, rule_name, ))
                         for violation_msg, entity_name, name in violations:
                             print(violation_msg)
                             self._save_violations(entity_name, name)
@@ -360,7 +602,9 @@ class LinterManager:
             self._violiations.setdefault(command_name, {}).setdefault('rule_exclusions', []).append(rule_name)
         else:
             command_name, param_name = entity_name
-            self._violiations.setdefault(command_name, {}).setdefault('parameters', {}).setdefault(param_name, {}).setdefault('rule_exclusions', []).append(rule_name)
+            self._violiations.setdefault(command_name, {}).setdefault('parameters', {}).setdefault(param_name,
+                                                                                                   {}).setdefault(
+                'rule_exclusions', []).append(rule_name)
 
 
 class RuleError(Exception):
@@ -375,6 +619,7 @@ class LinterScope:
     Linter Context manager. used when calling a rule function. Allows substitution of main linter for a linter
     that takes into account any applicable exclusions, if applicable.
     """
+
     def __init__(self, linter_manager, linter_callable):
         self.linter_manager = linter_manager
         self.linter = linter_callable()
