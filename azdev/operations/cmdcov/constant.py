@@ -107,9 +107,13 @@ CMD_PATTERN = [
     # xxxcmd = """ or xxxcmd = ''' or xxxcmd1
     r'cmd\d* = (?:"{3}|\'{3})(.*)',
 ]
+# Match content in '' or ""
 QUO_PATTERN = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
+# Match end: ) or checks= or ,\n
 END_PATTERN = r'(\)|checks=|,\n)'
+# Match doc string ''' or """
 DOCS_END_PATTERN = r'"{3}$|\'{3}$'
+# Match start with ' or "
 NOT_END_PATTERN = r'^(\s)+(\'|")'
 # (# xxxx)
 NUMBER_SIGN_PATTERN = r'^\s*#.*$'
