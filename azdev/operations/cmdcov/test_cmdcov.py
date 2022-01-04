@@ -7,7 +7,8 @@
 # pylint: disable=line-too-long
 
 import re
-from .constant import (CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, NUMBER_SIGN_PATTERN)
+from azdev.operations.constant import (
+    CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, NUMBER_SIGN_PATTERN)
 
 
 def regex(line):

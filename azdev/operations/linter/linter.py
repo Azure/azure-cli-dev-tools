@@ -4,21 +4,21 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+from difflib import context_diff
+from enum import Enum
+from importlib import import_module
 import inspect
 import json
 import os
 import re
+from pkgutil import iter_modules
 import yaml
+from knack.log import get_logger
 
-from .util import share_element, exclude_commands, LinterError
 from azdev.operations.regex import get_all_tested_commands_from_regex
 from azdev.utilities import diff_branches_detail
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
-from difflib import context_diff
-from enum import Enum
-from importlib import import_module
-from knack.log import get_logger
-from pkgutil import iter_modules
+from .util import share_element, exclude_commands, LinterError
 
 PACKAGE_NAME = 'azdev.operations.linter'
 _logger = get_logger(__name__)
@@ -41,7 +41,7 @@ class LinterSeverity(Enum):
         return sorted(LinterSeverity, key=lambda sev: sev.value)
 
 
-class Linter:  # pylint: disable=too-many-public-methods
+class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attributes
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, git_source=None, git_target=None,
                  git_repo=None, exclusions=None):
         self._all_yaml_help = help_file_entries
@@ -195,24 +195,29 @@ class Linter:  # pylint: disable=too-many-public-methods
         all_tested_command = self._detect_tested_command(diff_index)
         return self._run_command_coverage(commands, parameters, all_tested_command)
 
+    # pylint: disable=too-many-locals, too-many-nested-blocks, too-many-branches, too-many-statements
     def _detect_new_command(self, diff_index):
+        """
+        exclude_comands: List[str]
+        exclude_parameters: List[tuple[str, str]]
+        commands: List[str]
+        parameters: List[str, List[str]]
+        """
         parameters = []
         commands = []
         lines = []
         exclude_comands = []
         exclude_parameters = []
-        for k, v in self.exclusions.items():
+        for c, v in self.exclusions.items():
             if 'parameters' in v:
-                for m, n in v['parameters'].items():
-                    if 'missing_parameter_coverage' in n['rule_exclusions']:
-                        exclude_parameters.append((k, m))
+                for p, r in v['parameters'].items():
+                    if 'missing_parameter_coverage' in r['rule_exclusions']:
+                        exclude_parameters.append((c, p))
             elif 'rule_exclusions' in v:
                 if 'missing_command_coverage' in v['rule_exclusions']:
-                    exclude_comands.append(k)
-        _logger.debug('exclude_parameters: {}'.format(exclude_parameters))
-        _logger.debug('exclude_comands: {}'.format(exclude_comands))
-        print('exclude_parameters: {}'.format(exclude_parameters))
-        print('exclude_comands: {}'.format(exclude_comands))
+                    exclude_comands.append(c)
+        _logger.debug('exclude_parameters: %s', exclude_parameters)
+        _logger.debug('exclude_comands: %s', exclude_comands)
 
         for diff in diff_index:
             filename = diff.a_path.split('/')[-1]
@@ -256,17 +261,15 @@ class Linter:  # pylint: disable=too-many-public-methods
                             if cmds:
                                 if cmds[0] != 'scope':
                                     cmds = [cmds.strip('')]
-                                    break
                                 else:
                                     # Match `for scope in ['disk', 'snapshot']`:
                                     sub_pattern = r'for scope in (.*):'
                                     cmds = json.loads(
                                         re.findall(sub_pattern, param_lines[idx - 1])[0].replace('\'', '"'))
-                                    break
-                        exclude_flag = False
+                                break
                         for cmd in cmds:
                             if cmd not in exclude_comands and \
-                                    not list(filter(lambda x: cmd in x[0] and param_name in x[1], exclude_parameters)):
+                                    not list(filter(lambda x, c=cmd, p=param_name: c in x[0] and p in x[1], exclude_parameters)):  # pylint: disable=line-too-long
                                 parameters.append([cmd, params])
                                 continue
 
@@ -298,13 +301,12 @@ class Linter:  # pylint: disable=too-many-public-methods
                                 break
                         if cmd not in exclude_comands:
                             commands.append(cmd)
-        _logger.debug('New add parameters: {}'.format(parameters))
-        _logger.debug('New add commands: {}'.format(commands))
-        print('New add parameters: {}'.format(parameters))
-        print('New add commands: {}'.format(commands))
+        _logger.debug('New add parameters: %s', parameters)
+        _logger.debug('New add commands: %s', commands)
         return commands, parameters
 
-    def _detect_tested_command(self, diff_index):
+    @staticmethod
+    def _detect_tested_command(diff_index):
         all_tested_command = []
         # get tested command by regex
         for diff in diff_index:
@@ -314,48 +316,49 @@ class Linter:  # pylint: disable=too-many-public-methods
                     lines = f.readlines()
                 ref = get_all_tested_commands_from_regex(lines)
                 all_tested_command += ref
-        # get tested command by recording file
-        if re.findall(r'test_.*.yaml', filename) and os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
-            with open(os.path.join(get_cli_repo_path(), diff.a_path)) as f:
-                records = yaml.load(f, Loader=yaml.Loader) or {}
-                for record in records['interactions']:
-                    # parse command ['acr agentpool create']
-                    command = record['request']['headers'].get('CommandName', [''])[0]
-                    # parse argument ['-n -r']
-                    argument = record['request']['headers'].get('ParameterSetName', [''])[0]
-                    if command or argument:
-                        all_tested_command.append(command + ' ' + argument)
-        _logger.debug('All tested command: {}'.format(all_tested_command))
-        print('All tested command: {}'.format(all_tested_command))
+            # get tested command by recording file
+            if re.findall(r'test_.*.yaml', filename) and os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
+                with open(os.path.join(get_cli_repo_path(), diff.a_path)) as f:
+                    records = yaml.load(f, Loader=yaml.Loader) or {}
+                    for record in records['interactions']:
+                        # parse command ['acr agentpool create']
+                        command = record['request']['headers'].get('CommandName', [''])[0]
+                        # parse argument ['-n -r']
+                        argument = record['request']['headers'].get('ParameterSetName', [''])[0]
+                        if command or argument:
+                            all_tested_command.append(command + ' ' + argument)
+        _logger.debug('All tested command: %s', all_tested_command)
         return all_tested_command
 
-    def _run_command_coverage(self, commands, parameters, all_tested_command):
+    @staticmethod
+    def _run_command_coverage(commands, parameters, all_tested_command):
         flag = False
         exec_state = True
-        for commands, opt_list in parameters:
-            for command in commands:
+        for p_commands, opt_list in parameters:
+            for command in p_commands:
                 for opt in opt_list:
                     for code in all_tested_command:
                         if command in code and opt in code:
-                            _logger.debug("Find '{}' test case in '{}'".format(command + ' ' + opt, code))
+                            _logger.debug("Find '%s' test case in '%s'", command + ' ' + opt, code)
                             flag = True
                             break
                     else:
-                        _logger.error("Can not find '{}' test case".format(command + ' ' + opt))
+                        _logger.error("Can not find '%s' test case", command + ' ' + opt)
                         _logger.error("Please add some scenario tests for the new parameter")
-                        _logger.error("Or add the new parameter in linter_exclusions.yml")
+                        _logger.error(
+                            "Or add the parameter with missing_parameter_coverage rule in linter_exclusions.yml")
                         exec_state = False
                     if flag:
                         break
         for command in commands:
             for code in all_tested_command:
                 if command in code:
-                    _logger.debug("Find '{}' test case in '{}'".format(command, code))
+                    _logger.debug("Find '%s' test case in '%s'", command, code)
                     break
             else:
-                _logger.error("Can not find '{}' test case".format(command))
+                _logger.error("Can not find '%s' test case", command)
                 _logger.error("Please add some scenario tests for the new command")
-                _logger.error("Or add the new command in linter_exclusions.yml")
+                _logger.error("Or add the command with missing_command_coverage rule in linter_exclusions.yml")
                 exec_state = False
         return exec_state
 

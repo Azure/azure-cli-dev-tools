@@ -68,6 +68,11 @@ class CmdcovManager:
 
     def _get_all_commands(self):
         """
+        GLOBAL_EXCLUDE_COMMANDS: List[str]
+        EXCLUDE_COMMANDS: Dict[str: List[str]]
+        exclusions_comands: List[str]
+        exclude_parameters: List[List[str]]
+        exclusions_parameters: List[Tuple[str, str]]
         get all commands from loaded_help
         """
         exclude_parameters = []
@@ -77,16 +82,16 @@ class CmdcovManager:
 
         # some module like vm have multiple command like vm vmss disk snapshot ...
         # pylint: disable=too-many-nested-blocks, too-many-boolean-expressions
-        exclude_comands = []
-        exclude_parameters = []
-        for k, v in self.exclusions.items():
+        exclusions_comands = []
+        exclusions_parameters = []
+        for c, v in self.exclusions.items():
             if 'parameters' in v:
-                for m, n in v['parameters'].items():
-                    if 'missing_parameter_coverage' in n['rule_exclusions']:
-                        exclude_parameters.append((k, m))
+                for p, r in v['parameters'].items():
+                    if 'missing_parameter_coverage' in r['rule_exclusions']:
+                        exclusions_parameters.append((c, p))
             elif 'rule_exclusions' in v:
                 if 'missing_command_coverage' in v['rule_exclusions']:
-                    exclude_comands.append(k)
+                    exclusions_comands.append(c)
         for _, y in self.loaded_help.items():
             if hasattr(y, 'command_source') and y.command_source in self.selected_mod_names:
                 module = y.command_source
@@ -98,7 +103,7 @@ class CmdcovManager:
             if not y.deprecate_info:
                 if y.command.split()[-1] not in GLOBAL_EXCLUDE_COMMANDS and \
                         y.command not in EXCLUDE_COMMANDS.get(module, []) and \
-                        y.command not in exclude_comands:
+                        y.command not in exclusions_comands:
                     if self.level == 'argument':
                         for parameter in y.parameters:
                             # TODO support linter_exclusions.yml
