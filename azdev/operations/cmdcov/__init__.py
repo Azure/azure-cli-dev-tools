@@ -115,6 +115,7 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
                                    exclusions=linter_exclusions)
     cmdcov_manager.run()
 
+
 # pylint: disable=line-too-long
 def merge_exclusions(left_exclusion, right_exclusion):
     for command_name, value in right_exclusion.items():
@@ -123,6 +124,7 @@ def merge_exclusions(left_exclusion, right_exclusion):
         for param_name in value.get('parameters', {}):
             for rule_name in value.get('parameters', {}).get(param_name, {}).get('rule_exclusions', []):
                 left_exclusion.setdefault(command_name, {}).setdefault('parameters', {}).setdefault(param_name, {}).setdefault('rule_exclusions', []).append(rule_name)
+
 
 if __name__ == '__main__':
     pass

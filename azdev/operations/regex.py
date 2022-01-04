@@ -8,6 +8,7 @@ import re
 from azdev.operations.constant import (
     CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, NUMBER_SIGN_PATTERN)
 
+
 def get_all_tested_commands_from_regex(lines):
     """
     get all tested commands from test_*.py
