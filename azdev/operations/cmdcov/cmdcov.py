@@ -27,7 +27,7 @@ logger = get_logger(__name__)
 class CmdcovManager:
 
     def __init__(self, selected_mod_names=None, selected_mod_paths=None, loaded_help=None, level=None,
-                 enable_cli_own=None):
+                 enable_cli_own=None, exclusions=None):
         self.selected_mod_names = selected_mod_names
         self.selected_mod_paths = selected_mod_paths
         self.loaded_help = loaded_help
@@ -42,6 +42,7 @@ class CmdcovManager:
         self.report_date = '-'.join(self.date.replace(':', '-').split())
         self.cmdcov_path = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov')
         self.template_path = os.path.join(self.cmdcov_path, 'template')
+        self.exclusions = exclusions
 
     def run(self):
         self._get_all_commands()
@@ -76,6 +77,16 @@ class CmdcovManager:
 
         # some module like vm have multiple command like vm vmss disk snapshot ...
         # pylint: disable=too-many-nested-blocks, too-many-boolean-expressions
+        exclude_comands = []
+        exclude_parameters = []
+        for k, v in self.exclusions.items():
+            if 'parameters' in v:
+                for m, n in v['parameters'].items():
+                    if 'missing_parameter_coverage' in n['rule_exclusions']:
+                        exclude_parameters.append((k, m))
+            elif 'rule_exclusions' in v:
+                if 'missing_command_coverage' in v['rule_exclusions']:
+                    exclude_comands.append(k)
         for _, y in self.loaded_help.items():
             if hasattr(y, 'command_source') and y.command_source in self.selected_mod_names:
                 module = y.command_source
@@ -86,9 +97,11 @@ class CmdcovManager:
                 continue
             if not y.deprecate_info:
                 if y.command.split()[-1] not in GLOBAL_EXCLUDE_COMMANDS and \
-                        y.command not in EXCLUDE_COMMANDS.get(module, []):
+                        y.command not in EXCLUDE_COMMANDS.get(module, []) and \
+                        y.command not in exclude_comands:
                     if self.level == 'argument':
                         for parameter in y.parameters:
+                            # TODO support linter_exclusions.yml
                             if sorted(parameter.name_source) not in exclude_parameters:
                                 opt_list = [opt for opt in parameter.name_source if opt.startswith('-')]
                                 if opt_list:
