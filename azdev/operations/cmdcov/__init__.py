@@ -10,7 +10,7 @@ import time
 from knack.log import get_logger
 from azdev.utilities import (
     heading, display, get_path_table, require_azure_cli, filter_by_git_diff)
-from .constant import EXCLUDE_MODULES
+from azdev.operations.constant import EXCLUDE_MODULES
 from .cmdcov import CmdcovManager
 
 logger = get_logger(__name__)

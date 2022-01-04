@@ -13,11 +13,12 @@ import yaml
 
 from jinja2 import FileSystemLoader, Environment
 from knack.log import get_logger
+from azdev.operations.regex import get_all_tested_commands_from_regex
 from azdev.utilities.path import get_azdev_repo_path, find_files
-from .constant import (
-    ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS, CMD_PATTERN,
-    QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, NUMBER_SIGN_PATTERN, RED, ORANGE, GREEN, BLUE, GOLD,
-    RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES, EXCLUDE_COMMANDS, GLOBAL_EXCLUDE_COMMANDS)
+from azdev.operations.constant import (
+    ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS,
+    RED, ORANGE, GREEN, BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES,
+    EXCLUDE_COMMANDS, GLOBAL_EXCLUDE_COMMANDS)
 
 logger = get_logger(__name__)
 
@@ -99,7 +100,6 @@ class CmdcovManager:
         """
         get all tested commands from test_*.py
         """
-        import re
         # pylint: disable=too-many-nested-blocks
         for idx, path in enumerate(self.selected_mod_paths):
             test_dir = os.path.join(path, 'tests')
@@ -107,50 +107,8 @@ class CmdcovManager:
             for f in files:
                 with open(os.path.join(test_dir, f), 'r', encoding=ENCODING) as f:
                     lines = f.readlines()
-                    total_lines = len(lines)
-                    row_num = 0
-                    count = 1
-                    while row_num < total_lines:
-                        re_idx = None
-                        if re.findall(NUMBER_SIGN_PATTERN, lines[row_num]):
-                            row_num += 1
-                            continue
-                        if re.findall(CMD_PATTERN[0], lines[row_num]):
-                            re_idx = 0
-                        if re_idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
-                            re_idx = 1
-                        if re_idx is None and re.findall(CMD_PATTERN[2], lines[row_num]):
-                            re_idx = 2
-                        if re_idx is None and re.findall(CMD_PATTERN[3], lines[row_num]):
-                            re_idx = 3
-                        if re_idx is not None:
-                            command = re.findall(CMD_PATTERN[re_idx], lines[row_num])[0]
-                            while row_num < total_lines:
-                                if (re_idx in [0, 1] and not re.findall(END_PATTERN, lines[row_num])) or \
-                                        (re_idx == 2 and (row_num + 1) < total_lines and
-                                         re.findall(NOT_END_PATTERN, lines[row_num + 1])):
-                                    row_num += 1
-                                    cmd = re.findall(QUO_PATTERN, lines[row_num])
-                                    if cmd:
-                                        command += cmd[0][1]
-                                elif re_idx == 3 and (row_num + 1) < total_lines \
-                                        and not re.findall(DOCS_END_PATTERN, lines[row_num]):
-                                    row_num += 1
-                                    command += lines[row_num][:-1]
-                                else:
-                                    command = command + ' ' + str(count)
-                                    self.all_tested_commands[self.selected_mod_names[idx]].append(command)
-                                    row_num += 1
-                                    count += 1
-                                    break
-                            else:
-                                command = command + ' ' + str(count)
-                                self.all_tested_commands[self.selected_mod_names[idx]].append(command)
-                                row_num += 1
-                                count += 1
-                                break
-                        else:
-                            row_num += 1
+                ref = get_all_tested_commands_from_regex(lines)
+                self.all_tested_commands[self.selected_mod_names[idx]] += ref
 
     def _get_all_tested_commands_from_record(self):
         """

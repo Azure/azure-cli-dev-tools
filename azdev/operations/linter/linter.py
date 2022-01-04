@@ -11,6 +11,7 @@ import re
 import yaml
 
 from .util import share_element, exclude_commands, LinterError
+from azdev.operations.regex import get_all_tested_commands_from_regex
 from azdev.utilities import diff_branches_detail
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 from difflib import context_diff
@@ -303,81 +304,6 @@ class Linter:  # pylint: disable=too-many-public-methods
         print('New add commands: {}'.format(commands))
         return commands, parameters
 
-    def _get_all_tested_commands_from_regex(self, lines):
-        """
-        get all tested commands from test_*.py
-        """
-        # TODO import from cmdcov
-        # from .constant import CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN
-        CMD_PATTERN = [
-            # self.cmd( # test.cmd(
-            r'.\w{0,}cmd\(\n',
-            # self.cmd('xxxx or self.cmd("xxx or test.cmd(' or fstring
-            r'.\w{0,}cmd\(f?(?:\'|")(.*)(?:\'|")',
-            # xxxcmd = '' or xxxcmd = "" or xxxcmd1 or ***Command or ***command or fstring
-            r'(?:cmd|command|Command)\d* = f?(?:\'|"){1}([a-z]+.*)(?:\'|"){1}',
-            # r'self.cmd\(\n', r'cmd = (?:\'|")(.*)(?:\'|")(.*)?',
-            # xxxcmd = """ or xxxcmd = ''' or xxxcmd1
-            r'cmd\d* = (?:"{3}|\'{3})(.*)',
-        ]
-        # Match content in '' or ""
-        QUO_PATTERN = r'(["\'])((?:\\\1|(?:(?!\1)).)*)(\1)'
-        # Match end: ) or checks= or ,\n
-        END_PATTERN = r'(\)|checks=|,\n)'
-        # Match doc string ''' or """
-        DOCS_END_PATTERN = r'"{3}$|\'{3}$'
-        # Match start with ' or "
-        NOT_END_PATTERN = r'^\+(\s)+(\'|")'
-        # (# xxxx)
-        NUMBER_SIGN_PATTERN = r'^\s*#.*$'
-        # pylint: disable=too-many-nested-blocks
-        all_tested_commands = []
-        total_lines = len(lines)
-        row_num = 0
-        count = 1
-        while row_num < total_lines:
-            re_idx = None
-            if re.findall(NUMBER_SIGN_PATTERN, lines[row_num]):
-                row_num += 1
-                continue
-            if re.findall(CMD_PATTERN[0], lines[row_num]):
-                re_idx = 0
-            if re_idx is None and re.findall(CMD_PATTERN[1], lines[row_num]):
-                re_idx = 1
-            if re_idx is None and re.findall(CMD_PATTERN[2], lines[row_num]):
-                re_idx = 2
-            if re_idx is None and re.findall(CMD_PATTERN[3], lines[row_num]):
-                re_idx = 3
-            if re_idx is not None:
-                command = re.findall(CMD_PATTERN[re_idx], lines[row_num])[0]
-                while row_num < total_lines:
-                    if (re_idx in [0, 1] and not re.findall(END_PATTERN, lines[row_num])) or \
-                            (re_idx == 2 and (row_num + 1) < total_lines and
-                             re.findall(NOT_END_PATTERN, lines[row_num + 1])):
-                        row_num += 1
-                        cmd = re.findall(QUO_PATTERN, lines[row_num])
-                        if cmd:
-                            command += cmd[0][1]
-                    elif re_idx == 3 and (row_num + 1) < total_lines \
-                            and not re.findall(DOCS_END_PATTERN, lines[row_num]):
-                        row_num += 1
-                        command += lines[row_num][:-1]
-                    else:
-                        command = command + ' ' + str(count)
-                        all_tested_commands.append(command)
-                        row_num += 1
-                        count += 1
-                        break
-                else:
-                    command = command + ' ' + str(count)
-                    all_tested_commands.append(command)
-                    row_num += 1
-                    count += 1
-                    break
-            else:
-                row_num += 1
-        return all_tested_commands
-
     def _detect_tested_command(self, diff_index):
         all_tested_command = []
         # get tested command by regex
@@ -386,7 +312,7 @@ class Linter:  # pylint: disable=too-many-public-methods
             if re.findall(r'test_.*.py', filename) and os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
                 with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
                     lines = f.readlines()
-                ref = self._get_all_tested_commands_from_regex(lines)
+                ref = get_all_tested_commands_from_regex(lines)
                 all_tested_command += ref
         # get tested command by recording file
         if re.findall(r'test_.*.yaml', filename) and os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
