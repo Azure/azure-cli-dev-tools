@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import re
+import json
 from azdev.operations.constant import (
     CMD_PATTERN, QUO_PATTERN, END_PATTERN, DOCS_END_PATTERN, NOT_END_PATTERN, NUMBER_SIGN_PATTERN)
 
@@ -60,3 +61,51 @@ def get_all_tested_commands_from_regex(lines):
         else:
             row_num += 1
     return ref
+
+
+def search_argument_context(row_num, lines):
+    cmds = []
+    while row_num > 0:
+        row_num -= 1
+        # Match `with self.argument_context('') as c:`
+        sub_pattern0 = r'with self.argument_context\(\'(.*)\'\)'
+        # Match `with self.argument_context(scope) as c:`
+        sub_pattern1 = r'with self.argument_context\(scope\)'
+        # Match `with self.argument_context(\'{} stop\'.format(scope)) as c:',
+        sub_pattern2 = r'with self.argument_context\(\'(.*)\'.format\(scope\)\)'
+        ref0 = re.findall(sub_pattern0, lines[row_num])
+        ref1 = re.findall(sub_pattern1, lines[row_num])
+        ref2 = re.findall(sub_pattern2, lines[row_num])
+        # Match `with self.argument_context('') as c:`
+        if ref0:
+            cmds = ref0
+            break
+        # Match `with self.argument_context(scope) as c:`
+        if ref1:
+            sub_pattern = r'for scope in (.*):'
+            cmds = json.loads(
+                re.findall(sub_pattern, lines[row_num - 1])[0].replace('\'', '"'))
+            break
+        # Match `with self.argument_context(\'{} stop\'.format(scope)) as c:',
+        if ref2:
+            sub_pattern = r'for scope in (.*):'
+            format_strings = json.loads(
+                re.findall(sub_pattern, lines[row_num - 1])[0].replace('\'', '"'))
+            for c in ref2:
+                for f in format_strings:
+                    cmds.append(c.replace('{}', f))
+            break
+    return cmds
+
+
+def search_command_group(row_num, lines, command):
+    cmd = ''
+    while row_num > 0:
+        row_num -= 1
+        # Match `with self.command_group('local-context',`
+        sub_pattern = r'with self.command_group\(\'(.*?)\','
+        group = re.findall(sub_pattern, lines[row_num])
+        if group:
+            cmd = group[0] + ' ' + command
+            break
+    return cmd

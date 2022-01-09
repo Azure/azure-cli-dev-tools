@@ -8,14 +8,13 @@ from difflib import context_diff
 from enum import Enum
 from importlib import import_module
 import inspect
-import json
 import os
 import re
 from pkgutil import iter_modules
 import yaml
 from knack.log import get_logger
 
-from azdev.operations.regex import get_all_tested_commands_from_regex
+from azdev.operations.regex import get_all_tested_commands_from_regex, search_command_group, search_argument_context
 from azdev.utilities import diff_branches_detail
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 from .util import share_element, exclude_commands, LinterError
@@ -222,21 +221,21 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         for diff in diff_index:
             filename = diff.a_path.split('/')[-1]
             if 'params' in filename or 'commands' in filename:
-                # Match ` + c.argument('xxx')`
-                pattern = r'\+\s+c.argument\((.*)\)'
                 lines = list(
                     context_diff(diff.a_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.a_blob else [],
                                  diff.b_blob.data_stream.read().decode("utf-8").splitlines(True) if diff.b_blob else [],
                                  'Original', 'Current'))
             for row_num, line in enumerate(lines):
                 if 'params.py' in filename:
+                    # Match ` + c.argument('xxx')`
+                    pattern = r'\+\s+c.argument\((.*)\)'
                     ref = re.findall(pattern, line)
                     if ref:
                         param_name = ref[0].split(',')[0].strip("'")
                         if 'options_list' in ref[0]:
                             # Match ` options_list=xxx, or options_list=xxx)`
-                            sub_pattern = r'options_list=(.*)[,)]'
-                            params = json.loads(re.findall(sub_pattern, ref[0])[0].replace('\'', '"'))
+                            sub_pattern = r'options_list=\[(.*)\]'
+                            params = re.findall(sub_pattern, ref[0])[0].replace('\'', '').split()
                         else:
                             # if options_list not exist, generate by parameter name
                             params = ['--' + param_name.replace('_', '-')]
@@ -252,21 +251,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                                 break
                         with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
                             param_lines = f.readlines()
-                        while idx > 0:
-                            idx -= 1
-                            # Match `with self.argument_context(scope) as c:`
-                            # Match `with self.argument_context('') as c:`
-                            sub_pattern = r'with self.argument_context\(\'?(.*)\'?\)'
-                            cmds = re.findall(sub_pattern, param_lines[idx])
-                            if cmds:
-                                if cmds[0] != 'scope':
-                                    cmds = [cmds.strip('')]
-                                else:
-                                    # Match `for scope in ['disk', 'snapshot']`:
-                                    sub_pattern = r'for scope in (.*):'
-                                    cmds = json.loads(
-                                        re.findall(sub_pattern, param_lines[idx - 1])[0].replace('\'', '"'))
-                                break
+                        cmds = search_argument_context(idx, param_lines)
                         for cmd in cmds:
                             if cmd not in exclude_comands and \
                                     not list(filter(lambda x, c=cmd, p=param_name: c in x[0] and p in x[1], exclude_parameters)):  # pylint: disable=line-too-long
@@ -274,7 +259,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                                 continue
 
                 if 'commands.py' in filename:
-                    # Match `+ g.command(xxx) or + g.show_command(xxx)`
+                    # Match `+ g.*command(xxx)`
                     pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
                     ref = re.findall(pattern, line)
                     if ref:
@@ -291,15 +276,8 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                                 break
                         with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
                             cmd_lines = f.readlines()
-                        while idx > 0:
-                            idx -= 1
-                            # Match `with self.command_group('local-context',`
-                            sub_pattern = r'with self.command_group\(\'(.*)\','
-                            group = re.findall(sub_pattern, cmd_lines[idx])
-                            if group:
-                                cmd = group[0] + ' ' + command
-                                break
-                        if cmd not in exclude_comands:
+                        cmd = search_command_group(idx, cmd_lines, command)
+                        if cmd and cmd not in exclude_comands:
                             commands.append(cmd)
         _logger.debug('New add parameters: %s', parameters)
         _logger.debug('New add commands: %s', commands)
@@ -334,22 +312,21 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
     def _run_command_coverage(commands, parameters, all_tested_command):
         flag = False
         exec_state = True
-        for p_commands, opt_list in parameters:
-            for command in p_commands:
-                for opt in opt_list:
-                    for code in all_tested_command:
-                        if command in code and opt in code:
-                            _logger.debug("Find '%s' test case in '%s'", command + ' ' + opt, code)
-                            flag = True
-                            break
-                    else:
-                        _logger.error("Can not find '%s' test case", command + ' ' + opt)
-                        _logger.error("Please add some scenario tests for the new parameter")
-                        _logger.error(
-                            "Or add the parameter with missing_parameter_coverage rule in linter_exclusions.yml")
-                        exec_state = False
-                    if flag:
+        for command, opt_list in parameters:
+            for opt in opt_list:
+                for code in all_tested_command:
+                    if command in code and opt in code:
+                        _logger.debug("Find '%s' test case in '%s'", command + ' ' + opt, code)
+                        flag = True
                         break
+                else:
+                    _logger.error("Can not find '%s' test case", command + ' ' + opt)
+                    _logger.error("Please add some scenario tests for the new parameter")
+                    _logger.error(
+                        "Or add the parameter with missing_parameter_coverage rule in linter_exclusions.yml")
+                    exec_state = False
+                if flag:
+                    break
         for command in commands:
             for code in all_tested_command:
                 if command in code:

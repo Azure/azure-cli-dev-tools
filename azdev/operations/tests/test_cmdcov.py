@@ -6,7 +6,8 @@
 
 
 from pprint import pprint
-from azdev.operations.regex import get_all_tested_commands_from_regex
+import re
+from azdev.operations.regex import get_all_tested_commands_from_regex, search_command_group, search_argument_context
 
 
 # pylint: disable=line-too-long
@@ -166,6 +167,83 @@ def test_multiple_lines_regex():
     assert len(ref) == 21
 
 
+def test_detect_new_command():
+    commands = []
+    lines = [
+        'with self.command_group(\'disk\', compute_disk_sdk, operation_group=\'disks\', min_api=\'2017-03-30\') as g:',
+        # 1.`+    g.command(xxx)`
+        '+    g.command(\'list-instances\', \'list\', command_type=compute_vmss_vm_sdk)',
+        # 2.`+    g.custom_command(xxx)`
+        '+    g.custom_command(\'create\', \'create_managed_disk\', supports_no_wait=True, table_transformer=transform_disk_show_table_output, validator=process_disk_or_snapshot_create_namespace)',
+        # 3.`+    g.custom_show_command(xxx)`
+        '+    g.custom_show_command(\'show\', \'get_vmss\', table_transformer=get_vmss_table_output_transformer(self, False))',
+        # 4.`+    g.wait_command(xxx)`
+        '+    g.wait_command(\'wait\', getter_name=\'get_vmss\', getter_type=compute_custom)',
+    ]
+    for row_num, line in enumerate(lines):
+        # Match `+ g.*command(xxx)`
+        pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
+        ref = re.findall(pattern, line)
+        if ref:
+            command = ref[0].split(',')[0].strip("'")
+            cmd = search_command_group(row_num, lines, command)
+            if cmd:
+                commands.append(cmd)
+    # print(commands)
+    assert commands == ['disk list-instances', 'disk create', 'disk show', 'disk wait']
+
+
+def test_detect_new_params():
+    parameters = []
+    lines = [
+        # without scope
+        '    with self.argument_context(\'disk\') as c:',
+        '+        c.argument(\'zone\', zone_type, min_api=\'2017-03-30\', options_list=[\'--zone\']) ',
+        # scope
+        '    for scope in [\'disk\', \'snapshot\']:',
+        '        with self.argument_context(scope) as c:',
+        '+            c.argument(\'size_gb\', options_list=[\'--size-gb\', \'-z\'], help=\'size in GB. Max size: 4095 GB (certain preview disks can be larger).\', type=int)',
+        # scope + format
+        '    for scope in [\'create\', \'update\']:',
+        '        with self.argument_context(\'vmss run-command {}\'.format(scope)) as c:',
+        '+            c.argument(\'vmss_name\', run_cmd_vmss_name)',
+        # scope + format
+        '    for scope in [\'vm\', \'vmss\']:',
+        '        with self.argument_context(\'{} stop\'.format(scope)) as c:',
+        '+            c.argument(\'skip_shutdown\', action=\'store_true\', help=\'Skip shutdown and power-off immediately.\', min_api=\'2019-03-01\')',
+    ]
+    pattern = r'\+\s+c.argument\((.*)\)'
+    for row_num, line in enumerate(lines):
+        ref = re.findall(pattern, line)
+        if ref:
+            param_name = ref[0].split(',')[0].strip("'")
+            if 'options_list' in ref[0]:
+                # Match ` options_list=xxx, or options_list=xxx)`
+                sub_pattern = r'options_list=\[(.*)\]'
+                params = re.findall(sub_pattern, ref[0])[0].replace('\'', '').split()
+                # re.findall(r'options_list=(.*)[,)]', '\'zone\', zone_type, min_api=\'2017-03-30\', options_list=[\'--zone\']')
+            else:
+                # if options_list not exist, generate by parameter name
+                params = ['--' + param_name.replace('_', '-')]
+            cmds = search_argument_context(row_num, lines)
+            # print(cmds)
+            for cmd in cmds:
+                parameters.append([cmd, params])
+                continue
+    # print(parameters)
+    assert parameters == [
+        ['disk', ['--zone']],
+        ['disk', ['--size-gb,', '-z']],
+        ['snapshot', ['--size-gb,', '-z']],
+        ['vmss run-command create', ['--vmss-name']],
+        ['vmss run-command update', ['--vmss-name']],
+        ['vm stop', ['--skip-shutdown']],
+        ['vmss stop', ['--skip-shutdown']]
+    ]
+
+
 if __name__ == '__main__':
-    test_one_line_regex()
-    test_multiple_lines_regex()
+    # test_one_line_regex()
+    # test_multiple_lines_regex()
+    test_detect_new_command()
+    test_detect_new_params()
