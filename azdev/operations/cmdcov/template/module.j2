@@ -2,15 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>{{ module }} Coverage Detail</title>
+    <title>{{ module }} Test Coverage Detail</title>
     <link rel="stylesheet" type="text/css" href="component.css"/>
     <link rel="shortcut icon" href="favicon.ico">
   </head>
   <body>
     <div class="container">
       <header>
-        <h1>{{ module }} Coverage Report
-          <span>This is the coverage report of {{ module }}. Please scroll down to see the untested details.<br>
+        <h1>{{ module }} Test Coverage Report
+          <span>This is the test coverage report of {{ module }}. Please scroll down to see the untested details.<br>
           Any question please contact Azure Cli Team.</span>
         </h1>
         {% if enable_cli_own == true -%}
@@ -43,7 +43,7 @@
               {% endfor %}
             </tbody>
           </table>
-          <p class="contact">This is the coverage report of {{ module }} module.<br>
+          <p class="contact">This is the test coverage report of {{ module }} module.<br>
                              Any question please contact Azure Cli Team.<br>
           </p>
         </div>
