@@ -51,6 +51,11 @@ EXCLUDE_COMMANDS = {
         'network dns record-set txt delete',
         'network dns record-set txt show',
         'network dns record-set txt update'
+    ],
+    'resource': [
+        # Permission denied
+        'account management-group subscription add',
+        'account management-group subscription remove',
     ]
 }
 

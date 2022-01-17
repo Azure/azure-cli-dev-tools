@@ -243,7 +243,7 @@ def test_detect_new_params():
 
 
 if __name__ == '__main__':
-    # test_one_line_regex()
-    # test_multiple_lines_regex()
+    test_one_line_regex()
+    test_multiple_lines_regex()
     test_detect_new_command()
     test_detect_new_params()
