@@ -31,7 +31,7 @@ function sortStrDesc(a, b)
 }
 function sortTextAS(a, b)
 {
-    if (a==='N/A'){
+    if (a==='Not applicable'){
         a = -1
     } else if (a===''){
         a = 100
@@ -78,45 +78,44 @@ function sortTextDesc(a, b)
 
 function SortTable(obj){
     var column=obj.id
-    var td0s=document.getElementsByName("td0");
-    var td1s=document.getElementsByName("td1");
-    var td2s=document.getElementsByName("td2");
-    var td3s=document.getElementsByName("td3");
-    var td4s=document.getElementsByName("td4");
-    var td5s=document.getElementsByName("td5");
-    var tdArray0=[];
-    var tdArray1=[];
-    var tdArray2=[];
-    var tdArray3=[];
-    var tdArray4=[];
-    var tdArray5=[];
-    for(var i=0;i<td0s.length;i++){
-        tdArray0.push(td0s[i].innerHTML);
+    var tdModule=document.getElementsByName("td-module");
+    var tdTested=document.getElementsByName("td-tested");
+    var tdUntested=document.getElementsByName("td-untested");
+    var tdPercentage=document.getElementsByName("td-percentage");
+    var tdDetail=document.getElementsByClassName("detail")
+    var tdReport=document.getElementsByName("td-report");
+    var tdModuleArray=[];
+    var tdTestedArray=[];
+    var tdUntestedArray=[];
+    var tdPercentageArray=[];
+    var tdReportArray=[];
+    for(var i=0;i<tdModule.length;i++){
+        tdModuleArray.push(tdModule[i].innerHTML);
     }
-    for(var i=0;i<td1s.length;i++){
-        tdArray1.push(td1s[i].innerHTML);
+    for(var i=0;i<tdTested.length;i++){
+        tdTestedArray.push(tdTested[i].innerHTML);
     }
-    for(var i=0;i<td2s.length;i++){
-        tdArray2.push(td2s[i].innerHTML);
+    for(var i=0;i<tdUntested.length;i++){
+        tdUntestedArray.push(tdUntested[i].innerHTML);
     }
-    for(var i=0;i<td3s.length;i++){
-        tdArray3.push(td3s[i].innerHTML);
+    for(var i=0;i<tdPercentage.length;i++){
+        tdPercentageArray.push(tdPercentage[i].innerHTML);
     }
-    for(var i=0;i<td4s.length;i++){
-        tdArray4.push(td4s[i].innerHTML);
+    for(var i=0;i<tdReport.length;i++){
+        tdReportArray.push(tdReport[i].innerHTML);
     }
-    for(var i=0;i<td5s.length;i++){
-        tdArray5.push(td5s[i].innerHTML);
-    }
-    var tds=document.getElementsByName("td"+obj.id.substr(2,1));
     var columnArray=[];
-    for(var i=0;i<tds.length;i++){
-        if(column==='th1' || column==='th2'){
-            columnArray.push(parseInt(tds[i].innerHTML));
-        }else if(column==='th0' || column==='th5'){
-            columnArray.push(tds[i].innerHTML);
-        }else{
-            columnArray.push(tds[i].innerText);
+    for(var i=0;i<tdModule.length;i++){
+        if(column==='th-module'){
+            columnArray.push(tdModule[i].innerHTML);
+        }else if(column==='th-tested'){
+            columnArray.push(parseInt(tdTested[i].innerHTML));
+        }else if(column==='th-untested'){
+            columnArray.push(parseInt(tdUntested[i].innerHTML));
+        }else if(column==='th-percentage'){
+            columnArray.push(tdDetail[i].innerHTML)
+        }else if(column==='th-report'){
+            columnArray.push(tdReport[i].innerHTML);
         }
     }
     var orginArray=[];
@@ -125,18 +124,18 @@ function SortTable(obj){
     }
     var newArray = columnArray.slice(1,)
     if(obj.className=="as"){
-        if(column==='th1' || column==='th2'){
+        if(column==='th-tested' || column==='th-untested'){
             newArray.sort(sortNumberAS);
-        }else if(column==='th0' || column==='th5'){
+        }else if(column==='th-module' || column==='th-report'){
             newArray.sort(sortStrAS);
         }else{
             newArray.sort(sortTextAS);
         }
         obj.className="desc";
     }else{
-        if(column==='th1' || column==='th2'){
+        if(column==='th-tested' || column==='th-untested'){
             newArray.sort(sortNumberDesc);
-        }else if(column==='th0' || column==='th5'){
+        }else if(column==='th-module' || column==='th-report'){
             newArray.sort(sortStrDesc);
         }else{
             newArray.sort(sortTextDesc);
@@ -147,12 +146,11 @@ function SortTable(obj){
     for(var i=1;i<columnArray.length;i++){
         for(var j=1;j<orginArray.length;j++){
             if(orginArray[j]==columnArray[i]){
-                document.getElementsByName("td0")[i].innerHTML=tdArray0[j];
-                document.getElementsByName("td1")[i].innerHTML=tdArray1[j];
-                document.getElementsByName("td2")[i].innerHTML=tdArray2[j];
-                document.getElementsByName("td3")[i].innerHTML=tdArray3[j];
-                document.getElementsByName("td4")[i].innerHTML=tdArray4[j];
-                document.getElementsByName("td5")[i].innerHTML=tdArray5[j];
+                document.getElementsByName("td-module")[i].innerHTML=tdModuleArray[j];
+                document.getElementsByName("td-tested")[i].innerHTML=tdTestedArray[j];
+                document.getElementsByName("td-untested")[i].innerHTML=tdUntestedArray[j];
+                document.getElementsByName("td-percentage")[i].innerHTML=tdPercentageArray[j];
+                document.getElementsByName("td-report")[i].innerHTML=tdReportArray[j];
                 orginArray[j]=null;
                 break;
             }

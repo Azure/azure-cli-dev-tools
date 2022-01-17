@@ -86,6 +86,14 @@ tbody tr:hover {
 }
 
 /* circle styles */
+.detail {
+  display: none;
+}
+.column-percentage:hover .detail {
+  display: block;
+  text-align: center;
+}
+
 .single-chart {
   width: 100%;
   justify-content: space-around ;
@@ -216,11 +224,12 @@ tbody tr:hover {
 	text-transform: uppercase;
 	letter-spacing: 1px;
 	font-weight: 700;
+	color: #DB7093;
 }
 
 .button a:hover,
 .button a.current-page,
 .button a.current-page:hover {
-	border-color: #7c8d87;
-	color: #7c8d87;
+	border-color: #DB7093;
+	color: #DB7093;
 }
