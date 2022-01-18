@@ -56,6 +56,14 @@ EXCLUDE_COMMANDS = {
         # Permission denied
         'account management-group subscription add',
         'account management-group subscription remove',
+    ],
+    'role': [
+        # Deprecate
+        'ad app permission admin-consent',
+        'ad group owner remove',
+        'ad signed-in-user show',
+        'ad sp owner list',
+        'ad user list',
     ]
 }
 
