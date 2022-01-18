@@ -62,6 +62,7 @@ setup(
         'azdev.operations.extensions',
         'azdev.operations.statistics',
         'azdev.operations.command_change',
+        'azdev.operations.cmdcov',
         'azdev.utilities',
     ],
     install_requires=[

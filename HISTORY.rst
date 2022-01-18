@@ -3,6 +3,12 @@
 Release History
 ===============
 
+0.1.49
+++++++
+* Add Command Coverage Report for CLI modules (#323)
+* Add Linter rule missing_command_coverage and missing_parameter_coverage  (#323)
+* Add Command Coverage Report for CLI extensions (#383)
+
 0.1.48
 ++++++
 * `azdev command-change meta-export`: Add option deprecation info and ignore `cmd` arg (#381)
