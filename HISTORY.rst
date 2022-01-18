@@ -3,6 +3,11 @@
 Release History
 ===============
 
+0.1.41
+++++++
+* Add Command Coverage Report  (#323)
+* Add Linter rule missing_command_coverage and missing_parameter_coverage  (#323)
+
 0.1.40
 ++++++
 * Fix pytest issues (#347)
