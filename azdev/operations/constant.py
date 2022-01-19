@@ -56,6 +56,9 @@ EXCLUDE_COMMANDS = {
         # Permission denied
         'account management-group subscription add',
         'account management-group subscription remove',
+        # hard to test
+        'bicep publish',
+        'feature register',
     ],
     'role': [
         # Deprecate
