@@ -14,7 +14,12 @@ from pkgutil import iter_modules
 import yaml
 from knack.log import get_logger
 
-from azdev.operations.regex import get_all_tested_commands_from_regex, search_command_group, search_argument_context
+from azdev.operations.regex import (
+    get_all_tested_commands_from_regex,
+    search_argument,
+    search_argument_context,
+    search_command,
+    search_command_group)
 from azdev.utilities import diff_branches_detail
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 from .util import share_element, exclude_commands, LinterError
@@ -227,18 +232,8 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                                  'Original', 'Current'))
             for row_num, line in enumerate(lines):
                 if 'params.py' in filename:
-                    # Match ` + c.argument('xxx')`
-                    pattern = r'\+\s+c.argument\((.*)\)'
-                    ref = re.findall(pattern, line)
-                    if ref:
-                        param_name = ref[0].split(',')[0].strip("'")
-                        if 'options_list' in ref[0]:
-                            # Match ` options_list=xxx, or options_list=xxx)`
-                            sub_pattern = r'options_list=\[(.*)\]'
-                            params = re.findall(sub_pattern, ref[0])[0].replace('\'', '').split()
-                        else:
-                            # if options_list not exist, generate by parameter name
-                            params = ['--' + param_name.replace('_', '-')]
+                    params, param_name = search_argument(line)
+                    if params:
                         offset = -1
                         while row_num > 0:
                             row_num -= 1
@@ -259,11 +254,8 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                                 continue
 
                 if 'commands.py' in filename:
-                    # Match `+ g.*command(xxx)`
-                    pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
-                    ref = re.findall(pattern, line)
-                    if ref:
-                        command = ref[0].split(',')[0].strip("'")
+                    command = search_command(line)
+                    if command:
                         offset = -1
                         while row_num > 0:
                             row_num -= 1
