@@ -6,8 +6,12 @@
 
 
 from pprint import pprint
-import re
-from azdev.operations.regex import get_all_tested_commands_from_regex, search_command_group, search_argument_context
+from azdev.operations.regex import (
+    get_all_tested_commands_from_regex,
+    search_argument,
+    search_argument_context,
+    search_command,
+    search_command_group)
 
 
 # pylint: disable=line-too-long
@@ -181,15 +185,12 @@ def test_detect_new_command():
         '+    g.wait_command(\'wait\', getter_name=\'get_vmss\', getter_type=compute_custom)',
     ]
     for row_num, line in enumerate(lines):
-        # Match `+ g.*command(xxx)`
-        pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
-        ref = re.findall(pattern, line)
-        if ref:
-            command = ref[0].split(',')[0].strip("'")
+        command = search_command(line)
+        if command:
             cmd = search_command_group(row_num, lines, command)
             if cmd:
                 commands.append(cmd)
-    # print(commands)
+    pprint(commands)
     assert commands == ['disk list-instances', 'disk create', 'disk show', 'disk wait']
 
 
@@ -198,47 +199,58 @@ def test_detect_new_params():
     lines = [
         # without scope
         '    with self.argument_context(\'disk\') as c:',
+        '+        c.argument(\'network_policy\')',
         '+        c.argument(\'zone\', zone_type, min_api=\'2017-03-30\', options_list=[\'--zone\']) ',
         # scope
         '    for scope in [\'disk\', \'snapshot\']:',
         '        with self.argument_context(scope) as c:',
         '+            c.argument(\'size_gb\', options_list=[\'--size-gb\', \'-z\'], help=\'size in GB. Max size: 4095 GB (certain preview disks can be larger).\', type=int)',
-        # scope + format
+        # scope AND format
         '    for scope in [\'create\', \'update\']:',
         '        with self.argument_context(\'vmss run-command {}\'.format(scope)) as c:',
         '+            c.argument(\'vmss_name\', run_cmd_vmss_name)',
-        # scope + format
+        # scope AND format
         '    for scope in [\'vm\', \'vmss\']:',
         '        with self.argument_context(\'{} stop\'.format(scope)) as c:',
         '+            c.argument(\'skip_shutdown\', action=\'store_true\', help=\'Skip shutdown and power-off immediately.\', min_api=\'2019-03-01\')',
+        # multiple `[]`
+        '    with self.argument_context(\'acr connected-registry create\') as c:',
+        '+        c.argument(\'client_token_list\', options_list=[\'--client-tokens\'], nargs=\'+\', help=\'Specify the client access to the repositories in the connected registry. It can be in the format [TOKEN_NAME01] [TOKEN_NAME02]...\')',
+        '+        c.argument(\'notifications\', options_list=[\'--notifications\'], nargs=\'+\', help=\'List of artifact pattern for which notifications need to be generated. Use the format "--notifications [PATTERN1 PATTERN2 ...]".\')',
+        # multiple lines
+        '    with self.argument_context(\'webapp update\') as c:',
+        '+        c.argument(\'skip_custom_domain_verification\',',
+        '+                   help="If true, custom (non *.azurewebsites.net) domains associated with web app are not verified",',
+        '+                   arg_type=get_three_state_flag(return_label=True), deprecate_info=c.deprecate(expiration=\'3.0.0\'))',
+        # options_list=[""] double quotes
+        '    with self.argument_context(\'webapp update\') as c:',
+        '+        c.argument(\'minimum_elastic_instance_count\', options_list=["--minimum-elastic-instance-count", "-i"], type=int, is_preview=True, help="Minimum number of instances. App must be in an elastic scale App Service Plan.")',
+        '+        c.argument(\'prewarmed_instance_count\', options_list=["--prewarmed-instance-count", "-w"], type=int, is_preview=True, help="Number of preWarmed instances. App must be in an elastic scale App Service Plan.")',
     ]
-    pattern = r'\+\s+c.argument\((.*)\)'
+    # pattern = r'\+\s+c.argument\((.*)\)?'
     for row_num, line in enumerate(lines):
-        ref = re.findall(pattern, line)
-        if ref:
-            param_name = ref[0].split(',')[0].strip("'")
-            if 'options_list' in ref[0]:
-                # Match ` options_list=xxx, or options_list=xxx)`
-                sub_pattern = r'options_list=\[(.*)\]'
-                params = re.findall(sub_pattern, ref[0])[0].replace('\'', '').split()
-                # re.findall(r'options_list=(.*)[,)]', '\'zone\', zone_type, min_api=\'2017-03-30\', options_list=[\'--zone\']')
-            else:
-                # if options_list not exist, generate by parameter name
-                params = ['--' + param_name.replace('_', '-')]
+        params, _ = search_argument(line)
+        if params:
             cmds = search_argument_context(row_num, lines)
             # print(cmds)
             for cmd in cmds:
                 parameters.append([cmd, params])
                 continue
-    # print(parameters)
+    pprint(parameters)
     assert parameters == [
+        ['disk', ['--network-policy']],
         ['disk', ['--zone']],
         ['disk', ['--size-gb,', '-z']],
         ['snapshot', ['--size-gb,', '-z']],
         ['vmss run-command create', ['--vmss-name']],
         ['vmss run-command update', ['--vmss-name']],
         ['vm stop', ['--skip-shutdown']],
-        ['vmss stop', ['--skip-shutdown']]
+        ['vmss stop', ['--skip-shutdown']],
+        ['acr connected-registry create', ['--client-tokens']],
+        ['acr connected-registry create', ['--notifications']],
+        ['webapp update', ['--skip-custom-domain-verification']],
+        ['webapp update', ['--minimum-elastic-instance-count,', '-i']],
+        ['webapp update', ['--prewarmed-instance-count,', '-w']],
     ]
 
 

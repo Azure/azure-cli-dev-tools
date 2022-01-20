@@ -98,6 +98,25 @@ def search_argument_context(row_num, lines):
     return cmds
 
 
+def search_argument(line):
+    params = []
+    param_name = ''
+    # Match ` + c.argument('xxx')?`
+    pattern = r'\+\s+c.argument\((.*)\)?'
+    ref = re.findall(pattern, line)
+    if ref:
+        # strip ' and \' and )
+        param_name = ref[0].split(',')[0].strip(r"'\'\)")
+        if 'options_list' in ref[0]:
+            # Match ` options_list=xxx, or options_list=xxx)`
+            sub_pattern = r'options_list=\[(.*?)\]'
+            params = re.findall(sub_pattern, ref[0])[0].replace('\'', '').replace('"', '').split()
+        else:
+            # if options_list not exist, generate by parameter name
+            params = ['--' + param_name.replace('_', '-')]
+    return params, param_name
+
+
 def search_command_group(row_num, lines, command):
     cmd = ''
     while row_num > 0:
@@ -109,3 +128,13 @@ def search_command_group(row_num, lines, command):
             cmd = group[0] + ' ' + command
             break
     return cmd
+
+
+def search_command(line):
+    command = ''
+    # Match `+ g.*command(xxx)`
+    pattern = r'\+\s+g.(?:\w+)?command\((.*)\)'
+    ref = re.findall(pattern, line)
+    if ref:
+        command = ref[0].split(',')[0].strip("'")
+    return command
