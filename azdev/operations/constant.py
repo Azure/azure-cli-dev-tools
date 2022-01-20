@@ -7,6 +7,7 @@
 ENCODING = 'utf-8'
 
 # https://github.com/Azure/azure-cli/blob/dev/.github/CODEOWNERS
+# TODO add identity
 CLI_OWN_MODULES = ['cloud', 'container', 'databoxedge', 'keyvault', 'monitor', 'network',
                    'privatedns', 'profile', 'resource', 'role', 'storage', 'vm']
 
