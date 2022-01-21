@@ -165,10 +165,13 @@ def test_multiple_lines_regex():
         '             checks=[\n',
         '                 self.check(\'name\', \'green\'),\n',
         '             ])\n',
+        # --format vs .format
+        '    self.cmd(\n',
+        '        \'appconfig kv import -n {config_store_name} -s {import_source} --path "{strict_import_file_path}" --format {imported_format} --profile {profile} --strict -y\')',
     ]
     ref = get_all_tested_commands_from_regex(lines)
     pprint(ref, width=1000)
-    assert len(ref) == 21
+    assert len(ref) == 22
 
 
 def test_detect_new_command():
@@ -205,6 +208,10 @@ def test_detect_new_params():
         '    for scope in [\'disk\', \'snapshot\']:',
         '        with self.argument_context(scope) as c:',
         '+            c.argument(\'size_gb\', options_list=[\'--size-gb\', \'-z\'], help=\'size in GB. Max size: 4095 GB (certain preview disks can be larger).\', type=int)',
+        # scope with multi args
+        '    for scope in [\'signalr create\', \'signalr update\']:',
+        '        with self.argument_context(scope, arg_group=\'Network Rule\') as c:',
+        '+            c.argument(\'default_action\', arg_type=get_enum_type([\'Allow\', \'Deny\']), help=\'Default action to apply when no rule matches.\', required=False)',
         # scope AND format
         '    for scope in [\'create\', \'update\']:',
         '        with self.argument_context(\'vmss run-command {}\'.format(scope)) as c:',
@@ -226,6 +233,11 @@ def test_detect_new_params():
         '    with self.argument_context(\'webapp update\') as c:',
         '+        c.argument(\'minimum_elastic_instance_count\', options_list=["--minimum-elastic-instance-count", "-i"], type=int, is_preview=True, help="Minimum number of instances. App must be in an elastic scale App Service Plan.")',
         '+        c.argument(\'prewarmed_instance_count\', options_list=["--prewarmed-instance-count", "-w"], type=int, is_preview=True, help="Number of preWarmed instances. App must be in an elastic scale App Service Plan.")',
+        # self.argument_context with multi args
+        '    with self.argument_context(\'appconfig kv import\', arg_group=\'File\') as c:',
+        '+        c.argument(\'strict\', validator=validate_strict_import, arg_type=get_three_state_flag(), help="Delete all other key-values in the store with specified prefix and label", is_preview=True)',
+        '    with self.argument_context(\'snapshot\', resource_type=ResourceType.MGMT_COMPUTE, operation_group=\'snapshots\') as c:',
+        '+        c.argument(\'snapshot_name\', existing_snapshot_name, id_part=\'name\', completer=get_resource_name_completion_list(\'Microsoft.Compute/snapshots\'))',
     ]
     # pattern = r'\+\s+c.argument\((.*)\)?'
     for row_num, line in enumerate(lines):
@@ -242,6 +254,8 @@ def test_detect_new_params():
         ['disk', ['--zone']],
         ['disk', ['--size-gb,', '-z']],
         ['snapshot', ['--size-gb,', '-z']],
+        ['signalr create', ['--default-action']],
+        ['signalr update', ['--default-action']],
         ['vmss run-command create', ['--vmss-name']],
         ['vmss run-command update', ['--vmss-name']],
         ['vm stop', ['--skip-shutdown']],
@@ -251,6 +265,8 @@ def test_detect_new_params():
         ['webapp update', ['--skip-custom-domain-verification']],
         ['webapp update', ['--minimum-elastic-instance-count,', '-i']],
         ['webapp update', ['--prewarmed-instance-count,', '-w']],
+        ['appconfig kv import', ['--strict']],
+        ['snapshot', ['--snapshot-name']],
     ]
 
 
