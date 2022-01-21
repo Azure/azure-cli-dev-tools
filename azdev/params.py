@@ -83,7 +83,7 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'linter') as c:
         c.positional('modules', modules_type)
         c.argument('rules', options_list=['--rules', '-r'], nargs='+', help='Space-separated list of rules to run. Omit to run all rules.')
-        c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries', 'command_coverage'], help='Space-separated list of rule types to run. Omit to run all.')
+        c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries', 'command_test_coverage'], help='Space-separated list of rule types to run. Omit to run all.')
         c.argument('ci_exclusions', action='store_true', help='Force application of CI exclusions list when run locally.')
         c.argument('include_whl_extensions',
                    action='store_true',
@@ -132,7 +132,7 @@ def load_arguments(self, _):
     # region cmdcov
     with ArgumentsContext(self, 'cmdcov') as c:
         c.positional('modules', modules_type)
-        c.argument('level', choices=['command', 'argument'], help='Run command coverage in command level or argument level.')
+        c.argument('level', choices=['command', 'argument'], help='Run command test coverage in command level or argument level.')
     # endregion
 
     with ArgumentsContext(self, 'perf') as c:
