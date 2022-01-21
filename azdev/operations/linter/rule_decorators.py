@@ -33,7 +33,7 @@ class CommandCoverageRule(BaseRule):
                            (linter.git_source, linter.git_target),
                            func.__name__)
 
-            linter_manager.add_rule('command_coverage', func.__name__, wrapper, self.severity)
+            linter_manager.add_rule('command_test_coverage', func.__name__, wrapper, self.severity)
 
         add_to_linter.linter_rule = True
         return add_to_linter

@@ -282,12 +282,12 @@ helps['extension generate-docs'] = """
 """
 
 helps['cmdcov'] = """
-    short-summary: Test command coverage and generate CLI command coverage report.
+    short-summary: Run command test coverage and generate CLI command test coverage report.
     examples:
-        - name: Check all CLI modules command coverage.
+        - name: Check all CLI modules command test coverage.
           text: azdev cmdcov CLI
-        - name: Check one or serveral modules command coverage.
+        - name: Check one or serveral modules command test coverage.
           text: azdev cmdcov vm storage
-        - name: Check CLI modules command argument coverage.
+        - name: Check CLI modules command test coverage in argument level.
           text: azdev cmdcov CLI --level argument
 """
