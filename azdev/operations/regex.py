@@ -68,9 +68,9 @@ def search_argument_context(row_num, lines):
     while row_num > 0:
         row_num -= 1
         # Match `with self.argument_context('') as c:`
-        sub_pattern0 = r'with self.argument_context\(\'(.*)\'\)'
+        sub_pattern0 = r'with self.argument_context\(\'(.*?)\'[\),]'
         # Match `with self.argument_context(scope) as c:`
-        sub_pattern1 = r'with self.argument_context\(scope\)'
+        sub_pattern1 = r'with self.argument_context\(scope[\),]'
         # Match `with self.argument_context(\'{} stop\'.format(scope)) as c:',
         sub_pattern2 = r'with self.argument_context\(\'(.*)\'.format\(scope\)\)'
         ref0 = re.findall(sub_pattern0, lines[row_num])
