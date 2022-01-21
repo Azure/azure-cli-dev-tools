@@ -37,7 +37,7 @@ class CmdcovManager:
         self.all_tested_commands = {m: [] for m in self.selected_mod_names}
         self.all_live_commands = []
         self.all_untested_commands = {}
-        self.command_coverage = {'Total': [0, 0, 0]}
+        self.command_test_coverage = {'Total': [0, 0, 0]}
         self.date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         self.report_date = '-'.join(self.date.replace(':', '-').split())
         self.cmdcov_path = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov')
@@ -48,22 +48,22 @@ class CmdcovManager:
         self._get_all_commands()
         self._get_all_tested_commands_from_regex()
         self._get_all_tested_commands_from_record()
-        self._run_commands_coverage()
+        self._run_command_test_coverage()
         self._get_all_tested_commands_from_live()
-        self._run_commands_coverage_enhance()
+        self._run_command_test_coverage_enhance()
         html_file = self._render_html()
         if self.enable_cli_own:
-            command_coverage = {k: v for k, v in self.command_coverage.items() if k in CLI_OWN_MODULES}
+            command_test_coverage = {k: v for k, v in self.command_test_coverage.items() if k in CLI_OWN_MODULES}
             total_tested = 0
             total_untested = 0
-            command_coverage['Total'] = [0, 0, 0]
-            for module in command_coverage.keys():
-                total_tested += command_coverage[module][0] if command_coverage[module] else 0
-                total_untested += command_coverage[module][1] if command_coverage[module] else 0
-            command_coverage['Total'][0] = total_tested
-            command_coverage['Total'][1] = total_untested
-            command_coverage['Total'][2] = f'{total_tested / (total_tested + total_untested):.3%}'
-            self._render_cli_html(command_coverage)
+            command_test_coverage['Total'] = [0, 0, 0]
+            for module in command_test_coverage.keys():
+                total_tested += command_test_coverage[module][0] if command_test_coverage[module] else 0
+                total_untested += command_test_coverage[module][1] if command_test_coverage[module] else 0
+            command_test_coverage['Total'][0] = total_tested
+            command_test_coverage['Total'][1] = total_untested
+            command_test_coverage['Total'][2] = f'{total_tested / (total_tested + total_untested):.3%}'
+            self._render_cli_html(command_test_coverage)
         self._browse(html_file)
 
     def _get_all_commands(self):
@@ -87,10 +87,10 @@ class CmdcovManager:
         for c, v in self.exclusions.items():
             if 'parameters' in v:
                 for p, r in v['parameters'].items():
-                    if 'missing_parameter_coverage' in r['rule_exclusions']:
+                    if 'missing_parameter_test_coverage' in r['rule_exclusions']:
                         exclusions_parameters.append((c, p))
             elif 'rule_exclusions' in v:
-                if 'missing_command_coverage' in v['rule_exclusions']:
+                if 'missing_command_test_coverage' in v['rule_exclusions']:
                     exclusions_comands.append(c)
         for _, y in self.loaded_help.items():
             if hasattr(y, 'command_source') and y.command_source in self.selected_mod_names:
@@ -152,17 +152,17 @@ class CmdcovManager:
         with open(os.path.join(self.cmdcov_path, 'tested_command.txt'), 'r') as f:
             self.all_live_commands = f.readlines()
 
-    def _run_commands_coverage(self):
+    def _run_command_test_coverage(self):
         """
         all_commands: All commands that need to be test
         all_tested_commands: All commands already tested
-        command_coverage: {{module1: pct}, {module2: pct}}
+        command_test_coverage: {{module1: pct}, {module2: pct}}
         module: vm
         pct: xx.xxx%
         """
         import ast
         for module in self.all_commands.keys():
-            self.command_coverage[module] = []
+            self.command_test_coverage[module] = []
             self.all_untested_commands[module] = []
         # pylint: disable=too-many-nested-blocks
         for module in self.all_commands.keys():
@@ -192,23 +192,23 @@ class CmdcovManager:
                 else:
                     self.all_untested_commands[module].append(command)
             try:
-                self.command_coverage[module] = [count, len(self.all_untested_commands[module]),
-                                                 f'{count / len(self.all_commands[module]):.3%}']
+                self.command_test_coverage[module] = [count, len(self.all_untested_commands[module]),
+                                                      f'{count / len(self.all_commands[module]):.3%}']
             except ZeroDivisionError:
-                self.command_coverage[module] = [0, 0, 'N/A']
-            self.command_coverage['Total'][0] += count
-            self.command_coverage['Total'][1] += len(self.all_untested_commands[module])
-        self.command_coverage['Total'][2] = f'''{self.command_coverage["Total"][0] /
-                                                 (self.command_coverage["Total"][0] +
-                                                  self.command_coverage["Total"][1]):.3%}'''
-        logger.warning(self.command_coverage)
-        return self.command_coverage
+                self.command_test_coverage[module] = [0, 0, 'N/A']
+            self.command_test_coverage['Total'][0] += count
+            self.command_test_coverage['Total'][1] += len(self.all_untested_commands[module])
+        self.command_test_coverage['Total'][2] = f'''{self.command_test_coverage["Total"][0] /
+                                                 (self.command_test_coverage["Total"][0] +
+                                                  self.command_test_coverage["Total"][1]):.3%}'''
+        logger.warning(self.command_test_coverage)
+        return self.command_test_coverage
 
-    def _run_commands_coverage_enhance(self):
+    def _run_command_test_coverage_enhance(self):
         """
         all_untest_commands: {[module]:[],}
         all_tested_commands_from_file: []
-        command_coverage: {[module: [test, untested, pct]
+        command_test_coverage: {[module: [test, untested, pct]
         module: vm
         percentage: xx.xxx%
         """
@@ -227,13 +227,13 @@ class CmdcovManager:
                         if self.level == 'argument':
                             for opt in opt_list:
                                 if opt in cmd:
-                                    self.command_coverage[module][0] += 1
+                                    self.command_test_coverage[module][0] += 1
                                     untested_commands.pop(cmd_idx)
                                     exist_flag = True
                                     if exist_flag:
                                         break
                         else:
-                            self.command_coverage[module][0] += 1
+                            self.command_test_coverage[module][0] += 1
                             untested_commands.pop(cmd_idx)
                             exist_flag = True
                             if exist_flag:
@@ -241,18 +241,18 @@ class CmdcovManager:
                     if exist_flag:
                         break
             try:
-                self.command_coverage[module][1] = len(untested_commands)
-                self.command_coverage[module][2] = f'''{self.command_coverage[module][0] /
-                                                        (self.command_coverage[module][0] +
-                                                         self.command_coverage[module][1]):.3%}'''
+                self.command_test_coverage[module][1] = len(untested_commands)
+                self.command_test_coverage[module][2] = f'''{self.command_test_coverage[module][0] /
+                                                        (self.command_test_coverage[module][0] +
+                                                         self.command_test_coverage[module][1]):.3%}'''
             except ZeroDivisionError:
-                self.command_coverage[module] = [0, 0, 'N/A']
-            total_tested += self.command_coverage[module][0] if self.command_coverage[module] else 0
-            total_untested += self.command_coverage[module][1] if self.command_coverage[module] else 0
-        self.command_coverage['Total'][0] = total_tested
-        self.command_coverage['Total'][1] = total_untested
-        self.command_coverage['Total'][2] = f'{total_tested / (total_tested + total_untested):.3%}'
-        logger.warning(self.command_coverage)
+                self.command_test_coverage[module] = [0, 0, 'N/A']
+            total_tested += self.command_test_coverage[module][0] if self.command_test_coverage[module] else 0
+            total_untested += self.command_test_coverage[module][1] if self.command_test_coverage[module] else 0
+        self.command_test_coverage['Total'][0] = total_tested
+        self.command_test_coverage['Total'][1] = total_untested
+        self.command_test_coverage['Total'][2] = f'{total_tested / (total_tested + total_untested):.3%}'
+        logger.warning(self.command_test_coverage)
 
     def _render_html(self):
         """
@@ -263,22 +263,22 @@ class CmdcovManager:
         j2_loader = FileSystemLoader(self.template_path)
         env = Environment(loader=j2_loader)
         j2_tmpl = env.get_template('./index.j2')
-        for item in self.command_coverage.values():
+        for item in self.command_test_coverage.values():
             color, percentage = self._get_color(item)
             item.append({'color': color, 'percentage': percentage})
-        total = self.command_coverage.pop('Total')
+        total = self.command_test_coverage.pop('Total')
 
         content = j2_tmpl.render(description=description,
                                  enable_cli_own=self.enable_cli_own,
                                  date=self.date,
                                  Total=total,
-                                 command_coverage=self.command_coverage)
+                                 command_test_coverage=self.command_test_coverage)
         index_html = os.path.join(html_path, 'index.html')
         with open(index_html, 'w', encoding=ENCODING) as f:
             f.write(content)
 
         # render child html
-        for module, coverage in self.command_coverage.items():
+        for module, coverage in self.command_test_coverage.items():
             if coverage:
                 self._render_child_html(module, coverage, self.all_untested_commands[module])
 
@@ -297,7 +297,7 @@ class CmdcovManager:
 
         return index_html
 
-    def _render_cli_html(self, command_coverage):
+    def _render_cli_html(self, command_test_coverage):
         """
         render cli own html string
         """
@@ -306,15 +306,15 @@ class CmdcovManager:
         j2_loader = FileSystemLoader(self.template_path)
         env = Environment(loader=j2_loader)
         j2_tmpl = env.get_template('./index2.j2')
-        for module, item in command_coverage.items():
+        for module, item in command_test_coverage.items():
             color, percentage = self._get_color(item)
-            command_coverage[module].append({'color': color, 'percentage': percentage})
-        total = command_coverage.pop('Total')
+            command_test_coverage[module].append({'color': color, 'percentage': percentage})
+        total = command_test_coverage.pop('Total')
 
         content = j2_tmpl.render(description=description,
                                  date=self.date,
                                  Total=total,
-                                 command_coverage=command_coverage)
+                                 command_test_coverage=command_test_coverage)
         index_html = os.path.join(html_path, 'index2.html')
         with open(index_html, 'w', encoding=ENCODING) as f:
             f.write(content)

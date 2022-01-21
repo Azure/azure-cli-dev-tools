@@ -41,7 +41,7 @@
                 {{ render_percentage(Total[2], Total[3]) }}
                 <td name="td-report">N/A</td>
               </tr>
-              {% for module, cov in command_coverage.items() %}
+              {% for module, cov in command_test_coverage.items() %}
               <tr>
                 <td name="td-module">{{ module }}</td>
                 <td name="td-tested">{{ cov[0] }}</td>

@@ -193,11 +193,11 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
             return help_entry.short_summary or help_entry.long_summary
         return help_entry
 
-    def get_command_coverage(self):
+    def get_command_test_coverage(self):
         diff_index = diff_branches_detail(repo=self.git_repo, target=self.git_target, source=self.git_source)
         commands, parameters = self._detect_new_command(diff_index)
         all_tested_command = self._detect_tested_command(diff_index)
-        return self._run_command_coverage(commands, parameters, all_tested_command)
+        return self._run_command_test_coverage(commands, parameters, all_tested_command)
 
     # pylint: disable=too-many-locals, too-many-nested-blocks, too-many-branches, too-many-statements
     def _detect_new_command(self, diff_index):
@@ -215,10 +215,10 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         for c, v in self.exclusions.items():
             if 'parameters' in v:
                 for p, r in v['parameters'].items():
-                    if 'missing_parameter_coverage' in r['rule_exclusions']:
+                    if 'missing_parameter_test_coverage' in r['rule_exclusions']:
                         exclude_parameters.append((c, p))
             elif 'rule_exclusions' in v:
-                if 'missing_command_coverage' in v['rule_exclusions']:
+                if 'missing_command_test_coverage' in v['rule_exclusions']:
                     exclude_comands.append(c)
         _logger.debug('exclude_parameters: %s', exclude_parameters)
         _logger.debug('exclude_comands: %s', exclude_comands)
@@ -301,7 +301,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         return all_tested_command
 
     @staticmethod
-    def _run_command_coverage(commands, parameters, all_tested_command):
+    def _run_command_test_coverage(commands, parameters, all_tested_command):
         flag = False
         exec_state = True
         for command, opt_list in parameters:
@@ -315,7 +315,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                     _logger.error("Can not find '%s' test case", command + ' ' + opt)
                     _logger.error("Please add some scenario tests for the new parameter")
                     _logger.error(
-                        "Or add the parameter with missing_parameter_coverage rule in linter_exclusions.yml")
+                        "Or add the parameter with missing_parameter_test_coverage rule in linter_exclusions.yml")
                     exec_state = False
                 if flag:
                     break
@@ -327,14 +327,14 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
             else:
                 _logger.error("Can not find '%s' test case", command)
                 _logger.error("Please add some scenario tests for the new command")
-                _logger.error("Or add the command with missing_command_coverage rule in linter_exclusions.yml")
+                _logger.error("Or add the command with missing_command_test_coverage rule in linter_exclusions.yml")
                 exec_state = False
         return exec_state
 
 
 # pylint: disable=too-many-instance-attributes
 class LinterManager:
-    _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params', 'command_coverage'}
+    _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params', 'command_test_coverage'}
 
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, exclusions=None,
                  rule_inclusions=None, use_ci_exclusions=None, min_severity=None, update_global_exclusion=None,
@@ -387,7 +387,7 @@ class LinterManager:
         return self._exit_code
 
     def run(self, run_params=None, run_commands=None, run_command_groups=None,
-            run_help_files_entries=None, run_command_coverage=None):
+            run_help_files_entries=None, run_command_test_coverage=None):
         paths = import_module('{}.rules'.format(PACKAGE_NAME)).__path__
 
         if paths:
@@ -422,8 +422,8 @@ class LinterManager:
         if run_params and self._rules.get('params'):
             self._run_rules('params')
 
-        if run_command_coverage and self._rules.get('command_coverage'):
-            self._run_rules('command_coverage')
+        if run_command_test_coverage and self._rules.get('command_test_coverage'):
+            self._run_rules('command_test_coverage')
 
         if not self.exit_code:
             print(os.linesep + 'No violations found for linter rules.')

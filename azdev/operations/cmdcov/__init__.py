@@ -34,7 +34,7 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
     from azure.cli.core.file_util import (  # pylint: disable=import-error
         get_all_help, create_invoker_and_load_cmds_and_args)
 
-    heading('CLI Command Coverage')
+    heading('CLI Command Test Coverage')
 
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']

@@ -9,6 +9,6 @@ from ..linter import RuleError, LinterSeverity
 
 
 @CommandCoverageRule(LinterSeverity.HIGH)
-def missing_command_coverage(linter):
-    if not linter.get_command_coverage():
-        raise RuleError('Missing Command Coverage')
+def missing_command_test_coverage(linter):
+    if not linter.get_command_test_coverage():
+        raise RuleError('Missing Command Test Coverage')
