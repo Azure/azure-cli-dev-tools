@@ -8,9 +8,10 @@ ENCODING = 'utf-8'
 
 # Base on https://github.com/Azure/azure-cli/blob/dev/.github/CODEOWNERS
 # Add identity after pr 21041
-# Move container out of CLI_OWN_MODULES, because this module cannot find an owner in service team.
+# Move container out of CLI_OWN_MODULES, this module cannot find an owner in service team.
+# Move privatedns out of CLI_OWN_MODULES, this module cannot find an owner in service team.
 CLI_OWN_MODULES = ['cloud', 'databoxedge', 'keyvault', 'monitor', 'network',
-                   'privatedns', 'profile', 'resource', 'role', 'storage', 'vm']
+                   'profile', 'resource', 'role', 'storage', 'vm']
 
 EXCLUDE_MODULES = ['batchai', 'extension', 'feedback', 'find', 'interactive', 'kusto', 'util']
 
@@ -52,7 +53,7 @@ EXCLUDE_COMMANDS = {
         'network dns record-set srv update',
         'network dns record-set txt delete',
         'network dns record-set txt show',
-        'network dns record-set txt update'
+        'network dns record-set txt update',
     ],
     'resource': [
         # Permission denied
@@ -70,6 +71,7 @@ EXCLUDE_COMMANDS = {
         'ad sp owner list',
         'ad user list',
         # Move identity from role module to identity module
+        'identity show',
         'identity delete',
         'identity list',
         'identity list-operations',
