@@ -6,9 +6,10 @@
 
 ENCODING = 'utf-8'
 
-# https://github.com/Azure/azure-cli/blob/dev/.github/CODEOWNERS
-# TODO add identity
-CLI_OWN_MODULES = ['cloud', 'container', 'databoxedge', 'keyvault', 'monitor', 'network',
+# Base on https://github.com/Azure/azure-cli/blob/dev/.github/CODEOWNERS
+# Add identity after pr 21041
+# Move container out of CLI_OWN_MODULES, because this module cannot find an owner in service team.
+CLI_OWN_MODULES = ['cloud', 'databoxedge', 'keyvault', 'monitor', 'network',
                    'privatedns', 'profile', 'resource', 'role', 'storage', 'vm']
 
 EXCLUDE_MODULES = ['batchai', 'extension', 'feedback', 'find', 'interactive', 'kusto', 'util']
@@ -57,7 +58,7 @@ EXCLUDE_COMMANDS = {
         # Permission denied
         'account management-group subscription add',
         'account management-group subscription remove',
-        # hard to test
+        # Hard to test
         'bicep publish',
         'feature register',
     ],
@@ -68,6 +69,10 @@ EXCLUDE_COMMANDS = {
         'ad signed-in-user show',
         'ad sp owner list',
         'ad user list',
+        # Move identity from role module to identity module
+        'identity delete',
+        'identity list',
+        'identity list-operations',
     ]
 }
 
