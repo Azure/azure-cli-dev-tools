@@ -207,6 +207,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         commands: List[str]
         parameters: List[str, List[str]]
         """
+        YELLOW = '\x1b[33m'
         parameters = []
         commands = []
         lines = []
@@ -251,7 +252,9 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                             if cmd not in exclude_comands and \
                                     not list(filter(lambda x, c=cmd, p=param_name: c in x[0] and p in x[1], exclude_parameters)):  # pylint: disable=line-too-long
                                 parameters.append([cmd, params])
-                                continue
+                            else:
+                                print('%sCommand [%s, %s] not test and exclude in linter_exclusions.yml' % (
+                                    YELLOW, cmd, params))
 
                 if 'commands.py' in filename:
                     command = search_command(line)
@@ -269,8 +272,11 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                         with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
                             cmd_lines = f.readlines()
                         cmd = search_command_group(idx, cmd_lines, command)
-                        if cmd and cmd not in exclude_comands:
-                            commands.append(cmd)
+                        if cmd:
+                            if cmd in exclude_comands:
+                                print('%sCommand %s not test and exclude in linter_exclusions.yml' % (YELLOW, cmd))
+                            else:
+                                commands.append(cmd)
         _logger.debug('New add parameters: %s', parameters)
         _logger.debug('New add commands: %s', commands)
         return commands, parameters
