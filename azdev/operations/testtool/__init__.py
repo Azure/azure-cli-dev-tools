@@ -11,6 +11,7 @@ import os
 import re
 from subprocess import CalledProcessError
 import sys
+import webbrowser
 
 from knack.log import get_logger
 from knack.util import CLIError
@@ -21,7 +22,7 @@ from azdev.utilities import (
     ENV_VAR_TEST_LIVE,
     COMMAND_MODULE_PREFIX, EXTENSION_PREFIX,
     make_dirs, get_azdev_config_dir,
-    get_path_table, require_virtual_env, get_name_index)
+    get_path_table, require_virtual_env, get_name_index, call)
 from .pytest_runner import get_test_runner
 from .profile_context import ProfileContext, current_profile
 from .incremental_strategy import CLIAzureDevOpsContext
@@ -33,8 +34,11 @@ logger = get_logger(__name__)
 def run_tests(tests, xml_path=None, discover=False, in_series=False,
               run_live=False, profile=None, last_failed=False, pytest_args=None,
               no_exit_first=False, mark=None,
-              git_source=None, git_target=None, git_repo=None,
-              cli_ci=False):
+              git_source=None, git_target=None, git_repo=None, cli_ci=False,
+              coverage=False, no_htmlcov=False, append_coverage=False, coverage_path=None, open_coverage=False):
+
+    if (no_htmlcov or append_coverage or coverage_path or open_coverage) and not coverage:
+        raise CLIError("Cannot use a coverage command without coverage enabled. Use --coverage or -c")
 
     require_virtual_env()
 
@@ -113,8 +117,28 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
                                  log_path=xml_path,
                                  last_failed=last_failed,
                                  no_exit_first=no_exit_first,
-                                 mark=mark)
+                                 mark=mark, coverage=coverage,
+                                 append_coverage=append_coverage,
+                                 coverage_path=coverage_path)
         exit_code = runner(test_paths=test_paths, pytest_args=pytest_args)
+
+    html_exit_code = 1
+    if coverage and not no_htmlcov:
+        logger.info('Running: coverage html')
+        html_exit_code = call("coverage html")
+
+    if coverage and open_coverage:
+        if no_htmlcov:
+            raise CLIError("Cannot use --no-htmlcov with --open-coverage")
+
+        report_path = os.path.realpath("htmlcov/index.html")
+
+        if html_exit_code == 1:
+            logger.warning("Could not open coverage HTML report because it was not generated")
+        elif not os.path.isfile(report_path):
+            logger.warning("No such file: %s . Cannot open html coverage report", report_path)
+        else:
+            webbrowser.open('file://' + report_path)
 
     sys.exit(0 if not exit_code else 1)
 

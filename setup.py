@@ -71,12 +71,12 @@ setup(
         'knack',
         'pylint==2.11.1',
         'pytest-xdist',  # depends on pytest-forked
-        'pytest>=5.0.0',
         'pyyaml',
         'requests',
         'sphinx==1.6.7',
         'tox',
-        'wheel==0.30.0'
+        'wheel==0.30.0', 
+        'pytest-cov==2.12.1'
     ],
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
