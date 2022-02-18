@@ -1,5 +1,4 @@
 env/
-venv/
 .vs/
 src/aztool.egg-info/
 src/aztool/__pycache__/__init__.cpython-36.pyc
@@ -13,6 +12,3 @@ azdev.egg-info/
 pip-wheel-metadata/*
 build/
 dist/
-.DS_Store
-htmlcov/
-.coverage
