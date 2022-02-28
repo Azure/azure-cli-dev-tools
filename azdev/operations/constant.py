@@ -75,6 +75,10 @@ EXCLUDE_COMMANDS = {
         'identity delete',
         'identity list',
         'identity list-operations',
+    ],
+    'vm': [
+        # Hard to test
+        'vm host restart',
     ]
 }
 
