@@ -241,7 +241,7 @@ def _discover_tests(profile):
         if tests:
             module_data[mod_name] = tests
 
-    logger.info('\nExtensions: %s', ', '.join([name for name, _ in extensions]))
+    logger.info('\nExtensions: %s', ', '.join([name for name, _ in extensions if name]))
     for mod_name, mod_path in extensions:
         glob_pattern = os.path.normcase(os.path.join('{}*'.format(EXTENSION_PREFIX)))
         try:
