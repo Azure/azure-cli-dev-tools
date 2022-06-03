@@ -3,6 +3,11 @@
 Release History
 ===============
 
+0.1.37
+++++++
+* `azdev verify license`: Support license for CodeGen V2 (#334)
+* `azdev test`: Revert integrate pytest-cov  (#327)
+
 0.1.36
 ++++++
 * Remove colorama reference (#321)
