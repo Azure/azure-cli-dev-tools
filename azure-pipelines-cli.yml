@@ -10,7 +10,7 @@ jobs:
   displayName: 'Extract Metadata'
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-18.04'
+    name: 'pool-ubuntu-1804'
   steps:
   - task: Bash@3
     displayName: 'Extract Version'
@@ -30,7 +30,7 @@ jobs:
   dependsOn: ExtractMetadata
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-18.04'
+    name: 'pool-ubuntu-1804'
   steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.8'
@@ -53,7 +53,7 @@ jobs:
   timeoutInMinutes: 10
 
   pool:
-    vmImage: 'ubuntu-18.04'
+    name: 'pool-ubuntu-1804'
   strategy:
     matrix:
       Python36:
@@ -99,7 +99,7 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-18.04'
+    name: 'pool-ubuntu-1804'
   strategy:
     matrix:
       Python36:
@@ -133,7 +133,7 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-18.04'
+    name: 'pool-ubuntu-1804'
   strategy:
     matrix:
       Python36:
@@ -167,7 +167,7 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-18.04'
+    name: 'pool-ubuntu-1804'
   strategy:
     matrix:
       Python36:
@@ -201,7 +201,7 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-18.04'
+    name: 'pool-ubuntu-1804'
   strategy:
     matrix:
       Python36:
@@ -234,7 +234,7 @@ jobs:
   displayName: "Performance Check on Linux"
   dependsOn: BuildPythonWheel
   pool:
-    vmImage: 'ubuntu-18.04'
+    name: 'pool-ubuntu-1804'
   strategy:
     matrix:
       Python36:

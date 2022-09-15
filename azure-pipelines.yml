@@ -9,7 +9,7 @@ jobs:
 - job: Tox
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-20.04'
+    name: 'pool-ubuntu-2004'
   strategy:
     matrix:
       Python36:
@@ -44,7 +44,7 @@ jobs:
   displayName: 'Extract Metadata'
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-20.04'
+    name: 'pool-ubuntu-2004'
   steps:
   - task: Bash@3
     displayName: 'Extract Version'
@@ -64,7 +64,7 @@ jobs:
   dependsOn: ExtractMetadata
   condition: succeeded()
   pool:
-    vmImage: 'ubuntu-20.04'
+    name: 'pool-ubuntu-2004'
   steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.9'
