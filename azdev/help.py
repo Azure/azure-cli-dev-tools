@@ -141,6 +141,11 @@ helps['statistics'] = """
 
 helps['statistics list-command-table'] = """
     short-summary: List Command table for CLI module.
+    examples:
+        - name: List command table for the network module
+          text: azdev statistics list-command-table network -o table
+        - name: List command table for all modules of azure-cli repo, without commands details
+          text: azdev statistics list-command-table CLI --statistics-only
 """
 
 helps['perf'] = """
