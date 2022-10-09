@@ -6,23 +6,22 @@
 import inspect
 import re
 import time
-import os
 from pathlib import Path
 
+from knack.log import get_logger
 from azdev.utilities import (
     heading, display, get_path_table, require_azure_cli, filter_by_git_diff)
-from knack.log import get_logger
 
-# from .linter import LinterManager, LinterScope, RuleError, LinterSeverity
 from .util import filter_modules
 
 logger = get_logger(__name__)
 
-def list_command_table(modules=None, git_source=None, git_target=None, git_repo=None, include_whl_extensions=False, statistics_only=False):
+
+def list_command_table(modules=None, git_source=None, git_target=None, git_repo=None,
+                       include_whl_extensions=False, statistics_only=False):
     require_azure_cli()
 
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
-    # from azure.cli.core.file_util import create_invoker_and_load_cmds_and_args  # pylint: disable=import-error
 
     heading('List Command Table')
 
@@ -48,8 +47,8 @@ def list_command_table(modules=None, git_source=None, git_target=None, git_repo=
 
     selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
                          list(selected_modules['ext'].keys())
-    selected_mod_paths = list(selected_modules['mod'].values()) + list(selected_modules['core'].values()) + \
-                         list(selected_modules['ext'].values())
+    # selected_mod_paths = list(selected_modules['mod'].values()) + list(selected_modules['core'].values()) + \
+    #                      list(selected_modules['ext'].values())
 
     if selected_mod_names:
         display('Modules: {}\n'.format(', '.join(selected_mod_names)))
@@ -93,24 +92,26 @@ def list_command_table(modules=None, git_source=None, git_target=None, git_repo=
 
         commands.append(command_info)
 
+    if statistics_only:
+        return {
+            "total": len(commands),
+            "codegenV2": codegen_v2_command_count,
+            "codegenV1": codegen_v1_command_count,
+        }
+
     display(f"Total Commands: {len(commands)}\t "
             f"CodeGen V2 Commands: {codegen_v2_command_count}\t "
             f"CodeGen V1 Commands: {codegen_v1_command_count}")
 
-    if statistics_only:
-        return
-
     commands = sorted(commands, key=lambda a: a['name'])
     return commands
+
 
 def create_invoker_and_load_cmds(cli_ctx):
     from knack.events import (
         EVENT_INVOKER_PRE_CMD_TBL_CREATE, EVENT_INVOKER_POST_CMD_TBL_CREATE)
     from azure.cli.core.commands import register_cache_arguments
     from azure.cli.core.commands.arm import register_global_subscription_argument, register_ids_argument
-    from azure.cli.core.commands.events import (
-        EVENT_INVOKER_PRE_LOAD_ARGUMENTS, EVENT_INVOKER_POST_LOAD_ARGUMENTS)
-    import time
 
     start_time = time.time()
 
@@ -143,7 +144,7 @@ import_aaz_express = re.compile(r'^\s*from (.*\.)?aaz(\..*)? .*$')
 command_args_express = re.compile(r'^.*[\s\(]command_args=.*$')
 
 
-def _command_codegen_info(command_name, command, module_loader):
+def _command_codegen_info(command_name, command, module_loader):  # pylint: disable=unused-argument, too-many-branches, too-many-statements
     from azure.cli.core.aaz import AAZCommand
     from azure.cli.core.commands import AzCliCommand
     if isinstance(command, AAZCommand):
@@ -220,8 +221,11 @@ def _command_codegen_info(command_name, command, module_loader):
                 "version": "v2",
                 "type": "Convenience"
             }
-        elif is_generated:
+
+        if is_generated:
             return {
                 "version": "v1",
                 "type": "SDK"
             }
+
+    return None
