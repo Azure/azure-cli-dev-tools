@@ -77,9 +77,9 @@ def list_command_table(modules=None, git_source=None, git_target=None, git_repo=
     codegen_v2_command_count = 0
     codegen_v1_command_count = 0
     for command_name, command in command_loader.command_table.items():
-        # if hasattr(module_loader, '')
         command_info = {
-            "name": command_name
+            "name": command_name,
+            "source": _get_command_source(command_name, command)
         }
         module_loader = command_loader.cmd_to_loader_map[command_name]
         codegen_info = _command_codegen_info(command_name, command, module_loader)
@@ -106,6 +106,22 @@ def list_command_table(modules=None, git_source=None, git_target=None, git_repo=
 
     commands = sorted(commands, key=lambda a: a['name'])
     return commands
+
+
+def _get_command_source(command_name, command):
+    from azure.cli.core.commands import ExtensionCommandSource  # pylint: disable=import-error
+    if isinstance(command.command_source, ExtensionCommandSource):
+        return {
+            "module": command.command_source.extension_name,
+            "isExtension": True
+        }
+    if command.command_source is None:
+        raise ValueError('Command: `%s`, has no command source.' % command_name)
+    # command is from module
+    return {
+        "module": command.command_source,
+        "isExtension": False
+    }
 
 
 def create_invoker_and_load_cmds(cli_ctx):
@@ -146,13 +162,17 @@ command_args_express = re.compile(r'^.*[\s\(]command_args=.*$')
 
 
 def _command_codegen_info(command_name, command, module_loader):  # pylint: disable=unused-argument, too-many-branches, too-many-statements
-    from azure.cli.core.aaz import AAZCommand
     from azure.cli.core.commands import AzCliCommand
-    if isinstance(command, AAZCommand):
-        return {
-            "version": "v2",
-            "type": "Atomic"
-        }
+
+    try:
+        from azure.cli.core.aaz import AAZCommand
+        if isinstance(command, AAZCommand):
+            return {
+                "version": "v2",
+                "type": "Atomic"
+            }
+    except ImportError:
+        pass
 
     if isinstance(command, AzCliCommand):
         if 'command_operation' not in command.command_kwargs:
