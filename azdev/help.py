@@ -135,6 +135,13 @@ helps['linter'] = """
           text: azdev linter --repo azure-cli --tgt upstream/master --src upstream/dev
 """
 
+helps['statistics'] = """
+    short-summary: Commands for CLI modules statistics.
+"""
+
+helps['statistics list-command-table'] = """
+    short-summary: List Command table for CLI module.
+"""
 
 helps['perf'] = """
     short-summary: Commands to test CLI performance.
