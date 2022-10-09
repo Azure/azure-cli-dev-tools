@@ -45,8 +45,9 @@ def list_command_table(modules=None, git_source=None, git_target=None, git_repo=
     if not any(selected_modules.values()):
         logger.warning('No commands selected to check.')
 
-    selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['core'].keys()) + \
-                         list(selected_modules['ext'].keys())
+    selected_mod_names = list(selected_modules['mod'].keys())
+    selected_mod_names += list(selected_modules['core'].keys())
+    selected_mod_names += list(selected_modules['ext'].keys())
     # selected_mod_paths = list(selected_modules['mod'].values()) + list(selected_modules['core'].values()) + \
     #                      list(selected_modules['ext'].values())
 
