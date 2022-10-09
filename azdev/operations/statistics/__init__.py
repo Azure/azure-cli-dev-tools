@@ -4,6 +4,8 @@
 # license information.
 # -----------------------------------------------------------------------------
 import inspect
+import json
+import os
 import re
 import time
 from pathlib import Path
@@ -59,7 +61,7 @@ def list_command_table(modules=None, git_source=None, git_target=None, git_repo=
     az_cli = get_default_cli()
 
     # load commands, args, and help
-    create_invoker_and_load_cmds(az_cli)
+    _create_invoker_and_load_cmds(az_cli)
 
     stop = time.time()
     logger.info('Commands and help loaded in %i sec', stop - start)
@@ -108,6 +110,71 @@ def list_command_table(modules=None, git_source=None, git_target=None, git_repo=
     return commands
 
 
+def diff_command_tables(table_path, diff_table_path, statistics_only=False):
+    with open(table_path, 'r') as f:
+        commands = json.load(f)
+
+    with open(diff_table_path, 'r') as f:
+        new_commands = json.load(f)
+
+    command_table = {}
+    for command in commands:
+        command_table[command['name']] = command
+
+    added_commands = []
+    migrated_commands = []
+    for command in new_commands:
+        name = command['name']
+        if name not in command_table:
+            added_commands.append(command)
+        elif command != command_table[name] and \
+            command.get('codegen_version', None) != command_table[name].get('codegen_version', None):
+            migrated_commands.append(command)
+
+    added_v1_commands_count = 0
+    added_v2_commands_count = 0
+    for command in added_commands:
+        if command.get('codegen_version', None) == "v2":
+            added_v2_commands_count += 1
+        elif command.get('codegen_version', None) == "v1":
+            added_v1_commands_count += 1
+
+    migrated_v1_commands_count = 0
+    migrated_v2_commands_count = 0
+    for command in migrated_commands:
+        if command.get('codegen_version', None) == "v2":
+            migrated_v2_commands_count += 1
+        elif command.get('codegen_version', None) == "v1":
+            migrated_v1_commands_count += 1
+
+    if statistics_only:
+        return {
+            "newCommands": {
+                "total": len(added_commands),
+                "codegenV2": added_v2_commands_count,
+                "codegenv1": added_v1_commands_count,
+            },
+            "migratedCommands": {
+                "total": len(migrated_commands),
+                "codegenV2": migrated_v2_commands_count,
+                "codegenv1": migrated_v1_commands_count,
+            }
+        }
+
+    display(f"Total New Commands: {len(added_commands)}\t "
+            f"CodeGen V2 Commands: {added_v2_commands_count}\t "
+            f"CodeGen V1 Commands: {added_v1_commands_count}")
+
+    display(f"Total Migrated Commands: {len(migrated_commands)}\t "
+            f"CodeGen V2 Commands: {migrated_v2_commands_count}\t "
+            f"CodeGen V1 Commands: {migrated_v1_commands_count}")
+
+    return {
+        "newCommands": added_commands,
+        "migratedCommands": migrated_commands,
+    }
+
+
 def _get_command_source(command_name, command):
     from azure.cli.core.commands import ExtensionCommandSource  # pylint: disable=import-error
     if isinstance(command.command_source, ExtensionCommandSource):
@@ -124,7 +191,7 @@ def _get_command_source(command_name, command):
     }
 
 
-def create_invoker_and_load_cmds(cli_ctx):
+def _create_invoker_and_load_cmds(cli_ctx):
     from knack.events import (
         EVENT_INVOKER_PRE_CMD_TBL_CREATE, EVENT_INVOKER_POST_CMD_TBL_CREATE)
     from azure.cli.core.commands import register_cache_arguments
