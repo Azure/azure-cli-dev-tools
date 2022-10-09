@@ -155,7 +155,7 @@ def _command_codegen_info(command_name, command, module_loader):  # pylint: disa
 
     if isinstance(command, AzCliCommand):
         if 'command_operation' not in command.command_kwargs:
-            return
+            return None
 
         command_operation = command.command_kwargs['command_operation']
         is_v2_conveniance = False
