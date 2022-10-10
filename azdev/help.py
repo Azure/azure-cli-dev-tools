@@ -152,7 +152,7 @@ helps['statistics diff-command-tables'] = """
     short-summary: Diff the command table change.
     examples:
         - name: Diff the command table change from May to Oct
-          text: azdev statistics diff-command-tables --table-path .\projects\command-table_May_01.json --diff-table-path .\projects\command-table_Oct_01.json --statistics-only
+          text: azdev statistics diff-command-tables --table-path command-table_May_01.json --diff-table-path command-table_Oct_01.json --statistics-only
 """
 
 helps['perf'] = """
