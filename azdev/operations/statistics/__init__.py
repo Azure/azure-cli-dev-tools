@@ -127,8 +127,8 @@ def diff_command_tables(table_path, diff_table_path, statistics_only=False):
         name = command['name']
         if name not in command_table:
             added_commands.append(command)
-        elif command != command_table[name] and \
-            command.get('codegen_version', None) != command_table[name].get('codegen_version', None):
+        elif command != command_table[name] and command.get('codegen_version', None) != command_table[name].get(
+                'codegen_version', None):
             migrated_commands.append(command)
 
     added_v1_commands_count = 0
