@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.39
+++++++
+* Fix package issues (#345)
+
 0.1.38
 ++++++
 * `azdev statistics list-command-table`: List Command table for CLI modules (#342)
