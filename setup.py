@@ -60,6 +60,7 @@ setup(
         'azdev.operations.linter.pylint_checkers',
         'azdev.operations.testtool',
         'azdev.operations.extensions',
+        'azdev.operations.statistics',
         'azdev.utilities',
     ],
     install_requires=[
