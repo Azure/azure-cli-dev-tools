@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.40
+++++++
+* Fix pytest issues (#347)
+
 0.1.39
 ++++++
 * Fix package issues (#345)
