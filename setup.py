@@ -78,7 +78,7 @@ setup(
         'requests',
         'sphinx==1.6.7',
         'tox',
-        'wheel==0.30.0'
+        'wheel==0.38.1'
     ],
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
