@@ -10,7 +10,7 @@ ENCODING = 'utf-8'
 # Add identity after pr 21041
 # Move container out of CLI_OWN_MODULES, this module cannot find an owner in service team.
 # Move privatedns out of CLI_OWN_MODULES, this module cannot find an owner in service team.
-CLI_OWN_MODULES = ['cloud', 'databoxedge', 'keyvault', 'monitor', 'network',
+CLI_OWN_MODULES = ['cloud', 'databoxedge', 'identity', 'keyvault', 'monitor', 'network',
                    'profile', 'resource', 'role', 'storage', 'vm']
 
 EXCLUDE_MODULES = ['batchai', 'extension', 'feedback', 'find', 'interactive', 'kusto', 'util']

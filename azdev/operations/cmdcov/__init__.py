@@ -4,18 +4,22 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-
 import os
 import time
 import yaml
 
 from knack.log import get_logger
 from knack.util import CLIError
-from azdev.operations.constant import EXCLUDE_MODULES
 from azdev.utilities import (
     heading, display, get_path_table, require_azure_cli, filter_by_git_diff)
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 from .cmdcov import CmdcovManager
+
+
+with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
+    config = yaml.safe_load(file)
+    EXCLUDE_MODULES = config['EXCLUDE_MODULES']
+
 
 logger = get_logger(__name__)
 
