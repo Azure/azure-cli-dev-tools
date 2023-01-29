@@ -4,7 +4,6 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-
 import os
 import shutil
 import sys
@@ -14,11 +13,29 @@ import yaml
 from jinja2 import FileSystemLoader, Environment
 from knack.log import get_logger
 from azdev.operations.regex import get_all_tested_commands_from_regex
-from azdev.utilities.path import get_azdev_repo_path, find_files
-from azdev.operations.constant import (
-    ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS,
-    RED, ORANGE, GREEN, BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES,
-    EXCLUDE_COMMANDS, GLOBAL_EXCLUDE_COMMANDS)
+from azdev.utilities.path import get_azdev_repo_path, get_cli_repo_path, find_files
+
+
+with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
+    config = yaml.safe_load(file)
+    ENCODING = config['ENCODING']
+    GLOBAL_PARAMETERS = config['GLOBAL_PARAMETERS']
+    GENERIC_UPDATE_PARAMETERS = config['GENERIC_UPDATE_PARAMETERS']
+    WAIT_CONDITION_PARAMETERS = config['WAIT_CONDITION_PARAMETERS']
+    OTHER_PARAMETERS = config['OTHER_PARAMETERS']
+    RED = config['RED']
+    ORANGE = config['ORANGE']
+    GREEN = config['GREEN']
+    BLUE = config['BLUE']
+    GOLD = config['GOLD']
+    RED_PCT = config['RED_PCT']
+    ORANGE_PCT = config['ORANGE_PCT']
+    GREEN_PCT = config['GREEN_PCT']
+    BLUE_PCT = config['BLUE_PCT']
+    CLI_OWN_MODULES = config['CLI_OWN_MODULES']
+    EXCLUDE_COMMANDS = config['EXCLUDE_COMMANDS']
+    GLOBAL_EXCLUDE_COMMANDS = config['GLOBAL_EXCLUDE_COMMANDS']
+
 
 logger = get_logger(__name__)
 
