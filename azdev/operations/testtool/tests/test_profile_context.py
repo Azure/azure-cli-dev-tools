@@ -30,4 +30,4 @@ class TestProfileContext(unittest.TestCase):
     def test_raise_inner_exception(self):
         with self.assertRaises(Exception):
             with ProfileContext('latest'):
-                raise Exception('inner Exception')  # pylint: disable=broad-except
+                raise Exception('inner Exception')  # pylint: disable=broad-exception-raised
