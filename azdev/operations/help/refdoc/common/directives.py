@@ -37,13 +37,13 @@ class CliBaseDirective(ObjectDescription):
         signode += addnodes.desc_addname(sig, sig)
         return sig
 
-    def needs_arglist(self):  # pylint: disable=no-self-use
+    def needs_arglist(self):
         return False
 
     def add_target_and_index(self, name, sig, signode):
         signode['ids'].append(name)
 
-    def get_index_text(self, modname, name):  # pylint: disable=unused-argument, no-self-use
+    def get_index_text(self, modname, name):  # pylint: disable=unused-argument
         return name
 
 
