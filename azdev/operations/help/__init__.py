@@ -300,7 +300,7 @@ def _get_whl_from_url(url, filename, tmp_dir, whl_cache=None):
     if url in whl_cache:
         return whl_cache[url]
     import requests
-    r = requests.get(url, stream=True)
+    r = requests.get(url, stream=True)  # pylint: disable=missing-timeout
     assert r.status_code == 200, "Request to {} failed with {}".format(url, r.status_code)
     ext_file = os.path.join(tmp_dir, filename)
     with open(ext_file, 'wb') as f:

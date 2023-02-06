@@ -69,7 +69,7 @@ def get_whl_from_url(url, filename, tmp_dir, whl_cache=None):
     if url in whl_cache:
         return whl_cache[url]
     import requests
-    r = requests.get(url, stream=True)
+    r = requests.get(url, stream=True)  # pylint: disable=missing-timeout
     try:
         assert r.status_code == 200, "Request to {} failed with {}".format(url, r.status_code)
     except AssertionError:
