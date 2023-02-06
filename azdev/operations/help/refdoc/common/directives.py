@@ -53,7 +53,7 @@ class CliGroupDirective(CliBaseDirective):
         Field('docsource', label='Doc Source', has_arg=False,
               names=('docsource', 'documentsource')),
         Field('deprecated', label='Deprecated', has_arg=False,
-              names=('deprecated'))
+              names=('deprecated',))
     ])
 
 
@@ -63,7 +63,7 @@ class CliCommandDirective(CliBaseDirective):
         Field('docsource', label='Doc Source', has_arg=False,
               names=('docsource', 'documentsource')),
         Field('deprecated', label='Deprecated', has_arg=False,
-              names=('deprecated'))
+              names=('deprecated',))
     ])
 
 
@@ -71,15 +71,15 @@ class CliArgumentDirective(CliBaseDirective):
     doc_field_types = copy.copy(_CLI_FIELD_TYPES)
     doc_field_types.extend([
         Field('required', label='Required', has_arg=False,
-              names=('required')),
+              names=('required',)),
         Field('values', label='Allowed values', has_arg=False,
               names=('values', 'choices', 'options')),
         Field('default', label='Default value', has_arg=False,
-              names=('default')),
+              names=('default',)),
         Field('source', label='Values from', has_arg=False,
               names=('source', 'sources')),
         Field('deprecated', label='Deprecated', has_arg=False,
-              names=('deprecated'))
+              names=('deprecated',))
     ])
 
 
