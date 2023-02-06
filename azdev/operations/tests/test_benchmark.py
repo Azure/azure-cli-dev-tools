@@ -25,7 +25,7 @@ class TestBenchmarkStatistics(TestCase):
         max_num = round(rands[-1], 4)
         min_num = round(rands[0], 4)
         avg_num = round(sum(rands) / len(rands), 4)
-        std_num = round(sqrt(sum([(t - avg_num) ** 2 for t in rands]) / len(rands)), 4)
+        std_num = round(sqrt(sum((t - avg_num) ** 2 for t in rands) / len(rands)), 4)
 
         stats = _benchmark_cmd_staticstic(rands)
 
