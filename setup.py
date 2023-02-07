@@ -68,7 +68,7 @@ setup(
         'docutils',
         'flake8',
         'gitpython',
-        'jinja2',
+        'Jinja2~=3.0.3',
         'knack',
         'pylint==2.11.1',
         'pytest-xdist',  # depends on pytest-forked
@@ -77,7 +77,7 @@ setup(
         'pyyaml',
         'requests',
         'sphinx==1.6.7',
-        'tox',
+        'tox~=3.28.0',
         'wheel==0.30.0'
     ],
     package_data={
