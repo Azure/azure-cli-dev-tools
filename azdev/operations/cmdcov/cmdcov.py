@@ -12,6 +12,7 @@ import yaml
 
 from jinja2 import FileSystemLoader, Environment
 from knack.log import get_logger
+from tqdm import tqdm
 from azdev.operations.regex import get_all_tested_commands_from_regex
 from azdev.utilities.path import get_azdev_repo_path, get_cli_repo_path, find_files
 
@@ -60,6 +61,8 @@ class CmdcovManager:
         self.cmdcov_path = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov')
         self.template_path = os.path.join(self.cmdcov_path, 'template')
         self.exclusions = exclusions
+        self.width = 60
+        self.fillchar = '-'
 
     def run(self):
         self._get_all_commands()
@@ -109,15 +112,18 @@ class CmdcovManager:
             elif 'rule_exclusions' in v:
                 if 'missing_command_test_coverage' in v['rule_exclusions']:
                     exclusions_comands.append(c)
-        for _, y in self.loaded_help.items():
+        print("\033[31m" + "Get all commands".center(self.width, self.fillchar) + "\033[0m")
+        time.sleep(0.1)
+        for _, y in tqdm(self.loaded_help.items()):
             if hasattr(y, 'command_source') and y.command_source in self.selected_mod_names:
                 module = y.command_source
-            elif hasattr(y, 'command_source') and hasattr(y.command_source, 'extension_name') and \
-                    y.command_source.extension_name in self.selected_mod_names:
-                module = y.command_source.extension_name
+            elif hasattr(y, 'command_source') and hasattr(y.command_source, 'extension_name'):
+                module = 'azext_' + y.command_source.extension_name.replace('-', '_')
+                if module not in self.selected_mod_names:
+                    module = None
             else:
                 continue
-            if not y.deprecate_info:
+            if (not y.deprecate_info) and module:
                 if y.command.split()[-1] not in GLOBAL_EXCLUDE_COMMANDS and \
                         y.command not in EXCLUDE_COMMANDS.get(module, []) and \
                         y.command not in exclusions_comands:
@@ -136,8 +142,16 @@ class CmdcovManager:
         get all tested commands from test_*.py
         """
         # pylint: disable=too-many-nested-blocks
-        for idx, path in enumerate(self.selected_mod_paths):
-            test_dir = os.path.join(path, 'tests')
+        print("\033[31m" + "Get tested commands from regex".center(self.width, self.fillchar) + "\033[0m")
+        time.sleep(0.1)
+        for idx, path in enumerate(tqdm(self.selected_mod_paths)):
+            if 'azure-cli-extensions' in path:
+                for dirname in os.listdir(path):
+                    if dirname.startswith('azext'):
+                        test_dir = os.path.join(path, dirname, 'tests')
+                        break
+            else:
+                test_dir = os.path.join(path, 'tests')
             files = find_files(test_dir, '*.py')
             for f in files:
                 with open(os.path.join(test_dir, f), 'r', encoding=ENCODING) as f:
@@ -149,8 +163,16 @@ class CmdcovManager:
         """
         get all tested commands from recording files
         """
-        for idx, path in enumerate(self.selected_mod_paths):
-            test_dir = os.path.join(path, 'tests')
+        print("\033[31m" + "Get tested commands from recording files".center(self.width, self.fillchar) + "\033[0m")
+        time.sleep(0.1)
+        for idx, path in enumerate(tqdm(self.selected_mod_paths)):
+            if 'azure-cli-extensions' in path:
+                for dirname in os.listdir(path):
+                    if dirname.startswith('azext'):
+                        test_dir = os.path.join(path, dirname, 'tests')
+                        break
+            else:
+                test_dir = os.path.join(path, 'tests')
             files = find_files(test_dir, 'test*.yaml')
             for f in files:
                 with open(os.path.join(test_dir, f)) as f:
@@ -295,7 +317,9 @@ class CmdcovManager:
             f.write(content)
 
         # render child html
-        for module, coverage in self.command_test_coverage.items():
+        print("\033[31m" + "Render test coverage report".center(self.width, self.fillchar) + "\033[0m")
+        time.sleep(0.1)
+        for module, coverage in tqdm(self.command_test_coverage.items()):
             if coverage:
                 self._render_child_html(module, coverage, self.all_untested_commands[module])
 

@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.42
+++++++
+* Add Extension Command Coverage Report (#TODO)
+
 0.1.41
 ++++++
 * Add Command Coverage Report  (#323)

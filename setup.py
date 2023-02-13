@@ -79,6 +79,7 @@ setup(
         'requests',
         'sphinx==1.6.7',
         'tox',
+        'tqdm',
         'wheel==0.30.0'
     ],
     package_data={
