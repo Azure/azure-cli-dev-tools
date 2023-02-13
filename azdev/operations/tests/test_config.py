@@ -7,7 +7,7 @@
 import os
 import yaml
 
-from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
+from azdev.utilities.path import get_cli_repo_path
 from azdev.operations.constant import (
     ENCODING, GLOBAL_PARAMETERS, GENERIC_UPDATE_PARAMETERS, WAIT_CONDITION_PARAMETERS, OTHER_PARAMETERS,
     RED, ORANGE, GREEN, BLUE, GOLD, RED_PCT, ORANGE_PCT, GREEN_PCT, BLUE_PCT, CLI_OWN_MODULES,
