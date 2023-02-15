@@ -9,9 +9,9 @@ import os
 import re
 import yaml
 
-from azdev.utilities.path import get_cli_repo_path
 from knack.log import get_logger
 from knack.util import CLIError
+from azdev.utilities.path import get_cli_repo_path
 
 
 logger = get_logger(__name__)

@@ -8,11 +8,11 @@ import os
 import time
 import yaml
 
+from knack.log import get_logger
+from knack.util import CLIError
 from azdev.utilities import (
     heading, display, get_path_table, require_azure_cli, filter_by_git_diff)
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
-from knack.log import get_logger
-from knack.util import CLIError
 from .cmdcov import CmdcovManager
 
 

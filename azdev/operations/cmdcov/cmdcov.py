@@ -10,11 +10,11 @@ import sys
 import time
 import yaml
 
-from azdev.operations.regex import get_all_tested_commands_from_regex
-from azdev.utilities.path import get_azdev_repo_path, get_cli_repo_path, find_files
 from jinja2 import FileSystemLoader, Environment
 from knack.log import get_logger
 from knack.util import CLIError
+from azdev.operations.regex import get_all_tested_commands_from_regex
+from azdev.utilities.path import get_azdev_repo_path, get_cli_repo_path, find_files
 
 
 logger = get_logger(__name__)
