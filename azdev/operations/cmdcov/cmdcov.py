@@ -12,9 +12,9 @@ import yaml
 
 from azdev.operations.regex import get_all_tested_commands_from_regex
 from azdev.utilities.path import get_azdev_repo_path, get_cli_repo_path, find_files
-from configparser import NoSectionError
 from jinja2 import FileSystemLoader, Environment
 from knack.log import get_logger
+from knack.util import CLIError
 
 
 logger = get_logger(__name__)
@@ -38,7 +38,7 @@ try:
         CLI_OWN_MODULES = config['CLI_OWN_MODULES']
         EXCLUDE_COMMANDS = config['EXCLUDE_COMMANDS']
         GLOBAL_EXCLUDE_COMMANDS = config['GLOBAL_EXCLUDE_COMMANDS']
-except NoSectionError as ex:
+except CLIError as ex:
     logger.warning('Failed to load cmdcov.yml: %s', ex)
 
 
