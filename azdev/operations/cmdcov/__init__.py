@@ -8,20 +8,22 @@ import os
 import time
 import yaml
 
-from knack.log import get_logger
-from knack.util import CLIError
 from azdev.utilities import (
     heading, display, get_path_table, require_azure_cli, filter_by_git_diff)
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
+from configparser import NoSectionError
+from knack.log import get_logger
+from knack.util import CLIError
 from .cmdcov import CmdcovManager
 
 
-with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
-    config = yaml.safe_load(file)
-    EXCLUDE_MODULES = config['EXCLUDE_MODULES']
-
-
 logger = get_logger(__name__)
+try:
+    with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
+        config = yaml.safe_load(file)
+        EXCLUDE_MODULES = config['EXCLUDE_MODULES']
+except NoSectionError as ex:
+    logger.warning('Failed to load cmdcov.yml: %s', ex)
 
 
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches, duplicate-code
