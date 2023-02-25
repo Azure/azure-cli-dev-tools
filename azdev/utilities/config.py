@@ -21,7 +21,11 @@ def get_azdev_config_dir():
     """ Returns the user's .azdev directory. """
     from azdev.utilities import get_env_path
     env_name = None
-    _, env_name = os.path.splitdrive(get_env_path())
+    
+    # Check if get_env_path() is none to fix https://github.com/Azure/azure-cli-dev-tools/issues/355
+    if get_env_path():
+        _, env_name = os.path.splitdrive(get_env_path())
+    
     azdev_dir = os.getenv('AZDEV_CONFIG_DIR', None) or os.path.expanduser(os.path.join('~', '.azdev'))
     if not env_name:
         return azdev_dir
