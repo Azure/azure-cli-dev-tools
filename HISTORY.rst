@@ -3,6 +3,19 @@
 Release History
 ===============
 
+0.1.40
+++++++
+* Fix pytest issues (#347)
+
+0.1.39
+++++++
+* Fix package issues (#345)
+
+0.1.38
+++++++
+* `azdev statistics list-command-table`: List Command table for CLI modules (#342)
+* `azdev statistics diff-command-tables`: Diff the command table change (#343)
+
 0.1.37
 ++++++
 * `azdev verify license`: Support license for CodeGen V2 (#334)

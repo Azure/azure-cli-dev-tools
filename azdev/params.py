@@ -99,6 +99,22 @@ def load_arguments(self, _):
                         'Defaults to "high".')
     # endregion
 
+    # region statistics
+    with ArgumentsContext(self, 'statistics') as c:
+        c.argument('include_whl_extensions',
+                   action='store_true',
+                   help="Allow running linter on extensions installed by `az extension add`.")
+        c.argument('statistics_only', action='store_true', help='Show statistics only, without detailed commands.')
+
+    with ArgumentsContext(self, 'statistics list-command-table') as c:
+        c.positional('modules', modules_type)
+
+    with ArgumentsContext(self, 'statistics diff-command-tables') as c:
+        c.argument('table_path', help='command table json file')
+        c.argument('diff_table_path', help='command table json file to diff')
+
+    # endregion
+
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')
 

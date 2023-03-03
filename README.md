@@ -41,7 +41,7 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     # Develop with a new branch
     git checkout -b <feature_branch>
     ```
-    You can do the same for `azure-cli-extensions` except that the default branch for it is `master`, run `git branch master --set-upstream-to upstream/master` instead.
+    You can do the same for `azure-cli-extensions` except that the default branch for it is `main`, run `git branch main --set-upstream-to upstream/main` instead.
 
     See [Authenticating with GitHub from Git](https://docs.github.com/github/getting-started-with-github/set-up-git#next-steps-authenticating-with-github-from-git) about caching your GitHub credentials in Git which is needed when you push the code.
 
