@@ -23,7 +23,7 @@ logger = get_logger(__name__)
 # pylint: disable=too-many-statements
 def auto_format(modules=None, git_source=None, git_target=None, git_repo=None):
 
-    heading('Style Check')
+    heading('Autoformat')
 
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
@@ -79,7 +79,7 @@ def _run_black(modules):
     cli_paths = list(modules["core"].values()) + list(modules["mod"].values())
     ext_paths = list(modules["ext"].values())
 
-    def run(paths, rcfile, desc):
+    def run(paths, desc):
         if not paths:
             return None
         logger.debug("Running on %s:\n%s", desc, "\n".join(paths))
@@ -88,8 +88,6 @@ def _run_black(modules):
         )
         return py_cmd(command, message="Running black on {}...".format(desc))
 
-    cli_config, ext_config = _config_file_path("black")
-
-    cli_result = run(cli_paths, cli_config, "modules")
-    ext_result = run(ext_paths, ext_config, "extensions")
+    cli_result = run(cli_paths, "modules")
+    ext_result = run(ext_paths, "extensions")
     return _combine_command_result(cli_result, ext_result)
