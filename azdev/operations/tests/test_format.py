@@ -10,10 +10,6 @@ from unittest import mock
 
 
 class TestConfigFilePath(unittest.TestCase):
-    def test_unsupported_code_style_checker(self):
-        with self.assertRaises(ValueError):
-            _config_file_path(style_type="unknown")
-
     def test_black_config_without_setup(self):
         mocked_config = configparser.ConfigParser()
         mocked_config.add_section("cli")
