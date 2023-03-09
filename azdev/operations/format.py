@@ -69,7 +69,7 @@ def auto_format(modules=None, git_source=None, git_target=None, git_repo=None):
         logger.error(black_result.error.output.decode('utf-8'))
         logger.error('Black: FAILED\n')
     else:
-        display('Black: PASSED\n')
+        display('Black: COMPLETE\n')
 
     sys.exit(exit_code_sum)
 
