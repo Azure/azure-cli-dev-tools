@@ -74,6 +74,33 @@ def auto_format(modules=None, git_source=None, git_target=None, git_repo=None):
     sys.exit(exit_code_sum)
 
 
+def _combine_command_result(cli_result, ext_result):
+
+    final_result = CommandResultItem(None)
+
+    def apply_result(item):
+        if item:
+            final_result.exit_code += item.exit_code
+            if item.error:
+                if final_result.error:
+                    try:
+                        final_result.error.message += item.error.message
+                    except AttributeError:
+                        final_result.error.message += str(item.error)
+                else:
+                    final_result.error = item.error
+                    setattr(final_result.error, 'message', '')
+            if item.result:
+                if final_result.result:
+                    final_result.result += item.result
+                else:
+                    final_result.result = item.result
+
+    apply_result(cli_result)
+    apply_result(ext_result)
+    return final_result
+
+
 def _run_black(modules):
 
     cli_paths = list(modules["core"].values()) + list(modules["mod"].values())
