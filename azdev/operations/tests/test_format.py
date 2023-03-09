@@ -8,8 +8,6 @@ import configparser
 import unittest
 from unittest import mock
 
-from azdev.operations.style import _config_file_path
-
 
 class TestConfigFilePath(unittest.TestCase):
     def test_unsupported_code_style_checker(self):
