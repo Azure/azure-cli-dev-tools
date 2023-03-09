@@ -13,8 +13,7 @@ from knack.log import get_logger
 from knack.util import CLIError, CommandResultItem
 
 from azdev.utilities import (
-    display, heading, py_cmd, get_path_table, EXTENSION_PREFIX,
-    get_azdev_config, get_azdev_config_dir, require_azure_cli, filter_by_git_diff)
+    display, heading, py_cmd, get_path_table, filter_by_git_diff)
 
 
 logger = get_logger(__name__)
