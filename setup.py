@@ -65,6 +65,7 @@ setup(
     ],
     install_requires=[
         'azure-multiapi-storage',
+        'black',
         'docutils',
         'flake8',
         'gitpython',
