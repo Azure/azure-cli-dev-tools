@@ -12,6 +12,8 @@ ignore =
     F811,
     # code flow is too complex, too many violations, to be removed in the future
     C901,
+    # line break before binary operator
+    W503,
     # line break after binary operator effect on readability is subjective
     W504
 exclude = 
