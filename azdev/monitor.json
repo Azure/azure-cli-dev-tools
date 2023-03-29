@@ -1,0 +1,74 @@
+{
+  "ModuleName": "monitor",
+  "Commands": {
+    "names": ["clone"],
+    "stage": "stable",
+    "infos": [
+      {
+        "cmd": "clone",
+        "desc": {
+          "short": "test",
+          "long": "test"
+        },
+        "is_aaz": true,
+        "confirmation": false,
+        "Parameters": [
+          {
+            "name": "source_resource",
+            "type": "String",
+            "aaz_type": "AAZStrArg",
+            "options": ["source-resource"],
+            "is_required": true,
+            "desc": "Resource ID of the source resource."
+          },
+          {
+            "name": "target_resource",
+            "type": "String",
+            "aaz_type": "AAZStrArg",
+            "options": ["target-resource"],
+            "is_required": true,
+            "desc": "Resource ID of the target resource."
+          }
+        ],
+        "examples": [
+          {
+            "name":  "Clone the metric alert settings from one VM to another",
+            "example": [
+              "az monitor clone --source-resource resourceId"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "Subgroups": {
+    "names": ["action-group", "activity-log", "autoscale"],
+    "desc": "",
+    "infos": [
+      {
+        "GroupName": "action-group",
+        "Commands": {
+          "names": ["create", "list", "delete", "update"],
+          "stage": "stable",
+          "desc": "",
+          "infos": []
+        },
+        "Subgroups": {
+          "names": ["test-notifications"],
+          "desc": "",
+          "infos": [
+            {
+              "GroupName": "test-notifications",
+              "Commands": {
+                "names": ["create"],
+                "stage": "stable",
+                "desc": "",
+                "infos": []
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
