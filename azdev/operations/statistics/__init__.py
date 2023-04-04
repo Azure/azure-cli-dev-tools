@@ -328,7 +328,7 @@ def _get_module_functions(path):
     try:
         module = import_module(path)
         functions = inspect.getmembers(module, predicate=inspect.isfunction)
-        return {name: value for name, value in functions}
+        return dict(functions)
 
     except ModuleNotFoundError:
         return None  # bypass functions in sdk
