@@ -5,6 +5,7 @@
 
 import copy, json
 from knack.log import get_logger
+import jsbeautifier
 
 from azdev.utilities import get_name_index
 
@@ -86,7 +87,6 @@ def get_command_tree(command_name):
 def gen_command_meta(command_info):
     command_meta = {
         "name": command_info["name"],
-        "desc": command_info["name"],
         "is_aaz": command_info["is_aaz"],
         "confirmation": command_info["confirmation"],
         "parameters": [],
@@ -175,7 +175,9 @@ def get_commands_meta(command_group_table, commands_info):
 
 
 def gen_commands_meta(commands_meta):
+    options = jsbeautifier.default_options()
+    options.indent_size = 4
     for key, module_info in commands_meta.items():
         file_name = "az_" + key + "_meta.json"
         with open(file_name, "w") as f_out:
-            f_out.write(json.dumps(module_info, indent=4))
+            f_out.write(jsbeautifier.beautify(json.dumps(module_info), options))
