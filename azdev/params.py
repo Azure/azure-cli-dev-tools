@@ -109,6 +109,9 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'statistics list-command-table') as c:
         c.positional('modules', modules_type)
 
+    with ArgumentsContext(self, 'statistics gen-command-table') as c:
+        c.positional('modules', modules_type)
+
     with ArgumentsContext(self, 'statistics diff-command-tables') as c:
         c.argument('table_path', help='command table json file')
         c.argument('diff_table_path', help='command table json file to diff')
