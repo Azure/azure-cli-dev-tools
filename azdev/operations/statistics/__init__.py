@@ -235,7 +235,8 @@ def gen_command_table(modules=None):
             "is_aaz": False,
             "help": command.help,
             "confirmation": False if command.confirmation is None or command.confirmation is False else True,
-            "arguments": []
+            "arguments": [],
+            "az_arguments_schema": None
         }
         module_loader = command_loader.cmd_to_loader_map[command_name]
         codegen_info = _command_codegen_info(command_name, command, module_loader)
@@ -250,6 +251,11 @@ def gen_command_table(modules=None):
             logger.warning('No arguments generated from {0}.'.format(command_name))
         else:
             command_info['arguments'] = command.arguments
+        if command_info["is_aaz"]:
+            try:
+                command_info['az_arguments_schema'] = command._args_schema
+            except Exception as e:
+                pass
 
         commands_info.append(command_info)
     commands_meta = get_commands_meta(command_loader.command_group_table, commands_info)

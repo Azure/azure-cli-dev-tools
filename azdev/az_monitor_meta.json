@@ -25,47 +25,56 @@
                                 "name": "name",
                                 "options": ["-n", "--name"],
                                 "required": true,
-                                "desc": "The name of the log profile."
+                                "desc": "The name of the log profile.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "location",
                                 "options": ["--location", "-l"],
                                 "required": true,
-                                "desc": "Location. Values from: `az account list-locations`. You can configure the default location using `az configure --defaults location=<location>`."
+                                "desc": "Location. Values from: `az account list-locations`. You can configure the default location using `az configure --defaults location=<location>`.",
+                                "aaz_type": "AAZResourceLocationArg"
                             }, {
                                 "name": "categories",
                                 "options": ["--categories"],
                                 "required": true,
-                                "desc": "Space-separated categories of the logs. These categories are created as is convenient to the user. Some values are: 'Write', 'Delete', and/or 'Action.'  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more."
+                                "desc": "Space-separated categories of the logs. These categories are created as is convenient to the user. Some values are: 'Write', 'Delete', and/or 'Action.'  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more.",
+                                "aaz_type": "AAZListArg"
                             }, {
                                 "name": "locations",
                                 "options": ["--locations"],
                                 "required": true,
-                                "desc": "Space-separated list of regions for which Activity Log events should be stored.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more."
+                                "desc": "Space-separated list of regions for which Activity Log events should be stored.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more.",
+                                "aaz_type": "AAZListArg"
                             }, {
                                 "name": "service_bus_rule_id",
                                 "options": ["--service-bus-rule-id"],
                                 "required": false,
-                                "desc": "The service bus rule ID of the service bus namespace in which you would like to have Event Hubs created for streaming the Activity Log. The rule ID is of the format: '{service bus resource ID}/authorizationrules/{key name}'."
+                                "desc": "The service bus rule ID of the service bus namespace in which you would like to have Event Hubs created for streaming the Activity Log. The rule ID is of the format: '{service bus resource ID}/authorizationrules/{key name}'.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "storage_account_id",
                                 "options": ["--storage-account-id"],
                                 "required": false,
-                                "desc": "the resource id of the storage account to which you would like to send the Activity Log."
+                                "desc": "the resource id of the storage account to which you would like to send the Activity Log.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "tags",
                                 "options": ["--tags"],
                                 "required": false,
-                                "desc": "Space-separated tags: key[=value] [key[=value] ...]. Use '' to clear existing tags.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more."
+                                "desc": "Space-separated tags: key[=value] [key[=value] ...]. Use '' to clear existing tags.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more.",
+                                "aaz_type": "AAZDictArg"
                             }, {
                                 "name": "days",
                                 "options": ["--days"],
                                 "required": true,
-                                "desc": "the number of days for the retention in days. A value of 0 will retain the events indefinitely."
+                                "desc": "the number of days for the retention in days. A value of 0 will retain the events indefinitely.",
+                                "aaz_type": "AAZIntArg"
                             }, {
                                 "name": "enabled",
                                 "options": ["--enabled"],
                                 "required": true,
-                                "desc": "Whether the retention policy is enabled.  Allowed values: false, true."
+                                "desc": "Whether the retention policy is enabled.  Allowed values: false, true.",
+                                "aaz_type": "AAZBoolArg"
                             }],
                             "examples": [{
                                 "name": "Create a log profile. (autogenerated)",
@@ -81,7 +90,8 @@
                                 "name": "name",
                                 "options": ["-n", "--name"],
                                 "required": true,
-                                "desc": "The name of the log profile."
+                                "desc": "The name of the log profile.",
+                                "aaz_type": "AAZStrArg"
                             }],
                             "examples": [],
                             "desc": "Delete the log profile."
@@ -102,7 +112,8 @@
                                 "name": "name",
                                 "options": ["-n", "--name"],
                                 "required": true,
-                                "desc": "The name of the log profile."
+                                "desc": "The name of the log profile.",
+                                "aaz_type": "AAZStrArg"
                             }],
                             "examples": [],
                             "desc": "Get the log profile."
@@ -115,68 +126,80 @@
                                 "name": "generic_update_add",
                                 "options": ["--add"],
                                 "required": false,
-                                "desc": "Add an object to a list of objects by specifying a path and key value pairs.  Example: --add property.listProperty <key=value, string or JSON string>"
+                                "desc": "Add an object to a list of objects by specifying a path and key value pairs.  Example: --add property.listProperty <key=value, string or JSON string>",
+                                "aaz_type": "AAZGenericUpdateAddArg"
                             }, {
                                 "name": "generic_update_set",
                                 "options": ["--set"],
                                 "required": false,
-                                "desc": "Update an object by specifying a property path and value to set.  Example: --set property1.property2=<value>"
+                                "desc": "Update an object by specifying a property path and value to set.  Example: --set property1.property2=<value>",
+                                "aaz_type": "AAZGenericUpdateSetArg"
                             }, {
                                 "name": "generic_update_remove",
                                 "options": ["--remove"],
                                 "required": false,
-                                "desc": "Remove a property or an element from a list.  Example: --remove property.list <indexToRemove> OR --remove propertyToRemove"
+                                "desc": "Remove a property or an element from a list.  Example: --remove property.list <indexToRemove> OR --remove propertyToRemove",
+                                "aaz_type": "AAZGenericUpdateRemoveArg"
                             }, {
                                 "name": "generic_update_force_string",
                                 "options": ["--force-string"],
                                 "required": false,
-                                "desc": "When using 'set' or 'add', preserve string literals instead of attempting to convert to JSON."
+                                "desc": "When using 'set' or 'add', preserve string literals instead of attempting to convert to JSON.",
+                                "aaz_type": "AAZGenericUpdateForceStringArg"
                             }, {
                                 "name": "name",
                                 "options": ["-n", "--name"],
                                 "required": true,
-                                "desc": "The name of the log profile."
+                                "desc": "The name of the log profile.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "categories",
                                 "options": ["--categories"],
                                 "required": false,
-                                "desc": "Space-separated categories of the logs. These categories are created as is convenient to the user. Some values are: 'Write', 'Delete', and/or 'Action.'  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more."
+                                "desc": "Space-separated categories of the logs. These categories are created as is convenient to the user. Some values are: 'Write', 'Delete', and/or 'Action.'  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more.",
+                                "aaz_type": "AAZListArg"
                             }, {
                                 "name": "locations",
                                 "options": ["--locations"],
                                 "required": false,
-                                "desc": "Space-separated list of regions for which Activity Log events should be stored.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more."
+                                "desc": "Space-separated list of regions for which Activity Log events should be stored.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more.",
+                                "aaz_type": "AAZListArg"
                             }, {
                                 "name": "service_bus_rule_id",
                                 "options": ["--service-bus-rule-id"],
                                 "required": false,
-                                "desc": "The service bus rule ID of the service bus namespace in which you would like to have Event Hubs created for streaming the Activity Log. The rule ID is of the format: '{service bus resource ID}/authorizationrules/{key name}'."
+                                "desc": "The service bus rule ID of the service bus namespace in which you would like to have Event Hubs created for streaming the Activity Log. The rule ID is of the format: '{service bus resource ID}/authorizationrules/{key name}'.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "storage_account_id",
                                 "options": ["--storage-account-id"],
                                 "required": false,
-                                "desc": "the resource id of the storage account to which you would like to send the Activity Log."
+                                "desc": "the resource id of the storage account to which you would like to send the Activity Log.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "tags",
                                 "options": ["--tags"],
                                 "required": false,
-                                "desc": "Space-separated tags: key[=value] [key[=value] ...]. Use '' to clear existing tags.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more."
+                                "desc": "Space-separated tags: key[=value] [key[=value] ...]. Use '' to clear existing tags.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more.",
+                                "aaz_type": "AAZDictArg"
                             }, {
                                 "name": "days",
                                 "options": ["--days"],
                                 "required": false,
-                                "desc": "the number of days for the retention in days. A value of 0 will retain the events indefinitely."
+                                "desc": "the number of days for the retention in days. A value of 0 will retain the events indefinitely.",
+                                "aaz_type": "AAZIntArg"
                             }, {
                                 "name": "enabled",
                                 "options": ["--enabled"],
                                 "required": false,
-                                "desc": "Whether the retention policy is enabled.  Allowed values: false, true."
+                                "desc": "Whether the retention policy is enabled.  Allowed values: false, true.",
+                                "aaz_type": "AAZBoolArg"
                             }],
                             "examples": [],
                             "desc": "Update a log profile in Azure Monitoring REST API."
                         }
                     },
-                    "commands_name": ["monitor log-profiles create", "monitor log-profiles update", "monitor log-profiles list", "monitor log-profiles show", "monitor log-profiles delete"],
+                    "commands_name": ["monitor log-profiles show", "monitor log-profiles update", "monitor log-profiles list", "monitor log-profiles create", "monitor log-profiles delete"],
                     "sub_group_name": [],
                     "sub_groups": {}
                 },
@@ -192,72 +215,86 @@
                                 "name": "name",
                                 "options": ["-n", "--name"],
                                 "required": true,
-                                "desc": "The name of the diagnostic setting. Required."
+                                "desc": "The name of the diagnostic setting. Required.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "event_hub_rule",
                                 "options": ["--event-hub-rule"],
                                 "required": false,
-                                "desc": "Name or ID of the event hub authorization rule."
+                                "desc": "Name or ID of the event hub authorization rule.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "event_hub",
                                 "options": ["--event-hub"],
                                 "required": false,
-                                "desc": "Name or ID an event hub. If none is specified, the default event hub will be selected."
+                                "desc": "Name or ID an event hub. If none is specified, the default event hub will be selected.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "logs",
                                 "options": ["--logs"],
                                 "required": false,
-                                "desc": "JSON encoded list of logs settings. Use '@{file}' to load from a file.For more information, visit: https://docs.microsoft.com/rest/api/monitor/diagnosticsettings/createorupdate#logsettings.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more."
+                                "desc": "JSON encoded list of logs settings. Use '@{file}' to load from a file.For more information, visit: https://docs.microsoft.com/rest/api/monitor/diagnosticsettings/createorupdate#logsettings.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more.",
+                                "aaz_type": "AAZListArg"
                             }, {
                                 "name": "marketplace_partner_id",
                                 "options": ["--marketplace-partner-id"],
                                 "required": false,
-                                "desc": "The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic Logs."
+                                "desc": "The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic Logs.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "metrics",
                                 "options": ["--metrics"],
                                 "required": false,
-                                "desc": "The list of metric settings.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more."
+                                "desc": "The list of metric settings.  Support shorthand-syntax, json-file and yaml-file. Try `??` to show more.",
+                                "aaz_type": "AAZListArg"
                             }, {
                                 "name": "storage_account",
                                 "options": ["--storage-account"],
                                 "required": false,
-                                "desc": "Name or ID of the storage account to send diagnostic logs to."
+                                "desc": "Name or ID of the storage account to send diagnostic logs to.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "workspace",
                                 "options": ["--workspace"],
                                 "required": false,
-                                "desc": "Name or ID of the Log Analytics workspace to send diagnostic logs to."
+                                "desc": "Name or ID of the Log Analytics workspace to send diagnostic logs to.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "resource",
                                 "options": ["--resource"],
                                 "required": true,
-                                "desc": "Name or ID of the target resource."
+                                "desc": "Name or ID of the target resource.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "resource_group_name",
                                 "options": ["--resource-group", "-g"],
                                 "required": false,
-                                "desc": "Name of resource group. You can configure the default group using `az configure --defaults group=<name>`"
+                                "desc": "Name of resource group. You can configure the default group using `az configure --defaults group=<name>`",
+                                "aaz_type": "AAZResourceGroupNameArg"
                             }, {
                                 "name": "namespace",
                                 "options": ["--resource-namespace"],
                                 "required": false,
-                                "desc": "Target resource provider namespace."
+                                "desc": "Target resource provider namespace.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "parent",
                                 "options": ["--resource-parent"],
                                 "required": false,
-                                "desc": "Target resource parent path, if applicable."
+                                "desc": "Target resource parent path, if applicable.",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "resource_type",
                                 "options": ["--resource-type"],
                                 "required": false,
-                                "desc": "Target resource type. Can also accept namespace/type format (Ex: 'Microsoft.Compute/virtualMachines')"
+                                "desc": "Target resource type. Can also accept namespace/type format (Ex: 'Microsoft.Compute/virtualMachines')",
+                                "aaz_type": "AAZStrArg"
                             }, {
                                 "name": "export_to_resource_specific",
                                 "options": ["--export-to-resource-specific"],
                                 "required": false,
-                                "desc": "Indicate that the export to LA must be done to a resource specific table, a.k.a. dedicated or fixed schema table, as opposed to the default dynamic schema table called AzureDiagnostics. This argument is effective only when the argument --workspace is also given.  Allowed values: false, true."
+                                "desc": "Indicate that the export to LA must be done to a resource specific table, a.k.a. dedicated or fixed schema table, as opposed to the default dynamic schema table called AzureDiagnostics. This argument is effective only when the argument --workspace is also given.  Allowed values: false, true.",
+                                "aaz_type": "AAZBoolArg"
                             }],
                             "examples": [{
                                 "name": "Create diagnostic settings, retention here only applies when the target is a storage account.",
