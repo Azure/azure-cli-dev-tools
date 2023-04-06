@@ -110,7 +110,7 @@ def gen_command_meta(command_info):
             "required": settings.get("required", False),
             "desc": settings["help"],
         }
-        if command_info["is_aaz"]:
+        if command_info["is_aaz"] and command_info["az_arguments_schema"]:
             _fields = command_info["az_arguments_schema"]._fields
             aaz_type = _fields.get(settings["dest"], None)
             if aaz_type:
