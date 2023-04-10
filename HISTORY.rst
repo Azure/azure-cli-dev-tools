@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.41
+++++++
+* `azdev statistics list-command-table`: Support stats of nested function (#363)
+
 0.1.40
 ++++++
 * Fix pytest issues (#347)
