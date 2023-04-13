@@ -99,6 +99,14 @@ helps['verify history'] = """
 """
 
 
+helps['format'] = """
+    short-summary: Autoformat Python code (black).
+    examples:
+        - name: Autoformat Python code using Black.
+          text: azdev format
+"""
+
+
 helps['style'] = """
     short-summary: Check code style (pylint and PEP8).
     examples:

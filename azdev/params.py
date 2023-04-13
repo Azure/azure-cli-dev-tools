@@ -66,6 +66,9 @@ def load_arguments(self, _):
         c.argument('report', action='store_true', help='Display results as a report.')
         c.argument('untested_params', nargs='+', help='Space-separated list of param dest values to search for (OR logic)')
 
+    with ArgumentsContext(self, 'format') as c:
+        c.positional('modules', modules_type)
+
     with ArgumentsContext(self, 'style') as c:
         c.positional('modules', modules_type)
         c.argument('pylint', action='store_true', help='Run pylint.')

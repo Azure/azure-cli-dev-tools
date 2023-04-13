@@ -133,15 +133,19 @@ For instructions on manually writing the commands and tests, see more in
 - [Authoring Tests](https://github.com/Azure/azure-cli/blob/dev/doc/authoring_tests.md)
 
 ## Style, linter check and testing
-1. Check code style (Pylint and PEP8):
+1. Auto format code (Black):
+    ```
+    azdev format <extension-name/module-name>
+    ```
+2. Check code style (Pylint and PEP8):
     ```
     azdev style <extension-name/module-name>
     ```
-2. Run static code checks of the CLI command table:
+3. Run static code checks of the CLI command table:
     ```
     azdev linter <extension-name/module-name>
     ```
-3. Record or replay CLI tests:
+4. Record or replay CLI tests:
     ```
     azdev test <extension-name/module-name>
     ```

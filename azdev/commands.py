@@ -21,6 +21,9 @@ def load_command_table(self, _):
     with CommandGroup(self, '', operation_group('testtool')) as g:
         g.command('test', 'run_tests')
 
+    with CommandGroup(self, '', operation_group('format')) as g:
+        g.command('format', 'auto_format')
+
     with CommandGroup(self, '', operation_group('style')) as g:
         g.command('style', 'check_style')
 
