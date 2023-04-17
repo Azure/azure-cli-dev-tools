@@ -4,8 +4,6 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-from knack.util import CLIError
-import re
 from enum import Enum
 from .util import extract_cmd_name, extract_cmd_property, extract_para_info
 from ..statistics.util import get_command_tree
@@ -278,21 +276,18 @@ class MetaChangeDetects:
                 self.__process_list_item_cmd_parameters(key, cmd_name, diff_type, value)
 
     def check_dict_item_remove(self):
-        print("dict key remove check: ")
         if not self.deep_diff.get("dictionary_item_removed", None):
             return
         dict_item_removed = self.deep_diff["dictionary_item_removed"]
         self.__iter_dict_items(dict_item_removed, ChangeType.REMOVE)
 
     def check_dict_item_add(self):
-        print("dict key add check: ")
         if not self.deep_diff.get("dictionary_item_added", None):
             return
         dict_item_added = self.deep_diff["dictionary_item_added"]
         self.__iter_dict_items(dict_item_added, ChangeType.ADD)
 
     def check_list_item_remove(self):
-        print("list key remove: ")
         if not self.deep_diff.get("iterable_item_removed", None):
             return
 
@@ -300,14 +295,12 @@ class MetaChangeDetects:
         self.__iter_list_items(list_item_remove, ChangeType.REMOVE)
 
     def check_list_item_add(self):
-        print("list key add: ")
         if not self.deep_diff.get("iterable_item_added", None):
             return
         list_item_add = self.deep_diff["iterable_item_added"]
         self.__iter_list_items(list_item_add, ChangeType.ADD)
 
     def check_value_change(self):
-        print("value change check: ")
         if not self.deep_diff.get("values_changed", None):
             return
         value_changes = self.deep_diff["values_changed"]
