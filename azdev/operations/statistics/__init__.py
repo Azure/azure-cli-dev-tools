@@ -177,7 +177,8 @@ def diff_command_tables(table_path, diff_table_path, statistics_only=False):
     }
 
 
-def gen_command_table(modules=None):
+def gen_command_table(modules=None, git_source=None, git_target=None, git_repo=None,
+                      with_help=False, with_example=False):
     require_azure_cli()
 
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
@@ -197,6 +198,9 @@ def gen_command_table(modules=None):
     if ext_only:
         selected_modules['mod'] = {}
         selected_modules['core'] = {}
+
+    # filter down to only modules that have changed based on git diff
+    selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
 
     if not any(selected_modules.values()):
         logger.warning('No commands selected to check.')
@@ -236,7 +240,9 @@ def gen_command_table(modules=None):
             "help": command.help,
             "confirmation": False if command.confirmation is None or command.confirmation is False else True,
             "arguments": [],
-            "az_arguments_schema": None
+            "az_arguments_schema": None,
+            "supports_no_wait": command.supports_no_wait,
+            "is_preview": command.command_kwargs.get("is_preview", False)
         }
         module_loader = command_loader.cmd_to_loader_map[command_name]
         codegen_info = _command_codegen_info(command_name, command, module_loader)
@@ -258,7 +264,7 @@ def gen_command_table(modules=None):
                 pass
 
         commands_info.append(command_info)
-    commands_meta = get_commands_meta(command_loader.command_group_table, commands_info)
+    commands_meta = get_commands_meta(command_loader.command_group_table, commands_info, with_help, with_example)
     gen_commands_meta(commands_meta)
     display(f"Total Commands: {len(commands_info)} for {', '.join(selected_mod_names)} have been generated.")
     return

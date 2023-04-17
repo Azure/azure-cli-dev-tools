@@ -111,12 +111,18 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'statistics gen-command-table') as c:
         c.positional('modules', modules_type)
+        c.argument('with_help', action="store_false", help="State whether to include help message")
+        c.argument('with_example', action="store_false", help="State whether to include examples")
 
     with ArgumentsContext(self, 'statistics diff-command-tables') as c:
         c.argument('table_path', help='command table json file')
         c.argument('diff_table_path', help='command table json file to diff')
 
     # endregion
+
+    with ArgumentsContext(self, 'checker cmp-command-meta') as c:
+        c.argument('meta_path', required=True, help='command meta json file')
+        c.argument('diff_meta_path', required=True, help='command meta json file to diff')
 
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')

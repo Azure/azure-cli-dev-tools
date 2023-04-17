@@ -6,7 +6,7 @@
 import copy, json
 from knack.log import get_logger
 import jsbeautifier
-
+from azure.cli.core.aaz import has_value
 from azdev.utilities import get_name_index
 
 
@@ -64,6 +64,22 @@ def _get_command_source(command_name, command_table):
 
 
 def get_command_tree(command_name):
+    """
+    input: monitor log-profiles create
+    ret:
+    {
+        is_group: True,
+        group_name: 'monitor',
+        sub_info: {
+            is_group: True,
+            group_name: 'monitor log-profiles',
+            sub_info: {
+                is_group: False,
+                cmd_name: 'monitor log-profiles create'
+            }
+        }
+    }
+    """
     name_arr = command_name.split()
     ret = {}
     name_arr.reverse()
@@ -84,21 +100,37 @@ def get_command_tree(command_name):
     return ret
 
 
-def gen_command_meta(command_info):
+def process_aaz_argument(az_arguments_schema, argument_settings, para):
+    _fields = az_arguments_schema._fields
+    aaz_type = _fields.get(argument_settings["dest"], None)
+    if aaz_type:
+        para["aaz_type"] = aaz_type.__class__.__name__
+        para["type"] = aaz_type._type_in_help
+        if has_value(aaz_type._default):
+            para["aaz_default"] = aaz_type._default
+        if para["aaz_type"] in ["AAZArgEnum"] and aaz_type.get("enum", None) and aaz_type.enum.get("items", None):
+            para["aaz_choices"] = aaz_type.enum["items"]
+
+
+def gen_command_meta(command_info, with_help=False, with_example=False):
+    stored_property_when_exist = ["confirmation", "supports_no_wait", "is_preview"]
     command_meta = {
         "name": command_info["name"],
         "is_aaz": command_info["is_aaz"],
-        "confirmation": command_info["confirmation"],
-        "parameters": [],
     }
-    try:
-        command_meta["examples"] = command_info["help"]["examples"]
-    except Exception as e:
-        pass
-    try:
-        command_meta["desc"] = command_info["help"]["short-summary"]
-    except Exception as e:
-        pass
+    for property in stored_property_when_exist:
+        if command_info[property]:
+            command_meta[property] = command_info[property]
+    if with_example:
+        try:
+            command_meta["examples"] = command_info["help"]["examples"]
+        except Exception as e:
+            pass
+    if with_help:
+        try:
+            command_meta["desc"] = command_info["help"]["short-summary"]
+        except Exception as e:
+            pass
     parameters = []
     for key, argument in command_info["arguments"].items():
         if argument.type is None:
@@ -106,44 +138,51 @@ def gen_command_meta(command_info):
         settings = argument.type.settings
         para = {
             "name": settings["dest"],
-            "options": settings["options_list"],
-            "required": settings.get("required", False),
-            "desc": settings["help"],
+            "options": sorted(settings["options_list"])
         }
+        if settings.get("required", False):
+            para["required"] = True
+        if settings.get("choices", None):
+            para["choices"] = sorted(list(settings["choices"]))
+        if settings.get("id_part", None):
+            para["id_part"] = settings["id_part"]
+        if settings.get("nargs", None):
+            para["nargs"] = settings["nargs"]
+        if settings.get("default", None):
+            para["default"] = settings["default"]
+        if with_help:
+            para["desc"] = settings["help"]
         if command_info["is_aaz"] and command_info["az_arguments_schema"]:
-            _fields = command_info["az_arguments_schema"]._fields
-            aaz_type = _fields.get(settings["dest"], None)
-            if aaz_type:
-                para["aaz_type"] = aaz_type.__class__.__name__
+            process_aaz_argument(command_info["az_arguments_schema"], settings, para)
         parameters.append(para)
     command_meta["parameters"] = parameters
     return command_meta
 
 
-def iter_command_group(commands_meta_iter):
+def adjust_command_group(commands_meta_iter):
     for key, module_info in commands_meta_iter.items():
-        module_info["commands_name"] = list(module_info["commands_name"])
+        pass
+        # module_info["command_name"] = sorted(module_info["command_name"])
         # module_info["commands"] = module_info["commands"].values()
-        module_info["sub_group_name"] = list(module_info["sub_group_name"])
-        if len(module_info["sub_group_name"]) > 0:
-            iter_command_group(module_info["sub_groups"])
+        # module_info["sub_group_name"] = sorted(module_info["sub_group_name"])
+        # if len(module_info["sub_group_name"]) > 0:
+        #     adjust_command_group(module_info["sub_groups"])
         # module_info["sub_groups"] = module_info["sub_groups"].values()
 
 
-def get_commands_meta(command_group_table, commands_info):
+def get_commands_meta(command_group_table, commands_info, with_help, with_example):
     commands_meta = {}
 
-    for command_info in commands_info:
+    for command_info in commands_info[131:]:
         moduel_name = command_info["source"]["module"]
         command_name = command_info["name"]
         if moduel_name not in commands_meta:
             commands_meta[moduel_name] = {
                 "module_name": moduel_name,
                 "name": "az",
-                "desc": "azure cli",
+                # "command_name": set(),
+                # "sub_group_name": set(),
                 "commands": {},
-                "commands_name": set(),
-                "sub_group_name": set(),
                 "sub_groups": {}
             }
         command_group_info = commands_meta[moduel_name]
@@ -153,29 +192,33 @@ def get_commands_meta(command_group_table, commands_info):
                 break
             if command_tree["is_group"]:
                 group_name = command_tree["group_name"]
-                command_group_info["sub_group_name"].add(group_name)
+                # command_group_info["sub_group_name"].add(group_name)
                 if group_name not in command_group_info["sub_groups"]:
-                    # group_info = command_group_table.get(group_name, None)
+                    group_info = command_group_table.get(group_name, None)
                     command_group_info["sub_groups"][group_name] = {
                         "name": group_name,
-                        "desc": "az " + group_name,
-                        # "desc": group_info.help["short-summary"] if group_info is not None else "az " + group_name,
+                        # "command_name": set(),
+                        # "sub_group_name": set(),
                         "commands": {},
-                        "commands_name": set(),
-                        "sub_group_name": set(),
                         "sub_groups": {}
                     }
+                    if with_help:
+                        try:
+                            command_group_info["sub_groups"][group_name]["desc"] = group_info.help["short-summary"]
+                        except Exception as e:
+                            pass
+
                 command_tree = command_tree["sub_info"]
                 command_group_info = command_group_info["sub_groups"][group_name]
             else:
-                command_group_info["commands_name"].add(command_name)
+                # command_group_info["command_name"].add(command_name)
                 if command_name in command_group_info["commands"]:
                     logger.warning("repeated command: {0}".format(command_name))
                     break
-                command_meta = gen_command_meta(command_info)
+                command_meta = gen_command_meta(command_info, with_help, with_example)
                 command_group_info["commands"][command_name] = command_meta
                 break
-    iter_command_group(commands_meta)
+    adjust_command_group(commands_meta)
     return commands_meta
 
 
