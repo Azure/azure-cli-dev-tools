@@ -178,7 +178,7 @@ def diff_command_tables(table_path, diff_table_path, statistics_only=False):
 
 
 def gen_command_table(modules=None, git_source=None, git_target=None, git_repo=None,
-                      with_help=False, with_example=False):
+                      with_help=False, with_example=False, meta_output_path=None):
     require_azure_cli()
 
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
@@ -265,7 +265,7 @@ def gen_command_table(modules=None, git_source=None, git_target=None, git_repo=N
 
         commands_info.append(command_info)
     commands_meta = get_commands_meta(command_loader.command_group_table, commands_info, with_help, with_example)
-    gen_commands_meta(commands_meta)
+    gen_commands_meta(commands_meta, meta_output_path)
     display(f"Total Commands: {len(commands_info)} for {', '.join(selected_mod_names)} have been generated.")
     return
 

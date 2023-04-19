@@ -14,8 +14,8 @@
                         "monitor private-link-scope scoped-resource": {
                             "name": "monitor private-link-scope scoped-resource",
                             "commands": {
-                                "monitor private-link-scope scoped-resource list": {
-                                    "name": "monitor private-link-scope scoped-resource list",
+                                "monitor private-link-scope scoped-resource show": {
+                                    "name": "monitor private-link-scope scoped-resource show",
                                     "is_aaz": false,
                                     "is_preview": true,
                                     "parameters": [{
@@ -27,6 +27,14 @@
                                         "name": "scope_name",
                                         "options": ["--scope-name"],
                                         "required": true
+                                    }, {
+                                        "name": "resource_name",
+                                        "options": ["--resource-name"],
+                                        "required": true
+                                    }, {
+                                        "name": "cmd",
+                                        "options": ["--cmd"],
+                                        "nargs": "?"
                                     }]
                                 },
                                 "monitor private-link-scope scoped-resource create": {
@@ -49,6 +57,21 @@
                                     }, {
                                         "name": "linked_resource_id",
                                         "options": ["--linked-resource-id"],
+                                        "required": true
+                                    }]
+                                },
+                                "monitor private-link-scope scoped-resource list": {
+                                    "name": "monitor private-link-scope scoped-resource list",
+                                    "is_aaz": false,
+                                    "is_preview": true,
+                                    "parameters": [{
+                                        "name": "resource_group_name",
+                                        "options": ["--resource-group", "-g"],
+                                        "required": true,
+                                        "id_part": "resource_group"
+                                    }, {
+                                        "name": "scope_name",
+                                        "options": ["--scope-name"],
                                         "required": true
                                     }]
                                 },
@@ -218,7 +241,6 @@
                                 "monitor private-link-scope private-endpoint-connection delete": {
                                     "name": "monitor private-link-scope private-endpoint-connection delete",
                                     "is_aaz": false,
-                                    "confirmation": true,
                                     "is_preview": true,
                                     "parameters": [{
                                         "name": "resource_group_name",
@@ -235,7 +257,8 @@
                                         "required": true
                                     }, {
                                         "name": "yes",
-                                        "options": ["--yes", "-y"]
+                                        "options": ["--yes", "-y"],
+                                        "default": false
                                     }]
                                 }
                             },

@@ -113,6 +113,8 @@ def load_arguments(self, _):
         c.positional('modules', modules_type)
         c.argument('with_help', action="store_false", help="State whether to include help message")
         c.argument('with_example', action="store_false", help="State whether to include examples")
+        c.argument('meta_output_path', help='command meta json file path to store')
+
 
     with ArgumentsContext(self, 'statistics diff-command-tables') as c:
         c.argument('table_path', help='command table json file')
@@ -121,7 +123,7 @@ def load_arguments(self, _):
     # endregion
 
     with ArgumentsContext(self, 'checker cmp-command-meta') as c:
-        c.argument('meta_path', required=True, help='command meta json file')
+        c.argument('base_meta_path', required=True, help='command meta json file')
         c.argument('diff_meta_path', required=True, help='command meta json file to diff')
 
     with ArgumentsContext(self, 'perf') as c:

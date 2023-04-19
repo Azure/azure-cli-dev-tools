@@ -7,10 +7,13 @@
 from enum import Enum
 from .util import extract_cmd_name, extract_cmd_property, extract_para_info
 from ..statistics.util import get_command_tree
+import json
+from json import JSONEncoder
 
 CMD_PROPERTY_REMOVE_BREAK_LIST = []
 CMD_PROPERTY_ADD_BREAK_LIST = ["confirmation"]
 CMD_PROPERTY_CHANDE_BREAK_LIST = []
+
 PARA_PROPERTY_REMOVE_BREAK_LIST = ["options"]
 PARA_PROPERTY_ADD_BREAK_LIST = ["required"]
 PARA_PROPERTY_CHANGE_BREAK_LIST = ["default"]
@@ -30,8 +33,11 @@ class MetaDiff:
         self.is_break = is_break
         self.splitter = " "
 
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
 
-class CmdMetaDiff(MetaDiff):
+
+class CmdMetaDiff:
 
     def __init__(self, cmd_name, cmd_property, diff_type=ChangeType.DEFAULT, is_break=False,
                  old_value=None, new_value=None):
@@ -43,29 +49,36 @@ class CmdMetaDiff(MetaDiff):
         self.new_value = None
         if cmd_property:
             self.cmd_property = cmd_property
-            self.cmd_type = "CMD_PROPERTY: "
+            self.cmd_type = "CMD_PROPERTY:"
             if old_value is not None:
                 self.old_value = old_value
             if new_value is not None:
                 self.new_value = new_value
         else:
-            self.cmd_type = "CMD: "
-        super().__init__(diff_type, is_break)
+            self.cmd_type = "CMD:"
+        # super().__init__(diff_type, is_break)
+        self.diff_type = diff_type
+        self.is_break = is_break
 
     def __str__(self):
         if self.cmd_property:
             if self.old_value is not None and self.new_value is not None:
-                res = [self.cmd_type, self.cmd_name, self.cmd_property, self.diff_type,
-                       " From ", self.old_value, " to ", self.new_value,
+                res = [self.cmd_type, self.cmd_name,
+                       "PROPERTY:", self.cmd_property, self.diff_type,
+                       "From", self.old_value, "to", self.new_value,
                        "is_break: ", self.is_break]
             else:
-                res = [self.cmd_type, self.cmd_name, self.cmd_property, str(self.diff_type), "is_break: ", str(self.is_break)]
+                res = [self.cmd_type, self.cmd_name,
+                       "PROPERTY:", self.cmd_property, str(self.diff_type), "is_break: ", str(self.is_break)]
         else:
             res = [self.cmd_type, self.cmd_name, str(self.diff_type), "is_break: ", str(self.is_break)]
-        return self.splitter.join([str(a) for a in res])
+        return " ".join([str(a) for a in res])
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
 
 
-class ParaMetaDiff(MetaDiff):
+class ParaMetaDiff:
 
     def __init__(self, cmd_name, para_name, para_property, diff_type=ChangeType.DEFAULT, is_break=False,
                  old_value=None, new_value=None):
@@ -84,19 +97,29 @@ class ParaMetaDiff(MetaDiff):
                 self.old_value = old_value
             if new_value is not None:
                 self.new_value = new_value
-        super().__init__(diff_type, is_break)
+        # super().__init__(diff_type, is_break)
+        self.diff_type = diff_type
+        self.is_break = is_break
 
     def __str__(self):
         if self.para_name:
             if self.old_value is not None and self.new_value is not None:
-                res = [self.para_type, self.cmd_name, self.para_name, self.para_prop, str(self.diff_type),
-                       " From ", self.old_value, " to ", self.new_value,
+                res = [self.para_type, self.cmd_name,
+                       "DEST:", self.para_name,
+                       "PROPERTY:", self.para_prop, str(self.diff_type),
+                       "from ", self.old_value, " to ", self.new_value,
                        "is_break: ", str(self.is_break)]
             else:
-                res = [self.para_type, self.cmd_name, self.para_name, self.para_prop, str(self.diff_type), "is_break: ", str(self.is_break)]
+                res = [self.para_type, self.cmd_name,
+                       "DEST:", self.para_name,
+                       "PROPERTY:", self.para_prop,
+                       str(self.diff_type), "is_break: ", str(self.is_break)]
         else:
             res = [self.para_type, self.cmd_name, str(self.diff_type), "is_break: ", str(self.is_break)]
-        return self.splitter.join([str(a) for a in res])
+        return " ".join([str(a) for a in res])
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
 
 
 class MetaChangeDetects:
@@ -333,4 +356,12 @@ class MetaChangeDetects:
     def export_meta_changes(self):
         for obj in self.diff_objs:
             print(obj)
+        return self.diff_objs
+
+    def export_meta_changes_to_json(self):
+        with open("cmp_diff.json", "w") as c:
+            for obj in self.diff_objs:
+                pass
+                # json.dumps(obj.toJson(), indent=4)
+
 

@@ -16,16 +16,15 @@
                             "commands": {
                                 "monitor private-link-scope scoped-resource list": {
                                     "name": "monitor private-link-scope scoped-resource list",
-                                    "is_aaz": false,
-                                    "is_preview": true,
+                                    "is_aaz": true,
                                     "parameters": [{
                                         "name": "resource_group_name",
-                                        "options": ["--resource-group", "-g"],
+                                        "options": ["--resource-group"],
                                         "required": true,
                                         "id_part": "resource_group"
                                     }, {
                                         "name": "scope_name",
-                                        "options": ["--scope-name"],
+                                        "options": ["--scope-name", "-g"],
                                         "required": true
                                     }]
                                 },
@@ -72,7 +71,7 @@
                                         "required": true
                                     }, {
                                         "name": "yes",
-                                        "options": ["--yes", "-y"]
+                                        "required": true
                                     }]
                                 }
                             },
@@ -98,10 +97,6 @@
                                         "name": "group_name",
                                         "options": ["--group-name"],
                                         "required": true
-                                    }, {
-                                        "name": "cmd",
-                                        "options": ["--cmd"],
-                                        "nargs": "?"
                                     }]
                                 },
                                 "monitor private-link-scope private-link-resource list": {
@@ -117,6 +112,10 @@
                                         "name": "scope_name",
                                         "options": ["--scope-name"],
                                         "required": true
+                                    }, {
+                                        "name": "cmd",
+                                        "options": ["--cmd"],
+                                        "nargs": "?"
                                     }]
                                 }
                             },
@@ -235,7 +234,8 @@
                                         "required": true
                                     }, {
                                         "name": "yes",
-                                        "options": ["--yes", "-y"]
+                                        "options": ["--yes", "-y"],
+                                        "default": true
                                     }]
                                 }
                             },

@@ -222,10 +222,12 @@ def get_commands_meta(command_group_table, commands_info, with_help, with_exampl
     return commands_meta
 
 
-def gen_commands_meta(commands_meta):
+def gen_commands_meta(commands_meta, meta_output_path=None):
     options = jsbeautifier.default_options()
     options.indent_size = 4
     for key, module_info in commands_meta.items():
         file_name = "az_" + key + "_meta.json"
+        if meta_output_path:
+            file_name = meta_output_path + file_name
         with open(file_name, "w") as f_out:
             f_out.write(jsbeautifier.beautify(json.dumps(module_info), options))
