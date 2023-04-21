@@ -6,7 +6,7 @@
 
 import time, json
 from deepdiff import DeepDiff
-from .meta_changes import MetaChangeDetects
+from .operation import MetaChangeDetects
 
 from knack.log import get_logger
 from azdev.utilities import display
@@ -14,8 +14,9 @@ from azdev.utilities import display
 logger = get_logger(__name__)
 
 
-def cmp_command_meta(base_meta_path, diff_meta_path):
-    "todo: check file path here"
+def cmp_command_meta(base_meta_path, diff_meta_path, only_break=True, with_text=True, with_obj=False,
+                     change_output_path=None):
+    """todo: check file path here"""
     start = time.time()
     # display('Loading command meta files...')
     with open(base_meta_path, "r") as g:
@@ -29,5 +30,6 @@ def cmp_command_meta(base_meta_path, diff_meta_path):
     detected_changes = MetaChangeDetects(diff, command_tree_before, command_tree_after)
     detected_changes.check_deep_diffs()
     detected_changes.export_meta_changes_to_json()
-    return detected_changes.export_meta_changes()
+    return detected_changes.export_meta_changes(only_break, with_text, with_obj)
+
 

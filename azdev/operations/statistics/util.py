@@ -118,9 +118,9 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         "name": command_info["name"],
         "is_aaz": command_info["is_aaz"],
     }
-    for property in stored_property_when_exist:
-        if command_info[property]:
-            command_meta[property] = command_info[property]
+    for prop in stored_property_when_exist:
+        if command_info[prop]:
+            command_meta[prop] = command_info[prop]
     if with_example:
         try:
             command_meta["examples"] = command_info["help"]["examples"]
@@ -180,8 +180,6 @@ def get_commands_meta(command_group_table, commands_info, with_help, with_exampl
             commands_meta[moduel_name] = {
                 "module_name": moduel_name,
                 "name": "az",
-                # "command_name": set(),
-                # "sub_group_name": set(),
                 "commands": {},
                 "sub_groups": {}
             }
@@ -197,8 +195,6 @@ def get_commands_meta(command_group_table, commands_info, with_help, with_exampl
                     group_info = command_group_table.get(group_name, None)
                     command_group_info["sub_groups"][group_name] = {
                         "name": group_name,
-                        # "command_name": set(),
-                        # "sub_group_name": set(),
                         "commands": {},
                         "sub_groups": {}
                     }

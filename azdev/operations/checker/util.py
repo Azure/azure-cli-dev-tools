@@ -6,11 +6,19 @@
 
 from knack.log import get_logger
 import re
+from enum import Enum
 
 logger = get_logger(__name__)
 
 CMD_NAME_PATTERN = re.compile(r"\[\'commands\'\]\[\'([a-zA-Z0-9\-\s]+)\'\]")
 CMD_PARAMETER_PROPERTY_PATTERN = re.compile(r"\[(.*?)\]")
+
+
+class ChangeType(str, Enum):
+    DEFAULT = 0
+    ADD = 1
+    CHANGE = 2
+    REMOVE = 3
 
 
 def extract_cmd_name(key):
@@ -28,6 +36,7 @@ def extract_cmd_property(key, cmd_name):
     if not cmd_key_res:
         return False, None
     return True, cmd_key_res[0]
+
 
 def extract_para_info(key):
     parameters_ind = key.find("['parameters']")
