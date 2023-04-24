@@ -4,7 +4,6 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-import os, json
 from .util import extract_cmd_name, extract_cmd_property, extract_para_info, ChangeType
 from ..statistics.util import get_command_tree
 from .meta_changes import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate, ParaAdd, ParaRemove,
@@ -283,7 +282,6 @@ class MetaChangeDetects:
                 continue
             command_tree = get_command_tree(obj.cmd_name)
             command_group_info = ret_mod
-            meta_search = self.base_meta
             while True:
                 if "is_group" not in command_tree:
                     break
@@ -297,10 +295,8 @@ class MetaChangeDetects:
                         }
                     command_tree = command_tree["sub_info"]
                     command_group_info = command_group_info["sub_groups"][group_name]
-                    meta_search = meta_search["sub_groups"][group_name]
                 else:
                     cmd_name = command_tree["cmd_name"]
-                    meta_search = meta_search["commands"][cmd_name]
                     command_rules = []
                     if cmd_name in command_group_info["commands"]:
                         command_rules = command_group_info["commands"][cmd_name]
@@ -309,14 +305,6 @@ class MetaChangeDetects:
                     break
 
         return ret_txt, ret_obj, ret_mod
-
-    def export_meta_changes_to_json(self, output, output_path):
-        file_name = "az_" + self.module_name + "_meta_diff.json"
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-        output_file_name = output_path + "/" + file_name
-        with open(output_file_name, "w") as f_out:
-            f_out.write(json.dumps(output, indent=4))
 
 
 

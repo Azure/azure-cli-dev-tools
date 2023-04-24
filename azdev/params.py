@@ -128,7 +128,7 @@ def load_arguments(self, _):
         c.argument('as_text', action="store_true", help='whether print diff and suggest message')
         c.argument('as_obj', action="store_true", help='whether print diff details')
         c.argument('as_tree', action="store_true", help='whether print diff details')
-        c.argument('output_path', help='command meta diff json file path to store')
+        c.argument('output_file', help='command meta diff json file path to store')
 
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')

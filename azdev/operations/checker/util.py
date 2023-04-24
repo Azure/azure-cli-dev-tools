@@ -4,9 +4,12 @@
 # --------------------------------------------------------------------------------------------
 
 
-from knack.log import get_logger
+import json
+import os
 import re
 from enum import Enum
+
+from knack.log import get_logger
 
 logger = get_logger(__name__)
 
@@ -46,6 +49,12 @@ def extract_para_info(key):
         return None
     return property_res
 
+def export_meta_changes_to_json(output, output_file):
+    output_file_folder = os.path.dirname(output_file)
+    if not os.path.exists(output_file_folder):
+        os.makedirs(output_file_folder)
+    with open(output_file, "w") as f_out:
+        f_out.write(json.dumps(output, indent=4))
 
 if __name__ == '__main__':
     key = "root['sub_groups']['monitor']['sub_groups']['monitor private-link-scope']['sub_groups']['monitor private-link-scope scoped-resource']['commands']['monitor private-link-scope scoped-resource list']['is_preview']"

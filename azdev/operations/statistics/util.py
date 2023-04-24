@@ -227,3 +227,4 @@ def gen_commands_meta(commands_meta, meta_output_path=None):
             file_name = meta_output_path + file_name
         with open(file_name, "w") as f_out:
             f_out.write(jsbeautifier.beautify(json.dumps(module_info), options))
+

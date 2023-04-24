@@ -32,8 +32,8 @@ CHANGE_RULE_MESSAGE_MAPPING = {
     "1005": "cmd `{0}` updated property `{1}` from `{2}` to `{3}`",
     "1006": "cmd `{0}` added parameter `{1}`",
     "1007": "cmd `{0}` removed parameter `{1}`",
-    "1008": "cmd `{0}` update parameter `{1}: added property `{2}`",
-    "1009": "cmd `{0}` update parameter `{1}: removed property `{2}`",
+    "1008": "cmd `{0}` update parameter `{1}`: added property `{2}`",
+    "1009": "cmd `{0}` update parameter `{1}`: removed property `{2}`",
     "1010": "cmd `{0}` update parameter `{1}`: updated property `{2}` from `{3}` to `{4}`",
 }
 
@@ -47,6 +47,6 @@ CHANGE_SUGGEST_MESSAGE_MAPPING = {
     "1006": "please remove parameter `{0}` for cmd `{1}`",
     "1007": "please add back parameter `{0}` for cmd `{1}`",
     "1008": "please remove property `{0}` for parameter `{1}` for cmd `{2}`",
-    "1009": "please add back property `{0}` for parameter {1} for cmd `{2}`",
+    "1009": "please add back property `{0}` for parameter {1}` for cmd `{2}`",
     "1010": "please change property `{0}` from `{1}` to `{2}` for parameter `{3}` of cmd `{4}`",
 }
