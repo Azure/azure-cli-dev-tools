@@ -215,7 +215,7 @@ def gen_commands_meta(commands_meta, meta_output_path=None):
         if meta_output_path:
             file_name = meta_output_path + file_name
         file_folder = os.path.dirname(file_name)
-        if not os.path.exists(file_folder):
+        if file_folder and not os.path.exists(file_folder):
             os.makedirs(file_folder)
         with open(file_name, "w") as f_out:
             f_out.write(jsbeautifier.beautify(json.dumps(module_info), options))
