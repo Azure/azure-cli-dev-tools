@@ -4,6 +4,7 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+import os, json
 from .util import extract_cmd_name, extract_cmd_property, extract_para_info, ChangeType
 from ..statistics.util import get_command_tree
 from .meta_changes import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate, ParaAdd, ParaRemove,
@@ -16,11 +17,13 @@ from azdev.utilities import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BR
 
 class MetaChangeDetects:
 
-    EXPORTED_PROP = ["rule_id", "is_break", "rule_message", "suggest_message"]
+    EXPORTED_PROP = ["rule_id", "is_break", "rule_message", "suggest_message", "cmd_name"]
 
     def __init__(self, deep_diff=None, base_meta=None, diff_meta=None):
         if not deep_diff:
             raise Exception("None diffs from cmd meta json")
+        assert base_meta["module_name"] == diff_meta["module_name"]
+        self.module_name = base_meta["module_name"]
         self.deep_diff = deep_diff
         self.base_meta = base_meta
         self.diff_meta = diff_meta
@@ -258,24 +261,62 @@ class MetaChangeDetects:
         self.check_list_item_add()
         self.check_value_change()
 
-    def export_meta_changes(self, only_break, with_text, with_obj):
-        returned_obj = []
+    def export_meta_changes(self, only_break, as_tree):
+        ret_obj = []
+        ret_txt = []
+        ret_mod = {
+            "module_name": self.module_name,
+            "name": "az",
+            "commands": {},
+            "sub_groups": {}
+        }
         for obj in self.diff_objs:
             if only_break and not obj.is_break:
                 continue
             ret = {}
             for prop in self.EXPORTED_PROP:
                 ret[prop] = getattr(obj, prop)
-            ret["rule_cls"] = obj.__class__.__name__
-            if with_obj:
-                returned_obj.append(ret)
-            if with_text:
-                print(obj)
-        return returned_obj if with_obj else None
+            ret["rule_name"] = obj.__class__.__name__
+            ret_obj.append(ret)
+            ret_txt.append(str(obj))
+            if not as_tree:
+                continue
+            command_tree = get_command_tree(obj.cmd_name)
+            command_group_info = ret_mod
+            meta_search = self.base_meta
+            while True:
+                if "is_group" not in command_tree:
+                    break
+                if command_tree["is_group"]:
+                    group_name = command_tree["group_name"]
+                    if group_name not in command_group_info["sub_groups"]:
+                        command_group_info["sub_groups"][group_name] = {
+                            "name": group_name,
+                            "commands": {},
+                            "sub_groups": {}
+                        }
+                    command_tree = command_tree["sub_info"]
+                    command_group_info = command_group_info["sub_groups"][group_name]
+                    meta_search = meta_search["sub_groups"][group_name]
+                else:
+                    cmd_name = command_tree["cmd_name"]
+                    meta_search = meta_search["commands"][cmd_name]
+                    command_rules = []
+                    if cmd_name in command_group_info["commands"]:
+                        command_rules = command_group_info["commands"][cmd_name]
+                    command_rules.append(ret)
+                    command_group_info["commands"][cmd_name] = command_rules
+                    break
 
-    def export_meta_changes_to_json(self):
-        with open("cmp_diff.json", "w") as c:
-            for obj in self.diff_objs:
-                pass
+        return ret_txt, ret_obj, ret_mod
+
+    def export_meta_changes_to_json(self, output, output_path):
+        file_name = "az_" + self.module_name + "_meta_diff.json"
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        output_file_name = output_path + "/" + file_name
+        with open(output_file_name, "w") as f_out:
+            f_out.write(json.dumps(output, indent=4))
+
 
 

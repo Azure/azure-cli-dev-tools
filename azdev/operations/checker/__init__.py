@@ -4,32 +4,45 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-import time, json
+import time, json, os
 from deepdiff import DeepDiff
 from .operation import MetaChangeDetects
+from azdev.utilities import display
 
 from knack.log import get_logger
-from azdev.utilities import display
 
 logger = get_logger(__name__)
 
 
-def cmp_command_meta(base_meta_path, diff_meta_path, only_break=True, with_text=True, with_obj=False,
-                     change_output_path=None):
-    """todo: check file path here"""
+def cmp_command_meta(base_meta_path, diff_meta_path, only_break=False, as_text=False, as_obj=False,
+                     as_tree=False, output_path=None):
+    if not os.path.exists(base_meta_path):
+        display("base meta file path needed")
+        return
+    if not os.path.exists(diff_meta_path):
+        display("diff meta file path needed")
+        return
     start = time.time()
-    # display('Loading command meta files...')
     with open(base_meta_path, "r") as g:
         command_tree_before = json.load(g)
     with open(diff_meta_path, "r") as g:
         command_tree_after = json.load(g)
     stop = time.time()
-    # logger.info('Command meta files loaded in %i sec', stop - start)
-    # display('Command meta files loaded in {0} sec'.format(stop - start))
+    logger.info('Command meta files loaded in %i sec', stop - start)
     diff = DeepDiff(command_tree_before, command_tree_after)
     detected_changes = MetaChangeDetects(diff, command_tree_before, command_tree_after)
     detected_changes.check_deep_diffs()
-    detected_changes.export_meta_changes_to_json()
-    return detected_changes.export_meta_changes(only_break, with_text, with_obj)
+    ret_txt, ret_obj, ret_mod = detected_changes.export_meta_changes(only_break, as_tree)
+    result = []
+    if as_text:
+        result = ret_txt
+    if as_obj:
+        result = ret_obj
+    if as_tree:
+        result = ret_mod
+    if output_path:
+        detected_changes.export_meta_changes_to_json(result, output_path)
+    else:
+        return result
 
 
