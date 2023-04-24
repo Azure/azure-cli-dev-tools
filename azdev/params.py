@@ -109,7 +109,7 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'statistics list-command-table') as c:
         c.positional('modules', modules_type)
 
-    with ArgumentsContext(self, 'statistics gen-command-table') as c:
+    with ArgumentsContext(self, 'statistics gen-command-meta') as c:
         c.positional('modules', modules_type)
         c.argument('with_help', action="store_false", help="State whether to include help message")
         c.argument('with_example', action="store_false", help="State whether to include examples")
@@ -125,9 +125,9 @@ def load_arguments(self, _):
         c.argument('base_meta_path', required=True, help='command meta json file')
         c.argument('diff_meta_path', required=True, help='command meta json file to diff')
         c.argument('only_break', action="store_true", help='whether include non breaking changes')
-        c.argument('as_text', action="store_true", help='whether print diff and suggest message')
-        c.argument('as_obj', action="store_true", help='whether print diff details')
-        c.argument('as_tree', action="store_true", help='whether print diff details')
+        c.argument('as_text', action="store_true", help='print diff and suggest message as text')
+        c.argument('as_obj', action="store_true", help='print diff and suggest message as detailed objects')
+        c.argument('as_tree', action="store_true", help='print diff and suggest message as detailed objects under command tree')
         c.argument('output_file', help='command meta diff json file path to store')
 
     with ArgumentsContext(self, 'perf') as c:

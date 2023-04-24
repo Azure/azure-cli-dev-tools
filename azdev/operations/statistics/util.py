@@ -3,12 +3,15 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
-import copy, json
-from knack.log import get_logger
+import copy
+import json
+import os
+
 import jsbeautifier
 from azure.cli.core.aaz import has_value
-from azdev.utilities import get_name_index
+from knack.log import get_logger
 
+from azdev.utilities import get_name_index
 
 logger = get_logger(__name__)
 
@@ -159,17 +162,6 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
     return command_meta
 
 
-def adjust_command_group(commands_meta_iter):
-    for key, module_info in commands_meta_iter.items():
-        pass
-        # module_info["command_name"] = sorted(module_info["command_name"])
-        # module_info["commands"] = module_info["commands"].values()
-        # module_info["sub_group_name"] = sorted(module_info["sub_group_name"])
-        # if len(module_info["sub_group_name"]) > 0:
-        #     adjust_command_group(module_info["sub_groups"])
-        # module_info["sub_groups"] = module_info["sub_groups"].values()
-
-
 def get_commands_meta(command_group_table, commands_info, with_help, with_example):
     commands_meta = {}
 
@@ -190,7 +182,6 @@ def get_commands_meta(command_group_table, commands_info, with_help, with_exampl
                 break
             if command_tree["is_group"]:
                 group_name = command_tree["group_name"]
-                # command_group_info["sub_group_name"].add(group_name)
                 if group_name not in command_group_info["sub_groups"]:
                     group_info = command_group_table.get(group_name, None)
                     command_group_info["sub_groups"][group_name] = {
@@ -207,14 +198,12 @@ def get_commands_meta(command_group_table, commands_info, with_help, with_exampl
                 command_tree = command_tree["sub_info"]
                 command_group_info = command_group_info["sub_groups"][group_name]
             else:
-                # command_group_info["command_name"].add(command_name)
                 if command_name in command_group_info["commands"]:
                     logger.warning("repeated command: {0}".format(command_name))
                     break
                 command_meta = gen_command_meta(command_info, with_help, with_example)
                 command_group_info["commands"][command_name] = command_meta
                 break
-    adjust_command_group(commands_meta)
     return commands_meta
 
 
@@ -225,6 +214,9 @@ def gen_commands_meta(commands_meta, meta_output_path=None):
         file_name = "az_" + key + "_meta.json"
         if meta_output_path:
             file_name = meta_output_path + file_name
+        file_folder = os.path.dirname(file_name)
+        if not os.path.exists(file_folder):
+            os.makedirs(file_folder)
         with open(file_name, "w") as f_out:
             f_out.write(jsbeautifier.beautify(json.dumps(module_info), options))
 

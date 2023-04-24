@@ -8,6 +8,7 @@ import time, json, os
 from deepdiff import DeepDiff
 from .operation import MetaChangeDetects
 from azdev.utilities import display
+from .util import export_meta_changes_to_json
 
 from knack.log import get_logger
 
@@ -15,7 +16,7 @@ logger = get_logger(__name__)
 
 
 def cmp_command_meta(base_meta_path, diff_meta_path, only_break=False, as_text=False, as_obj=False,
-                     as_tree=False, output_path=None):
+                     as_tree=False, output_file=None):
     if not os.path.exists(base_meta_path):
         display("base meta file path needed")
         return
@@ -40,8 +41,8 @@ def cmp_command_meta(base_meta_path, diff_meta_path, only_break=False, as_text=F
         result = ret_obj
     if as_tree:
         result = ret_mod
-    if output_path:
-        detected_changes.export_meta_changes_to_json(result, output_path)
+    if output_file:
+        export_meta_changes_to_json(result, output_file)
     else:
         return result
 

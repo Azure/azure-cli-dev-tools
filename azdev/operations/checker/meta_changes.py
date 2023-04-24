@@ -23,9 +23,10 @@ class MetaChange(object):
         self.suggest_message = suggest_message
 
     def __str__(self):
-        res = [self.rule_message, ". is_break: {0}. ".format(self.is_break),
-               self.suggest_message]
-        return " ".join([str(a) for a in res])
+        res = [self.rule_message, "is_break: {0}. ".format(self.is_break)]
+        if self.suggest_message:
+            res.append(self.suggest_message)
+        return "| ".join([str(a) for a in res])
 
 
 class CmdAdd(MetaChange):

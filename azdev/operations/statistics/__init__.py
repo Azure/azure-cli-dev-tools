@@ -177,7 +177,7 @@ def diff_command_tables(table_path, diff_table_path, statistics_only=False):
     }
 
 
-def gen_command_table(modules=None, git_source=None, git_target=None, git_repo=None,
+def gen_command_meta(modules=None, git_source=None, git_target=None, git_repo=None,
                       with_help=False, with_example=False, meta_output_path=None):
     require_azure_cli()
 

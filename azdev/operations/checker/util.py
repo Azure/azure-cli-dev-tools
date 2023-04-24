@@ -49,6 +49,7 @@ def extract_para_info(key):
         return None
     return property_res
 
+
 def export_meta_changes_to_json(output, output_file):
     output_file_folder = os.path.dirname(output_file)
     if not os.path.exists(output_file_folder):

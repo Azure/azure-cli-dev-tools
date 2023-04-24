@@ -30,7 +30,7 @@ def load_command_table(self, _):
     with CommandGroup(self, 'statistics', operation_group('statistics')) as g:
         g.command('list-command-table', 'list_command_table')
         g.command('diff-command-tables', 'diff_command_tables')
-        g.command('gen-command-table', 'gen_command_table')
+        g.command('gen-command-meta', 'gen_command_meta')
 
     with CommandGroup(self, 'verify', operation_group('pypi')) as g:
         g.command('history', 'check_history')

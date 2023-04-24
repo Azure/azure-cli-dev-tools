@@ -220,7 +220,7 @@
                                     "confirmation": true,
                                     "is_preview": true,
                                     "parameters": [{
-                                        "name": "resource_group_name",
+                                        "name": "resource_group",
                                         "options": ["--resource-group", "-g"],
                                         "required": true,
                                         "id_part": "resource_group"
