@@ -1,0 +1,9 @@
+[
+    "cmd `monitor private-link-scope scoped-resource show` removed . is_break: True.  please confirm cmd `monitor private-link-scope scoped-resource show` removed",
+    "cmd `monitor private-link-scope scoped-resource delete` update parameter `yes: removed property `options` . is_break: True.  please add back property `options` for parameter yes for cmd `monitor private-link-scope scoped-resource delete`",
+    "cmd `monitor private-link-scope scoped-resource delete` update parameter `yes: added property `required` . is_break: True.  please remove property `required` for parameter `yes` for cmd `monitor private-link-scope scoped-resource delete`",
+    "cmd `monitor private-link-scope private-endpoint-connection delete` added property `confirmation` . is_break: True.  please remove property `confirmation` for cmd `monitor private-link-scope private-endpoint-connection delete`",
+    "cmd `monitor private-link-scope scoped-resource list` update parameter `resource_group_name`: updated property `options` from `[ --resource-group -g ]` to `[ --resource-group ]` . is_break: True.  please change property `options` from `[ --resource-group ]` to `[ --resource-group -g ]` for parameter `resource_group_name` of cmd `monitor private-link-scope scoped-resource list`",
+    "cmd `monitor private-link-scope private-link-resource show` removed parameter `cmd` . is_break: True.  please add back parameter `cmd` for cmd `monitor private-link-scope private-link-resource show`",
+    "cmd `monitor private-link-scope private-endpoint-connection delete` update parameter `yes`: updated property `default` from `False` to `True` . is_break: True.  please change property `default` from `True` to `False` for parameter `yes` of cmd `monitor private-link-scope private-endpoint-connection delete`"
+]

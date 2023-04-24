@@ -124,10 +124,11 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'checker cmp-command-meta') as c:
         c.argument('base_meta_path', required=True, help='command meta json file')
         c.argument('diff_meta_path', required=True, help='command meta json file to diff')
-        c.argument('only_break', action="store_true", help='command meta json file to diff')
-        c.argument('with_text', action="store_true", help='command meta json file to diff')
-        c.argument('with_obj', action="store_false", help='command meta json file to diff')
-        c.argument('change_output_path', help='command meta diff json file path to store')
+        c.argument('only_break', action="store_true", help='whether include non breaking changes')
+        c.argument('as_text', action="store_true", help='whether print diff and suggest message')
+        c.argument('as_obj', action="store_true", help='whether print diff details')
+        c.argument('as_tree', action="store_true", help='whether print diff details')
+        c.argument('output_path', help='command meta diff json file path to store')
 
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')

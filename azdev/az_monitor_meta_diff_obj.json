@@ -1,0 +1,58 @@
+[
+    {
+        "rule_id": "1002",
+        "is_break": true,
+        "rule_message": "cmd `monitor private-link-scope scoped-resource show` removed",
+        "suggest_message": "please confirm cmd `monitor private-link-scope scoped-resource show` removed",
+        "cmd_name": "monitor private-link-scope scoped-resource show",
+        "rule_name": "CmdRemove"
+    },
+    {
+        "rule_id": "1009",
+        "is_break": true,
+        "rule_message": "cmd `monitor private-link-scope scoped-resource delete` update parameter `yes: removed property `options`",
+        "suggest_message": "please add back property `options` for parameter yes for cmd `monitor private-link-scope scoped-resource delete`",
+        "cmd_name": "monitor private-link-scope scoped-resource delete",
+        "rule_name": "ParaPropRemove"
+    },
+    {
+        "rule_id": "1008",
+        "is_break": true,
+        "rule_message": "cmd `monitor private-link-scope scoped-resource delete` update parameter `yes: added property `required`",
+        "suggest_message": "please remove property `required` for parameter `yes` for cmd `monitor private-link-scope scoped-resource delete`",
+        "cmd_name": "monitor private-link-scope scoped-resource delete",
+        "rule_name": "ParaPropAdd"
+    },
+    {
+        "rule_id": "1003",
+        "is_break": true,
+        "rule_message": "cmd `monitor private-link-scope private-endpoint-connection delete` added property `confirmation`",
+        "suggest_message": "please remove property `confirmation` for cmd `monitor private-link-scope private-endpoint-connection delete`",
+        "cmd_name": "monitor private-link-scope private-endpoint-connection delete",
+        "rule_name": "CmdPropAdd"
+    },
+    {
+        "rule_id": "1010",
+        "is_break": true,
+        "rule_message": "cmd `monitor private-link-scope scoped-resource list` update parameter `resource_group_name`: updated property `options` from `[ --resource-group -g ]` to `[ --resource-group ]`",
+        "suggest_message": "please change property `options` from `[ --resource-group ]` to `[ --resource-group -g ]` for parameter `resource_group_name` of cmd `monitor private-link-scope scoped-resource list`",
+        "cmd_name": "monitor private-link-scope scoped-resource list",
+        "rule_name": "ParaPropUpdate"
+    },
+    {
+        "rule_id": "1007",
+        "is_break": true,
+        "rule_message": "cmd `monitor private-link-scope private-link-resource show` removed parameter `cmd`",
+        "suggest_message": "please add back parameter `cmd` for cmd `monitor private-link-scope private-link-resource show`",
+        "cmd_name": "monitor private-link-scope private-link-resource show",
+        "rule_name": "ParaRemove"
+    },
+    {
+        "rule_id": "1010",
+        "is_break": true,
+        "rule_message": "cmd `monitor private-link-scope private-endpoint-connection delete` update parameter `yes`: updated property `default` from `False` to `True`",
+        "suggest_message": "please change property `default` from `True` to `False` for parameter `yes` of cmd `monitor private-link-scope private-endpoint-connection delete`",
+        "cmd_name": "monitor private-link-scope private-endpoint-connection delete",
+        "rule_name": "ParaPropUpdate"
+    }
+]
