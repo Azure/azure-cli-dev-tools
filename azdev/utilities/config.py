@@ -33,11 +33,11 @@ def get_azure_config_dir():
     return os.getenv('AZURE_CONFIG_DIR', None) or os.path.expanduser(os.path.join('~', '.azure'))
 
 
-def get_change_rule_template(rule_id=1000):
+def get_change_rule_template(rule_id="1000"):
     """ Return the rule message template"""
     return CHANGE_RULE_MESSAGE_MAPPING.get(rule_id, "Non applicable")
 
 
-def get_change_suggest_template(rule_id=1000):
+def get_change_suggest_template(rule_id="1000"):
     """ Return the change suggest message template"""
     return CHANGE_SUGGEST_MESSAGE_MAPPING.get(rule_id, "Non applicable")

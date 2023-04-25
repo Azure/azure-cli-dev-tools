@@ -4,7 +4,7 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-from .util import extract_cmd_name, extract_cmd_property, extract_para_info, ChangeType
+from .util import extract_cmd_name, extract_cmd_property, ChangeType
 from ..statistics.util import get_command_tree
 from .meta_changes import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate, ParaAdd, ParaRemove,
                            ParaPropAdd, ParaPropRemove, ParaPropUpdate)
@@ -16,7 +16,7 @@ from azdev.utilities import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BR
 
 class MetaChangeDetects:
 
-    EXPORTED_PROP = ["rule_id", "is_break", "rule_message", "suggest_message", "cmd_name"]
+    EXPORTED_META_PROPERTY = ["rule_id", "is_break", "rule_message", "suggest_message", "cmd_name"]
     CHECKED_PARA_PROPERTY = ["name", "options", "required", "choices", "id_part", "nargs", "default", "desc",
                              "aaz_type", "type", "aaz_default", "aaz_choices"]
 
@@ -257,7 +257,7 @@ class MetaChangeDetects:
             if only_break and not obj.is_break:
                 continue
             ret = {}
-            for prop in self.EXPORTED_PROP:
+            for prop in self.EXPORTED_META_PROPERTY:
                 ret[prop] = getattr(obj, prop)
             ret["rule_name"] = obj.__class__.__name__
             ret_obj.append(ret)

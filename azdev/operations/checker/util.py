@@ -17,7 +17,7 @@ CMD_NAME_PATTERN = re.compile(r"\[\'commands\'\]\[\'([a-zA-Z0-9\-\s]+)\'\]")
 CMD_PARAMETER_PROPERTY_PATTERN = re.compile(r"\[(.*?)\]")
 
 
-class ChangeType(str, Enum):
+class ChangeType(int, Enum):
     DEFAULT = 0
     ADD = 1
     CHANGE = 2
@@ -58,14 +58,14 @@ def export_meta_changes_to_json(output, output_file):
         f_out.write(json.dumps(output, indent=4))
 
 if __name__ == '__main__':
-    key = "root['sub_groups']['monitor']['sub_groups']['monitor private-link-scope']['sub_groups']['monitor private-link-scope scoped-resource']['commands']['monitor private-link-scope scoped-resource list']['is_preview']"
-    key = "root['sub_groups']['monitor']['sub_groups']['monitor private-link-scope']['sub_groups']['monitor private-link-scope scoped-resource']['commands']['monitor private-link-scope scoped-resource list']['parameters'][0]['options'][1]"
-    print(key)
-    has_cmd, cmd_name = extract_cmd_name(key)
+    test_key = "root['sub_groups']['monitor']['sub_groups']['monitor private-link-scope']['sub_groups']['monitor private-link-scope scoped-resource']['commands']['monitor private-link-scope scoped-resource list']['is_preview']"
+    test_key = "root['sub_groups']['monitor']['sub_groups']['monitor private-link-scope']['sub_groups']['monitor private-link-scope scoped-resource']['commands']['monitor private-link-scope scoped-resource list']['parameters'][0]['options'][1]"
+    print(test_key)
+    has_cmd, c_name = extract_cmd_name(test_key)
     print(has_cmd)
-    print(cmd_name)
-    has_cmd_key, cmd_key = extract_cmd_property(key, cmd_name)
+    print(c_name)
+    has_cmd_key, cmd_key = extract_cmd_property(test_key, c_name)
     print(has_cmd_key)
     print(cmd_key)
-    para_res = extract_para_info(key)
+    para_res = extract_para_info(test_key)
     print(para_res)
