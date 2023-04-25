@@ -5,13 +5,21 @@
 # -----------------------------------------------------------------------------
 
 from .util import extract_cmd_name, extract_cmd_property, ChangeType
-from ..statistics.util import get_command_tree
+from .util import get_command_tree
 from .meta_changes import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate, ParaAdd, ParaRemove,
                            ParaPropAdd, ParaPropRemove, ParaPropUpdate)
 
 from azdev.utilities import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BREAK_LIST,
                              CMD_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_REMOVE_BREAK_LIST,
                              PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST)
+
+from enum import Enum
+
+
+class DiffExportFormat(Enum):
+    DICT = "dict"
+    TEXT = "text"
+    TREE = "tree"
 
 
 class MetaChangeDetects:
@@ -244,9 +252,8 @@ class MetaChangeDetects:
         self.check_value_change()
         self.check_cmds_parameter_diff()
 
-    def export_meta_changes(self, only_break, as_tree):
-        ret_obj = []
-        ret_txt = []
+    def export_meta_changes(self, only_break, output_type="text"):
+        ret_objs = []
         ret_mod = {
             "module_name": self.module_name,
             "name": "az",
@@ -260,9 +267,11 @@ class MetaChangeDetects:
             for prop in self.EXPORTED_META_PROPERTY:
                 ret[prop] = getattr(obj, prop)
             ret["rule_name"] = obj.__class__.__name__
-            ret_obj.append(ret)
-            ret_txt.append(str(obj))
-            if not as_tree:
+            if output_type == "dict":
+                ret_objs.append(ret)
+            elif output_type == "text":
+                ret_objs.append(str(obj))
+            if output_type != "tree":
                 continue
             command_tree = get_command_tree(obj.cmd_name)
             command_group_info = ret_mod
@@ -288,7 +297,7 @@ class MetaChangeDetects:
                     command_group_info["commands"][cmd_name] = command_rules
                     break
 
-        return ret_txt, ret_obj, ret_mod
+        return ret_objs if output_type in ["text", "dict"] else ret_mod
 
 
 
