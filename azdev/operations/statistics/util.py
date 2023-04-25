@@ -165,7 +165,7 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
 def get_commands_meta(command_group_table, commands_info, with_help, with_example):
     commands_meta = {}
 
-    for command_info in commands_info[131:]:
+    for command_info in commands_info:
         moduel_name = command_info["source"]["module"]
         command_name = command_info["name"]
         if moduel_name not in commands_meta:
