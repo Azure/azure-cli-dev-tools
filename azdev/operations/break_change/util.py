@@ -24,6 +24,7 @@ class ChangeType(int, Enum):
     CHANGE = 2
     REMOVE = 3
 
+
 def get_command_tree(command_name):
     """
     input: monitor log-profiles create
@@ -211,18 +212,3 @@ def export_meta_changes_to_json(output, output_file):
         os.makedirs(output_file_folder)
     with open(output_file, "w") as f_out:
         f_out.write(json.dumps(output, indent=4))
-
-
-
-if __name__ == '__main__':
-    test_key = "root['sub_groups']['monitor']['sub_groups']['monitor private-link-scope']['sub_groups']['monitor private-link-scope scoped-resource']['commands']['monitor private-link-scope scoped-resource list']['is_preview']"
-    test_key = "root['sub_groups']['monitor']['sub_groups']['monitor private-link-scope']['sub_groups']['monitor private-link-scope scoped-resource']['commands']['monitor private-link-scope scoped-resource list']['parameters'][0]['options'][1]"
-    print(test_key)
-    has_cmd, c_name = extract_cmd_name(test_key)
-    print(has_cmd)
-    print(c_name)
-    has_cmd_key, cmd_key = extract_cmd_property(test_key, c_name)
-    print(has_cmd_key)
-    print(cmd_key)
-    para_res = extract_para_info(test_key)
-    print(para_res)
