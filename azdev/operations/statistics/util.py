@@ -9,6 +9,7 @@ from knack.log import get_logger
 
 from azdev.utilities import get_name_index
 
+
 logger = get_logger(__name__)
 
 
