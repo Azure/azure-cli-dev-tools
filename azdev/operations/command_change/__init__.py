@@ -36,8 +36,8 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
     if cli_only:
         selected_modules['ext'] = {}
     if ext_only:
-        selected_modules['mod'] = {}
         selected_modules['core'] = {}
+        selected_modules['mod'] = {}
 
     # filter down to only modules that have changed based on git diff
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
@@ -46,13 +46,13 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
         logger.warning('No commands selected to check.')
 
     selected_mod_names = list(selected_modules['mod'].keys())
-    selected_mod_names += list(selected_modules['core'].keys())
     selected_mod_names += list(selected_modules['ext'].keys())
+    selected_mod_names += list(selected_modules['core'].keys())
 
     if selected_mod_names:
-        display('Modules: {}\n'.format(', '.join(selected_mod_names)))
+        display('Modules selected: {}\n'.format(', '.join(selected_mod_names)))
 
-    heading('Export Command Table')
+    heading('Export Command Table Meta')
     start = time.time()
     display('Initializing with loading command table...')
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
@@ -108,7 +108,7 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
         commands_info.append(command_info)
     commands_meta = get_commands_meta(command_loader.command_group_table, commands_info, with_help, with_example)
     gen_commands_meta(commands_meta, meta_output_path)
-    display(f"Total Commands: {len(commands_info)} for {', '.join(selected_mod_names)} have been generated.")
+    display(f"Total Commands: {len(commands_info)} from {', '.join(selected_mod_names)} have been generated.")
     return
 
 

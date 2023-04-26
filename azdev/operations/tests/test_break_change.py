@@ -7,8 +7,8 @@
 
 import unittest
 import os
-from azdev.operations.break_change import export_command_meta, cmp_command_meta
-from azdev.operations.break_change.util import get_command_tree, extract_cmd_name, \
+from azdev.operations.command_change import export_command_meta, cmp_command_meta
+from azdev.operations.command_change.util import get_command_tree, extract_cmd_name, \
     extract_cmd_property, extract_para_info
 
 
@@ -26,7 +26,7 @@ class MyTestCase(unittest.TestCase):
         ret = get_command_tree(cmd_name)
         self.assertTrue(ret["is_group"], "group parse failed")
         self.assertFalse(ret["sub_info"]["sub_info"]["is_group"], "group parse failed")
-        self.assertFalse(ret["sub_info"]["sub_info"]["cmd_name"] == "monitor log-profiles create", "group parse failed")
+        self.assertTrue(ret["sub_info"]["sub_info"]["cmd_name"] == "monitor log-profiles create", "group parse failed")
 
     def test_diff_dict_key_parse(self):
         test_key = "root['sub_groups']['monitor']['sub_groups']['monitor private-link-scope']['sub_groups']" \

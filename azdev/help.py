@@ -155,6 +155,24 @@ helps['statistics diff-command-tables'] = """
           text: azdev statistics diff-command-tables --table-path command-table_May_01.json --diff-table-path command-table_Oct_01.json --statistics-only
 """
 
+helps['command-change'] = """
+    short-summary: Commands for CLI modules meta data.
+"""
+
+helps['command-change meta-export'] = """
+    short-summary: Export Command meta data for CLI module.
+    examples:
+        - name: Export command meta for the monitor and network module
+          text: azdev command-change meta-export network monitor -o table
+"""
+
+helps['command-change meta-diff'] = """
+    short-summary: Diff the command meta between provided meta files.
+    examples:
+        - name: Diff the command meta change from fileA to fileB
+          text: azdev statistics meta-diff --table-path fileA --diff-table-path fileB --only-break
+"""
+
 helps['perf'] = """
     short-summary: Commands to test CLI performance.
 """
