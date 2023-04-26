@@ -9,7 +9,7 @@ import os
 import re
 from enum import Enum
 import jsbeautifier
-from azure.cli.core.aaz import has_value
+from azure.cli.core.aaz import has_value # pylint: disable=import-error
 from knack.log import get_logger
 
 logger = get_logger(__name__)
