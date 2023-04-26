@@ -112,17 +112,17 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
     return
 
 
-def cmp_command_meta(base_meta_path, diff_meta_path, only_break=False, output_type="text", output_file=None):
-    if not os.path.exists(base_meta_path):
+def cmp_command_meta(base_meta_file, diff_meta_file, only_break=False, output_type="text", output_file=None):
+    if not os.path.exists(base_meta_file):
         display("base meta file path needed")
         return
-    if not os.path.exists(diff_meta_path):
+    if not os.path.exists(diff_meta_file):
         display("diff meta file path needed")
         return
     start = time.time()
-    with open(base_meta_path, "r") as g:
+    with open(base_meta_file, "r") as g:
         command_tree_before = json.load(g)
-    with open(diff_meta_path, "r") as g:
+    with open(diff_meta_file, "r") as g:
         command_tree_after = json.load(g)
     stop = time.time()
     logger.info('Command meta files loaded in %i sec', stop - start)

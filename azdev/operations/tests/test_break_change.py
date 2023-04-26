@@ -45,8 +45,8 @@ class MyTestCase(unittest.TestCase):
         if not os.path.exists("./jsons/az_monitor_meta_before.json") \
                 or not os.path.exists("./jsons/az_monitor_meta_after.json"):
             return
-        result = cmp_command_meta(base_meta_path="./jsons/az_monitor_meta_before.json",
-                         diff_meta_path="./jsons/az_monitor_meta_after.json",
+        result = cmp_command_meta(base_meta_file="./jsons/az_monitor_meta_before.json",
+                         diff_meta_file="./jsons/az_monitor_meta_after.json",
                          output_type="text")
         target_message = "please confirm cmd `monitor private-link-scope scoped-resource show` removed"
         for line in result:
