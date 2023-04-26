@@ -9,7 +9,6 @@ import os
 import re
 from enum import Enum
 import jsbeautifier
-from azure.cli.core.aaz import has_value # pylint: disable=import-error
 from knack.log import get_logger
 
 logger = get_logger(__name__)
@@ -63,6 +62,7 @@ def get_command_tree(command_name):
 
 
 def process_aaz_argument(az_arguments_schema, argument_settings, para):
+    from azure.cli.core.aaz import has_value
     _fields = az_arguments_schema._fields
     aaz_type = _fields.get(argument_settings["dest"], None)
     if aaz_type:
