@@ -54,7 +54,7 @@ def get_command_tree(command_name):
         else:
             tmp = {
                 "is_group": True,
-                "group_name": " ".join(name_arr[len(name_arr):i-1:-1]),
+                "group_name": " ".join(name_arr[len(name_arr): (i - 1): -1]),
                 "sub_info": ret
             }
         ret = tmp

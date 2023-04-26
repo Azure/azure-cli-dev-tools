@@ -9,6 +9,7 @@ import os
 from knack.config import CLIConfig
 from .const import CHANGE_RULE_MESSAGE_MAPPING, CHANGE_SUGGEST_MESSAGE_MAPPING
 
+
 def get_azdev_config():
     return CLIConfig(config_dir=get_azdev_config_dir(), config_env_var_prefix='AZDEV')
 
