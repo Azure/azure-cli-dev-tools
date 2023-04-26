@@ -170,7 +170,7 @@ helps['command-change meta-diff'] = """
     short-summary: Diff the command meta between provided meta files.
     examples:
         - name: Diff the command meta change from fileA to fileB
-          text: azdev statistics meta-diff --table-path fileA --diff-table-path fileB --only-break
+          text: azdev statistics meta-diff --base-meta-file fileA --diff-meta-file fileB --only-break
 """
 
 helps['perf'] = """

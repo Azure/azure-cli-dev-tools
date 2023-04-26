@@ -4,16 +4,14 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+from enum import Enum
+from azdev.utilities import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BREAK_LIST,
+                             CMD_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_REMOVE_BREAK_LIST,
+                             PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST)
 from .util import extract_cmd_name, extract_cmd_property, ChangeType
 from .util import get_command_tree
 from .meta_changes import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate, ParaAdd, ParaRemove,
                            ParaPropAdd, ParaPropRemove, ParaPropUpdate)
-
-from azdev.utilities import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BREAK_LIST,
-                             CMD_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_REMOVE_BREAK_LIST,
-                             PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST)
-
-from enum import Enum
 
 
 class DiffExportFormat(Enum):
@@ -39,7 +37,8 @@ class MetaChangeDetects:
         self.diff_objs = []
         self.cmd_set_with_parameter_change = set()
 
-    def __search_cmd_obj(self, cmd_name, search_meta):
+    @staticmethod
+    def __search_cmd_obj(cmd_name, search_meta):
         command_tree = get_command_tree(cmd_name)
         meta_search = search_meta
         while True:
@@ -59,7 +58,7 @@ class MetaChangeDetects:
         self.cmd_set_with_parameter_change.add(cmd_name)
 
     def __iter_dict_items(self, dict_items, diff_type):
-        if diff_type != ChangeType.REMOVE and diff_type != ChangeType.ADD:
+        if diff_type not in [ChangeType.REMOVE, ChangeType.ADD]:
             raise Exception("Unsupported dict item type")
 
         for dict_key in dict_items:
@@ -98,10 +97,10 @@ class MetaChangeDetects:
         ['parameters'][0]['choices'][0]
         ['parameters'][3]
         """
-        if diff_type != ChangeType.REMOVE and diff_type != ChangeType.ADD:
+        if diff_type not in [ChangeType.REMOVE, ChangeType.ADD]:
             raise Exception("Unsupported dict item type")
 
-        for key, value in list_items.items():
+        for key, _ in list_items.items():
             has_cmd, cmd_name = extract_cmd_name(key)
             if not has_cmd or not cmd_name:
                 print("extract cmd failed for " + key)
@@ -161,7 +160,8 @@ class MetaChangeDetects:
                     diff_obj = CmdPropUpdate(cmd_name, cmd_property, False, old_value, new_value)
                 self.diff_objs.append(diff_obj)
 
-    def __search_para_with_name_and_options(self, base_para_obj, search_parameters):
+    @staticmethod
+    def __search_para_with_name_and_options(base_para_obj, search_parameters):
         para_name = base_para_obj["name"]
         para_option_set = set(base_para_obj["options"])
         for para_obj in search_parameters:
@@ -298,6 +298,3 @@ class MetaChangeDetects:
                     break
 
         return ret_objs if output_type in ["text", "dict"] else ret_mod
-
-
-

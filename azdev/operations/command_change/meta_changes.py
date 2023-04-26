@@ -4,17 +4,10 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-import json
-from json import JSONEncoder
 from azdev.utilities import get_change_rule_template, get_change_suggest_template
 
 
-class MetaChangeEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
-
-
-class MetaChange(object):
+class MetaChange:
 
     def __init__(self, rule_id="1000", is_break=False, rule_message="", suggest_message=""):
         self.rule_id = rule_id
@@ -84,6 +77,7 @@ class CmdPropRemove(MetaChange):
 
 class CmdPropUpdate(MetaChange):
 
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, cmd_name, cmd_property, is_break=False, old_value=None, new_value=None):
         if not cmd_name or not cmd_property:
             raise Exception("cmd name and cmd prop needed")
@@ -176,6 +170,7 @@ class ParaPropRemove(MetaChange):
 
 class ParaPropUpdate(MetaChange):
 
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, cmd_name, para_name, para_property, is_break=False, old_value=None, new_value=None):
         if not cmd_name or not para_name or not para_property:
             raise Exception("cmd name, parameter name and parameter property needed")
@@ -199,20 +194,3 @@ class ParaPropUpdate(MetaChange):
                                                                                 self.para_name,
                                                                                 self.cmd_name) if self.is_break else ""
         super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message)
-
-
-if __name__ == '__main__':
-    diff = CmdPropUpdate("monitor private-link-scope scoped-resource show", "is_aaz", False, False, True)
-    # encode object into json
-    # refer: https://pynative.com/python-convert-json-data-into-custom-python-object/
-
-    diff_json = json.dumps(diff, cls=MetaChangeEncoder, indent=4)
-    print(diff_json)
-    diff_json_loaded = json.loads(diff_json)
-    print(" print : ", str(diff))
-    for attr, value in diff.__dict__.items():
-        if attr not in ["rule_id", "is_break", "rule_message", "suggest_message"]:
-            print(attr, getattr(diff, attr))
-
-
-

@@ -4,15 +4,19 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-import time, json, os
-from deepdiff import DeepDiff
-from .custom import MetaChangeDetects, DiffExportFormat
-from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff
-from .util import export_meta_changes_to_json, gen_commands_meta, get_commands_meta
-from ..statistics import _create_invoker_and_load_cmds, _get_command_source, _command_codegen_info
-from ..statistics.util import filter_modules
+import json
+import os
+import time
 
+from deepdiff import DeepDiff
 from knack.log import get_logger
+
+from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff
+from .custom import MetaChangeDetects, DiffExportFormat
+from .util import export_meta_changes_to_json, gen_commands_meta, get_commands_meta
+from ..statistics import _create_invoker_and_load_cmds, _get_command_source, \
+    _command_codegen_info  # pylint: disable=protected-access
+from ..statistics.util import filter_modules
 
 logger = get_logger(__name__)
 
@@ -21,8 +25,10 @@ def diff_export_format_choices():
     return [form.value for form in DiffExportFormat]
 
 
+# pylint: disable=too-many-statements
 def export_command_meta(modules=None, git_source=None, git_target=None, git_repo=None,
-                      with_help=False, with_example=False, meta_output_path=None):
+                        with_help=False, with_example=False,
+                        meta_output_path=None):
     require_azure_cli()
 
     # allow user to run only on CLI or extensions
@@ -80,7 +86,7 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
             "source": _get_command_source(command_name, command),
             "is_aaz": False,
             "help": command.help,
-            "confirmation": False if command.confirmation is None or command.confirmation is False else True,
+            "confirmation": command.confirmation is True,
             "arguments": [],
             "az_arguments_schema": None,
             "supports_no_wait": command.supports_no_wait,
@@ -96,29 +102,26 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
         command_loader.load_arguments(command_name)
 
         if command.arguments is None:
-            logger.warning('No arguments generated from {0}.'.format(command_name))
+            logger.warning('No arguments generated from %i.', command_name)
         else:
             command_info['arguments'] = command.arguments
         if command_info["is_aaz"]:
             try:
-                command_info['az_arguments_schema'] = command._args_schema
-            except Exception as e:
+                command_info['az_arguments_schema'] = command._args_schema  # pylint: disable=protected-access
+            except AttributeError:
                 pass
 
         commands_info.append(command_info)
     commands_meta = get_commands_meta(command_loader.command_group_table, commands_info, with_help, with_example)
     gen_commands_meta(commands_meta, meta_output_path)
     display(f"Total Commands: {len(commands_info)} from {', '.join(selected_mod_names)} have been generated.")
-    return
 
 
 def cmp_command_meta(base_meta_file, diff_meta_file, only_break=False, output_type="text", output_file=None):
     if not os.path.exists(base_meta_file):
-        display("base meta file path needed")
-        return
+        raise Exception("base meta file path needed")
     if not os.path.exists(diff_meta_file):
-        display("diff meta file path needed")
-        return
+        raise Exception("diff meta file path needed")
     start = time.time()
     with open(base_meta_file, "r") as g:
         command_tree_before = json.load(g)
@@ -130,9 +133,5 @@ def cmp_command_meta(base_meta_file, diff_meta_file, only_break=False, output_ty
     detected_changes = MetaChangeDetects(diff, command_tree_before, command_tree_after)
     detected_changes.check_deep_diffs()
     result = detected_changes.export_meta_changes(only_break, output_type)
-    if output_file:
-        export_meta_changes_to_json(result, output_file)
-    else:
-        return result
 
-
+    return export_meta_changes_to_json(result, output_file)

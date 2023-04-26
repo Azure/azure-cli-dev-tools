@@ -46,13 +46,15 @@ class MyTestCase(unittest.TestCase):
                 or not os.path.exists("./jsons/az_monitor_meta_after.json"):
             return
         result = cmp_command_meta(base_meta_file="./jsons/az_monitor_meta_before.json",
-                         diff_meta_file="./jsons/az_monitor_meta_after.json",
-                         output_type="text")
+                                  diff_meta_file="./jsons/az_monitor_meta_after.json",
+                                  output_type="text")
         target_message = "please confirm cmd `monitor private-link-scope scoped-resource show` removed"
+        found = False
         for line in result:
             if line.find(target_message) > -1:
-                return
-        self.assertTrue(False, "target message not found")
+                found = True
+                break
+        self.assertTrue(found, "target message not found")
 
 
 if __name__ == '__main__':

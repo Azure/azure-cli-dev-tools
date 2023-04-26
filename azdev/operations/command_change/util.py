@@ -44,7 +44,7 @@ def get_command_tree(command_name):
     name_arr = command_name.split()
     ret = {}
     name_arr.reverse()
-    for i, name in enumerate(name_arr):
+    for i, _ in enumerate(name_arr):
         tmp = {}
         if i == 0:
             tmp = {
@@ -62,14 +62,14 @@ def get_command_tree(command_name):
 
 
 def process_aaz_argument(az_arguments_schema, argument_settings, para):
-    from azure.cli.core.aaz import has_value
-    _fields = az_arguments_schema._fields
+    from azure.cli.core.aaz import has_value  # pylint: disable=import-error
+    _fields = az_arguments_schema._fields  # pylint: disable=protected-access
     aaz_type = _fields.get(argument_settings["dest"], None)
     if aaz_type:
         para["aaz_type"] = aaz_type.__class__.__name__
-        para["type"] = aaz_type._type_in_help
-        if has_value(aaz_type._default):
-            para["aaz_default"] = aaz_type._default
+        para["type"] = aaz_type._type_in_help  # pylint: disable=protected-access
+        if has_value(aaz_type._default):  # pylint: disable=protected-access
+            para["aaz_default"] = aaz_type._default  # pylint: disable=protected-access
         if para["aaz_type"] in ["AAZArgEnum"] and aaz_type.get("enum", None) and aaz_type.enum.get("items", None):
             para["aaz_choices"] = aaz_type.enum["items"]
 
@@ -86,15 +86,15 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
     if with_example:
         try:
             command_meta["examples"] = command_info["help"]["examples"]
-        except Exception as e:
+        except AttributeError:
             pass
     if with_help:
         try:
             command_meta["desc"] = command_info["help"]["short-summary"]
-        except Exception as e:
+        except AttributeError:
             pass
     parameters = []
-    for key, argument in command_info["arguments"].items():
+    for _, argument in command_info["arguments"].items():
         if argument.type is None:
             continue
         settings = argument.type.settings
@@ -124,17 +124,17 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
 def get_commands_meta(command_group_table, commands_info, with_help, with_example):
     commands_meta = {}
 
-    for command_info in commands_info:
-        moduel_name = command_info["source"]["module"]
+    for command_info in commands_info:  # pylint: disable=too-many-nested-blocks
+        module_name = command_info["source"]["module"]
         command_name = command_info["name"]
-        if moduel_name not in commands_meta:
-            commands_meta[moduel_name] = {
-                "module_name": moduel_name,
+        if module_name not in commands_meta:
+            commands_meta[module_name] = {
+                "module_name": module_name,
                 "name": "az",
                 "commands": {},
                 "sub_groups": {}
             }
-        command_group_info = commands_meta[moduel_name]
+        command_group_info = commands_meta[module_name]
         command_tree = get_command_tree(command_name)
         while True:
             if "is_group" not in command_tree:
@@ -151,14 +151,14 @@ def get_commands_meta(command_group_table, commands_info, with_help, with_exampl
                     if with_help:
                         try:
                             command_group_info["sub_groups"][group_name]["desc"] = group_info.help["short-summary"]
-                        except Exception as e:
+                        except AttributeError:
                             pass
 
                 command_tree = command_tree["sub_info"]
                 command_group_info = command_group_info["sub_groups"][group_name]
             else:
                 if command_name in command_group_info["commands"]:
-                    logger.warning("repeated command: {0}".format(command_name))
+                    logger.warning("repeated command: %i", command_name)
                     break
                 command_meta = gen_command_meta(command_info, with_help, with_example)
                 command_group_info["commands"][command_name] = command_meta
@@ -207,8 +207,11 @@ def extract_para_info(key):
 
 
 def export_meta_changes_to_json(output, output_file):
+    if not output_file:
+        return output
     output_file_folder = os.path.dirname(output_file)
-    if not os.path.exists(output_file_folder):
+    if output_file_folder and not os.path.exists(output_file_folder):
         os.makedirs(output_file_folder)
     with open(output_file, "w") as f_out:
         f_out.write(json.dumps(output, indent=4))
+    return None
