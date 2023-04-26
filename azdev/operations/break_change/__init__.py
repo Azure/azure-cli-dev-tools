@@ -25,10 +25,6 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
                       with_help=False, with_example=False, meta_output_path=None):
     require_azure_cli()
 
-    from azure.cli.core import get_default_cli  # pylint: disable=import-error
-
-    heading('Gen Command Table')
-
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
     ext_only = modules == ['EXT']
@@ -56,19 +52,21 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
     if selected_mod_names:
         display('Modules: {}\n'.format(', '.join(selected_mod_names)))
 
+    heading('Export Command Table')
     start = time.time()
-    display('Initializing with command table and help files...')
+    display('Initializing with loading command table...')
+    from azure.cli.core import get_default_cli  # pylint: disable=import-error
     az_cli = get_default_cli()
 
     # load commands, args, and help
     _create_invoker_and_load_cmds(az_cli)
 
     stop = time.time()
-    logger.info('Commands and help loaded in %i sec', stop - start)
-    display('Commands and help loaded in {} sec'.format(stop - start))
+    logger.info('Commands loaded in %i sec', stop - start)
+    display('Commands loaded in {} sec'.format(stop - start))
     command_loader = az_cli.invocation.commands_loader
 
-    # trim command table and help to just selected_modules
+    # trim command table to selected_modules
     command_loader = filter_modules(command_loader, modules=selected_mod_names)
 
     if not command_loader.command_table:

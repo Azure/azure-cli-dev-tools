@@ -79,8 +79,8 @@ setup(
         'requests',
         'sphinx==1.6.7',
         'tox',
-        'jsbeautifier>=1.14.7',
-        'deepdiff>=6.3.0',
+        'jsbeautifier~=1.14.7',
+        'deepdiff~=6.3.0',
         'wheel==0.30.0'
     ],
     package_data={
