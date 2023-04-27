@@ -35,3 +35,9 @@ def group_delete_commands_should_confirm(linter, command_name):
         if 'yes' not in linter.get_command_parameters(command_name):
             raise RuleError("If this command deletes a collection, or group of resources. "
                             "Please make sure to ask for confirmation.")
+
+
+@CommandRule(LinterSeverity.HIGH)
+def no_wait_command(linter, command_name):
+    if linter.support_no_wait(command_name):
+        raise RuleError('Deprecated command is expired and should be removed.')

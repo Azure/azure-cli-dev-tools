@@ -180,6 +180,18 @@ class Linter:  # pylint: disable=too-many-public-methods
             return help_entry.short_summary or help_entry.long_summary
         return help_entry
 
+    def support_no_wait(self, command_name):
+        no_wait = self._command_loader.command_table[command_name].support_no_wait
+        op = self.get_op_handler()
+        import inspect
+        import re
+        source_code = inspect.getsource(op)
+        pattern = re.compile("sdk_no_wait")
+        support_no_wait = pattern.search(source_code)
+        if no_wait:
+            return command_name
+        return False
+
 
 # pylint: disable=too-many-instance-attributes
 class LinterManager:
