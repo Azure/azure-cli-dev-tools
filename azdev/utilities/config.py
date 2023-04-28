@@ -7,6 +7,7 @@
 import os
 
 from knack.config import CLIConfig
+from .const import CHANGE_RULE_MESSAGE_MAPPING, CHANGE_SUGGEST_MESSAGE_MAPPING
 
 
 def get_azdev_config():
@@ -31,3 +32,13 @@ def get_azdev_config_dir():
 def get_azure_config_dir():
     """ Returns the user's Azure directory. """
     return os.getenv('AZURE_CONFIG_DIR', None) or os.path.expanduser(os.path.join('~', '.azure'))
+
+
+def get_change_rule_template(rule_id="1000"):
+    """ Return the rule message template"""
+    return CHANGE_RULE_MESSAGE_MAPPING.get(rule_id, "Non applicable")
+
+
+def get_change_suggest_template(rule_id="1000"):
+    """ Return the change suggest message template"""
+    return CHANGE_SUGGEST_MESSAGE_MAPPING.get(rule_id, "Non applicable")
