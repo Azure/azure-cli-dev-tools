@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.42
+++++++
+* `azdev command-change meta-export/meta-diff`: Generate cli cmd meta data and the diffs between two meta data (#362)
+
 0.1.41
 ++++++
 * `azdev statistics list-command-table`: Support stats of nested function (#363)
