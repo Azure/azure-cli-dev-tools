@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.43
+++++++
+* `azdev statistics list-command-table`: Fix unexpected indent (#368)
+
 0.1.42
 ++++++
 * `azdev command-change meta-export/meta-diff`: Generate cli cmd meta data and the diffs between two meta data (#362)
