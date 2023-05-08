@@ -8,6 +8,7 @@ import inspect
 import json
 import os
 import re
+import textwrap
 import time
 from importlib import import_module
 from pathlib import Path
@@ -335,7 +336,7 @@ def _get_module_functions(path):
 
 
 def _expand_all_functions(func, func_map):
-    source = inspect.getsource(func)
+    source = textwrap.dedent(inspect.getsource(func))
     if func_map is None:
         return source
 
