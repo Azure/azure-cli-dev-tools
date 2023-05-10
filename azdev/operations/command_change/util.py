@@ -111,7 +111,7 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         if settings.get("nargs", None):
             para["nargs"] = settings["nargs"]
         if settings.get("default", None):
-            if not isinstance(settings["default"], str):
+            if not isinstance(settings["default"], (float, int, str, list, bool)):
                 para["default"] = str(settings["default"])
             else:
                 para["default"] = settings["default"]
