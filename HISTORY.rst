@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.44
+++++++
+* `azdev command-change meta-export`: Fix object dump failure (#370)
+
 0.1.43
 ++++++
 * `azdev statistics list-command-table`: Fix unexpected indent (#368)
