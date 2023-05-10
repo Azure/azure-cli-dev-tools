@@ -111,7 +111,10 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         if settings.get("nargs", None):
             para["nargs"] = settings["nargs"]
         if settings.get("default", None):
-            para["default"] = settings["default"]
+            if not isinstance(settings["default"], str):
+                para["default"] = str(settings["default"])
+            else:
+                para["default"] = settings["default"]
         if with_help:
             para["desc"] = settings["help"]
         if command_info["is_aaz"] and command_info["az_arguments_schema"]:
@@ -172,7 +175,7 @@ def gen_commands_meta(commands_meta, meta_output_path=None):
     for key, module_info in commands_meta.items():
         file_name = "az_" + key + "_meta.json"
         if meta_output_path:
-            file_name = meta_output_path + file_name
+            file_name = meta_output_path + "/" + file_name
         file_folder = os.path.dirname(file_name)
         if file_folder and not os.path.exists(file_folder):
             os.makedirs(file_folder)
