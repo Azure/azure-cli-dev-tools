@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 from enum import Enum
+from knack.log import get_logger
 from azdev.utilities import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BREAK_LIST,
                              CMD_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_REMOVE_BREAK_LIST,
                              PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST)
@@ -12,6 +13,8 @@ from .util import extract_cmd_name, extract_cmd_property, ChangeType
 from .util import get_command_tree
 from .meta_changes import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate, ParaAdd, ParaRemove,
                            ParaPropAdd, ParaPropRemove, ParaPropUpdate)
+
+logger = get_logger(__name__)
 
 
 class DiffExportFormat(Enum):
@@ -27,11 +30,13 @@ class MetaChangeDetects:
                              "aaz_type", "type", "aaz_default", "aaz_choices"]
 
     def __init__(self, deep_diff=None, base_meta=None, diff_meta=None):
-        if not deep_diff:
-            raise Exception("None diffs from cmd meta json")
+        self.deep_diff = {}
+        if deep_diff:
+            self.deep_diff = deep_diff
+        else:
+            logger.info("None diffs from cmd meta json")
         assert base_meta["module_name"] == diff_meta["module_name"]
         self.module_name = base_meta["module_name"]
-        self.deep_diff = deep_diff
         self.base_meta = base_meta
         self.diff_meta = diff_meta
         self.diff_objs = []

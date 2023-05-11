@@ -4,6 +4,8 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+# pylint: disable=no-else-return
+
 import json
 import os
 import time
@@ -119,9 +121,9 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
 
 def cmp_command_meta(base_meta_file, diff_meta_file, only_break=False, output_type="text", output_file=None):
     if not os.path.exists(base_meta_file):
-        raise Exception("base meta file path needed")
+        raise Exception("base meta file needed")
     if not os.path.exists(diff_meta_file):
-        raise Exception("diff meta file path needed")
+        raise Exception("diff meta file needed")
     start = time.time()
     with open(base_meta_file, "r") as g:
         command_tree_before = json.load(g)
@@ -130,8 +132,11 @@ def cmp_command_meta(base_meta_file, diff_meta_file, only_break=False, output_ty
     stop = time.time()
     logger.info('Command meta files loaded in %i sec', stop - start)
     diff = DeepDiff(command_tree_before, command_tree_after)
-    detected_changes = MetaChangeDetects(diff, command_tree_before, command_tree_after)
-    detected_changes.check_deep_diffs()
-    result = detected_changes.export_meta_changes(only_break, output_type)
-
-    return export_meta_changes_to_json(result, output_file)
+    if not diff:
+        display(f"No meta diffs from {diff_meta_file} to {base_meta_file}")
+        return export_meta_changes_to_json(None, output_file)
+    else:
+        detected_changes = MetaChangeDetects(diff, command_tree_before, command_tree_after)
+        detected_changes.check_deep_diffs()
+        result = detected_changes.export_meta_changes(only_break, output_type)
+        return export_meta_changes_to_json(result, output_file)
