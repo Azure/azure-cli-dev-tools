@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.45
+++++++
+* `azdev command-change meta-diff`: Refine no meta diff output (#372)
+
 0.1.44
 ++++++
 * `azdev command-change meta-export`: Fix object dump failure (#370)
