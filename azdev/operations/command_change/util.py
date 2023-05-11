@@ -216,5 +216,6 @@ def export_meta_changes_to_json(output, output_file):
     if output_file_folder and not os.path.exists(output_file_folder):
         os.makedirs(output_file_folder)
     with open(output_file, "w") as f_out:
-        f_out.write(json.dumps(output, indent=4))
+        if output:
+            f_out.write(json.dumps(output, indent=4))
     return None
