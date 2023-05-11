@@ -4,6 +4,8 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+# pylint: disable=no-else-return
+
 import json
 import os
 import time
