@@ -9,10 +9,10 @@ from knack.log import get_logger
 from azdev.utilities import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BREAK_LIST,
                              CMD_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_REMOVE_BREAK_LIST,
                              PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST)
-from .util import extract_cmd_name, extract_cmd_property, ChangeType
+from .util import extract_cmd_name, extract_cmd_property, extract_subgroup_name, ChangeType
 from .util import get_command_tree
 from .meta_changes import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate, ParaAdd, ParaRemove,
-                           ParaPropAdd, ParaPropRemove, ParaPropUpdate)
+                           ParaPropAdd, ParaPropRemove, ParaPropUpdate, SubgroupAdd, SubgroupRemove)
 
 logger = get_logger(__name__)
 
@@ -25,7 +25,7 @@ class DiffExportFormat(Enum):
 
 class MetaChangeDetects:
 
-    EXPORTED_META_PROPERTY = ["rule_id", "is_break", "rule_message", "suggest_message", "cmd_name"]
+    EXPORTED_META_PROPERTY = ["rule_id", "is_break", "rule_message", "suggest_message", "cmd_name", "subgroup_name"]
     CHECKED_PARA_PROPERTY = ["name", "options", "required", "choices", "id_part", "nargs", "default", "desc",
                              "aaz_type", "type", "aaz_default", "aaz_choices"]
 
@@ -69,7 +69,14 @@ class MetaChangeDetects:
         for dict_key in dict_items:
             has_cmd, cmd_name = extract_cmd_name(dict_key)
             if not has_cmd or not cmd_name:
-                print("extract cmd failed for " + dict_key)
+                has_subgroup, subgroup_name = extract_subgroup_name(dict_key)
+                if not has_subgroup or not subgroup_name:
+                    continue
+                if diff_type == ChangeType.REMOVE:
+                    diff_obj = SubgroupRemove(subgroup_name)
+                else:
+                    diff_obj = SubgroupAdd(subgroup_name)
+                self.diff_objs.append(diff_obj)
                 continue
 
             has_cmd_key, cmd_property = extract_cmd_property(dict_key, cmd_name)
@@ -270,13 +277,40 @@ class MetaChangeDetects:
                 continue
             ret = {}
             for prop in self.EXPORTED_META_PROPERTY:
-                ret[prop] = getattr(obj, prop)
+                if hasattr(obj, prop):
+                    ret[prop] = getattr(obj, prop)
             ret["rule_name"] = obj.__class__.__name__
             if output_type == "dict":
                 ret_objs.append(ret)
             elif output_type == "text":
                 ret_objs.append(str(obj))
             if output_type != "tree":
+                continue
+            if not hasattr(obj, "cmd_name") and not hasattr(obj, "subgroup_name"):
+                continue
+            if not hasattr(obj, "cmd_name") and hasattr(obj, "subgroup_name"):
+                command_group_info = ret_mod
+                group_name_arr = obj.subgroup_name.split(" ")
+                start_level = 1
+                while start_level < len(group_name_arr):
+                    group_name = " ".join(group_name_arr[:start_level])
+                    if group_name not in command_group_info["sub_groups"]:
+                        command_group_info["sub_groups"][group_name] = {
+                            "name": group_name,
+                            "commands": {},
+                            "sub_groups": {}
+                        }
+                    start_level += 1
+                    command_group_info = command_group_info["sub_groups"][group_name]
+                group_name = obj.subgroup_name
+                group_rules = []
+                if group_name not in command_group_info["sub_groups"]:
+                    command_group_info["sub_groups"] = {group_name: group_rules}
+                group_rules = command_group_info["sub_groups"][group_name]
+                group_rules.append(ret)
+                command_group_info["sub_groups"][group_name] = group_rules
+                continue
+            if not hasattr(obj, "cmd_name"):
                 continue
             command_tree = get_command_tree(obj.cmd_name)
             command_group_info = ret_mod

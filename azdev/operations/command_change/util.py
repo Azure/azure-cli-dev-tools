@@ -13,6 +13,7 @@ from knack.log import get_logger
 
 logger = get_logger(__name__)
 
+SUBGROUP_NAME_PATTERN = re.compile(r"\[\'sub_groups\'\]\[\'([a-zA-Z0-9\-\s]+)\'\]")
 CMD_NAME_PATTERN = re.compile(r"\[\'commands\'\]\[\'([a-zA-Z0-9\-\s]+)\'\]")
 CMD_PARAMETER_PROPERTY_PATTERN = re.compile(r"\[(.*?)\]")
 
@@ -183,19 +184,24 @@ def gen_commands_meta(commands_meta, meta_output_path=None):
             f_out.write(jsbeautifier.beautify(json.dumps(module_info), options))
 
 
-def extract_cmd_name(key):
-    cmd_name_res = re.finditer(CMD_NAME_PATTERN, key)
-    if not cmd_name_res:
+def extract_subgroup_name(key):
+    subgroup_ame_res = re.findall(SUBGROUP_NAME_PATTERN, key)
+    if not subgroup_ame_res or len(subgroup_ame_res) == 0:
         return False, None
-    for cmd_match in cmd_name_res:
-        cmd_name = cmd_match.group(1)
-        return True, cmd_name
+    return True, subgroup_ame_res[-1]
+
+
+def extract_cmd_name(key):
+    cmd_name_res = re.findall(CMD_NAME_PATTERN, key)
+    if not cmd_name_res or len(cmd_name_res) == 0:
+        return False, None
+    return True, cmd_name_res[0]
 
 
 def extract_cmd_property(key, cmd_name):
     cmd_key_pattern = re.compile(cmd_name + r"\'\]\[\'([a-zA-Z0-9\-\_]+)\'\]")
     cmd_key_res = re.findall(cmd_key_pattern, key)
-    if not cmd_key_res:
+    if not cmd_key_res or len(cmd_key_res) == 0:
         return False, None
     return True, cmd_key_res[0]
 

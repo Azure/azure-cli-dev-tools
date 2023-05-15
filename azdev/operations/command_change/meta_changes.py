@@ -23,6 +23,30 @@ class MetaChange:
         return " | ".join([str(a) for a in res])
 
 
+class SubgroupAdd(MetaChange):
+    def __init__(self, subgroup_name, is_break=False):
+        if not subgroup_name:
+            raise Exception("sub group name needed")
+        self.rule_id = "1011"
+        self.subgroup_name = subgroup_name
+        self.is_break = is_break
+        self.rule_message = get_change_rule_template(self.rule_id).format(self.subgroup_name)
+        self.suggest_message = get_change_suggest_template(self.rule_id).format(self.subgroup_name) if self.is_break else ""
+        super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message)
+
+
+class SubgroupRemove(MetaChange):
+    def __init__(self, subgroup_name, is_break=True):
+        if not subgroup_name:
+            raise Exception("sub group name needed")
+        self.rule_id = "1012"
+        self.subgroup_name = subgroup_name
+        self.is_break = is_break
+        self.rule_message = get_change_rule_template(self.rule_id).format(self.subgroup_name)
+        self.suggest_message = get_change_suggest_template(self.rule_id).format(self.subgroup_name) if self.is_break else ""
+        super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message)
+
+
 class CmdAdd(MetaChange):
     def __init__(self, cmd_name, is_break=False):
         if not cmd_name:

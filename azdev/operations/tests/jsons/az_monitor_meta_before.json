@@ -262,7 +262,18 @@
                                     }]
                                 }
                             },
-                            "sub_groups": {}
+                            "sub_groups": {
+                                "monitor private-link-scope private-endpoint-connection cust": {
+                                    "name": "monitor private-link-scope private-endpoint-connection cust",
+                                    "commands": {
+                                        "monitor private-link-scope private-endpoint-connection cust show": {
+                                            "name": "monitor private-link-scope private-endpoint-connection cust show",
+                                            "parameters": []
+                                        }
+                                    },
+                                    "sub_groups": {}
+                                }
+                            }
                         }
                     }
                 }
