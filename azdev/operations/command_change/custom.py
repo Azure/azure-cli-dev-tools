@@ -264,6 +264,55 @@ class MetaChangeDetects:
         self.check_value_change()
         self.check_cmds_parameter_diff()
 
+    @staticmethod
+    def fill_subgroup_rules(obj, ret_mod, rule):
+        command_group_info = ret_mod
+        group_name_arr = obj.subgroup_name.split(" ")
+        start_level = 1
+        while start_level < len(group_name_arr):
+            group_name = " ".join(group_name_arr[:start_level])
+            if group_name not in command_group_info["sub_groups"]:
+                command_group_info["sub_groups"][group_name] = {
+                    "name": group_name,
+                    "commands": {},
+                    "sub_groups": {}
+                }
+            start_level += 1
+            command_group_info = command_group_info["sub_groups"][group_name]
+        group_name = obj.subgroup_name
+        group_rules = []
+        if group_name not in command_group_info["sub_groups"]:
+            command_group_info["sub_groups"] = {group_name: group_rules}
+        group_rules = command_group_info["sub_groups"][group_name]
+        group_rules.append(rule)
+        command_group_info["sub_groups"][group_name] = group_rules
+
+    @staticmethod
+    def fill_cmd_rules(obj, ret_mod, rule):
+        command_tree = get_command_tree(obj.cmd_name)
+        command_group_info = ret_mod
+        while True:
+            if "is_group" not in command_tree:
+                break
+            if command_tree["is_group"]:
+                group_name = command_tree["group_name"]
+                if group_name not in command_group_info["sub_groups"]:
+                    command_group_info["sub_groups"][group_name] = {
+                        "name": group_name,
+                        "commands": {},
+                        "sub_groups": {}
+                    }
+                command_tree = command_tree["sub_info"]
+                command_group_info = command_group_info["sub_groups"][group_name]
+            else:
+                cmd_name = command_tree["cmd_name"]
+                command_rules = []
+                if cmd_name in command_group_info["commands"]:
+                    command_rules = command_group_info["commands"][cmd_name]
+                command_rules.append(rule)
+                command_group_info["commands"][cmd_name] = command_rules
+                break
+
     def export_meta_changes(self, only_break, output_type="text"):
         ret_objs = []
         ret_mod = {
@@ -287,53 +336,12 @@ class MetaChangeDetects:
             if output_type != "tree":
                 continue
             if not hasattr(obj, "cmd_name") and not hasattr(obj, "subgroup_name"):
-                continue
-            if not hasattr(obj, "cmd_name") and hasattr(obj, "subgroup_name"):
-                command_group_info = ret_mod
-                group_name_arr = obj.subgroup_name.split(" ")
-                start_level = 1
-                while start_level < len(group_name_arr):
-                    group_name = " ".join(group_name_arr[:start_level])
-                    if group_name not in command_group_info["sub_groups"]:
-                        command_group_info["sub_groups"][group_name] = {
-                            "name": group_name,
-                            "commands": {},
-                            "sub_groups": {}
-                        }
-                    start_level += 1
-                    command_group_info = command_group_info["sub_groups"][group_name]
-                group_name = obj.subgroup_name
-                group_rules = []
-                if group_name not in command_group_info["sub_groups"]:
-                    command_group_info["sub_groups"] = {group_name: group_rules}
-                group_rules = command_group_info["sub_groups"][group_name]
-                group_rules.append(ret)
-                command_group_info["sub_groups"][group_name] = group_rules
-                continue
-            if not hasattr(obj, "cmd_name"):
-                continue
-            command_tree = get_command_tree(obj.cmd_name)
-            command_group_info = ret_mod
-            while True:
-                if "is_group" not in command_tree:
-                    break
-                if command_tree["is_group"]:
-                    group_name = command_tree["group_name"]
-                    if group_name not in command_group_info["sub_groups"]:
-                        command_group_info["sub_groups"][group_name] = {
-                            "name": group_name,
-                            "commands": {},
-                            "sub_groups": {}
-                        }
-                    command_tree = command_tree["sub_info"]
-                    command_group_info = command_group_info["sub_groups"][group_name]
-                else:
-                    cmd_name = command_tree["cmd_name"]
-                    command_rules = []
-                    if cmd_name in command_group_info["commands"]:
-                        command_rules = command_group_info["commands"][cmd_name]
-                    command_rules.append(ret)
-                    command_group_info["commands"][cmd_name] = command_rules
-                    break
+                logger.info("unsupported rule ignored")
+            elif not hasattr(obj, "cmd_name") and hasattr(obj, "subgroup_name"):
+                self.fill_subgroup_rules(obj, ret_mod, ret)
+            elif not hasattr(obj, "subgroup_name") and hasattr(obj, "cmd_name"):
+                self.fill_cmd_rules(obj, ret_mod, ret)
+            else:
+                logger.info("unsupported rule ignored")
 
         return ret_objs if output_type in ["text", "dict"] else ret_mod

@@ -43,7 +43,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_diff_dict_key_for_subgroups(self):
         test_key = "root['sub_groups']['monitor']['sub_groups']['monitor account']"
-        has_cmd, cmd_name = extract_cmd_name(test_key)
+        has_cmd, _ = extract_cmd_name(test_key)
         self.assertFalse(has_cmd, "cmd parse error from diff dict key")
         has_subgroup, subgroup_name = extract_subgroup_name(test_key)
         self.assertTrue(has_subgroup, "sub group parse failed from diff dict key")

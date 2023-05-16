@@ -31,7 +31,8 @@ class SubgroupAdd(MetaChange):
         self.subgroup_name = subgroup_name
         self.is_break = is_break
         self.rule_message = get_change_rule_template(self.rule_id).format(self.subgroup_name)
-        self.suggest_message = get_change_suggest_template(self.rule_id).format(self.subgroup_name) if self.is_break else ""
+        self.suggest_message = get_change_suggest_template(self.rule_id).format(self.subgroup_name) \
+            if self.is_break else ""
         super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message)
 
 
@@ -43,7 +44,8 @@ class SubgroupRemove(MetaChange):
         self.subgroup_name = subgroup_name
         self.is_break = is_break
         self.rule_message = get_change_rule_template(self.rule_id).format(self.subgroup_name)
-        self.suggest_message = get_change_suggest_template(self.rule_id).format(self.subgroup_name) if self.is_break else ""
+        self.suggest_message = get_change_suggest_template(self.rule_id).format(self.subgroup_name) \
+            if self.is_break else ""
         super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message)
 
 
