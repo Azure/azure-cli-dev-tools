@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.46
+++++++
+* `azdev command-change meta-diff`: Add subgroups change detect (#374)
+
 0.1.45
 ++++++
 * `azdev command-change meta-diff`: Refine no meta diff output (#372)
