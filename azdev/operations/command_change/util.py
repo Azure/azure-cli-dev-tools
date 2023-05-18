@@ -7,6 +7,7 @@
 import json
 import os
 import re
+import csv
 from enum import Enum
 import jsbeautifier
 from knack.log import get_logger
@@ -16,6 +17,10 @@ logger = get_logger(__name__)
 SUBGROUP_NAME_PATTERN = re.compile(r"\[\'sub_groups\'\]\[\'([a-zA-Z0-9\-\s]+)\'\]")
 CMD_NAME_PATTERN = re.compile(r"\[\'commands\'\]\[\'([a-zA-Z0-9\-\s]+)\'\]")
 CMD_PARAMETER_PROPERTY_PATTERN = re.compile(r"\[(.*?)\]")
+MODULE_NAME_PATTERN = re.compile("az_([a-zA-Z0-9\-\_]+)_meta.json")
+
+EXPORTED_CSV_META_HEADER = ["module", "cmd_name", "rule_id", "rule_name", "is_break",
+                            "rule_message", "suggest_message"]
 
 
 class ChangeType(int, Enum):
@@ -215,6 +220,13 @@ def extract_para_info(key):
     return property_res
 
 
+def extrct_module_name_from_meta_file(file_name):
+    name_res = re.findall(MODULE_NAME_PATTERN, file_name)
+    if not name_res or len(name_res) == 0:
+        return None
+    return name_res[0]
+
+
 def export_meta_changes_to_json(output, output_file):
     if not output_file:
         return output
@@ -225,3 +237,28 @@ def export_meta_changes_to_json(output, output_file):
         if output:
             f_out.write(json.dumps(output, indent=4))
     return None
+
+
+def format_module_diff_csv(module_diffs):
+    csv_res = [EXPORTED_CSV_META_HEADER]
+    for diff_obj in module_diffs:
+        _row = []
+        for attr in EXPORTED_CSV_META_HEADER:
+            if attr == "cmd_name":
+                _row.append(diff_obj.get(attr, None) or diff_obj.get("subgroup_name", "-"))
+            else:
+                _row.append(diff_obj.get(attr, None))
+        csv_res.append(_row)
+    return csv_res
+
+
+def export_meta_changes_to_csv(module_diffs, version_diff_file):
+    csv_res = format_module_diff_csv(module_diffs)
+    if not version_diff_file:
+        return csv_res
+    diff_file_folder = os.path.dirname(version_diff_file)
+    if diff_file_folder and not os.path.exists(diff_file_folder):
+        os.makedirs(diff_file_folder)
+    with open(version_diff_file, "w", newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(csv_res)

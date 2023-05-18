@@ -13,9 +13,10 @@ import time
 from deepdiff import DeepDiff
 from knack.log import get_logger
 
-from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff
+from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff, get_cli_repo_path
 from .custom import MetaChangeDetects, DiffExportFormat
-from .util import export_meta_changes_to_json, gen_commands_meta, get_commands_meta
+from .util import export_meta_changes_to_json, gen_commands_meta, get_commands_meta, \
+    extrct_module_name_from_meta_file, export_meta_changes_to_csv
 from ..statistics import _create_invoker_and_load_cmds, _get_command_source, \
     _command_codegen_info  # pylint: disable=protected-access
 from ..statistics.util import filter_modules
@@ -140,3 +141,38 @@ def cmp_command_meta(base_meta_file, diff_meta_file, only_break=False, output_ty
         detected_changes.check_deep_diffs()
         result = detected_changes.export_meta_changes(only_break, output_type)
         return export_meta_changes_to_json(result, output_file)
+
+
+def cmp_command_meta_of_versions(base_version, diff_version, only_break=False, version_diff_file=None):
+    cli_repo_path = get_cli_repo_path()
+    base_version_meta_path = os.path.join(cli_repo_path, 'cmd_meta', "azure-cli-" + base_version)
+    diff_version_meta_path = os.path.join(cli_repo_path, 'cmd_meta', "azure-cli-" + diff_version)
+    if not os.path.exists(base_version_meta_path) or not os.path.exists(diff_version_meta_path):
+        return
+    version_diffs = []
+    for base_meta_file in os.listdir(base_version_meta_path):
+        module_name = extrct_module_name_from_meta_file(base_meta_file)
+        if not module_name:
+            continue
+        diff_meta_file = os.path.join(diff_version_meta_path, base_meta_file)
+        if not os.path.exists(diff_meta_file):
+            display(f"Module {module_name} removed for {diff_version}")
+            continue
+        with open(os.path.join(base_version_meta_path, base_meta_file), "r") as g:
+            command_tree_before = json.load(g)
+        with open(diff_meta_file, "r") as g:
+            command_tree_after = json.load(g)
+        diff = DeepDiff(command_tree_before, command_tree_after)
+        if not diff:
+            display(f"No meta diffs from version: {diff_version}/{base_meta_file} for module: {module_name}")
+            continue
+        else:
+            detected_changes = MetaChangeDetects(diff, command_tree_before, command_tree_after)
+            detected_changes.check_deep_diffs()
+            diff_objs = detected_changes.export_meta_changes(only_break, "dict")
+            mod_obj = {"module": module_name}
+            for obj in diff_objs:
+                obj.update(mod_obj)
+                version_diffs.append(obj)
+        time.sleep(1)
+    return export_meta_changes_to_csv(version_diffs, version_diff_file)
