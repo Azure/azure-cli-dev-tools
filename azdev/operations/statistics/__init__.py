@@ -3,11 +3,14 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # -----------------------------------------------------------------------------
+import ast
 import inspect
 import json
 import os
 import re
+import textwrap
 import time
+from importlib import import_module
 from pathlib import Path
 
 from knack.log import get_logger
@@ -246,65 +249,68 @@ def _command_codegen_info(command_name, command, module_loader):  # pylint: disa
             return None
 
         command_operation = command.command_kwargs['command_operation']
-        is_v2_conveniance = False
+        is_v2_convenience = False
         is_generated = False
         if getattr(command_operation, 'op_path', None):
-            op = command_operation.get_op_handler(command_operation.op_path)
-            op_source = inspect.getsource(op)
+            operation_path = command_operation.op_path
+            operation_module_path = operation_path.split("#")[0]
+            op = command_operation.get_op_handler(operation_path)
+            func_map = _get_module_functions(operation_module_path)
+            op_source = _expand_all_functions(op, func_map)
             for line in op_source.splitlines():
                 if import_aaz_express.match(line):
-                    is_v2_conveniance = True
+                    is_v2_convenience = True
                     break
                 if command_args_express.match(line):
-                    is_v2_conveniance = True
+                    is_v2_convenience = True
 
             path_parts = list(Path(inspect.getfile(op)).parts)
             if "generated" in path_parts:
                 is_generated = True
 
-        if not is_v2_conveniance and getattr(command_operation, 'getter_op_path', None):
+        if not is_v2_convenience and getattr(command_operation, 'getter_op_path', None):
             op = command_operation.get_op_handler(command_operation.getter_op_path)
             op_source = inspect.getsource(op)
             for line in op_source.splitlines():
                 if import_aaz_express.match(line):
-                    is_v2_conveniance = True
+                    is_v2_convenience = True
                     break
                 if command_args_express.match(line):
-                    is_v2_conveniance = True
+                    is_v2_convenience = True
 
             path_parts = list(Path(inspect.getfile(op)).parts)
             if "generated" in path_parts:
                 is_generated = True
 
-        if not is_v2_conveniance and getattr(command_operation, 'setter_op_path', None):
+        if not is_v2_convenience and getattr(command_operation, 'setter_op_path', None):
             op = command_operation.get_op_handler(command_operation.setter_op_path)
             op_source = inspect.getsource(op)
             for line in op_source.splitlines():
                 if import_aaz_express.match(line):
-                    is_v2_conveniance = True
+                    is_v2_convenience = True
                     break
                 if command_args_express.match(line):
-                    is_v2_conveniance = True
+                    is_v2_convenience = True
 
             path_parts = list(Path(inspect.getfile(op)).parts)
             if "generated" in path_parts:
                 is_generated = True
 
-        if not is_v2_conveniance and getattr(command_operation, 'custom_function_op_path', None):
+        if not is_v2_convenience and getattr(command_operation, 'custom_function_op_path', None):
             op = command_operation.get_op_handler(command_operation.custom_function_op_path)
             op_source = inspect.getsource(op)
             for line in op_source.splitlines():
                 if import_aaz_express.match(line):
-                    is_v2_conveniance = True
+                    is_v2_convenience = True
                     break
                 if command_args_express.match(line):
-                    is_v2_conveniance = True
+                    is_v2_convenience = True
 
             path_parts = list(Path(inspect.getfile(op)).parts)
             if "generated" in path_parts:
                 is_generated = True
 
-        if is_v2_conveniance:
+        if is_v2_convenience:
             return {
                 "version": "v2",
                 "type": "Convenience"
@@ -317,3 +323,32 @@ def _command_codegen_info(command_name, command, module_loader):  # pylint: disa
             }
 
     return None
+
+
+def _get_module_functions(path):
+    try:
+        module = import_module(path)
+        functions = inspect.getmembers(module, predicate=inspect.isfunction)
+        return dict(functions)
+
+    except ModuleNotFoundError:
+        return None  # bypass functions in sdk
+
+
+def _expand_all_functions(func, func_map):
+    source = textwrap.dedent(inspect.getsource(func))
+    if func_map is None:
+        return source
+
+    tree = ast.parse(source)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            function_name = node.func.id
+            function = func_map.get(function_name, None)
+            # skip recursion and `locals()`
+            if function_name == func.__name__ or function is None:
+                continue
+
+            source += _expand_all_functions(function, func_map)
+
+    return source

@@ -3,6 +3,30 @@
 Release History
 ===============
 
+0.1.46
+++++++
+* `azdev command-change meta-diff`: Add subgroups change detect (#374)
+
+0.1.45
+++++++
+* `azdev command-change meta-diff`: Refine no meta diff output (#372)
+
+0.1.44
+++++++
+* `azdev command-change meta-export`: Fix object dump failure (#370)
+
+0.1.43
+++++++
+* `azdev statistics list-command-table`: Fix unexpected indent (#368)
+
+0.1.42
+++++++
+* `azdev command-change meta-export/meta-diff`: Generate cli cmd meta data and the diffs between two meta data (#362)
+
+0.1.41
+++++++
+* `azdev statistics list-command-table`: Support stats of nested function (#363)
+
 0.1.40
 ++++++
 * Fix pytest issues (#347)

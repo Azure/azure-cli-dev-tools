@@ -11,6 +11,7 @@ from knack.arguments import ArgumentsContext, CLIArgumentType
 
 from azdev.completer import get_test_completion
 from azdev.operations.linter import linter_severity_choices
+from azdev.operations.command_change import diff_export_format_choices
 
 
 class Flag:
@@ -114,6 +115,20 @@ def load_arguments(self, _):
         c.argument('diff_table_path', help='command table json file to diff')
 
     # endregion
+
+    with ArgumentsContext(self, 'command-change meta-export') as c:
+        c.positional('modules', modules_type)
+        c.argument('with_help', action="store_true", help="State whether to include help message")
+        c.argument('with_example', action="store_true", help="State whether to include examples")
+        c.argument('meta_output_path', help='command meta json file path to store')
+
+    with ArgumentsContext(self, 'command-change meta-diff') as c:
+        c.argument('base_meta_file', required=True, help='command meta json file')
+        c.argument('diff_meta_file', required=True, help='command meta json file to diff')
+        c.argument('only_break', action="store_true", help='whether include non breaking changes')
+        c.argument('output_type', choices=diff_export_format_choices(), default=diff_export_format_choices()[0],
+                   help='format to print diff and suggest message')
+        c.argument('output_file', help='command meta diff json file path to store')
 
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')
