@@ -11,7 +11,8 @@ disable=
     too-many-arguments,
     consider-using-f-string,
     unspecified-encoding,
-    broad-exception-raised
+    broad-exception-raised,
+    deprecated-module
 
 [TYPECHECK]
 # For Azure CLI extensions, we ignore some import errors as they'll be available in the environment of the CLI

@@ -8,7 +8,7 @@ import os
 import re
 import sys
 
-from distutils.version import LooseVersion  # pylint:disable=import-error,no-name-in-module,deprecated-module
+from distutils.version import LooseVersion  # pylint:disable=import-error,no-name-in-module
 from docutils import core, io
 
 from knack.log import get_logger
