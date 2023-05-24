@@ -16,7 +16,11 @@ disable=
     too-many-arguments,
     invalid-name,
     duplicate-code,
-    import-outside-toplevel
+    import-outside-toplevel,
+    # These rules were added in Pylint >= 2.12 and disabled to avoid making retroactively required
+    broad-exception-raised,
+    deprecated-module,
+    missing-timeout
 
 [TYPECHECK]
 # For Azure CLI extensions, we ignore some import errors as they'll be available in the environment of the CLI
