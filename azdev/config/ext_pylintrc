@@ -17,7 +17,7 @@ disable=
     invalid-name,
     duplicate-code,
     import-outside-toplevel,
-    # These rules were added in Pylint >= 2.12 and disabled to avoid making retroactively required
+    # These rules were added in Pylint >= 2.12 and are disabled to avoid making retroactively required
     broad-exception-raised,
     deprecated-module,
     missing-timeout
