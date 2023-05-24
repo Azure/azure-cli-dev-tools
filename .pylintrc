@@ -11,6 +11,7 @@ disable=
     too-many-arguments,
     consider-using-f-string,
     unspecified-encoding,
+    # These rules were added in Pylint >= 2.12 and disabled to avoid making retroactively required
     broad-exception-raised,
     deprecated-module
 
