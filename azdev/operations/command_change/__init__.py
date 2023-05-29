@@ -13,7 +13,7 @@ import time
 from deepdiff import DeepDiff
 from knack.log import get_logger
 
-from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff, get_cli_repo_path
+from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff, cmd
 from .custom import MetaChangeDetects, DiffExportFormat
 from .util import export_meta_changes_to_json, gen_commands_meta, get_commands_meta, \
     extrct_module_name_from_meta_file, export_meta_changes_to_csv
@@ -144,17 +144,28 @@ def cmp_command_meta(base_meta_file, diff_meta_file, only_break=False, output_ty
 
 
 def cmp_command_meta_of_versions(base_version, diff_version, only_break=False, version_diff_file=None):
-    cli_repo_path = get_cli_repo_path()
-    base_version_meta_path = os.path.join(cli_repo_path, 'cmd_meta', "azure-cli-" + base_version)
-    diff_version_meta_path = os.path.join(cli_repo_path, 'cmd_meta', "azure-cli-" + diff_version)
-    if not os.path.exists(base_version_meta_path) or not os.path.exists(diff_version_meta_path):
-        return
     version_diffs = []
-    for base_meta_file in os.listdir(base_version_meta_path):
+    base_version_meta_path = "azure-cli-" + base_version
+    base_meta_download_cmd = """az storage blob download-batch --account-name versionmeta -s $web --pattern """ \
+                             + base_version_meta_path + """/*  -d . """
+    display(f"Downloading {base_version} meta data using '{base_meta_download_cmd}'")
+    cmd(base_meta_download_cmd, show_stderr=True)
+    if not os.path.exists(os.getcwd() + "/" + base_version_meta_path):
+        display(f"No meta downloaded from blob for {base_version}, please check blob data")
+        return export_meta_changes_to_csv(version_diffs, version_diff_file)
+    diff_version_meta_path = "azure-cli-" + diff_version
+    diff_meta_download_cmd = """az storage blob download-batch --account-name versionmeta -s $web --pattern """ \
+                             + diff_version_meta_path + """/*  -d . """
+    display(f"Downloading {diff_version} meta data using '{diff_meta_download_cmd}'")
+    cmd(diff_meta_download_cmd, show_stderr=True)
+    if not os.path.exists(os.getcwd() + "/" + diff_version_meta_path):
+        display(f"No meta downloaded from blob for {diff_version}, please check blob data")
+        return export_meta_changes_to_csv(version_diffs, version_diff_file)
+    for base_meta_file in os.listdir(os.getcwd() + "/" + base_version_meta_path):
         module_name = extrct_module_name_from_meta_file(base_meta_file)
         if not module_name:
             continue
-        diff_meta_file = os.path.join(diff_version_meta_path, base_meta_file)
+        diff_meta_file = os.path.join(os.getcwd(), diff_version_meta_path, base_meta_file)
         if not os.path.exists(diff_meta_file):
             display(f"Module {module_name} removed for {diff_version}")
             continue
@@ -174,5 +185,4 @@ def cmp_command_meta_of_versions(base_version, diff_version, only_break=False, v
             for obj in diff_objs:
                 obj.update(mod_obj)
                 version_diffs.append(obj)
-        time.sleep(1)
     return export_meta_changes_to_csv(version_diffs, version_diff_file)
