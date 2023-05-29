@@ -17,7 +17,7 @@ logger = get_logger(__name__)
 SUBGROUP_NAME_PATTERN = re.compile(r"\[\'sub_groups\'\]\[\'([a-zA-Z0-9\-\s]+)\'\]")
 CMD_NAME_PATTERN = re.compile(r"\[\'commands\'\]\[\'([a-zA-Z0-9\-\s]+)\'\]")
 CMD_PARAMETER_PROPERTY_PATTERN = re.compile(r"\[(.*?)\]")
-MODULE_NAME_PATTERN = re.compile("az_([a-zA-Z0-9\-\_]+)_meta.json")
+MODULE_NAME_PATTERN = re.compile(r"az_([a-zA-Z0-9\-\_]+)_meta.json")
 
 EXPORTED_CSV_META_HEADER = ["module", "cmd_name", "rule_id", "rule_name", "is_break",
                             "rule_message", "suggest_message"]
@@ -262,3 +262,4 @@ def export_meta_changes_to_csv(module_diffs, version_diff_file):
     with open(version_diff_file, "w", newline='') as f:
         writer = csv.writer(f)
         writer.writerows(csv_res)
+    return None

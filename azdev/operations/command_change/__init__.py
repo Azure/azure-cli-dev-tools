@@ -177,12 +177,11 @@ def cmp_command_meta_of_versions(base_version, diff_version, only_break=False, v
         if not diff:
             display(f"No meta diffs from version: {diff_version}/{base_meta_file} for module: {module_name}")
             continue
-        else:
-            detected_changes = MetaChangeDetects(diff, command_tree_before, command_tree_after)
-            detected_changes.check_deep_diffs()
-            diff_objs = detected_changes.export_meta_changes(only_break, "dict")
-            mod_obj = {"module": module_name}
-            for obj in diff_objs:
-                obj.update(mod_obj)
-                version_diffs.append(obj)
+        detected_changes = MetaChangeDetects(diff, command_tree_before, command_tree_after)
+        detected_changes.check_deep_diffs()
+        diff_objs = detected_changes.export_meta_changes(only_break, "dict")
+        mod_obj = {"module": module_name}
+        for obj in diff_objs:
+            obj.update(mod_obj)
+            version_diffs.append(obj)
     return export_meta_changes_to_csv(version_diffs, version_diff_file)
