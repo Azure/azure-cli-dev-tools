@@ -111,7 +111,7 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
 
 ## Authoring commands and tests
 
-If you are building commands based on a REST API SPEC from [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs), you can leverage [autorest.az](https://github.com/Azure/autorest.az) to generate the commands. Otherwise you can run the following commands to create a code template:
+If you are building commands based on a REST API SPEC from [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs), you can leverage [aaz-dev-tools](https://github.com/Azure/aaz-dev-tools) to generate the commands. Otherwise you can run the following commands to create a code template:
 ```
 azdev extension create <extension-name>
 ```
