@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.47
+++++++
+* `azdev command-change meta-export`: Load parameter from module loader (#378)
+
 0.1.46
 ++++++
 * `azdev command-change meta-diff`: Add subgroups change detect (#374)
