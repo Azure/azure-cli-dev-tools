@@ -75,6 +75,28 @@ def process_aaz_argument(az_arguments_schema, argument_settings, para):
             para["aaz_choices"] = aaz_type.enum["items"]
 
 
+def process_arg_options(para, settings):
+    para["options"] = []
+    if not settings.get("options_list", None):
+        return
+    raw_options_list = settings["options_list"]
+    option_list = set()
+    for opt in raw_options_list:
+        opt_type = opt.__class__.__name__
+        if opt_type == "str":
+            option_list.add(opt)
+        elif opt_type == "Deprecated":
+            if hasattr(opt, "hide") and opt.hide:
+                pass
+            if hasattr(opt, "redirect"):
+                option_list.add(opt.redirect)
+            elif hasattr(opt, "target"):
+                option_list.add(opt.target)
+        else:
+            logger.warning("Unsupported option type: %i", opt_type)
+    para["options"] = sorted(option_list)
+
+
 def gen_command_meta(command_info, with_help=False, with_example=False):
     stored_property_when_exist = ["confirmation", "supports_no_wait", "is_preview"]
     command_meta = {
@@ -101,8 +123,8 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         settings = argument.type.settings
         para = {
             "name": settings["dest"],
-            "options": sorted(settings["options_list"])
         }
+        process_arg_options(para, settings)
         if settings.get("required", False):
             para["required"] = True
         if settings.get("choices", None):
