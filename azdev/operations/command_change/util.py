@@ -121,6 +121,11 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         if argument.type is None:
             continue
         settings = argument.type.settings
+        if settings.get("action", None):
+            action = settings["action"]
+            if hasattr(action, "__name__") and action.__name__ == "IgnoreAction":
+                # ignore argument like: cmd
+                continue
         para = {
             "name": settings["dest"],
         }
