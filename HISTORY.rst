@@ -3,6 +3,10 @@
 Release History
 ===============
 
+0.1.48
+++++++
+* `azdev command-change meta-export`: Add option deprecation info and ignore `cmd` arg (#381)
+
 0.1.47
 ++++++
 * `azdev command-change meta-export`: Load parameter from module loader (#378)
