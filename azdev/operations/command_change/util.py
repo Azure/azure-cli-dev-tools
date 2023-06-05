@@ -75,6 +75,26 @@ def process_aaz_argument(az_arguments_schema, argument_settings, para):
             para["aaz_choices"] = aaz_type.enum["items"]
 
 
+def process_arg_options(argument_settings, para):
+    para["options"] = []
+    if not argument_settings.get("options_list", None):
+        return
+    raw_options_list = argument_settings["options_list"]
+    option_list = set()
+    for opt in raw_options_list:
+        opt_type = opt.__class__.__name__
+        if opt_type == "str":
+            option_list.add(opt)
+        elif opt_type == "Deprecated":
+            if hasattr(opt, "hide") and opt.hide:
+                continue
+            if hasattr(opt, "target"):
+                option_list.add(opt.target)
+        else:
+            logger.warning("Unsupported option type: %i", opt_type)
+    para["options"] = sorted(option_list)
+
+
 def gen_command_meta(command_info, with_help=False, with_example=False):
     stored_property_when_exist = ["confirmation", "supports_no_wait", "is_preview"]
     command_meta = {
@@ -99,10 +119,15 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         if argument.type is None:
             continue
         settings = argument.type.settings
+        if settings.get("action", None):
+            action = settings["action"]
+            if hasattr(action, "__name__") and action.__name__ == "IgnoreAction":
+                # ignore argument like: cmd
+                continue
         para = {
             "name": settings["dest"],
-            "options": sorted(settings["options_list"])
         }
+        process_arg_options(settings, para)
         if settings.get("required", False):
             para["required"] = True
         if settings.get("choices", None):
