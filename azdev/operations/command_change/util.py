@@ -87,10 +87,8 @@ def process_arg_options(para, settings):
             option_list.add(opt)
         elif opt_type == "Deprecated":
             if hasattr(opt, "hide") and opt.hide:
-                pass
-            if hasattr(opt, "redirect"):
-                option_list.add(opt.redirect)
-            elif hasattr(opt, "target"):
+                continue
+            if hasattr(opt, "target"):
                 option_list.add(opt.target)
         else:
             logger.warning("Unsupported option type: %i", opt_type)
