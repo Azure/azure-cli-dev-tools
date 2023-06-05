@@ -75,11 +75,11 @@ def process_aaz_argument(az_arguments_schema, argument_settings, para):
             para["aaz_choices"] = aaz_type.enum["items"]
 
 
-def process_arg_options(para, settings):
+def process_arg_options(argument_settings, para):
     para["options"] = []
-    if not settings.get("options_list", None):
+    if not argument_settings.get("options_list", None):
         return
-    raw_options_list = settings["options_list"]
+    raw_options_list = argument_settings["options_list"]
     option_list = set()
     for opt in raw_options_list:
         opt_type = opt.__class__.__name__
@@ -127,7 +127,7 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         para = {
             "name": settings["dest"],
         }
-        process_arg_options(para, settings)
+        process_arg_options(settings, para)
         if settings.get("required", False):
             para["required"] = True
         if settings.get("choices", None):
