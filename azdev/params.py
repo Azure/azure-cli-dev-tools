@@ -130,6 +130,11 @@ def load_arguments(self, _):
                    help='format to print diff and suggest message')
         c.argument('output_file', help='command meta diff json file path to store')
 
+    with ArgumentsContext(self, 'command-change version-diff') as c:
+        c.argument('base_version', required=True, help='azure cli version as base')
+        c.argument('diff_version', required=True, help='azure cli version to diff')
+        c.argument('version_diff_file', help='command meta version diff file path to store')
+
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')
 
