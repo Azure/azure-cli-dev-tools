@@ -1,7 +1,8 @@
-# --------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.
-# --------------------------------------------------------------------------------------------
+# Licensed under the MIT License. See License.txt in the project root for
+# license information.
+# -----------------------------------------------------------------------------
 
 import logging
 from .utils import get_command_tree, ChangeType, extract_cmd_name, extract_subgroup_name, extract_cmd_property

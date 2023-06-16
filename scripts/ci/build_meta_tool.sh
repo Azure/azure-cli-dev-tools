@@ -10,5 +10,5 @@ cd ./cli-meta-tool
 
 echo "Build cli meta tool"
 pip install -U pip setuptools wheel
-python setup.py bdist_wheel -d "${BUILD_STAGINGDIRECTORY}/cli-meta-tool"
-python setup.py sdist -d "${BUILD_STAGINGDIRECTORY}/cli-meta-tool"
+python setup.py bdist_wheel -d "${BUILD_STAGINGDIRECTORY}"
+python setup.py sdist -d "${BUILD_STAGINGDIRECTORY}"
