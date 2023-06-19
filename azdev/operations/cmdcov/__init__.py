@@ -96,7 +96,7 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
         copied_selected_modules = copy.deepcopy(selected_modules)
         unsupported_extensions = ['azext_connection_monitor_preview', 'azext_spring_cloud', 'azext_interactive']
         for k, v in copied_selected_modules['ext'].items():
-            if k in special_extensions_name.keys():
+            if k in special_extensions_name:
                 selected_modules['ext'][special_extensions_name[k]] = v
                 del selected_modules['ext'][k]
             if k in unsupported_extensions:
