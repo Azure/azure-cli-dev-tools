@@ -10,10 +10,74 @@ ENCODING = 'utf-8'
 # Add identity after pr 21041
 # Move container out of CLI_OWN_MODULES, this module cannot find an owner in service team.
 # Move privatedns out of CLI_OWN_MODULES, this module cannot find an owner in service team.
-CLI_OWN_MODULES = ['cloud', 'databoxedge', 'identity', 'keyvault', 'monitor', 'network',
-                   'profile', 'resource', 'role', 'storage', 'vm']
+CLI_OWN_MODULES = [
+    'cloud',
+    'databoxedge',
+    'identity',
+    'keyvault',
+    'monitor',
+    'network',
+    'profile',
+    'resource',
+    'role',
+    'storage',
+    'vm',
+    'azext_account',
+    'azext_ad',
+    'azext_automanage',
+    'azext_automation',
+    'azext_azure-firewall',
+    'azext_blockchain',
+#    - azext_cloudservice # azure-mgmt-compute~=20.0.0 (azure-mgmt-compute-29.0.0) install failed
+    'azext_communication',
+    'azext_confluent',
+#    - azext_connection-monitor-preview # compatible with your current CLI core version 2.44.1.（2.0.81）
+    'azext_costmanagement',
+    'azext_custom-providers',
+    'azext_databox',
+    'azext_datafactory',
+    'azext_dns-resolver',
+    'azext_dynatrace',
+    'azext_edgeorder',
+    'azext_elastic',
+    'azext_express-route-cross-connection',
+    'azext_healthcareapis',
+    'azext_hpc-cache',
+    'azext_image-gallery',
+    'azext_init',
+    'azext_interactive',
+    'azext_internet-analyzer',
+    'azext_ip-group',
+    'azext_keyvault-preview',
+    'azext_log-analytics-solution',
+    'azext_logic',
+    'azext_logz',
+    'azext_mobile-network',
+    'azext_monitor-control-service',
+    'azext_network-manager',
+    'azext_next',
+    'azext_peering',
+    'azext_purview',
+    'azext_scheduled-query',
+    'azext_stack-hci',
+    'azext_storage-blob-preview',
+    'azext_storage-preview',
+    'azext_storagesync',
+    'azext_swiftlet',
+    'azext_timeseriesinsights',
+    'azext_virtual-network-tap',
+    'azext_virtual-wan',
+]
 
-EXCLUDE_MODULES = ['batchai', 'extension', 'feedback', 'find', 'interactive', 'kusto', 'util']
+EXCLUDE_MODULES = [
+    'batchai',
+    'extension',
+    'feedback',
+    'find',
+    'interactive',
+    'kusto',
+    'util'
+]
 
 GLOBAL_EXCLUDE_COMMANDS = ['wait']
 
