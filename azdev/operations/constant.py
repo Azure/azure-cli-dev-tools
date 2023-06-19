@@ -28,10 +28,10 @@ CLI_OWN_MODULES = [
     'azext_automation',
     'azext_azure-firewall',
     'azext_blockchain',
-#    - azext_cloudservice # azure-mgmt-compute~=20.0.0 (azure-mgmt-compute-29.0.0) install failed
+    # 'azext_cloudservice', # azure-mgmt-compute~=20.0.0 (azure-mgmt-compute-29.0.0) install failed
     'azext_communication',
     'azext_confluent',
-#    - azext_connection-monitor-preview # compatible with your current CLI core version 2.44.1.（2.0.81）
+    # 'azext_connection-monitor-preview', # compatible with your current CLI core version 2.44.1.（2.0.81）
     'azext_costmanagement',
     'azext_custom-providers',
     'azext_databox',
