@@ -61,8 +61,7 @@ class CmdcovManager:
         self.command_test_coverage = {'Total': [0, 0, 0]}
         self.date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         self.report_date = '-'.join(self.date.replace(':', '-').split())
-        self.cmdcov_path = os.path.join(get_azdev_repo_path(), 'azdev', 'operations', 'cmdcov')
-        self.template_path = os.path.join(self.cmdcov_path, 'template')
+        self.cmdcov_path = os.path.dirname(__file__)
         self.exclusions = exclusions
         self.width = 60
         self.fillchar = '-'
@@ -302,7 +301,7 @@ class CmdcovManager:
         """
         html_path = self.get_html_path()
         description = 'Command' if self.level == 'command' else 'Command Argument'
-        j2_loader = FileSystemLoader(self.template_path)
+        j2_loader = FileSystemLoader(self.cmdcov_path)
         env = Environment(loader=j2_loader)
         j2_tmpl = env.get_template('./index.j2')
         for item in self.command_test_coverage.values():
@@ -347,7 +346,7 @@ class CmdcovManager:
         """
         html_path = self.get_html_path()
         description = 'Command' if self.level == 'command' else 'Command Argument'
-        j2_loader = FileSystemLoader(self.template_path)
+        j2_loader = FileSystemLoader(self.cmdcov_path)
         env = Environment(loader=j2_loader)
         j2_tmpl = env.get_template('./index2.j2')
         for module, item in command_test_coverage.items():
@@ -368,7 +367,7 @@ class CmdcovManager:
         render every module html
         """
         html_path = self.get_html_path()
-        j2_loader = FileSystemLoader(self.template_path)
+        j2_loader = FileSystemLoader(self.cmdcov_path)
         env = Environment(loader=j2_loader)
         j2_tmpl = env.get_template('./module.j2')
         content = j2_tmpl.render(module=module,
