@@ -15,10 +15,15 @@ from azdev.utilities import (
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 from .cmdcov import CmdcovManager
 
+logger = get_logger(__name__)
 
-with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
-    config = yaml.safe_load(file)
-    EXCLUDE_MODULES = config['EXCLUDE_MODULES']
+try:
+    with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
+        config = yaml.safe_load(file)
+        EXCLUDE_MODULES = config['EXCLUDE_MODULES']
+except CLIError as ex:
+    logger.warning(f'Failed to load cmdcov.yml: {ex}, '
+                   f'please make sure your repo contains the following file https://github.com/Azure/azure-cli/blob/dev/scripts/ci/cmdcov.yml')
 
 
 logger = get_logger(__name__)
