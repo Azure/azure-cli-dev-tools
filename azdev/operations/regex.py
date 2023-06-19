@@ -13,8 +13,8 @@ from knack.log import get_logger
 from knack.util import CLIError
 from azdev.utilities.path import get_cli_repo_path
 
-
 logger = get_logger(__name__)
+
 try:
     with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
         config = yaml.safe_load(file)
@@ -25,7 +25,8 @@ try:
         NOT_END_PATTERN = config['NOT_END_PATTERN']
         NUMBER_SIGN_PATTERN = config['NUMBER_SIGN_PATTERN']
 except CLIError as ex:
-    logger.warning('Failed to load cmdcov.yml: %s', ex)
+    logger.warning('Failed to load cmdcov.yml: %s, please make sure your repo contains the following file '
+                   'https://github.com/Azure/azure-cli/blob/dev/scripts/ci/cmdcov.yml', str(ex))
 
 
 def get_all_tested_commands_from_regex(lines):

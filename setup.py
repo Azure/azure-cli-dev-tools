@@ -82,6 +82,7 @@ setup(
         'tox',
         'jsbeautifier~=1.14.7',
         'deepdiff~=6.3.0',
+        'tqdm',
         'wheel==0.30.0'
     ],
     package_data={

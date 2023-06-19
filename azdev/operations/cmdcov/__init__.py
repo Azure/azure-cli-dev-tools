@@ -15,14 +15,15 @@ from azdev.utilities import (
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 from .cmdcov import CmdcovManager
 
-
 logger = get_logger(__name__)
+
 try:
     with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
         config = yaml.safe_load(file)
         EXCLUDE_MODULES = config['EXCLUDE_MODULES']
 except CLIError as ex:
-    logger.warning('Failed to load cmdcov.yml: %s', ex)
+    logger.warning('Failed to load cmdcov.yml: %s, please make sure your repo contains the following file '
+                   'https://github.com/Azure/azure-cli/blob/dev/scripts/ci/cmdcov.yml', str(ex))
 
 
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches, duplicate-code
@@ -43,12 +44,14 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
 
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
-    # ext_only = modules == ['EXT']
-    enable_cli_own = bool(cli_only or modules is None)
-    if cli_only:
+    ext_only = modules == ['EXT']
+    both_cli_ext = False
+    if modules == ['ALL']:
+        both_cli_ext = True
+    if cli_only or ext_only or both_cli_ext:
         modules = None
-    # if cli_only or ext_only:
-    #     modules = None
+
+    enable_cli_own = bool(modules is None)
 
     selected_modules = get_path_table(include_only=modules)
 
@@ -58,19 +61,64 @@ def run_cmdcov(modules=None, git_source=None, git_target=None, git_repo=None, le
     if not any(selected_modules.values()):
         logger.warning('No commands selected to check.')
 
+    # mapping special extension name
+    def _map_extension_module(selected_modules):
+        # azext_applicationinsights -> azext_application_insights
+        # azext_firewall -> azext_azure_firewall
+        # azext_dms -> azext_dms_preview
+        # azext_dnsresolver -> azext_dns_resolver
+        # azext_expressroutecrossconnection -> azext_express_route_cross_connection
+        # azext_imagecopy -> azext_image_copy
+        # azext_loganalytics -> azext_log_analytics
+        # azext_amcs -> azext_monitor_control_service
+        # azext_resourcegraph -> azext_resource_graph
+        # azext_sentinel -> azext_securityinsight
+        # azext_serialconsole -> azext_serial_console
+        # azext_vnettap -> azext_virtual_network_tap
+        # azext_vwan -> azext_virtual_wan
+        # azext_connection_monitor_preview -> azure cli 2.0.81
+        # azext_spring_cloud -> deprecate
+        # azext_interactive -> no command
+        special_extensions_name = {
+            'azext_applicationinsights': 'azext_application_insights',
+            'azext_firewall': 'azext_azure_firewall',
+            'azext_dms': 'azext_dms_preview',
+            'azext_dnsresolver': 'azext_dns_resolver',
+            'azext_expressroutecrossconnection': 'azext_express_route_cross_connection',
+            'azext_imagecopy': 'azext_image_copy',
+            'azext_loganalytics': 'azext_log_analytics',
+            'azext_amcs': 'azext_monitor_control_service',
+            'azext_resourcegraph': 'azext_resource_graph',
+            'azext_sentinel': 'azext_securityinsight',
+            'azext_serialconsole': 'azext_serial_console',
+            'azext_vnettap': 'azext_virtual_network_tap',
+            'azext_vwan': 'azext_virtual_wan',
+        }
+        import copy
+        copied_selected_modules = copy.deepcopy(selected_modules)
+        unsupported_extensions = ['azext_connection_monitor_preview', 'azext_spring_cloud', 'azext_interactive']
+        for k, v in copied_selected_modules['ext'].items():
+            if k in special_extensions_name:
+                selected_modules['ext'][special_extensions_name[k]] = v
+                del selected_modules['ext'][k]
+            if k in unsupported_extensions:
+                del selected_modules['ext'][k]
+
+    _map_extension_module(selected_modules)
+
     if EXCLUDE_MODULES:
         selected_modules['mod'] = {k: v for k, v in selected_modules['mod'].items() if k not in EXCLUDE_MODULES}
         selected_modules['ext'] = {k: v for k, v in selected_modules['ext'].items() if k not in EXCLUDE_MODULES}
 
-    if cli_only:
+    if cli_only and not both_cli_ext:
         selected_mod_names = list(selected_modules['mod'].keys())
         selected_mod_paths = list(selected_modules['mod'].values())
-    # elif ext_only:
-    #     selected_mod_names = list(selected_modules['ext'].keys())
-    #     selected_mod_paths = list(selected_modules['ext'].values())
+    elif ext_only and not both_cli_ext:
+        selected_mod_names = list(selected_modules['ext'].keys())
+        selected_mod_paths = list(selected_modules['ext'].values())
     else:
-        selected_mod_names = list(selected_modules['mod'].keys())
-        selected_mod_paths = list(selected_modules['mod'].values())
+        selected_mod_names = list(selected_modules['mod'].keys()) + list(selected_modules['ext'].keys())
+        selected_mod_paths = list(selected_modules['mod'].values()) + list(selected_modules['ext'].values())
 
     if selected_mod_names:
         display('Modules: {}\n'.format(', '.join(selected_mod_names)))
