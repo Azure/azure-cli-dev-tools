@@ -22,11 +22,7 @@ try:
         config = yaml.safe_load(file)
         EXCLUDE_MODULES = config['EXCLUDE_MODULES']
 except CLIError as ex:
-    logger.warning(f'Failed to load cmdcov.yml: {ex}, '
-                   f'please make sure your repo contains the following file https://github.com/Azure/azure-cli/blob/dev/scripts/ci/cmdcov.yml')
-
-
-logger = get_logger(__name__)
+    logger.warning('Failed to load cmdcov.yml: %s, please make sure your repo contains the following file https://github.com/Azure/azure-cli/blob/dev/scripts/ci/cmdcov.yml' % str(ex))
 
 
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches, duplicate-code
