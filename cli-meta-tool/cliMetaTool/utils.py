@@ -13,7 +13,7 @@ import csv
 import logging
 from enum import Enum
 from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED
-from ._const import CONFIG_FILE_PATH, CHANGE_RULE_MESSAGE_MAPPING, CHANGE_SUGGEST_MESSAGE_MAPPING, \
+from _const import CONFIG_FILE_PATH, CHANGE_RULE_MESSAGE_MAPPING, CHANGE_SUGGEST_MESSAGE_MAPPING, \
     EXPORTED_CSV_META_HEADER, DOWNLOAD_THREADS
 logger = logging.getLogger(__name__)
 
@@ -91,7 +91,10 @@ def get_command_tree(command_name):
     return ret
 
 
-def module_meta_file_downloader(meta_file_url, meta_file_save_path, module_file):
+def module_meta_file_downloader(meta_file_url, meta_file_save_path, module_file, use_cache):
+    if use_cache and os.path.exists(meta_file_save_path):
+        print("Using cached {0} for {1}".format(meta_file_save_path, module_file))
+        return
     print("Downloading {0} for {1}".format(meta_file_url, module_file))
     try:
         res = requests.get(meta_file_url)
@@ -101,7 +104,7 @@ def module_meta_file_downloader(meta_file_url, meta_file_save_path, module_file)
         print(str(e))
 
 
-def get_target_version_modules(blob_url, path_prefix, index_file, version):
+def get_target_version_modules(blob_url, path_prefix, index_file, version, use_cache=False):
     version_meta_path = path_prefix + version
     version_meta_index_file = blob_url + "/" + version_meta_path + "/" + index_file
     version_meta_module_file_list = []
@@ -115,7 +118,7 @@ def get_target_version_modules(blob_url, path_prefix, index_file, version):
                                           version_meta_folder + "/" + module_file,
                                           module_file) for module_file in module_file_list if module_file]
         with ThreadPoolExecutor(max_workers=DOWNLOAD_THREADS) as pool:
-            download_module_jobs = [pool.submit(module_meta_file_downloader, _url, _save_path, module_file)
+            download_module_jobs = [pool.submit(module_meta_file_downloader, _url, _save_path, module_file, use_cache)
                                     for _url, _save_path, module_file in version_meta_module_file_list]
             wait(download_module_jobs, return_when=ALL_COMPLETED)
     except Exception as e:
@@ -198,7 +201,3 @@ def export_meta_changes_to_csv(module_diffs, version_diff_file):
         writer = csv.writer(f)
         writer.writerows(csv_res)
     return None
-
-
-if __name__ == "__main__":
-    get_target_version_modules("https://versionmeta.z13.web.core.windows.net/", "azure-cli-", "index.txt", "2.49.0")

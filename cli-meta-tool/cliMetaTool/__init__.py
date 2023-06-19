@@ -51,13 +51,13 @@ def meta_diff(base_meta_file, diff_meta_file, only_break=False, output_type="tex
         return export_meta_changes_to_json(result, output_file)
 
 
-def version_diff(base_version, diff_version, only_break=False, version_diff_file=None):
+def version_diff(base_version, diff_version, only_break=False, version_diff_file=None, use_cache=False):
     config = load_blob_config_file()
     blob_url, path_prefix, index_file = get_blob_config(config)
-    base_version_module_list = get_target_version_modules(blob_url, path_prefix, index_file, base_version)
-    get_target_version_modules(blob_url, path_prefix, index_file, diff_version)
+    base_version_module_list = get_target_version_modules(blob_url, path_prefix, index_file, base_version, use_cache)
+    get_target_version_modules(blob_url, path_prefix, index_file, diff_version, use_cache)
     version_diffs = []
-    for _, base_meta_file_full_path, base_meta_file in base_version_module_list[:10]:
+    for _, base_meta_file_full_path, base_meta_file in base_version_module_list:
         module_name = extrct_module_name_from_meta_file(base_meta_file)
         if not module_name:
             continue
