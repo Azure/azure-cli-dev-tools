@@ -280,3 +280,14 @@ helps['extension generate-docs'] = """
     long-summary: >
         This command installs the extensions in a temporary directory and sets it as the extensions dir when generating reference docs.
 """
+
+helps['cmdcov'] = """
+    short-summary: Run command test coverage and generate CLI command test coverage report.
+    examples:
+        - name: Check all CLI modules command test coverage.
+          text: azdev cmdcov CLI
+        - name: Check one or serveral modules command test coverage.
+          text: azdev cmdcov vm storage
+        - name: Check CLI modules command test coverage in argument level.
+          text: azdev cmdcov CLI --level argument
+"""

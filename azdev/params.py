@@ -83,7 +83,7 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'linter') as c:
         c.positional('modules', modules_type)
         c.argument('rules', options_list=['--rules', '-r'], nargs='+', help='Space-separated list of rules to run. Omit to run all rules.')
-        c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries'], help='Space-separated list of rule types to run. Omit to run all.')
+        c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries', 'command_test_coverage'], help='Space-separated list of rule types to run. Omit to run all.')
         c.argument('ci_exclusions', action='store_true', help='Force application of CI exclusions list when run locally.')
         c.argument('include_whl_extensions',
                    action='store_true',
@@ -113,7 +113,6 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'statistics diff-command-tables') as c:
         c.argument('table_path', help='command table json file')
         c.argument('diff_table_path', help='command table json file to diff')
-
     # endregion
 
     with ArgumentsContext(self, 'command-change meta-export') as c:
@@ -129,6 +128,12 @@ def load_arguments(self, _):
         c.argument('output_type', choices=diff_export_format_choices(), default=diff_export_format_choices()[0],
                    help='format to print diff and suggest message')
         c.argument('output_file', help='command meta diff json file path to store')
+
+    # region cmdcov
+    with ArgumentsContext(self, 'cmdcov') as c:
+        c.positional('modules', modules_type)
+        c.argument('level', choices=['command', 'argument'], help='Run command test coverage in command level or argument level.')
+    # endregion
 
     with ArgumentsContext(self, 'perf') as c:
         c.argument('runs', type=int, help='Number of runs to average performance over.')

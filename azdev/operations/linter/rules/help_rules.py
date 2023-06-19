@@ -70,6 +70,7 @@ def faulty_help_example_rule(linter, help_entry):
 
 @HelpFileEntryRule(LinterSeverity.HIGH)
 def faulty_help_example_parameters_rule(linter, help_entry):
+    # print(linter, help_entry)
     parser = linter.command_parser
     violations = []
 

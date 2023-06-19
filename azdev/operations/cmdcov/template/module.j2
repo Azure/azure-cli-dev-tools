@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{{ module }} Test Coverage Detail</title>
+    <link rel="stylesheet" type="text/css" href="component.css"/>
+    <link rel="shortcut icon" href="favicon.ico">
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>{{ module }} Test Coverage Report
+          <span>This is the test coverage report of {{ module }}. Please scroll down to see the untested details.<br>
+          Any question please contact Azure Cli Team.</span>
+        </h1>
+        {% if enable_cli_own == true -%}
+        <nav class="button">
+          <a class="current-page" href="index.html">ALL</a>
+          <a href="index2.html">CLI OWN</a>
+        </nav>
+        {% else -%}
+        <nav class="button">
+          <a href="index.html">ALL</a>
+        </nav>
+        {% endif -%}
+      </header>
+        <div class="component">
+          <h3>Date: {{ date }}</h3>
+          <h3>Tested: {{ coverage[0] }}, Untested: {{ coverage[1] }}, Percentage: {{ coverage[2] }}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th>Untested</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cmd in untested_commands %}
+              <tr>
+               <td>{{ module }}</td>
+               <td>{{ cmd }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <p class="contact">This is the test coverage report of {{ module }} module.<br>
+                             Any question please contact Azure Cli Team.<br>
+          </p>
+        </div>
+    </div><!-- /container -->
+  </body>
+</html>
