@@ -40,7 +40,8 @@ try:
         EXCLUDE_COMMANDS = config['EXCLUDE_COMMANDS']
         GLOBAL_EXCLUDE_COMMANDS = config['GLOBAL_EXCLUDE_COMMANDS']
 except CLIError as ex:
-    logger.warning('Failed to load cmdcov.yml: %s, please make sure your repo contains the following file https://github.com/Azure/azure-cli/blob/dev/scripts/ci/cmdcov.yml' % str(ex))
+    logger.warning('Failed to load cmdcov.yml: %s, please make sure your repo contains the following file '
+                   'https://github.com/Azure/azure-cli/blob/dev/scripts/ci/cmdcov.yml', str(ex))
 
 
 # pylint: disable=too-many-instance-attributes
