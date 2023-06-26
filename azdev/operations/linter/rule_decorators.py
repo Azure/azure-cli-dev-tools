@@ -28,7 +28,7 @@ class CommandCoverageRule(BaseRule):
                     func(linter)
                 except RuleError as ex:
                     linter_manager.mark_rule_failure(self.severity)
-                    yield (_create_violation_msg(ex, 'repo: {}, src: {}, tgt: {}',
+                    yield (_create_violation_msg(ex, 'Repo: {}, Src Branch: {}, Target Branch: {}',
                            linter.git_repo, linter.git_source, linter.git_target),
                            (linter.git_source, linter.git_target),
                            func.__name__)

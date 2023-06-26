@@ -129,7 +129,7 @@ def search_argument(line):
         if 'options_list' in ref[0]:
             # Match ` options_list=xxx, or options_list=xxx)`
             sub_pattern = r'options_list=\[(.*?)\]'
-            params = re.findall(sub_pattern, ref[0])[0].replace('\'', '').replace('"', '').split()
+            params = re.findall(sub_pattern, ref[0])[0].replace('\'', '').replace('"', '').split(',')
         else:
             # if options_list not exist, generate by parameter name
             params = ['--' + param_name.replace('_', '-')]
