@@ -2,13 +2,17 @@
 
 Release History
 ===============
+0.1.52
+++++++
+* Fix cmdcov issue(#396): Fix the regex which to get the command group
+
 0.1.51
 ++++++
-* Fix cmdcov issue(#391)
+* Fix cmdcov issue(#391): Add violation message to cmdcov linter rule and fix related issues
 
 0.1.50
 ++++++
-* Fix cmdcov issue(#385)
+* Fix cmdcov issue(#385): Add cmdcov to package data
 
 0.1.49
 ++++++
