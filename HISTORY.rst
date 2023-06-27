@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.51
+++++++
+* Fix cmdcov issue(#391)
+
 0.1.50
 ++++++
 * Fix cmdcov issue(#385)
