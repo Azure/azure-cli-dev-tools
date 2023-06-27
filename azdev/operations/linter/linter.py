@@ -318,13 +318,9 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         for command in commands:
             for code in all_tested_command:
                 if command in code:
-                    _logger.debug("Find '%s' test case in '%s'", command, code)
                     break
             else:
                 violations.append(f'Missing command test coverage: `{command}`')
-                _logger.error("Can not find '%s' test case", command)
-                _logger.error("Please add some scenario tests for the new command")
-                _logger.error("Or add the command with missing_command_test_coverage rule in linter_exclusions.yml")
                 exec_state = False
         if violations:
             violations.insert(0, 'Failed.')
@@ -342,15 +338,10 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
             for opt in opt_list:
                 for code in all_tested_command:
                     if command in code and opt in code:
-                        _logger.debug("Find '%s' test case in '%s'", command + ' ' + opt, code)
                         flag = True
                         break
                 else:
                     violations.append(f'Missing parameter test coverage: `{command} {opt}`')
-                    _logger.error("Can not find '%s' test case", command + ' ' + opt)
-                    _logger.error("Please add some scenario tests for the new parameter")
-                    _logger.error(
-                        "Or add the parameter with missing_parameter_test_coverage rule in linter_exclusions.yml")
                     exec_state = False
                 if flag:
                     break
