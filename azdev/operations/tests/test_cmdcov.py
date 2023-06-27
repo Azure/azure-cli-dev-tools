@@ -249,25 +249,23 @@ def test_detect_new_params():
                 parameters.append([cmd, params])
                 continue
     pprint(parameters)
-    assert parameters == [
-        ['disk', ['--network-policy']],
-        ['disk', ['--zone']],
-        ['disk', ['--size-gb,', '-z']],
-        ['snapshot', ['--size-gb,', '-z']],
-        ['signalr create', ['--default-action']],
-        ['signalr update', ['--default-action']],
-        ['vmss run-command create', ['--vmss-name']],
-        ['vmss run-command update', ['--vmss-name']],
-        ['vm stop', ['--skip-shutdown']],
-        ['vmss stop', ['--skip-shutdown']],
-        ['acr connected-registry create', ['--client-tokens']],
-        ['acr connected-registry create', ['--notifications']],
-        ['webapp update', ['--skip-custom-domain-verification']],
-        ['webapp update', ['--minimum-elastic-instance-count,', '-i']],
-        ['webapp update', ['--prewarmed-instance-count,', '-w']],
-        ['appconfig kv import', ['--strict']],
-        ['snapshot', ['--snapshot-name']],
-    ]
+    assert parameters[0] == ['disk', ['--network-policy']]
+    assert parameters[1] == ['disk', ['--zone']]
+    assert parameters[2] == ['disk', ['--size-gb', '-z']]
+    assert parameters[3] == ['snapshot', ['--size-gb', '-z']]
+    assert parameters[4] == ['signalr create', ['--default-action']]
+    assert parameters[5] == ['signalr update', ['--default-action']]
+    assert parameters[6] == ['vmss run-command create', ['--vmss-name']]
+    assert parameters[7] == ['vmss run-command update', ['--vmss-name']]
+    assert parameters[8] == ['vm stop', ['--skip-shutdown']]
+    assert parameters[9] == ['vmss stop', ['--skip-shutdown']]
+    assert parameters[10] == ['acr connected-registry create', ['--client-tokens']]
+    assert parameters[11] == ['acr connected-registry create', ['--notifications']]
+    assert parameters[12] == ['webapp update', ['--skip-custom-domain-verification']]
+    assert parameters[13] == ['webapp update', ['--minimum-elastic-instance-count', '-i']]
+    assert parameters[14] == ['webapp update', ['--prewarmed-instance-count', '-w']]
+    assert parameters[15] == ['appconfig kv import', ['--strict']]
+    assert parameters[16] == ['snapshot', ['--snapshot-name']]
 
 
 if __name__ == '__main__':

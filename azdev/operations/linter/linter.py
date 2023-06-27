@@ -195,9 +195,15 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
 
     def get_command_test_coverage(self):
         diff_index = diff_branches_detail(repo=self.git_repo, target=self.git_target, source=self.git_source)
-        commands, parameters = self._detect_new_command(diff_index)
+        commands, _ = self._detect_new_command(diff_index)
         all_tested_command = self._detect_tested_command(diff_index)
-        return self._run_command_test_coverage(commands, parameters, all_tested_command)
+        return self._run_command_test_coverage(commands, all_tested_command)
+
+    def get_parameter_test_coverage(self):
+        diff_index = diff_branches_detail(repo=self.git_repo, target=self.git_target, source=self.git_source)
+        _, parameters = self._detect_new_command(diff_index)
+        all_tested_command = self._detect_tested_command(diff_index)
+        return self._run_parameter_test_coverage(parameters, all_tested_command)
 
     # pylint: disable=too-many-locals, too-many-nested-blocks, too-many-branches, too-many-statements
     def _detect_new_command(self, diff_index):
@@ -306,9 +312,32 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         return all_tested_command
 
     @staticmethod
-    def _run_command_test_coverage(commands, parameters, all_tested_command):
+    def _run_command_test_coverage(commands, all_tested_command):
+        exec_state = True
+        violations = []
+        for command in commands:
+            for code in all_tested_command:
+                if command in code:
+                    _logger.debug("Find '%s' test case in '%s'", command, code)
+                    break
+            else:
+                violations.append(f'Missing command test coverage: `{command}`')
+                _logger.error("Can not find '%s' test case", command)
+                _logger.error("Please add some scenario tests for the new command")
+                _logger.error("Or add the command with missing_command_test_coverage rule in linter_exclusions.yml")
+                exec_state = False
+        if violations:
+            violations.insert(0, 'Failed.')
+            violations.extend([
+                'Please add some scenario tests for the new command',
+                'Or add the command with missing_command_test_coverage rule in linter_exclusions.yml'])
+        return exec_state, violations
+
+    @staticmethod
+    def _run_parameter_test_coverage(parameters, all_tested_command):
         flag = False
         exec_state = True
+        violations = []
         for command, opt_list in parameters:
             for opt in opt_list:
                 for code in all_tested_command:
@@ -317,6 +346,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                         flag = True
                         break
                 else:
+                    violations.append(f'Missing parameter test coverage: `{command} {opt}`')
                     _logger.error("Can not find '%s' test case", command + ' ' + opt)
                     _logger.error("Please add some scenario tests for the new parameter")
                     _logger.error(
@@ -324,17 +354,12 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                     exec_state = False
                 if flag:
                     break
-        for command in commands:
-            for code in all_tested_command:
-                if command in code:
-                    _logger.debug("Find '%s' test case in '%s'", command, code)
-                    break
-            else:
-                _logger.error("Can not find '%s' test case", command)
-                _logger.error("Please add some scenario tests for the new command")
-                _logger.error("Or add the command with missing_command_test_coverage rule in linter_exclusions.yml")
-                exec_state = False
-        return exec_state
+        if violations:
+            violations.insert(0, 'Failed.')
+            violations.extend([
+                'Please add some scenario tests for the new parameter',
+                'Or add the parameter with missing_parameter_test_coverage rule in linter_exclusions.yml'])
+        return exec_state, violations
 
 
 # pylint: disable=too-many-instance-attributes
