@@ -315,7 +315,6 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
 
     @staticmethod
     def _run_command_test_coverage(commands, all_tested_command):
-        flag = False
         exec_state = True
         violations = []
         for command in commands:
