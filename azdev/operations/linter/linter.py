@@ -199,13 +199,11 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         all_tested_command = self._detect_tested_command(diff_index)
         return self._run_command_test_coverage(commands, all_tested_command)
 
-
     def get_parameter_test_coverage(self):
         diff_index = diff_branches_detail(repo=self.git_repo, target=self.git_target, source=self.git_source)
         _, parameters = self._detect_new_command(diff_index)
         all_tested_command = self._detect_tested_command(diff_index)
         return self._run_parameter_test_coverage(parameters, all_tested_command)
-
 
     # pylint: disable=too-many-locals, too-many-nested-blocks, too-many-branches, too-many-statements
     def _detect_new_command(self, diff_index):
