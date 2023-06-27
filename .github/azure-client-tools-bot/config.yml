@@ -1,0 +1,9 @@
+files_check:
+  - files:
+      - "HISTORY.rst"
+      - "azdev/__init__.py"
+    comment: |
+      Please write the description of change into HISTORY.rst.
+      If you want to release a new azdev version, please update the __VERSION__ in __init__.py as well.
+    is_regex: true
+    type: necessary
