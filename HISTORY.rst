@@ -2,6 +2,31 @@
 
 Release History
 ===============
+0.1.52
+++++++
+* Fix cmdcov issue(#396): Fix the regex which to get the command group
+
+0.1.51
+++++++
+* Fix cmdcov issue(#391): Add violation message to cmdcov linter rule and fix related issues
+
+0.1.50
+++++++
+* Fix cmdcov issue(#385): Add cmdcov to package data
+
+0.1.49
+++++++
+* Add Command Coverage Report for CLI modules (#323)
+* Add Linter rule missing_command_coverage and missing_parameter_coverage  (#323)
+* Add Command Coverage Report for CLI extensions (#383)
+
+0.1.48
+++++++
+* `azdev command-change meta-export`: Add option deprecation info and ignore `cmd` arg (#381)
+
+0.1.47
+++++++
+* `azdev command-change meta-export`: Load parameter from module loader (#378)
 
 0.1.46
 ++++++

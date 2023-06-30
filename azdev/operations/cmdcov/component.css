@@ -1,0 +1,235 @@
+*, *:after, *:before { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+body {
+    font-family: sans-serif;
+}
+
+/* Container styles */
+.container .button a {
+	color: #31bc86;
+	text-decoration: none;
+}
+
+.container .button a:hover, a:focus {
+	color: #7c8d87;
+}
+
+.container > header {
+	margin: 0 auto;
+	text-align: center;
+	background: rgba(0,0,0,0.01);
+}
+
+.container > header h1 {
+	font-size: 2.625em;
+	line-height: 1.3;
+	margin: 0;
+	font-weight: 500;
+}
+
+.container > header span {
+	display: block;
+	font-size: 45%;
+	opacity: 0.6;
+	padding-top: 0.5em
+}
+
+/* Component styles */
+.component {
+	line-height: 1.5em;
+	margin: 0 auto;
+	padding: 0;
+	width: 100%;
+	max-width: 1200px;
+	overflow: hidden;
+}
+
+.component h3 {
+    font-size: 1.11em;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+}
+
+table {
+    border: 1px solid black;
+    border-collapse: collapse;
+    margin-bottom: 3em;
+    width: 100%;
+    background: #fff;
+}
+
+td, th {
+    border: 1px solid black;
+    padding: 0.75em 1.5em;
+    text-align: left;
+}
+	td.err {
+		background-color: #e992b9;
+		color: #fff;
+		font-size: 0.75em;
+		text-align: center;
+		line-height: 1;
+	}
+
+th {
+    background-color: #31bc86;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+}
+
+tbody th {
+	background-color: #2ea879;
+}
+
+tbody tr:hover {
+    background-color: rgba(129,208,177,.3);
+}
+
+/* circle styles */
+.detail {
+  display: none;
+}
+.column-percentage:hover .detail {
+  display: block;
+  text-align: center;
+}
+
+.single-chart {
+  width: 100%;
+  justify-content: space-around ;
+}
+
+.circular-chart {
+  display: block;
+  margin: 0px auto;
+  max-width: 100%;
+  max-height: 50px;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3.8;
+}
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+.circular-chart.red .circle {
+  stroke: #e71837;
+}
+
+.circular-chart.orange .circle {
+  stroke: #ff9f00;
+}
+
+.circular-chart.green .circle {
+  stroke: #4CC790;
+}
+
+.circular-chart.blue .circle {
+  stroke: #3c9ee5;
+}
+
+.circular-chart.gold .circle {
+  stroke: #ffd700;
+  fill: #ffd700;
+}
+
+.percentage {
+  fill: #666;
+  font-size: 0.6em;
+  text-anchor: middle;
+}
+
+/* medal styles */
+.medal {
+  width: 100px;
+  height: 60px;
+}
+
+.ribbon {
+  width: 40px;
+  height: 35px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.ribbon:before,
+.ribbon:after {
+  content: '';
+  position: absolute;
+  width: 17.5px;
+  height: 100%;
+  top: 0;
+}
+
+.ribbon:before {
+  right: 0;
+  background: #30110E;
+  transform: skew(-28deg);
+}
+
+.ribbon:after {
+  background: #EF7E76;
+  transform: skew(28deg);
+}
+
+.coin {
+  border: 1px solid #CA5D3E;
+  border-radius: 50%;
+  background: #F0CD73;
+  width: 35px;
+  height: 35px;
+  position: relative;
+  margin: -7.5px auto 0 auto;
+  box-shadow: 0px 0px 3px 0px #989898;
+}
+
+.coin:after {
+  content: '';
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  width: 17.5px;
+  height: 17.5px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 9px #D9B867;
+}
+
+/* Buttons Style */
+.button {
+	padding-top: 1em;
+	font-size: 0.8em;
+}
+
+.button a {
+	display: inline-block;
+	margin: 0.5em;
+	padding: 0.7em 1.1em;
+	outline: none;
+	border: 2px solid #31bc86;
+	text-decoration: none;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-weight: 700;
+	color: #DB7093;
+}
+
+.button a:hover,
+.button a.current-page,
+.button a.current-page:hover {
+	border-color: #DB7093;
+	color: #DB7093;
+}

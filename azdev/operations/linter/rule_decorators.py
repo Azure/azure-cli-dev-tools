@@ -17,6 +17,28 @@ class BaseRule:
         self.severity = severity
 
 
+# command_test_rule run once
+class CommandCoverageRule(BaseRule):
+
+    def __call__(self, func):
+        def add_to_linter(linter_manager):
+            def wrapper():
+                linter = linter_manager.linter
+                try:
+                    func(linter)
+                except RuleError as ex:
+                    linter_manager.mark_rule_failure(self.severity)
+                    yield (_create_violation_msg(ex, 'Repo: {}, Src Branch: {}, Target Branch: {}',
+                           linter.git_repo, linter.git_source, linter.git_target),
+                           (linter.git_source, linter.git_target),
+                           func.__name__)
+
+            linter_manager.add_rule('command_test_coverage', func.__name__, wrapper, self.severity)
+
+        add_to_linter.linter_rule = True
+        return add_to_linter
+
+
 # help_file_entry_rule
 class HelpFileEntryRule(BaseRule):
 
@@ -68,7 +90,7 @@ def _get_decorator(func, rule_group, print_format, severity):
     def add_to_linter(linter_manager):
         def wrapper():
             linter = linter_manager.linter
-
+            # print('enter add to linter', len(getattr(linter, rule_group)))
             for iter_entity in getattr(linter, rule_group):
                 exclusions = linter_manager.exclusions.get(iter_entity, {}).get('rule_exclusions', [])
                 if func.__name__ not in exclusions:

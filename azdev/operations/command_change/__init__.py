@@ -95,6 +95,8 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
             "is_preview": command.command_kwargs.get("is_preview", False)
         }
         module_loader = command_loader.cmd_to_loader_map[command_name]
+        for loader in module_loader:
+            loader.skip_applicability = True
         codegen_info = _command_codegen_info(command_name, command, module_loader)
         if codegen_info:
             command_info['codegen_version'] = codegen_info['version']

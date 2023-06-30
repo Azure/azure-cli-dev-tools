@@ -62,6 +62,7 @@ setup(
         'azdev.operations.extensions',
         'azdev.operations.statistics',
         'azdev.operations.command_change',
+        'azdev.operations.cmdcov',
         'azdev.utilities',
     ],
     install_requires=[
@@ -81,12 +82,14 @@ setup(
         'tox',
         'jsbeautifier~=1.14.7',
         'deepdiff~=6.3.0',
+        'tqdm',
         'wheel==0.30.0'
     ],
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
         'azdev.mod_templates': ['*.*'],
-        'azdev.operations.linter.rules': ['ci_exclusions.yml']
+        'azdev.operations.linter.rules': ['ci_exclusions.yml'],
+        'azdev.operations.cmdcov': ['*.*'],
     },
     include_package_data=True,
     entry_points={

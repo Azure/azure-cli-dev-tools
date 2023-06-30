@@ -1,0 +1,60 @@
+{% from "_macros.j2" import render_percentage %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>CLI Own {{ description }} Test Coverage</title>
+    <link rel="stylesheet" type="text/css" href="component.css"/>
+    <link rel="shortcut icon" href="favicon.ico">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="./component.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>CLI Own {{ description }} Test Coverage Report
+          <span>Please scroll down to see the every module test coverage.<br>
+          Any question please contact Azure Cli Team.</span>
+        </h1>
+          <nav class="button">
+              <a href="index.html">ALL</a>
+              <a class="current-page" href="index2.html">CLI OWN</a>'
+          </nav>
+      </header>
+        <div class="component">
+          <h3>Date: {{ date }}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th id="th-module" onclick="SortTable(this)" class="as">Module</th>
+                <th id="th-tested" onclick="SortTable(this)" class="as">Tested</th>
+                <th id="th-untested" onclick="SortTable(this)" class="as">Untested</th>
+                <th id="th-percentage" onclick="SortTable(this)" class="as">Percentage</th>
+                <th id="th-report" onclick="SortTable(this)" class="as">Reports</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td name="td-module">Total</td>
+                <td name="td-tested">{{ Total[0] }}</td>
+                <td name="td-untested">{{ Total[1] }}</td>
+                {{ render_percentage(Total[2], Total[3]) }}
+                <td name="td-report">N/A</td>
+              </tr>
+              {% for module, cov in command_test_coverage.items() %}
+              <tr>
+                <td name="td-module">{{ module }}</td>
+                <td name="td-tested">{{ cov[0] }}</td>
+                <td name="td-untested">{{ cov[1] }}</td>
+                {{ render_percentage(cov[2], cov[3]) }}
+                <td name="td-report"><a href="{{ module }}.html">{{ module }} test coverage report</a></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <p class="contact">This is the {{ description.lower() }} test coverage report of CLI Own.<br>
+                             Any question please contact Azure Cli Team.</p>
+        </div>
+    </div><!-- /container -->
+  </body>
+</html>

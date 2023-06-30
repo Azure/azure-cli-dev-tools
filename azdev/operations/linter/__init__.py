@@ -152,7 +152,10 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                                    rule_inclusions=rules,
                                    use_ci_exclusions=ci_exclusions,
                                    min_severity=min_severity,
-                                   update_global_exclusion=update_global_exclusion)
+                                   update_global_exclusion=update_global_exclusion,
+                                   git_source=git_source,
+                                   git_target=git_target,
+                                   git_repo=git_repo)
 
     subheading('Results')
     logger.info('Running linter: %i commands, %i help entries',
@@ -161,9 +164,12 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         run_params=not rule_types or 'params' in rule_types,
         run_commands=not rule_types or 'commands' in rule_types,
         run_command_groups=not rule_types or 'command_groups' in rule_types,
-        run_help_files_entries=not rule_types or 'help_entries' in rule_types)
+        run_help_files_entries=not rule_types or 'help_entries' in rule_types,
+        run_command_test_coverage=not rule_types or 'command_test_coverage' in rule_types,
+    )
     display(os.linesep + 'Run custom pylint rules.')
     exit_code += pylint_rules(selected_modules)
+    print(exit_code)
     sys.exit(exit_code)
 
 

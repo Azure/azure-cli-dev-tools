@@ -12,3 +12,4 @@ azdev.egg-info/
 pip-wheel-metadata/*
 build/
 dist/
+cmd_coverage
