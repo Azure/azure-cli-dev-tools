@@ -9,8 +9,8 @@
 """Azure Command Meta Tools package that can be installed using setuptools"""
 
 from setuptools import setup, find_packages
-setup(name="cli-meta-tool",
-      version='0.1.1',
+setup(name="azure-cli-diff-tool",
+      version='0.1.0',
       description="A tool for cli metadata management",
       long_description="A tool for cli metadata management",
       license='MIT',
@@ -20,6 +20,6 @@ setup(name="cli-meta-tool",
       include_package_data=True,
       install_requires=["deepdiff", "requests"],
       package_data={
-        "cliMetaTool": ["data/*"]
+        "azureCliDiffTool": ["data/*"]
       }
       )

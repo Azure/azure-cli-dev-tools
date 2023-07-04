@@ -13,7 +13,7 @@ import csv
 import logging
 from enum import Enum
 from concurrent.futures import ThreadPoolExecutor, wait, ALL_COMPLETED
-from _const import CONFIG_FILE_PATH, CHANGE_RULE_MESSAGE_MAPPING, CHANGE_SUGGEST_MESSAGE_MAPPING, \
+from ._const import CONFIG_FILE_PATH, CHANGE_RULE_MESSAGE_MAPPING, CHANGE_SUGGEST_MESSAGE_MAPPING, \
     EXPORTED_CSV_META_HEADER, DOWNLOAD_THREADS
 logger = logging.getLogger(__name__)
 
