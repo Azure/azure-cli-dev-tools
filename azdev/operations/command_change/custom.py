@@ -87,7 +87,7 @@ class MetaChangeDetects:
                     if cmd_property in CMD_PROPERTY_ADD_BREAK_LIST:
                         diff_obj = CmdPropAdd(cmd_name, cmd_property, True)
                     else:
-                        diff_obj = CmdPropAdd(cmd_name, cmd_property, True)
+                        diff_obj = CmdPropAdd(cmd_name, cmd_property, False)
                     self.diff_objs.append(diff_obj)
                 else:
                     if cmd_property in CMD_PROPERTY_REMOVE_BREAK_LIST:
