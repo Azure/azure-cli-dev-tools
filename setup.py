@@ -5,6 +5,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # -----------------------------------------------------------------------------
+# test 20230704
 
 """Azure Developer Tools package that can be installed using setuptools"""
 
