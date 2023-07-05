@@ -169,7 +169,8 @@ class ParaRemove(MetaChange):
 
 
 class ParaPropAdd(MetaChange):
-
+    
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, cmd_name, para_name, para_property, is_break=False):
         if not cmd_name or not para_name or not para_property:
             raise Exception("cmd name, parameter name and parameter property needed")
@@ -192,6 +193,7 @@ class ParaPropAdd(MetaChange):
 
 class ParaPropRemove(MetaChange):
 
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, cmd_name, para_name, para_property, is_break=False):
         if not cmd_name or not para_name or not para_property:
             raise Exception("cmd name, parameter name and parameter property needed")
