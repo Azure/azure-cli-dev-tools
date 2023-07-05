@@ -67,6 +67,17 @@ class MyTestCase(unittest.TestCase):
                     found = True
                     break
             self.assertTrue(found, "target message not found")
+        ignored_message = [
+            "updated property `is_aaz` from `False` to `True`"
+        ]
+        for mes in ignored_message:
+            ignored = True
+            for line in result:
+                if line.find(mes) > -1:
+                    ignored = False
+                    break
+            self.assertTrue(ignored, "ignored message found")
+
 
 
 if __name__ == '__main__':
