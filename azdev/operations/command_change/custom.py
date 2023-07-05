@@ -324,6 +324,8 @@ class MetaChangeDetects:
         for obj in self.diff_objs:
             if only_break and not obj.is_break:
                 continue
+            if obj.is_ignore:
+                continue
             ret = {}
             for prop in self.EXPORTED_META_PROPERTY:
                 if hasattr(obj, prop):
