@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.53
+++++++
+* `azdev command-change meta-export`: Add rule link (#402)
+
 0.1.52
 ++++++
 * Fix cmdcov issue(#396): Fix the regex which to get the command group
