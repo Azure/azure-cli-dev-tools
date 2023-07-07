@@ -15,6 +15,9 @@ ENV_VAR_TEST_MODULES = 'AZDEV_TEST_TESTS'               # comma-separated list o
 ENV_VAR_VIRTUAL_ENV = ['VIRTUAL_ENV', 'CONDA_PREFIX']   # used by system to identify virtual environment
 ENV_VAR_TEST_LIVE = 'AZURE_TEST_RUN_LIVE'               # denotes that tests should be run live instead of played back
 
+BREAKING_CHANE_RULE_LINK_URL_PREFIX = "https://github.com/Azure/azure-cli/blob/dev/doc/breaking_change_rules/"
+BREAKING_CHANE_RULE_LINK_URL_SUFFIX = ".md"
+
 CMD_PROPERTY_REMOVE_BREAK_LIST = []
 CMD_PROPERTY_ADD_BREAK_LIST = ["confirmation"]
 CMD_PROPERTY_UPDATE_BREAK_LIST = []

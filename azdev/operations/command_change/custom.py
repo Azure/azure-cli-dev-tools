@@ -25,7 +25,8 @@ class DiffExportFormat(Enum):
 
 class MetaChangeDetects:
 
-    EXPORTED_META_PROPERTY = ["rule_id", "is_break", "rule_message", "suggest_message", "cmd_name", "subgroup_name"]
+    EXPORTED_META_PROPERTY = ["rule_id", "rule_link_url", "is_break", "rule_message", "suggest_message",
+                              "cmd_name", "subgroup_name"]
     CHECKED_PARA_PROPERTY = ["name", "options", "required", "choices", "id_part", "nargs", "default", "desc",
                              "aaz_type", "type", "aaz_default", "aaz_choices"]
 
