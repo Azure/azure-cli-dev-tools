@@ -24,8 +24,8 @@ CMD_PROPERTY_UPDATE_BREAK_LIST = []
 CMD_PROPERTY_IGNORED_LIST = ["is_aaz"]
 
 PARA_PROPERTY_REMOVE_BREAK_LIST = ["options", "id_part", "nargs"]
-PARA_PROPERTY_ADD_BREAK_LIST = ["required", "choices"]
-PARA_PROPERTY_UPDATE_BREAK_LIST = ["default", "aaz_default"]
+PARA_PROPERTY_ADD_BREAK_LIST = ["required", "choices", "type"]
+PARA_PROPERTY_UPDATE_BREAK_LIST = ["default", "aaz_default", "type"]
 PARA_NAME_IGNORED_LIST = ["force_string"]
 PARA_PROPERTY_IGNORED_LIST = []
 PARA_VALUE_IGNORED_LIST = ["generic_update_set", "generic_update_add", "generic_update_remove",
