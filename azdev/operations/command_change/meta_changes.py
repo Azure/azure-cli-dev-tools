@@ -4,13 +4,15 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-from azdev.utilities import get_change_rule_template, get_change_suggest_template
+from azdev.utilities import get_change_rule_template, get_change_suggest_template, \
+    BREAKING_CHANE_RULE_LINK_URL_PREFIX, BREAKING_CHANE_RULE_LINK_URL_SUFFIX
 
 
 class MetaChange:
 
     def __init__(self, rule_id="1000", is_break=False, rule_message="", suggest_message=""):
         self.rule_id = rule_id
+        self.rule_link_url = BREAKING_CHANE_RULE_LINK_URL_PREFIX + self.rule_id + BREAKING_CHANE_RULE_LINK_URL_SUFFIX
         self.is_break = is_break
         self.rule_message = rule_message
         self.suggest_message = suggest_message
