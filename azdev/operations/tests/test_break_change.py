@@ -79,6 +79,15 @@ class MyTestCase(unittest.TestCase):
                     break
             self.assertTrue(ignored, "ignored message found")
 
+    def test_diff_meta_whitelist(self):
+        if not os.path.exists("./jsons/az_ams_meta_before.json") \
+                or not os.path.exists("./jsons/az_ams_meta_after.json"):
+            return
+        result = cmp_command_meta(base_meta_file="./jsons/az_ams_meta_before.json",
+                                  diff_meta_file="./jsons/az_ams_meta_after.json",
+                                  output_type="text")
+        self.assertEqual(result, [], "returned change isn't empty")
+
 
 if __name__ == '__main__':
     unittest.main()

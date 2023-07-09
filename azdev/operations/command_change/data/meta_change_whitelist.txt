@@ -1,0 +1,1 @@
+1010	ams asset get-sas-urls	expiry_time	default

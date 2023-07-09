@@ -4,6 +4,7 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+# pylint: disable=too-many-instance-attributes
 
 from azdev.utilities import get_change_rule_template, get_change_suggest_template
 from azdev.utilities import CMD_PROPERTY_IGNORED_LIST, PARA_PROPERTY_IGNORED_LIST, PARA_NAME_IGNORED_LIST, \
@@ -12,13 +13,15 @@ from azdev.utilities import CMD_PROPERTY_IGNORED_LIST, PARA_PROPERTY_IGNORED_LIS
 
 class MetaChange:
 
-    def __init__(self, rule_id="1000", is_break=False, rule_message="", suggest_message="", is_ignore=False):
+    def __init__(self, rule_id="1000", is_break=False, rule_message="", suggest_message="",
+                 is_ignore=False, filter_key=None):
         self.rule_id = rule_id
         self.rule_link_url = BREAKING_CHANE_RULE_LINK_URL_PREFIX + self.rule_id + BREAKING_CHANE_RULE_LINK_URL_SUFFIX
         self.is_break = is_break
         self.rule_message = rule_message
         self.suggest_message = suggest_message
         self.is_ignore = is_ignore
+        self.filter_key = filter_key
 
     def __str__(self):
         res = [self.rule_message]
@@ -92,7 +95,9 @@ class CmdPropAdd(MetaChange):
             if self.is_break else ""
         if cmd_property in CMD_PROPERTY_IGNORED_LIST:
             self.is_ignore = True
-        super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message, self.is_ignore)
+        self.filter_key = [self.rule_id, self.cmd_name, self.cmd_property]
+        super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message, self.is_ignore,
+                         self.filter_key)
 
 
 class CmdPropRemove(MetaChange):
@@ -109,12 +114,13 @@ class CmdPropRemove(MetaChange):
             if self.is_break else ""
         if cmd_property in CMD_PROPERTY_IGNORED_LIST:
             self.is_ignore = True
-        super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message, self.is_ignore)
+        self.filter_key = [self.rule_id, self.cmd_name, self.cmd_property]
+        super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message,
+                         self.is_ignore, self.filter_key)
 
 
 class CmdPropUpdate(MetaChange):
 
-    # pylint: disable=too-many-instance-attributes
     def __init__(self, cmd_name, cmd_property, is_break=False, old_value=None, new_value=None):
         if not cmd_name or not cmd_property:
             raise Exception("cmd name and cmd prop needed")
@@ -137,7 +143,9 @@ class CmdPropUpdate(MetaChange):
                                                                                 self.cmd_name) if self.is_break else ""
         if cmd_property in CMD_PROPERTY_IGNORED_LIST:
             self.is_ignore = True
-        super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message, self.is_ignore)
+        self.filter_key = [self.rule_id, self.cmd_name, self.cmd_prop_updated]
+        super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message,
+                         self.is_ignore, self.filter_key)
 
 
 class ParaAdd(MetaChange):
@@ -172,7 +180,6 @@ class ParaRemove(MetaChange):
 
 class ParaPropAdd(MetaChange):
 
-    # pylint: disable=too-many-instance-attributes
     def __init__(self, cmd_name, para_name, para_property, is_break=False):
         if not cmd_name or not para_name or not para_property:
             raise Exception("cmd name, parameter name and parameter property needed")
@@ -195,7 +202,6 @@ class ParaPropAdd(MetaChange):
 
 class ParaPropRemove(MetaChange):
 
-    # pylint: disable=too-many-instance-attributes
     def __init__(self, cmd_name, para_name, para_property, is_break=False):
         if not cmd_name or not para_name or not para_property:
             raise Exception("cmd name, parameter name and parameter property needed")
@@ -218,7 +224,6 @@ class ParaPropRemove(MetaChange):
 
 class ParaPropUpdate(MetaChange):
 
-    # pylint: disable=too-many-instance-attributes
     def __init__(self, cmd_name, para_name, para_property, is_break=False, old_value=None, new_value=None):
         if not cmd_name or not para_name or not para_property:
             raise Exception("cmd name, parameter name and parameter property needed")
@@ -246,4 +251,6 @@ class ParaPropUpdate(MetaChange):
             self.is_ignore = True
         if self.new_value in PARA_VALUE_IGNORED_LIST or self.old_value in PARA_VALUE_IGNORED_LIST:
             self.is_ignore = True
-        super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message, self.is_ignore)
+        self.filter_key = [self.rule_id, self.cmd_name, self.para_name, self.para_prop_updated]
+        super().__init__(self.rule_id, is_break, self.rule_message, self.suggest_message,
+                         self.is_ignore, self.filter_key)

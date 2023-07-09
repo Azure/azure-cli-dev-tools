@@ -21,7 +21,7 @@ BREAKING_CHANE_RULE_LINK_URL_SUFFIX = ".md"
 CMD_PROPERTY_REMOVE_BREAK_LIST = []
 CMD_PROPERTY_ADD_BREAK_LIST = ["confirmation"]
 CMD_PROPERTY_UPDATE_BREAK_LIST = []
-CMD_PROPERTY_IGNORED_LIST = ["is_aaz"]
+CMD_PROPERTY_IGNORED_LIST = ["is_aaz", "supports_no_wait"]
 
 PARA_PROPERTY_REMOVE_BREAK_LIST = ["options", "id_part", "nargs"]
 PARA_PROPERTY_ADD_BREAK_LIST = ["required", "choices", "type"]
