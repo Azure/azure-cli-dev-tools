@@ -127,7 +127,24 @@ def get_target_version_modules(blob_url, path_prefix, index_file, version, use_c
         return version_meta_module_file_list
 
 
-def extrct_module_name_from_meta_file(file_name):
+def get_target_version_module(blob_url, path_prefix, version, target_module, use_cache=False):
+    version_meta_path = path_prefix + version
+    module_file = "az_" + target_module + "_meta.json"
+    version_meta_module_file_url = blob_url + "/" + version_meta_path + "/" + module_file
+    version_meta_folder = os.getcwd() + "/" + version_meta_path
+    if not os.path.exists(version_meta_folder):
+        os.makedirs(version_meta_folder)
+    version_meta_module_file_save_path = version_meta_folder + "/" + module_file
+    try:
+        module_meta_file_downloader(version_meta_module_file_url, version_meta_module_file_save_path,
+                                    module_file, use_cache)
+    except Exception as e:
+        print(str(e))
+    finally:
+        return [(version_meta_module_file_url, version_meta_module_file_save_path, module_file)]
+
+
+def extract_module_name_from_meta_file(file_name):
     name_res = re.findall(MODULE_NAME_PATTERN, file_name)
     if not name_res or len(name_res) == 0:
         return None

@@ -5,6 +5,8 @@
 # -----------------------------------------------------------------------------
 
 import logging
+import os.path
+
 from .utils import get_command_tree, ChangeType, extract_cmd_name, extract_subgroup_name, extract_cmd_property
 from .meta_change import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate,
                           ParaAdd, ParaRemove, ParaPropAdd, ParaPropRemove, ParaPropUpdate,
@@ -34,10 +36,13 @@ class MetaChangeDetect:
         self.diff_meta = diff_meta
         self.diff_objs = []
         self.cmd_set_with_parameter_change = set()
+        self.meta_change_whitelist = set()
         self.__get_meta_change_whitelist__()
 
     def __get_meta_change_whitelist__(self):
-        self.meta_change_whitelist = set()
+        if not os.path.exists(META_CHANDE_WHITELIST_FILE_PATH):
+            logger.info("meta_change_whitelist.txt not exist, skipped")
+            return
         with open(META_CHANDE_WHITELIST_FILE_PATH, "r") as f_in:
             for line in f_in:
                 white_key = line.rstrip()

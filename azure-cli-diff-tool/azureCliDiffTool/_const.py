@@ -12,7 +12,7 @@ CONFIG_FILE_PATH = f"{script_directory}/{BLOB_SETTING_CONFIG_FILE}"
 META_CHANDE_WHITELIST_FILE = "./data/meta_change_whitelist.txt"
 META_CHANDE_WHITELIST_FILE_PATH = f"{script_directory}/{META_CHANDE_WHITELIST_FILE}"
 
-DOWNLOAD_THREADS = 10
+DOWNLOAD_THREADS = 30
 
 BREAKING_CHANE_RULE_LINK_URL_PREFIX = "https://github.com/Azure/azure-cli/blob/dev/doc/breaking_change_rules/"
 BREAKING_CHANE_RULE_LINK_URL_SUFFIX = ".md"
