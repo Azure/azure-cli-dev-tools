@@ -49,7 +49,7 @@ jobs:
       TargetPath: $(Build.ArtifactStagingDirectory)
       ArtifactName: pypi
 
-- job: BuildMetaToolPythonWheel
+- job: BuildCliDiffToolPythonWheel
   displayName: 'Build Python Wheel for cli breaking change detection tool'
 
   condition: succeeded()
@@ -65,13 +65,13 @@ jobs:
     displayName: 'Run Wheel Build Script'
     inputs:
       targetType: 'filePath'
-      filePath: scripts/ci/build_meta_tool.sh
+      filePath: scripts/ci/build_cli_diff_tool.sh
 
   - task: PublishPipelineArtifact@0
     displayName: 'Publish Artifact: pypi'
     inputs:
       TargetPath: $(Build.ArtifactStagingDirectory)
-      ArtifactName: pypi_meta_tool
+      ArtifactName: pypi_cli_diff_tool
 
 - job: Unittest
   timeoutInMinutes: 10

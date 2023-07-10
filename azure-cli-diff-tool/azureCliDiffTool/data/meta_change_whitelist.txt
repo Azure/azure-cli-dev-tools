@@ -1,0 +1,9 @@
+1010	ams asset get-sas-urls	expiry_time	default
+1010	mysql flexible-server create	administrator_login	default
+1010	mysql flexible-server restore	restore_point_in_time	default
+1010	mysql flexible-server import create	administrator_login	default
+1010	postgres flexible-server create	administrator_login	default
+1010	postgres flexible-server restore	restore_point_in_time	default
+1010	mysql server create	administrator_login	default
+1010	postgres server create	administrator_login	default
+1010	mariadb server create	administrator_login	default

@@ -6,9 +6,9 @@ set -ev
 : "${BUILD_SOURCESDIRECTORY:=$(cd $(dirname $0); cd ../../; pwd)}"
 
 cd "${BUILD_SOURCESDIRECTORY}"
-cd ./cli-meta-tool
+cd ./azure-cli-diff-tool
 
-echo "Build cli meta tool"
+echo "Build azure cli diff tool"
 pip install -U pip setuptools wheel
 python setup.py bdist_wheel -d "${BUILD_STAGINGDIRECTORY}"
 python setup.py sdist -d "${BUILD_STAGINGDIRECTORY}"

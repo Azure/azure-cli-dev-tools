@@ -6,11 +6,11 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-"""Azure Command Meta Tools package that can be installed using setuptools"""
+"""Azure Command Diff Tools package that can be installed using setuptools"""
 
 from setuptools import setup, find_packages
 setup(name="azure-cli-diff-tool",
-      version='0.1.3',
+      version='0.1.1',
       description="A tool for cli metadata management",
       long_description="A tool for cli metadata management",
       license='MIT',
