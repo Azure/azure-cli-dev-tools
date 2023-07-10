@@ -68,7 +68,7 @@ def process_aaz_argument(az_arguments_schema, argument_settings, para):
     aaz_type = _fields.get(argument_settings["dest"], None)
     if aaz_type:
         para["aaz_type"] = aaz_type.__class__.__name__
-        if aaz_type._type_in_help and aaz_type._type_in_help.lower() != "undefined": # pylint: disable=protected-access
+        if aaz_type._type_in_help and aaz_type._type_in_help.lower() != "undefined":  # pylint: disable=protected-access
             para["type"] = aaz_type._type_in_help  # pylint: disable=protected-access
         if has_value(aaz_type._default):  # pylint: disable=protected-access
             para["aaz_default"] = aaz_type._default  # pylint: disable=protected-access
