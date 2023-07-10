@@ -35,7 +35,7 @@ def diff_export_format_choices():
 
 def check_meta_tool_compatibility(meta_version):
     if not meta_version:
-        return True
+        return False
     meta_version_vec = meta_version.split(".")
     tool_version_vec = __VERSION__.split(".")
     version_outdated = False
