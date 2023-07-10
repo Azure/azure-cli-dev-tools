@@ -48,7 +48,7 @@ Setting up your environment
 
     ::
 
-        pip install azureCliDiffTool
+        pip install azure-cli-diff-tool
 
 Reporting issues and feedback
 +++++++++++++++++++++++++++++
