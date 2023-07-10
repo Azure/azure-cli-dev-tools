@@ -9,6 +9,9 @@ BLOB_SETTING_CONFIG_FILE = "./data/blob_config.ini"
 script_directory = os.path.dirname(os.path.realpath(__file__))
 CONFIG_FILE_PATH = f"{script_directory}/{BLOB_SETTING_CONFIG_FILE}"
 
+META_CHANDE_WHITELIST_FILE = "./data/meta_change_whitelist.txt"
+META_CHANDE_WHITELIST_FILE_PATH = f"{script_directory}/{META_CHANDE_WHITELIST_FILE}"
+
 DOWNLOAD_THREADS = 10
 
 BREAKING_CHANE_RULE_LINK_URL_PREFIX = "https://github.com/Azure/azure-cli/blob/dev/doc/breaking_change_rules/"
@@ -17,10 +20,15 @@ BREAKING_CHANE_RULE_LINK_URL_SUFFIX = ".md"
 CMD_PROPERTY_REMOVE_BREAK_LIST = []
 CMD_PROPERTY_ADD_BREAK_LIST = ["confirmation"]
 CMD_PROPERTY_UPDATE_BREAK_LIST = []
+CMD_PROPERTY_IGNORED_LIST = ["is_aaz", "supports_no_wait"]
 
 PARA_PROPERTY_REMOVE_BREAK_LIST = ["options", "id_part", "nargs"]
-PARA_PROPERTY_ADD_BREAK_LIST = ["required", "choices", "nargs"]
-PARA_PROPERTY_UPDATE_BREAK_LIST = ["default", "aaz_default"]
+PARA_PROPERTY_ADD_BREAK_LIST = ["required", "choices", "type"]
+PARA_PROPERTY_UPDATE_BREAK_LIST = ["default", "aaz_default", "type"]
+PARA_NAME_IGNORED_LIST = ["force_string"]
+PARA_PROPERTY_IGNORED_LIST = []
+PARA_VALUE_IGNORED_LIST = ["generic_update_set", "generic_update_add", "generic_update_remove",
+                           "generic_update_force_string"]
 
 EXPORTED_CSV_META_HEADER = ["module", "cmd_name", "rule_id", "rule_name", "is_break", "rule_link_url",
                             "rule_message", "suggest_message"]

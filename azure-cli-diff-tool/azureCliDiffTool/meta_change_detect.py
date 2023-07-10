@@ -11,7 +11,7 @@ from .meta_change import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropU
                           SubgroupAdd, SubgroupRemove)
 from ._const import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BREAK_LIST,
                      CMD_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_REMOVE_BREAK_LIST,
-                     PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST)
+                     PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST, META_CHANDE_WHITELIST_FILE_PATH)
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +34,14 @@ class MetaChangeDetect:
         self.diff_meta = diff_meta
         self.diff_objs = []
         self.cmd_set_with_parameter_change = set()
+        self.__get_meta_change_whitelist__()
+
+    def __get_meta_change_whitelist__(self):
+        self.meta_change_whitelist = set()
+        with open(META_CHANDE_WHITELIST_FILE_PATH, "r") as f_in:
+            for line in f_in:
+                white_key = line.rstrip()
+                self.meta_change_whitelist.add(white_key)
 
     @staticmethod
     def __search_cmd_obj(cmd_name, search_meta):
@@ -80,7 +88,7 @@ class MetaChangeDetect:
                     if cmd_property in CMD_PROPERTY_ADD_BREAK_LIST:
                         diff_obj = CmdPropAdd(cmd_name, cmd_property, True)
                     else:
-                        diff_obj = CmdPropAdd(cmd_name, cmd_property, True)
+                        diff_obj = CmdPropAdd(cmd_name, cmd_property, False)
                     self.diff_objs.append(diff_obj)
                 else:
                     if cmd_property in CMD_PROPERTY_REMOVE_BREAK_LIST:
@@ -249,6 +257,17 @@ class MetaChangeDetect:
             cmp_parameters = cmd_cmp.get("parameters", [])
             self.check_cmd_parameter_diff(cmd_name, base_parameters, cmp_parameters)
 
+    def filter_diffs_by_whitelist(self):
+        """
+        filter_diffs_by_whitelist
+        """
+        new_diff_objs = []
+        for obj in self.diff_objs:
+            if obj.filter_key and obj.is_break and "\t".join(obj.filter_key) in self.meta_change_whitelist:
+                continue
+            new_diff_objs.append(obj)
+        self.diff_objs = new_diff_objs
+
     def check_deep_diffs(self):
         self.check_dict_item_remove()
         self.check_dict_item_add()
@@ -256,6 +275,7 @@ class MetaChangeDetect:
         self.check_list_item_add()
         self.check_value_change()
         self.check_cmds_parameter_diff()
+        self.filter_diffs_by_whitelist()
 
     @staticmethod
     def fill_subgroup_rules(obj, ret_mod, rule):
@@ -316,6 +336,8 @@ class MetaChangeDetect:
         }
         for obj in self.diff_objs:
             if only_break and not obj.is_break:
+                continue
+            if obj.is_ignore:
                 continue
             ret = {}
             for prop in self.EXPORTED_META_PROPERTY:
