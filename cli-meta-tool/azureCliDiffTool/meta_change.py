@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 from .utils import get_change_rule_template, get_change_suggest_template
+from ._const import BREAKING_CHANE_RULE_LINK_URL_PREFIX, BREAKING_CHANE_RULE_LINK_URL_SUFFIX
 
 
 class MetaChange:
@@ -14,6 +15,7 @@ class MetaChange:
         self.is_break = is_break
         self.rule_message = rule_message
         self.suggest_message = suggest_message
+        self.rule_link_url = BREAKING_CHANE_RULE_LINK_URL_PREFIX + self.rule_id + BREAKING_CHANE_RULE_LINK_URL_SUFFIX
 
     def __str__(self):
         res = [self.rule_message]

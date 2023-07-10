@@ -11,6 +11,8 @@ CONFIG_FILE_PATH = f"{script_directory}/{BLOB_SETTING_CONFIG_FILE}"
 
 DOWNLOAD_THREADS = 10
 
+BREAKING_CHANE_RULE_LINK_URL_PREFIX = "https://github.com/Azure/azure-cli/blob/dev/doc/breaking_change_rules/"
+BREAKING_CHANE_RULE_LINK_URL_SUFFIX = ".md"
 
 CMD_PROPERTY_REMOVE_BREAK_LIST = []
 CMD_PROPERTY_ADD_BREAK_LIST = ["confirmation"]
@@ -20,7 +22,7 @@ PARA_PROPERTY_REMOVE_BREAK_LIST = ["options", "id_part", "nargs"]
 PARA_PROPERTY_ADD_BREAK_LIST = ["required", "choices", "nargs"]
 PARA_PROPERTY_UPDATE_BREAK_LIST = ["default", "aaz_default"]
 
-EXPORTED_CSV_META_HEADER = ["module", "cmd_name", "rule_id", "rule_name", "is_break",
+EXPORTED_CSV_META_HEADER = ["module", "cmd_name", "rule_id", "rule_name", "is_break", "rule_link_url",
                             "rule_message", "suggest_message"]
 
 CHANGE_RULE_MESSAGE_MAPPING = {

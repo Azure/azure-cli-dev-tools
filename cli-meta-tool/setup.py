@@ -10,7 +10,7 @@
 
 from setuptools import setup, find_packages
 setup(name="azure-cli-diff-tool",
-      version='0.1.0',
+      version='0.1.3',
       description="A tool for cli metadata management",
       long_description="A tool for cli metadata management",
       license='MIT',

@@ -201,3 +201,29 @@ def export_meta_changes_to_csv(module_diffs, version_diff_file):
         writer = csv.writer(f)
         writer.writerows(csv_res)
     return None
+
+
+def format_module_diff_dict(module_diffs):
+    dict_res = []
+    for diff_obj in module_diffs:
+        _row = {}
+        for attr in EXPORTED_CSV_META_HEADER:
+            if attr == "cmd_name":
+                _row['cmd_name'] = diff_obj.get(attr, None) or diff_obj.get("subgroup_name", "-")
+            else:
+                _row[attr] = diff_obj.get(attr, None)
+        dict_res.append(_row)
+    return dict_res
+
+
+def export_meta_changes_to_dict(module_diffs, version_diff_file):
+    dict_res = format_module_diff_dict(module_diffs)
+    if not version_diff_file:
+        return dict_res
+    diff_file_folder = os.path.dirname(version_diff_file)
+    if diff_file_folder and not os.path.exists(diff_file_folder):
+        os.makedirs(diff_file_folder)
+    with open(version_diff_file, "w", newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(dict_res)
+    return None
