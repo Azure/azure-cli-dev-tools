@@ -21,10 +21,15 @@ BREAKING_CHANE_RULE_LINK_URL_SUFFIX = ".md"
 CMD_PROPERTY_REMOVE_BREAK_LIST = []
 CMD_PROPERTY_ADD_BREAK_LIST = ["confirmation"]
 CMD_PROPERTY_UPDATE_BREAK_LIST = []
+CMD_PROPERTY_IGNORED_LIST = ["is_aaz", "supports_no_wait"]
 
 PARA_PROPERTY_REMOVE_BREAK_LIST = ["options", "id_part", "nargs"]
-PARA_PROPERTY_ADD_BREAK_LIST = ["required", "choices", "nargs"]
-PARA_PROPERTY_UPDATE_BREAK_LIST = ["default", "aaz_default"]
+PARA_PROPERTY_ADD_BREAK_LIST = ["required", "choices", "type"]
+PARA_PROPERTY_UPDATE_BREAK_LIST = ["default", "aaz_default", "type"]
+PARA_NAME_IGNORED_LIST = ["force_string"]
+PARA_PROPERTY_IGNORED_LIST = []
+PARA_VALUE_IGNORED_LIST = ["generic_update_set", "generic_update_add", "generic_update_remove",
+                           "generic_update_force_string"]
 
 CHANGE_RULE_MESSAGE_MAPPING = {
     "1000": "default Message",

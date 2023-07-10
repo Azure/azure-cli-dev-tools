@@ -68,7 +68,8 @@ def process_aaz_argument(az_arguments_schema, argument_settings, para):
     aaz_type = _fields.get(argument_settings["dest"], None)
     if aaz_type:
         para["aaz_type"] = aaz_type.__class__.__name__
-        para["type"] = aaz_type._type_in_help  # pylint: disable=protected-access
+        if aaz_type._type_in_help and aaz_type._type_in_help.lower() != "undefined":  # pylint: disable=protected-access
+            para["type"] = aaz_type._type_in_help  # pylint: disable=protected-access
         if has_value(aaz_type._default):  # pylint: disable=protected-access
             para["aaz_default"] = aaz_type._default  # pylint: disable=protected-access
         if para["aaz_type"] in ["AAZArgEnum"] and aaz_type.get("enum", None) and aaz_type.enum.get("items", None):
@@ -93,6 +94,21 @@ def process_arg_options(argument_settings, para):
         else:
             logger.warning("Unsupported option type: %i", opt_type)
     para["options"] = sorted(option_list)
+
+
+def process_arg_type(argument_settings, para):
+    if not argument_settings.get("type", None):
+        return
+    configured_type = argument_settings["type"]
+    raw_type = None
+    if hasattr(configured_type, "__name__"):
+        raw_type = configured_type.__name__
+    elif hasattr(configured_type, "__class__"):
+        raw_type = configured_type.__class__.__name__
+    else:
+        print("unsupported type", configured_type)
+        return
+    para["type"] = raw_type if raw_type in ["str", "int", "float", "bool", "file_type"] else "custom_type"
 
 
 def gen_command_meta(command_info, with_help=False, with_example=False):
@@ -128,6 +144,7 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
             "name": settings["dest"],
         }
         process_arg_options(settings, para)
+        process_arg_type(settings, para)
         if settings.get("required", False):
             para["required"] = True
         if settings.get("choices", None):
