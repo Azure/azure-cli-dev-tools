@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.54
+++++++
+* `azdev command-change meta-export/meta-diff`: Add cmd `type` extraction, fix false positive in cmdPropUpdate and add whitelist in certain meta-changes (#401)
+
 0.1.53
 ++++++
 * `azdev command-change meta-export`: Add rule link (#402)
