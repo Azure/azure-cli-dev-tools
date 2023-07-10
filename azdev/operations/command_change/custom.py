@@ -3,13 +3,12 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # -----------------------------------------------------------------------------
-
+import os.path
 from enum import Enum
 from knack.log import get_logger
 from azdev.utilities import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BREAK_LIST,
                              CMD_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_REMOVE_BREAK_LIST,
-                             PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST,
-                             get_azdev_repo_path)
+                             PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST)
 from .util import extract_cmd_name, extract_cmd_property, extract_subgroup_name, ChangeType
 from .util import get_command_tree
 from .meta_changes import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate, ParaAdd, ParaRemove,
@@ -43,12 +42,15 @@ class MetaChangeDetects:
         self.diff_meta = diff_meta
         self.diff_objs = []
         self.cmd_set_with_parameter_change = set()
+        self.meta_change_whitelist = set()
         self.__get_meta_change_whitelist__()
 
     def __get_meta_change_whitelist__(self):
-        self.meta_change_whitelist = set()
-        with open(get_azdev_repo_path() +
-                  "/azdev/operations/command_change/data/meta_change_whitelist.txt", "r") as f_in:
+        white_list_file = os.path.dirname(os.path.realpath(__file__)) + "/data/meta_change_whitelist.txt"
+        if not os.path.exists(white_list_file):
+            logger.info("meta_change_whitelist.txt not exist, skipped")
+            return
+        with open(white_list_file, "r") as f_in:
             for line in f_in:
                 white_key = line.rstrip()
                 self.meta_change_whitelist.add(white_key)

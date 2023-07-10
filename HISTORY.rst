@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.55
+++++++
+* `azdev command-change meta-diff`: Fix data/meta_change_whitelist.txt pkg building
+
 0.1.54
 ++++++
 * `azdev command-change meta-export/meta-diff`: Add cmd `type` extraction, fix false positive in cmdPropUpdate and add whitelist in certain meta-changes (#401)
