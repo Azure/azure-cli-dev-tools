@@ -18,6 +18,7 @@ from .utils import get_blob_config, load_blob_config_file, get_target_version_mo
     extract_module_name_from_meta_file, export_meta_changes_to_csv, export_meta_changes_to_json, \
     export_meta_changes_to_dict
 
+__VERSION__ = '0.0.1'
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,18 @@ def diff_export_format_choices():
     return [form.value for form in DiffExportFormat]
 
 
+def check_meta_tool_compatibility(meta_version):
+    if not meta_version:
+        return True
+    meta_version_vec = meta_version.split(".")
+    tool_version_vec = __VERSION__.split(".")
+    version_outdated = False
+    for ind, v in enumerate(meta_version_vec):
+        if v.isdigit() and tool_version_vec[ind].isdigit() and int(v) > int(tool_version_vec[ind]):
+            version_outdated = True
+    return version_outdated
+
+
 def meta_diff(base_meta_file, diff_meta_file, only_break=False, output_type="text", output_file=None):
     if not os.path.exists(base_meta_file):
         raise Exception("base meta file needed")
@@ -42,6 +55,13 @@ def meta_diff(base_meta_file, diff_meta_file, only_break=False, output_type="tex
         command_tree_before = json.load(g)
     with open(diff_meta_file, "r") as g:
         command_tree_after = json.load(g)
+    if command_tree_before.get("compat_version", None) \
+            and check_meta_tool_compatibility(command_tree_before["compat_version"]):
+        raise Exception("Please update your azure cli diff tool")
+    if command_tree_after.get("compat_version", None) \
+            and check_meta_tool_compatibility(command_tree_after["compat_version"]):
+        raise Exception("Please update your azure cli diff tool")
+
     diff = DeepDiff(command_tree_before, command_tree_after)
     if not diff:
         print(f"No meta diffs from {diff_meta_file} to {base_meta_file}")
@@ -89,6 +109,14 @@ def version_diff(base_version, diff_version, only_break=False, version_diff_file
             command_tree_before = json.load(g)
         with open(diff_meta_file_full_path, "r") as g:
             command_tree_after = json.load(g)
+
+        if command_tree_before.get("compat_version", None) \
+                and check_meta_tool_compatibility(command_tree_before["compat_version"]):
+            raise Exception("Please update your azure cli diff tool")
+        if command_tree_after.get("compat_version", None) \
+                and check_meta_tool_compatibility(command_tree_after["compat_version"]):
+            raise Exception("Please update your azure cli diff tool")
+
         diff = DeepDiff(command_tree_before, command_tree_after)
         if not diff:
             print(f"No meta diffs from version: {diff_version}/{base_meta_file} for module: {module_name}")

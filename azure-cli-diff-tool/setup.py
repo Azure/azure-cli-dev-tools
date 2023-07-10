@@ -7,9 +7,14 @@
 # -----------------------------------------------------------------------------
 
 """Azure Command Diff Tools package that can be installed using setuptools"""
-
+import os
+import re
 from setuptools import setup, find_packages
 
+diff_tool_path = os.path.dirname(os.path.realpath(__file__))
+with open(os.path.join(diff_tool_path, 'azureCliDiffTool', '__init__.py'), 'r') as version_file:
+    __VERSION__ = re.search(r'^__VERSION__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                            version_file.read(), re.MULTILINE).group(1)
 
 with open('README.rst', 'r', encoding='utf-8') as f:
     README = f.read()
@@ -17,7 +22,7 @@ with open('HISTORY.rst', 'r', encoding='utf-8') as f:
     HISTORY = f.read()
 
 setup(name="azure-cli-diff-tool",
-      version='0.0.1',
+      version=__VERSION__,
       description="A tool for cli metadata management",
       long_description=README + '\n\n' + HISTORY,
       license='MIT',
