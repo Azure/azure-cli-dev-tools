@@ -1,5 +1,5 @@
 Microsoft Azure CLI Diff Tools (azureCliDiffTool)
-=====================================
+=================================================
 
 The ``azureCliDiffTool`` is designed to aid azure-cli users in diffing metadata files to see its updates through historical versions for Azure CLI command modules and extensions.
 
