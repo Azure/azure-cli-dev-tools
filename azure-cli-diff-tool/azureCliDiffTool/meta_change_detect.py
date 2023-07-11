@@ -3,30 +3,24 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # -----------------------------------------------------------------------------
+
+import logging
 import os.path
-from enum import Enum
-from knack.log import get_logger
-from azdev.utilities import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BREAK_LIST,
-                             CMD_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_REMOVE_BREAK_LIST,
-                             PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST)
-from .util import extract_cmd_name, extract_cmd_property, extract_subgroup_name, ChangeType
-from .util import get_command_tree
-from .meta_changes import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate, ParaAdd, ParaRemove,
-                           ParaPropAdd, ParaPropRemove, ParaPropUpdate, SubgroupAdd, SubgroupRemove)
 
-logger = get_logger(__name__)
+from .utils import get_command_tree, ChangeType, extract_cmd_name, extract_subgroup_name, extract_cmd_property
+from .meta_change import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate,
+                          ParaAdd, ParaRemove, ParaPropAdd, ParaPropRemove, ParaPropUpdate,
+                          SubgroupAdd, SubgroupRemove)
+from ._const import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BREAK_LIST,
+                     CMD_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_REMOVE_BREAK_LIST,
+                     PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST, META_CHANDE_WHITELIST_FILE_PATH)
 
-
-class DiffExportFormat(Enum):
-    DICT = "dict"
-    TEXT = "text"
-    TREE = "tree"
+logger = logging.getLogger(__name__)
 
 
-class MetaChangeDetects:
+class MetaChangeDetect:
 
-    EXPORTED_META_PROPERTY = ["rule_id", "rule_link_url", "is_break", "rule_message", "suggest_message",
-                              "cmd_name", "subgroup_name"]
+    EXPORTED_META_PROPERTY = ["rule_id", "rule_link_url", "is_break", "rule_message", "suggest_message", "cmd_name", "subgroup_name"]
     CHECKED_PARA_PROPERTY = ["name", "options", "required", "choices", "id_part", "nargs", "default", "desc",
                              "aaz_type", "type", "aaz_default", "aaz_choices"]
 
@@ -46,11 +40,10 @@ class MetaChangeDetects:
         self.__get_meta_change_whitelist__()
 
     def __get_meta_change_whitelist__(self):
-        white_list_file = os.path.dirname(os.path.realpath(__file__)) + "/data/meta_change_whitelist.txt"
-        if not os.path.exists(white_list_file):
+        if not os.path.exists(META_CHANDE_WHITELIST_FILE_PATH):
             logger.info("meta_change_whitelist.txt not exist, skipped")
             return
-        with open(white_list_file, "r") as f_in:
+        with open(META_CHANDE_WHITELIST_FILE_PATH, "r") as f_in:
             for line in f_in:
                 white_key = line.rstrip()
                 self.meta_change_whitelist.add(white_key)

@@ -4,16 +4,15 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-import sys
+import os
+BLOB_SETTING_CONFIG_FILE = "./data/blob_config.ini"
+script_directory = os.path.dirname(os.path.realpath(__file__))
+CONFIG_FILE_PATH = f"{script_directory}/{BLOB_SETTING_CONFIG_FILE}"
 
-COMMAND_MODULE_PREFIX = 'azure-cli-'
-EXTENSION_PREFIX = 'azext_'
-EXT_REPO_NAME = 'azure-cli-extensions'
-IS_WINDOWS = sys.platform.lower() in ['windows', 'win32']
+META_CHANDE_WHITELIST_FILE = "./data/meta_change_whitelist.txt"
+META_CHANDE_WHITELIST_FILE_PATH = f"{script_directory}/{META_CHANDE_WHITELIST_FILE}"
 
-ENV_VAR_TEST_MODULES = 'AZDEV_TEST_TESTS'               # comma-separated list of modules to test
-ENV_VAR_VIRTUAL_ENV = ['VIRTUAL_ENV', 'CONDA_PREFIX']   # used by system to identify virtual environment
-ENV_VAR_TEST_LIVE = 'AZURE_TEST_RUN_LIVE'               # denotes that tests should be run live instead of played back
+DOWNLOAD_THREADS = 30
 
 BREAKING_CHANE_RULE_LINK_URL_PREFIX = "https://github.com/Azure/azure-cli/blob/dev/doc/breaking_change_rules/"
 BREAKING_CHANE_RULE_LINK_URL_SUFFIX = ".md"
@@ -30,6 +29,9 @@ PARA_NAME_IGNORED_LIST = ["force_string"]
 PARA_PROPERTY_IGNORED_LIST = []
 PARA_VALUE_IGNORED_LIST = ["generic_update_set", "generic_update_add", "generic_update_remove",
                            "generic_update_force_string"]
+
+EXPORTED_CSV_META_HEADER = ["module", "cmd_name", "rule_id", "rule_name", "is_break", "rule_link_url",
+                            "rule_message", "suggest_message"]
 
 CHANGE_RULE_MESSAGE_MAPPING = {
     "1000": "default Message",
@@ -62,3 +64,4 @@ CHANGE_SUGGEST_MESSAGE_MAPPING = {
     "1011": "please confirm sub group `{0}` added",
     "1012": "please confirm sub group `{0}` removed",
 }
+
