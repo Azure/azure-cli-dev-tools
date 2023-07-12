@@ -19,7 +19,6 @@ disable=
     import-outside-toplevel,
     # These rules were added in Pylint >= 2.12, disable them to avoid making retroactive change
     broad-exception-raised,
-    deprecated-module,
     missing-timeout
 
 [TYPECHECK]
