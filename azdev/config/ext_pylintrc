@@ -40,22 +40,3 @@ max-branches=20
 
 [SIMILARITIES]
 min-similarity-lines=10
-
-[BASIC]
-# Naming hints based on PEP 8 (https://www.python.org/dev/peps/pep-0008/#naming-conventions).
-# Consider these guidelines and not hard rules. Read PEP 8 for more details.
-
-# The invalid-name checker must be **enabled** for these hints to be used.
-include-naming-hint=yes
-
-module-naming-style=snake_case
-const-naming-style=UPPER_CASE
-class-naming-style=PascalCase
-class-attribute-naming-style=snake_case
-attr-naming-style=snake_case
-method-naming-style=snake_case
-function-naming-style=snake_case
-argument-naming-style=snake_case
-variable-naming-style=snake_case
-inlinevar-naming-style=snake_case
-
