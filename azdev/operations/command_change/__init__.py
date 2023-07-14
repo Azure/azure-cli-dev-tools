@@ -6,19 +6,17 @@
 
 # pylint: disable=no-else-return
 
-import json
-import os
 import time
 
-from deepdiff import DeepDiff
 from knack.log import get_logger
 
 from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff
-from .custom import MetaChangeDetects, DiffExportFormat
-from .util import export_meta_changes_to_json, gen_commands_meta, get_commands_meta
+from .custom import DiffExportFormat, get_commands_meta
+from .util import export_commands_meta
 from ..statistics import _create_invoker_and_load_cmds, _get_command_source, \
     _command_codegen_info  # pylint: disable=protected-access
 from ..statistics.util import filter_modules
+import azure_cli_diff_tool
 
 logger = get_logger(__name__)
 
@@ -117,28 +115,9 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
 
         commands_info.append(command_info)
     commands_meta = get_commands_meta(command_loader.command_group_table, commands_info, with_help, with_example)
-    gen_commands_meta(commands_meta, meta_output_path)
+    export_commands_meta(commands_meta, meta_output_path)
     display(f"Total Commands: {len(commands_info)} from {', '.join(selected_mod_names)} have been generated.")
 
 
 def cmp_command_meta(base_meta_file, diff_meta_file, only_break=False, output_type="text", output_file=None):
-    if not os.path.exists(base_meta_file):
-        raise Exception("base meta file needed")
-    if not os.path.exists(diff_meta_file):
-        raise Exception("diff meta file needed")
-    start = time.time()
-    with open(base_meta_file, "r") as g:
-        command_tree_before = json.load(g)
-    with open(diff_meta_file, "r") as g:
-        command_tree_after = json.load(g)
-    stop = time.time()
-    logger.info('Command meta files loaded in %i sec', stop - start)
-    diff = DeepDiff(command_tree_before, command_tree_after)
-    if not diff:
-        display(f"No meta diffs from {diff_meta_file} to {base_meta_file}")
-        return export_meta_changes_to_json(None, output_file)
-    else:
-        detected_changes = MetaChangeDetects(diff, command_tree_before, command_tree_after)
-        detected_changes.check_deep_diffs()
-        result = detected_changes.export_meta_changes(only_break, output_type)
-        return export_meta_changes_to_json(result, output_file)
+    return azure_cli_diff_tool.meta_diff(base_meta_file, diff_meta_file, only_break, output_type, output_file)
