@@ -18,6 +18,7 @@ logger = get_logger(__name__)
 try:
     with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
         config = yaml.safe_load(file)
+# pylint: disable=broad-exception-caught
 except Exception as ex:
     url = "https://raw.githubusercontent.com/Azure/azure-cli/dev/scripts/ci/cmdcov.yml"
     response = requests.get(url)
