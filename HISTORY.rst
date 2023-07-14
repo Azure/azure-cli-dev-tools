@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.56
+++++++
+* Fix cmdcov issue(#410): Get config from github when get_cli_repo_path failed
+
 0.1.55
 ++++++
 * `azdev command-change meta-diff`: Fix data/meta_change_whitelist.txt pkg building
