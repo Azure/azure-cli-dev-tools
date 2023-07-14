@@ -6,6 +6,7 @@
 
 import os
 import time
+import requests
 import yaml
 
 from knack.log import get_logger
@@ -20,10 +21,12 @@ logger = get_logger(__name__)
 try:
     with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
         config = yaml.safe_load(file)
-        EXCLUDE_MODULES = config['EXCLUDE_MODULES']
-except CLIError as ex:
-    logger.warning('Failed to load cmdcov.yml: %s, please make sure your repo contains the following file '
-                   'https://github.com/Azure/azure-cli/blob/dev/scripts/ci/cmdcov.yml', str(ex))
+# pylint: disable=broad-exception-caught
+except Exception:
+    url = "https://raw.githubusercontent.com/Azure/azure-cli/dev/scripts/ci/cmdcov.yml"
+    response = requests.get(url)
+    config = yaml.safe_load(response.text)
+EXCLUDE_MODULES = config['EXCLUDE_MODULES']
 
 
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches, duplicate-code

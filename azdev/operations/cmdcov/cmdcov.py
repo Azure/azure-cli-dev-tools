@@ -8,11 +8,11 @@ import os
 import shutil
 import sys
 import time
+import requests
 import yaml
 
 from jinja2 import FileSystemLoader, Environment
 from knack.log import get_logger
-from knack.util import CLIError
 from tqdm import tqdm
 from azdev.operations.regex import get_all_tested_commands_from_regex
 from azdev.utilities.path import get_azdev_repo_path, get_cli_repo_path, find_files
@@ -22,26 +22,28 @@ logger = get_logger(__name__)
 try:
     with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
         config = yaml.safe_load(file)
-        ENCODING = config['ENCODING']
-        GLOBAL_PARAMETERS = config['GLOBAL_PARAMETERS']
-        GENERIC_UPDATE_PARAMETERS = config['GENERIC_UPDATE_PARAMETERS']
-        WAIT_CONDITION_PARAMETERS = config['WAIT_CONDITION_PARAMETERS']
-        OTHER_PARAMETERS = config['OTHER_PARAMETERS']
-        RED = config['RED']
-        ORANGE = config['ORANGE']
-        GREEN = config['GREEN']
-        BLUE = config['BLUE']
-        GOLD = config['GOLD']
-        RED_PCT = config['RED_PCT']
-        ORANGE_PCT = config['ORANGE_PCT']
-        GREEN_PCT = config['GREEN_PCT']
-        BLUE_PCT = config['BLUE_PCT']
-        CLI_OWN_MODULES = config['CLI_OWN_MODULES']
-        EXCLUDE_COMMANDS = config['EXCLUDE_COMMANDS']
-        GLOBAL_EXCLUDE_COMMANDS = config['GLOBAL_EXCLUDE_COMMANDS']
-except CLIError as ex:
-    logger.warning('Failed to load cmdcov.yml: %s, please make sure your repo contains the following file '
-                   'https://github.com/Azure/azure-cli/blob/dev/scripts/ci/cmdcov.yml', str(ex))
+# pylint: disable=broad-exception-caught
+except Exception:
+    url = "https://raw.githubusercontent.com/Azure/azure-cli/dev/scripts/ci/cmdcov.yml"
+    response = requests.get(url)
+    config = yaml.safe_load(response.text)
+ENCODING = config['ENCODING']
+GLOBAL_PARAMETERS = config['GLOBAL_PARAMETERS']
+GENERIC_UPDATE_PARAMETERS = config['GENERIC_UPDATE_PARAMETERS']
+WAIT_CONDITION_PARAMETERS = config['WAIT_CONDITION_PARAMETERS']
+OTHER_PARAMETERS = config['OTHER_PARAMETERS']
+RED = config['RED']
+ORANGE = config['ORANGE']
+GREEN = config['GREEN']
+BLUE = config['BLUE']
+GOLD = config['GOLD']
+RED_PCT = config['RED_PCT']
+ORANGE_PCT = config['ORANGE_PCT']
+GREEN_PCT = config['GREEN_PCT']
+BLUE_PCT = config['BLUE_PCT']
+CLI_OWN_MODULES = config['CLI_OWN_MODULES']
+EXCLUDE_COMMANDS = config['EXCLUDE_COMMANDS']
+GLOBAL_EXCLUDE_COMMANDS = config['GLOBAL_EXCLUDE_COMMANDS']
 
 
 # pylint: disable=too-many-instance-attributes
