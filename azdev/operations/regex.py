@@ -22,8 +22,7 @@ try:
 except Exception as ex:
     url = "https://raw.githubusercontent.com/Azure/azure-cli/dev/scripts/ci/cmdcov.yml"
     response = requests.get(url)
-    content = response.text
-    config = yaml.safe_load(content)
+    config = yaml.safe_load(response.text)
 CMD_PATTERN = config['CMD_PATTERN']
 QUO_PATTERN = config['QUO_PATTERN']
 END_PATTERN = config['END_PATTERN']
