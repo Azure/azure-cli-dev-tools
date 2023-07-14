@@ -19,7 +19,7 @@ try:
     with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
         config = yaml.safe_load(file)
 # pylint: disable=broad-exception-caught
-except Exception as ex:
+except Exception:
     url = "https://raw.githubusercontent.com/Azure/azure-cli/dev/scripts/ci/cmdcov.yml"
     response = requests.get(url)
     config = yaml.safe_load(response.text)
@@ -29,7 +29,6 @@ END_PATTERN = config['END_PATTERN']
 DOCS_END_PATTERN = config['DOCS_END_PATTERN']
 NOT_END_PATTERN = config['NOT_END_PATTERN']
 NUMBER_SIGN_PATTERN = config['NUMBER_SIGN_PATTERN']
-
 
 
 def get_all_tested_commands_from_regex(lines):
