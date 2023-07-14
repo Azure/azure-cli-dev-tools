@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import os
+import requests
 import time
 import yaml
 
@@ -20,10 +21,12 @@ logger = get_logger(__name__)
 try:
     with open(os.path.join(get_cli_repo_path(), 'scripts', 'ci', 'cmdcov.yml'), 'r') as file:
         config = yaml.safe_load(file)
-        EXCLUDE_MODULES = config['EXCLUDE_MODULES']
-except CLIError as ex:
-    logger.warning('Failed to load cmdcov.yml: %s, please make sure your repo contains the following file '
-                   'https://github.com/Azure/azure-cli/blob/dev/scripts/ci/cmdcov.yml', str(ex))
+except Exception as ex:
+    url = "https://raw.githubusercontent.com/Azure/azure-cli/dev/scripts/ci/cmdcov.yml"
+    response = requests.get(url)
+    content = response.text
+    config = yaml.safe_load(content)
+EXCLUDE_MODULES = config['EXCLUDE_MODULES']
 
 
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches, duplicate-code
