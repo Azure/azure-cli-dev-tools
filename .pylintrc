@@ -10,7 +10,10 @@ disable=
     too-few-public-methods,
     too-many-arguments,
     consider-using-f-string,
-    unspecified-encoding
+    unspecified-encoding,
+    # These rules were added in Pylint >= 2.12, disable them to avoid making retroactive change
+    broad-exception-raised,
+    missing-timeout
 
 [TYPECHECK]
 # For Azure CLI extensions, we ignore some import errors as they'll be available in the environment of the CLI

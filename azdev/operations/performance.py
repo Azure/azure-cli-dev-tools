@@ -237,7 +237,7 @@ def _benchmark_cmd_staticstic(time_series: list):
     avg_time = sum(time_series) / size
 
     std_deviation = sqrt(
-        sum([(t - avg_time) * (t - avg_time) for t in time_series]) / size
+        sum((t - avg_time) * (t - avg_time) for t in time_series) / size
     )
 
     return {
