@@ -61,49 +61,6 @@ def get_command_tree(command_name):
     return ret
 
 
-def extract_subgroup_name(key):
-    subgroup_ame_res = re.findall(SUBGROUP_NAME_PATTERN, key)
-    if not subgroup_ame_res or len(subgroup_ame_res) == 0:
-        return False, None
-    return True, subgroup_ame_res[-1]
-
-
-def extract_cmd_name(key):
-    cmd_name_res = re.findall(CMD_NAME_PATTERN, key)
-    if not cmd_name_res or len(cmd_name_res) == 0:
-        return False, None
-    return True, cmd_name_res[0]
-
-
-def extract_cmd_property(key, cmd_name):
-    cmd_key_pattern = re.compile(cmd_name + r"\'\]\[\'([a-zA-Z0-9\-\_]+)\'\]")
-    cmd_key_res = re.findall(cmd_key_pattern, key)
-    if not cmd_key_res or len(cmd_key_res) == 0:
-        return False, None
-    return True, cmd_key_res[0]
-
-
-def extract_para_info(key):
-    parameters_ind = key.find("['parameters']")
-    property_ind = key.find("[", parameters_ind + 1)
-    property_res = re.findall(CMD_PARAMETER_PROPERTY_PATTERN, key[property_ind:])
-    if not property_res:
-        return None
-    return property_res
-
-
-def export_meta_changes_to_json(output, output_file):
-    if not output_file:
-        return output
-    output_file_folder = os.path.dirname(output_file)
-    if output_file_folder and not os.path.exists(output_file_folder):
-        os.makedirs(output_file_folder)
-    with open(output_file, "w") as f_out:
-        if output:
-            f_out.write(json.dumps(output, indent=4))
-    return None
-
-
 def export_commands_meta(commands_meta, meta_output_path=None):
     options = jsbeautifier.default_options()
     options.indent_size = 4
