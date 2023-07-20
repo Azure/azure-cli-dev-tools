@@ -12,7 +12,7 @@ import re
 from setuptools import setup, find_packages
 
 diff_tool_path = os.path.dirname(os.path.realpath(__file__))
-with open(os.path.join(diff_tool_path, 'azureCliDiffTool', '__init__.py'), 'r') as version_file:
+with open(os.path.join(diff_tool_path, 'azure_cli_diff_tool', '__init__.py'), 'r') as version_file:
     __VERSION__ = re.search(r'^__VERSION__\s*=\s*[\'"]([^\'"]*)[\'"]',
                             version_file.read(), re.MULTILINE).group(1)
 
@@ -32,6 +32,6 @@ setup(name="azure-cli-diff-tool",
       include_package_data=True,
       install_requires=["deepdiff", "requests"],
       package_data={
-        "azureCliDiffTool": ["data/*"]
+        "azure_cli_diff_tool": ["data/*"]
       }
       )

@@ -18,7 +18,7 @@ from .utils import get_blob_config, load_blob_config_file, get_target_version_mo
     extract_module_name_from_meta_file, export_meta_changes_to_csv, export_meta_changes_to_json, \
     export_meta_changes_to_dict
 
-__VERSION__ = '0.0.1'
+__VERSION__ = '0.0.2'
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +84,7 @@ def version_diff(base_version, diff_version, only_break=False, version_diff_file
     else:
         base_version_module_list = get_target_version_modules(blob_url, path_prefix, index_file, base_version, use_cache)
     download_base_end = time.time()
-    print("base version {} meta files download using {} sec".format(base_version,
+    logger.info("base version {} meta files download using {} sec".format(base_version,
                                                                           download_base_end - download_base_start))
     if target_module:
         get_target_version_module(blob_url, path_prefix, diff_version,
@@ -92,7 +92,7 @@ def version_diff(base_version, diff_version, only_break=False, version_diff_file
     else:
         get_target_version_modules(blob_url, path_prefix, index_file, diff_version, use_cache)
     download_target_end = time.time()
-    print("diff version {} meta files download using {} sec".format(diff_version,
+    logger.info("diff version {} meta files download using {} sec".format(diff_version,
                                                                           download_target_end - download_base_end))
     version_diffs = []
     for _, base_meta_file_full_path, base_meta_file in base_version_module_list:
@@ -129,7 +129,7 @@ def version_diff(base_version, diff_version, only_break=False, version_diff_file
             obj.update(mod_obj)
             version_diffs.append(obj)
     meta_change_end = time.time()
-    print("meta file diffs using {} sec".format(meta_change_end - download_target_end))
+    logger.info("meta file diffs using {} sec".format(meta_change_end - download_target_end))
     if output_type == "dict":
         return export_meta_changes_to_dict(version_diffs, version_diff_file)
     return export_meta_changes_to_csv(version_diffs, version_diff_file)
