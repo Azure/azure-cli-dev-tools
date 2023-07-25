@@ -10,6 +10,7 @@ import re
 from enum import Enum
 import jsbeautifier
 from knack.log import get_logger
+from azdev.utilities import META_CHANDE_COMPAT_VERSION
 
 logger = get_logger(__name__)
 
@@ -178,6 +179,7 @@ def get_commands_meta(command_group_table, commands_info, with_help, with_exampl
                 "module_name": module_name,
                 "name": "az",
                 "commands": {},
+                "compat_version": META_CHANDE_COMPAT_VERSION,
                 "sub_groups": {}
             }
         command_group_info = commands_meta[module_name]

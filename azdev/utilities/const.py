@@ -31,6 +31,8 @@ PARA_PROPERTY_IGNORED_LIST = []
 PARA_VALUE_IGNORED_LIST = ["generic_update_set", "generic_update_add", "generic_update_remove",
                            "generic_update_force_string"]
 
+META_CHANDE_COMPAT_VERSION = "0.0.x"
+
 CHANGE_RULE_MESSAGE_MAPPING = {
     "1000": "default Message",
     "1001": "cmd `{0}` added",
