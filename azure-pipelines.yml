@@ -12,9 +12,6 @@ jobs:
     name: 'pool-ubuntu-2004'
   strategy:
     matrix:
-      Python37:
-        python.version: '3.7'
-        tox_env: 'py37'
       Python38:
         python.version: '3.8'
         tox_env: 'py38'

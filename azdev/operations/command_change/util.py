@@ -6,8 +6,8 @@
 import json
 import os
 import re
-import jsbeautifier
 from enum import Enum
+import jsbeautifier
 from knack.log import get_logger
 
 logger = get_logger(__name__)

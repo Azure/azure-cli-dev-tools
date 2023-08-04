@@ -9,14 +9,14 @@
 import time
 
 from knack.log import get_logger
-
+import azure_cli_diff_tool
 from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff
 from .custom import DiffExportFormat, get_commands_meta
 from .util import export_commands_meta
 from ..statistics import _create_invoker_and_load_cmds, _get_command_source, \
     _command_codegen_info  # pylint: disable=protected-access
 from ..statistics.util import filter_modules
-import azure_cli_diff_tool
+
 
 logger = get_logger(__name__)
 
