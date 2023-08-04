@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.57
+++++++
+* `azdev command-change meta-diff`: Remove duplicated meta-diff code and use azure-cli-diff-tool
+
 0.1.56
 ++++++
 * Fix cmdcov issue(#410): Get config from github when get_cli_repo_path failed
