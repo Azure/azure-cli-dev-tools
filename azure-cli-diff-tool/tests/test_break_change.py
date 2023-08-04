@@ -7,19 +7,12 @@
 
 import unittest
 import os
-from azdev.operations.command_change import export_command_meta, cmp_command_meta
-from azdev.operations.command_change.util import get_command_tree, extract_cmd_name, \
-    extract_cmd_property, extract_para_info, extract_subgroup_name
+from azure_cli_diff_tool import meta_diff
+from azure_cli_diff_tool.utils import get_command_tree, extract_cmd_name, extract_cmd_property, extract_para_info, \
+    extract_subgroup_name
 
 
 class MyTestCase(unittest.TestCase):
-
-    def test_cmd_meta_generation(self):
-        if os.path.exists("./jsons/az_monitor_meta.json"):
-            os.remove("./jsons/az_monitor_meta.json")
-        module_list = ["monitor"]
-        export_command_meta(modules=module_list, meta_output_path="./jsons/")
-        self.assertTrue(os.path.exists("./jsons/az_monitor_meta.json"), "new monitor meta generation failed")
 
     def test_parse_cmd_tree(self):
         cmd_name = "monitor log-profiles create"
@@ -53,9 +46,9 @@ class MyTestCase(unittest.TestCase):
         if not os.path.exists("./jsons/az_monitor_meta_before.json") \
                 or not os.path.exists("./jsons/az_monitor_meta_after.json"):
             return
-        result = cmp_command_meta(base_meta_file="./jsons/az_monitor_meta_before.json",
-                                  diff_meta_file="./jsons/az_monitor_meta_after.json",
-                                  output_type="text")
+        result = meta_diff(base_meta_file="./jsons/az_monitor_meta_before.json",
+                           diff_meta_file="./jsons/az_monitor_meta_after.json",
+                           output_type="text")
         target_message = [
             "please confirm cmd `monitor private-link-scope scoped-resource show` removed",
             "sub group `monitor private-link-scope private-endpoint-connection cust` removed",
@@ -83,9 +76,9 @@ class MyTestCase(unittest.TestCase):
         if not os.path.exists("./jsons/az_ams_meta_before.json") \
                 or not os.path.exists("./jsons/az_ams_meta_after.json"):
             return
-        result = cmp_command_meta(base_meta_file="./jsons/az_ams_meta_before.json",
-                                  diff_meta_file="./jsons/az_ams_meta_after.json",
-                                  output_type="text")
+        result = meta_diff(base_meta_file="./jsons/az_ams_meta_before.json",
+                           diff_meta_file="./jsons/az_ams_meta_after.json",
+                           output_type="text")
         self.assertEqual(result, [], "returned change isn't empty")
 
 

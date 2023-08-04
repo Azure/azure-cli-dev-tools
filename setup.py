@@ -91,7 +91,6 @@ setup(
         'azdev.mod_templates': ['*.*'],
         'azdev.operations.linter.rules': ['ci_exclusions.yml'],
         'azdev.operations.cmdcov': ['*.*'],
-        'azdev.operations.command_change': ['data/*'],
     },
     include_package_data=True,
     entry_points={
