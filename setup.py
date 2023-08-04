@@ -82,6 +82,7 @@ setup(
         'tox',
         'jsbeautifier~=1.14.7',
         'deepdiff~=6.3.0',
+        'azure-cli-diff-tool',
         'tqdm',
         'wheel==0.30.0'
     ],
@@ -90,7 +91,6 @@ setup(
         'azdev.mod_templates': ['*.*'],
         'azdev.operations.linter.rules': ['ci_exclusions.yml'],
         'azdev.operations.cmdcov': ['*.*'],
-        'azdev.operations.command_change': ['data/*'],
     },
     include_package_data=True,
     entry_points={

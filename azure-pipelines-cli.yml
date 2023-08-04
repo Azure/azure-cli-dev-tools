@@ -80,10 +80,10 @@ jobs:
     name: 'pool-ubuntu-2004'
   strategy:
     matrix:
-      Python37:
-        python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
     - task: UsePythonVersion@0
       displayName: 'Use Python $(python.version)'
@@ -115,6 +115,19 @@ jobs:
       inputs:
         codeCoverageTool: Cobertura
         summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    - task: UsePythonVersion@0
+      displayName: 'azure cli diff tool unittests'
+      inputs:
+        versionSpec: '$(python.version)'
+    - bash: |
+        set -ev
+        python -m venv env
+        . env/bin/activate
+        # install azure cli diff tool from source code
+        cd azure-cli-diff-tool
+        pip install -e .
+        pip install pytest-cov
+        python -m pytest tests --cov=azure_cli_diff_tool --cov-report=xml
 
 - job: TestAzdevSetup
   displayName: 'Test azdev setup'
@@ -124,10 +137,10 @@ jobs:
     name: 'pool-ubuntu-2004'
   strategy:
     matrix:
-      Python37:
-        python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -156,10 +169,10 @@ jobs:
     name: 'pool-ubuntu-2004'
   strategy:
     matrix:
-      Python37:
-        python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -188,10 +201,10 @@ jobs:
     name: 'pool-ubuntu-2004'
   strategy:
     matrix:
-      Python37:
-        python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -220,10 +233,10 @@ jobs:
     name: 'pool-ubuntu-2004'
   strategy:
     matrix:
-      Python37:
-        python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -251,10 +264,10 @@ jobs:
     name: 'pool-ubuntu-2004'
   strategy:
     matrix:
-      Python37:
-        python.version: '3.7'
       Python38:
         python.version: '3.8'
+      Python39:
+        python.version: '3.9'
   steps:
     - task: DownloadPipelineArtifact@1
       displayName: 'Download Build'
