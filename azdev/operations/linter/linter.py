@@ -224,7 +224,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                 for p, r in v['parameters'].items():
                     if 'missing_parameter_test_coverage' in r['rule_exclusions']:
                         exclude_parameters.append((c, p))
-            elif 'rule_exclusions' in v:
+            if 'rule_exclusions' in v:
                 if 'missing_command_test_coverage' in v['rule_exclusions']:
                     exclude_comands.append(c)
         _logger.debug('exclude_parameters: %s', exclude_parameters)
@@ -340,11 +340,11 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                     if command in code and opt in code:
                         flag = True
                         break
-                else:
-                    violations.append(f'Missing parameter test coverage: `{command} {opt}`')
-                    exec_state = False
                 if flag:
                     break
+            else:
+                violations.append(f'Missing parameter test coverage: `{command} {opt}`')
+                exec_state = False
         if violations:
             violations.insert(0, 'Failed.')
             violations.extend([
