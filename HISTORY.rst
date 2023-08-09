@@ -4,7 +4,7 @@ Release History
 ===============
 0.1.58
 ++++++
-* Fix cmdcov issue(#): Any name of a parameter has been tested, the parameter should be considered as passing the parameter test coverage.
+* Fix cmdcov issue(#417): Any name of a parameter has been tested, the parameter should be considered as passing the parameter test coverage.
 
 0.1.57
 ++++++
