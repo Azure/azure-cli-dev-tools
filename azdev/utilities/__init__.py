@@ -9,8 +9,6 @@ from .config import (
     get_azure_config_dir,
     get_azdev_config,
     get_azdev_config_dir,
-    get_change_rule_template,
-    get_change_suggest_template
 )
 from .command import (
     call,
@@ -78,8 +76,6 @@ __all__ = [
     'get_azure_config',
     'get_azdev_config_dir',
     'get_azdev_config',
-    'get_change_rule_template',
-    'get_change_suggest_template',
     'ENV_VAR_TEST_MODULES',
     'ENV_VAR_TEST_LIVE',
     'ENV_VAR_VIRTUAL_ENV',
