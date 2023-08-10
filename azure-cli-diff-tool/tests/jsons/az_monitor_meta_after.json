@@ -106,12 +106,12 @@
                                     "parameters": [{
                                         "name": "resource_group_name",
                                         "options": ["--resource-group", "-g"],
-                                        "required": true,
-                                        "id_part": "resource_group"
+                                        "required": true
                                     }, {
                                         "name": "scope_name",
                                         "options": ["--scope-name"],
-                                        "required": true
+                                        "required": true,
+                                        "type": "string"
                                     }, {
                                         "name": "cmd",
                                         "options": ["--cmd"],

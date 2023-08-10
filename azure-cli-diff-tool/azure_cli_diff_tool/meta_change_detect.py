@@ -209,18 +209,20 @@ class MetaChangeDetect:
                     continue
                 if prop in base_para_obj and prop not in cmp_para_obj:
                     # prop dropped in new para obj
+                    prop_value = base_para_obj[prop]
                     if prop in PARA_PROPERTY_REMOVE_BREAK_LIST:
-                        diff_obj = ParaPropRemove(cmd_name, base_para_obj["name"], prop, True)
+                        diff_obj = ParaPropRemove(cmd_name, base_para_obj["name"], prop, prop_value, True)
                     else:
-                        diff_obj = ParaPropRemove(cmd_name, base_para_obj["name"], prop, False)
+                        diff_obj = ParaPropRemove(cmd_name, base_para_obj["name"], prop, prop_value, False)
                     self.diff_objs.append(diff_obj)
                     continue
                 if prop not in base_para_obj and prop in cmp_para_obj:
                     # prop added in new para obj
+                    prop_value = cmp_para_obj[prop]
                     if prop in PARA_PROPERTY_ADD_BREAK_LIST:
-                        diff_obj = ParaPropAdd(cmd_name, base_para_obj["name"], prop, True)
+                        diff_obj = ParaPropAdd(cmd_name, base_para_obj["name"], prop, prop_value, True)
                     else:
-                        diff_obj = ParaPropAdd(cmd_name, base_para_obj["name"], prop, False)
+                        diff_obj = ParaPropAdd(cmd_name, base_para_obj["name"], prop, prop_value, False)
                     self.diff_objs.append(diff_obj)
                     continue
                 # prop exists in both new and old para obj, value needs to be checked

@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # -----------------------------------------------------------------------------
-
+# pylint: disable=line-too-long
 
 import unittest
 import os
@@ -52,6 +52,8 @@ class MyTestCase(unittest.TestCase):
         target_message = [
             "please confirm cmd `monitor private-link-scope scoped-resource show` removed",
             "sub group `monitor private-link-scope private-endpoint-connection cust` removed",
+            "cmd `monitor private-link-scope private-link-resource list` update parameter `scope_name`: added property `type=string`",
+            "cmd `monitor private-link-scope private-link-resource list` update parameter `resource_group_name`: removed property `id_part=resource_group`"
         ]
         for mes in target_message:
             found = False

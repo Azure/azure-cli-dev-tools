@@ -67,6 +67,27 @@ def process_arg_type(argument_settings, para):
     para["type"] = raw_type if raw_type in ["str", "int", "float", "bool", "file_type"] else "custom_type"
 
 
+def normalize_para_types(para):
+    type_string_opts = ["string", "str", "aazstrarg",
+                        "aazresourcelocationarg", "aazresourcegroupnamearg", "aazresourceidarg",
+                        "aazpaginationtokenarg", "aazfilearg"]
+
+    type_int_opts = ["int", "aazintarg", "aazpaginationlimitarg"]
+    type_float_opts = ["float", "aazfloatarg"]
+    type_bool_opts = ["boolean", "bool", "aazboolarg", "aazgenericupdateforcestringarg"]
+
+    def normalize_para_type(type_opts, value):
+        if para.get("type", None) and para["type"].lower() in type_opts:
+            para["type"] = value
+        if para.get("aaz_type", None) and para["aaz_type"].lower() in type_opts:
+            para["aaz_type"] = value
+
+    normalize_para_type(type_string_opts, "string")
+    normalize_para_type(type_int_opts, "int")
+    normalize_para_type(type_float_opts, "float")
+    normalize_para_type(type_bool_opts, "bool")
+
+
 def gen_command_meta(command_info, with_help=False, with_example=False):
     stored_property_when_exist = ["confirmation", "supports_no_wait", "is_preview"]
     command_meta = {
@@ -118,6 +139,7 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
             para["desc"] = settings["help"]
         if command_info["is_aaz"] and command_info["az_arguments_schema"]:
             process_aaz_argument(command_info["az_arguments_schema"], settings, para)
+        normalize_para_types(para)
         parameters.append(para)
     command_meta["parameters"] = parameters
     return command_meta

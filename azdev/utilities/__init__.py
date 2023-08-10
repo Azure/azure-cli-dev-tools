@@ -9,8 +9,6 @@ from .config import (
     get_azure_config_dir,
     get_azdev_config,
     get_azdev_config_dir,
-    get_change_rule_template,
-    get_change_suggest_template
 )
 from .command import (
     call,
@@ -20,18 +18,6 @@ from .command import (
     CommandError
 )
 from .const import (
-    BREAKING_CHANE_RULE_LINK_URL_PREFIX,
-    BREAKING_CHANE_RULE_LINK_URL_SUFFIX,
-    CMD_PROPERTY_ADD_BREAK_LIST,
-    CMD_PROPERTY_REMOVE_BREAK_LIST,
-    CMD_PROPERTY_UPDATE_BREAK_LIST,
-    CMD_PROPERTY_IGNORED_LIST,
-    PARA_PROPERTY_ADD_BREAK_LIST,
-    PARA_PROPERTY_REMOVE_BREAK_LIST,
-    PARA_PROPERTY_UPDATE_BREAK_LIST,
-    PARA_NAME_IGNORED_LIST,
-    PARA_PROPERTY_IGNORED_LIST,
-    PARA_VALUE_IGNORED_LIST,
     COMMAND_MODULE_PREFIX,
     EXTENSION_PREFIX,
     IS_WINDOWS,
@@ -73,18 +59,6 @@ from .tools import (
 __all__ = [
     'COMMAND_MODULE_PREFIX',
     'EXTENSION_PREFIX',
-    'BREAKING_CHANE_RULE_LINK_URL_PREFIX',
-    'BREAKING_CHANE_RULE_LINK_URL_SUFFIX',
-    'CMD_PROPERTY_ADD_BREAK_LIST',
-    'CMD_PROPERTY_REMOVE_BREAK_LIST',
-    'CMD_PROPERTY_UPDATE_BREAK_LIST',
-    'CMD_PROPERTY_IGNORED_LIST',
-    'PARA_PROPERTY_ADD_BREAK_LIST',
-    'PARA_PROPERTY_REMOVE_BREAK_LIST',
-    'PARA_PROPERTY_UPDATE_BREAK_LIST',
-    'PARA_NAME_IGNORED_LIST',
-    'PARA_PROPERTY_IGNORED_LIST',
-    'PARA_VALUE_IGNORED_LIST',
     'display',
     'output',
     'heading',
@@ -102,8 +76,6 @@ __all__ = [
     'get_azure_config',
     'get_azdev_config_dir',
     'get_azdev_config',
-    'get_change_rule_template',
-    'get_change_suggest_template',
     'ENV_VAR_TEST_MODULES',
     'ENV_VAR_TEST_LIVE',
     'ENV_VAR_VIRTUAL_ENV',
