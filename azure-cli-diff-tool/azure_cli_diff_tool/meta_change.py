@@ -178,7 +178,7 @@ class ParaRemove(MetaChange):
 
 class ParaPropAdd(MetaChange):
 
-    def __init__(self, cmd_name, para_name, para_property, is_break=False):
+    def __init__(self, cmd_name, para_name, para_property, para_prop_value, is_break=False):
         if not cmd_name or not para_name or not para_property:
             raise Exception("cmd name, parameter name and parameter property needed")
         self.rule_id = "1008"
@@ -186,11 +186,13 @@ class ParaPropAdd(MetaChange):
         self.cmd_name = cmd_name
         self.para_name = para_name
         self.para_prop = para_property
+        self.para_prop_value = para_prop_value
         self.is_break = is_break
 
         self.rule_message = get_change_rule_template(self.rule_id).format(self.cmd_name, self.para_name,
-                                                                          self.para_prop)
+                                                                          self.para_prop, self.para_prop_value)
         self.suggest_message = get_change_suggest_template(self.rule_id).format(self.para_prop,
+                                                                                self.para_prop_value,
                                                                                 self.para_name,
                                                                                 self.cmd_name) if self.is_break else ""
         if para_property in PARA_PROPERTY_IGNORED_LIST or para_name in PARA_NAME_IGNORED_LIST:
@@ -200,7 +202,7 @@ class ParaPropAdd(MetaChange):
 
 class ParaPropRemove(MetaChange):
 
-    def __init__(self, cmd_name, para_name, para_property, is_break=False):
+    def __init__(self, cmd_name, para_name, para_property, para_prop_value, is_break=False):
         if not cmd_name or not para_name or not para_property:
             raise Exception("cmd name, parameter name and parameter property needed")
         self.rule_id = "1009"
@@ -208,11 +210,13 @@ class ParaPropRemove(MetaChange):
         self.cmd_name = cmd_name
         self.para_name = para_name
         self.para_prop = para_property
+        self.para_prop_value = para_prop_value
         self.is_break = is_break
 
         self.rule_message = get_change_rule_template(self.rule_id).format(self.cmd_name, self.para_name,
-                                                                          self.para_prop)
+                                                                          self.para_prop, self.para_prop_value)
         self.suggest_message = get_change_suggest_template(self.rule_id).format(self.para_prop,
+                                                                                self.para_prop_value,
                                                                                 self.para_name,
                                                                                 self.cmd_name) if self.is_break else ""
         if para_property in PARA_PROPERTY_IGNORED_LIST or para_name in PARA_NAME_IGNORED_LIST:
