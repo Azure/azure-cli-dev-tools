@@ -2,6 +2,11 @@
 
 Release History
 ===============
+
+0.1.60
+++++++
+* `azdev statistics list-command-table`: Handle exceptions when source code cannot be retrieved
+
 0.1.59
 ++++++
 * `azdev command-change meta-export`: Normalize basic cmd types: str, bool, int, float
