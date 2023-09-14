@@ -341,7 +341,7 @@ def _expand_all_functions(func, func_map):
         source = textwrap.dedent(inspect.getsource(func))
     except (OSError, TypeError):
         # https://docs.python.org/3/library/inspect.html#inspect.getsource
-        logger.warning(f"Cannot retrieve the source code of {func}.")
+        logger.warning("Cannot retrieve the source code of %s.", func)
 
     if func_map is None:
         return source
