@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.0.4
+++++++
+* Add meta change parameter update warn list
+
 0.0.3
 ++++++
 * Add prop value for parameter add/remove property
