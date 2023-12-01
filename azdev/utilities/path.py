@@ -242,7 +242,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
                     table[key][long_name] = folder
 
     # Since include_only.remove will delete the found name, adjust the order of _update_table to ensure that extension is updated first.
-    # When the extension name and module name are the same, azdev style tests the extension instead of the main module.
+    # When the extension name and module name are the same, let azdev style tests the extension instead of the main module.
     _update_table(ext_paths, 'ext')
     if include_whl_extensions:
         _update_table(whl_ext_paths, 'ext')
