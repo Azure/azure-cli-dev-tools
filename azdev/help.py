@@ -115,29 +115,29 @@ helps['test'] = """
             - pytest -h
     examples:
         - name: Run all tests.
-          text: azdev test 
-         
+          text: azdev test
+
         - name: Run tests for main modules.
           text: azdev test CLI
-          
+
         - name: Run tests for extensions.
-          text: azdev test EXT  
-          
+          text: azdev test EXT
+
         - name: Run tests for specific modules.
           text: azdev test {mod1} {mod2}
-          
+
         - name: Run tests for specific cli modules, it is recommended to use the long name azure-cli-{mod}.
           text: azdev test azure-cli-vm azure-cli-compute
-        
+
         - name: Run tests for specific extensions, it is recommended to use the long name azext_{ext}.
           text: azdev test azext_containerapp azext_aosm
-        
+
         - name: Run tests for specific test files.
           text: azdev test test_account_scenario
-        
+
         - name: Run tests for specific python class.
           text: azdev test SubscriptionClientScenarioTest
-        
+
         - name: Run tests for specific test cases.
           text: azdev test test_account
 
