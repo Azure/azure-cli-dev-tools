@@ -3,6 +3,11 @@
 Release History
 ===============
 
+0.1.61
+++++++
+* `azdev test`: Add some examples.
+* `azdev style`: Modify the execution order of the _update_table function.
+
 0.1.60
 ++++++
 * `azdev statistics list-command-table`: Handle exceptions when source code cannot be retrieved
