@@ -292,13 +292,15 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         # get tested command by regex
         for diff in diff_index:
             filename = diff.a_path.split('/')[-1]
-            if re.findall(r'^test_.*\.py$', filename) and os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
+            if re.findall(r'^test_.*\.py$', filename) and \
+                    os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
                 with open(os.path.join(self.git_repo, diff.a_path), encoding='utf-8') as f:
                     lines = f.readlines()
                 ref = get_all_tested_commands_from_regex(lines)
                 all_tested_command += ref
             # get tested command by recording file
-            if re.findall(r'^test_.*\.yaml$', filename) and os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
+            if re.findall(r'^test_.*\.yaml$', filename) and \
+                    os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
                 with open(os.path.join(self.git_repo, diff.a_path)) as f:
                     records = yaml.load(f, Loader=yaml.Loader) or {}
                     for record in records['interactions']:
