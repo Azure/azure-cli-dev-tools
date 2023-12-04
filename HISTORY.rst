@@ -3,6 +3,12 @@
 Release History
 ===============
 
+0.1.61
+++++++
+* `azdev test`: Add some examples.
+* `azdev style`: Modify the execution order of the _update_table function.
+* `azdev linter`: Bug fixes for `_detected_tested_command`, strictly limited to starting with test and ending with .py or .yaml
+
 0.1.60
 ++++++
 * `azdev statistics list-command-table`: Handle exceptions when source code cannot be retrieved
