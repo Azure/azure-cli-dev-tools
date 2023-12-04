@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.0.5
+++++++
+* Add `DiffLevel` to meta comparison
+
 0.0.4
 ++++++
 * Add meta change parameter update warn list

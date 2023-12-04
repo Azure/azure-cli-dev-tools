@@ -7,20 +7,26 @@
 import logging
 import os.path
 
-from .utils import get_command_tree, ChangeType, extract_cmd_name, extract_subgroup_name, extract_cmd_property
+from .utils import get_command_tree, ChangeType, extract_cmd_name, extract_subgroup_name, extract_cmd_property, DiffLevel
 from .meta_change import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate,
                           ParaAdd, ParaRemove, ParaPropAdd, ParaPropRemove, ParaPropUpdate,
                           SubgroupAdd, SubgroupRemove)
-from ._const import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_REMOVE_BREAK_LIST,
-                     CMD_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_REMOVE_BREAK_LIST,
-                     PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_UPDATE_BREAK_LIST, META_CHANDE_WHITELIST_FILE_PATH)
+from ._const import (CMD_PROPERTY_ADD_BREAK_LIST, CMD_PROPERTY_ADD_WARN_LIST,
+                     CMD_PROPERTY_REMOVE_BREAK_LIST, CMD_PROPERTY_REMOVE_WARN_LIST,
+                     CMD_PROPERTY_UPDATE_BREAK_LIST, CMD_PROPERTY_UPDATE_WARN_LIST,
+                     PARA_PROPERTY_REMOVE_BREAK_LIST, PARA_PROPERTY_REMOVE_WARN_LIST,
+                     PARA_PROPERTY_ADD_BREAK_LIST, PARA_PROPERTY_ADD_WARN_LIST,
+                     PARA_PROPERTY_UPDATE_BREAK_LIST, PARA_PROPERTY_UPDATE_WARN_LIST,
+                     CMD_REMOVE_SUFFIX_WARN_LIST,
+                     META_CHANDE_WHITELIST_FILE_PATH)
 
 logger = logging.getLogger(__name__)
 
 
 class MetaChangeDetect:
 
-    EXPORTED_META_PROPERTY = ["rule_id", "rule_link_url", "is_break", "rule_message", "suggest_message", "cmd_name", "subgroup_name"]
+    EXPORTED_META_PROPERTY = ["rule_id", "rule_link_url", "is_break", "diff_level",
+                              "rule_message", "suggest_message", "cmd_name", "subgroup_name"]
     CHECKED_PARA_PROPERTY = ["name", "options", "required", "choices", "id_part", "nargs", "default", "desc",
                              "aaz_type", "type", "aaz_default", "aaz_choices"]
 
@@ -90,20 +96,27 @@ class MetaChangeDetect:
                 if cmd_property == "parameters":
                     self.__log_cmd_with_parameter_change(cmd_name)
                 elif diff_type == ChangeType.ADD:
-                    if cmd_property in CMD_PROPERTY_ADD_BREAK_LIST:
-                        diff_obj = CmdPropAdd(cmd_name, cmd_property, True)
+                    if cmd_property in CMD_PROPERTY_ADD_WARN_LIST:
+                        diff_obj = CmdPropAdd(cmd_name, cmd_property, False, DiffLevel.WARN)
+                    elif cmd_property in CMD_PROPERTY_ADD_BREAK_LIST:
+                        diff_obj = CmdPropAdd(cmd_name, cmd_property, True, DiffLevel.BREAK)
                     else:
-                        diff_obj = CmdPropAdd(cmd_name, cmd_property, False)
+                        diff_obj = CmdPropAdd(cmd_name, cmd_property, False, DiffLevel.INFO)
                     self.diff_objs.append(diff_obj)
                 else:
-                    if cmd_property in CMD_PROPERTY_REMOVE_BREAK_LIST:
-                        diff_obj = CmdPropRemove(cmd_name, cmd_property, True)
+                    if cmd_property in CMD_PROPERTY_REMOVE_WARN_LIST:
+                        diff_obj = CmdPropRemove(cmd_name, cmd_property, False, DiffLevel.WARN)
+                    elif cmd_property in CMD_PROPERTY_REMOVE_BREAK_LIST:
+                        diff_obj = CmdPropRemove(cmd_name, cmd_property, True, DiffLevel.BREAK)
                     else:
-                        diff_obj = CmdPropRemove(cmd_name, cmd_property, False)
+                        diff_obj = CmdPropRemove(cmd_name, cmd_property, False, DiffLevel.INFO)
                     self.diff_objs.append(diff_obj)
             else:
                 if diff_type == ChangeType.REMOVE:
-                    diff_obj = CmdRemove(cmd_name)
+                    if cmd_name.split()[-1] in CMD_REMOVE_SUFFIX_WARN_LIST:
+                        diff_obj = CmdRemove(cmd_name, False, DiffLevel.WARN)
+                    else:
+                        diff_obj = CmdRemove(cmd_name, True, DiffLevel.BREAK)
                 else:
                     diff_obj = CmdAdd(cmd_name)
 
@@ -172,10 +185,12 @@ class MetaChangeDetect:
             if cmd_property == "parameters":
                 self.__log_cmd_with_parameter_change(cmd_name)
             else:
-                if cmd_property in CMD_PROPERTY_UPDATE_BREAK_LIST:
-                    diff_obj = CmdPropUpdate(cmd_name, cmd_property, True, old_value, new_value)
+                if cmd_property in CMD_PROPERTY_UPDATE_WARN_LIST:
+                    diff_obj = CmdPropUpdate(cmd_name, cmd_property, False, DiffLevel.WARN, old_value, new_value)
+                elif cmd_property in CMD_PROPERTY_UPDATE_BREAK_LIST:
+                    diff_obj = CmdPropUpdate(cmd_name, cmd_property, True, DiffLevel.BREAK, old_value, new_value)
                 else:
-                    diff_obj = CmdPropUpdate(cmd_name, cmd_property, False, old_value, new_value)
+                    diff_obj = CmdPropUpdate(cmd_name, cmd_property, False, DiffLevel.INFO, old_value, new_value)
                 self.diff_objs.append(diff_obj)
 
     @staticmethod
@@ -199,7 +214,7 @@ class MetaChangeDetect:
             cmp_para_obj = self.__search_para_with_name_and_options(base_para_obj, cmp_parameters)
             if cmp_para_obj is None:
                 # cmd lost parameter obj, is break
-                diff_obj = ParaRemove(cmd_name, base_para_obj["name"], True)
+                diff_obj = ParaRemove(cmd_name, base_para_obj["name"], True, DiffLevel.BREAK)
                 # add flag to avoid duplicate compare
                 self.diff_objs.append(diff_obj)
                 continue
@@ -210,19 +225,29 @@ class MetaChangeDetect:
                 if prop in base_para_obj and prop not in cmp_para_obj:
                     # prop dropped in new para obj
                     prop_value = base_para_obj[prop]
-                    if prop in PARA_PROPERTY_REMOVE_BREAK_LIST:
-                        diff_obj = ParaPropRemove(cmd_name, base_para_obj["name"], prop, prop_value, True)
+                    if prop in PARA_PROPERTY_REMOVE_WARN_LIST:
+                        diff_obj = ParaPropRemove(cmd_name, base_para_obj["name"], prop, prop_value,
+                                                  False, DiffLevel.WARN)
+                    elif prop in PARA_PROPERTY_REMOVE_BREAK_LIST:
+                        diff_obj = ParaPropRemove(cmd_name, base_para_obj["name"], prop, prop_value,
+                                                  True, DiffLevel.BREAK)
                     else:
-                        diff_obj = ParaPropRemove(cmd_name, base_para_obj["name"], prop, prop_value, False)
+                        diff_obj = ParaPropRemove(cmd_name, base_para_obj["name"], prop, prop_value,
+                                                  False, DiffLevel.INFO)
                     self.diff_objs.append(diff_obj)
                     continue
                 if prop not in base_para_obj and prop in cmp_para_obj:
                     # prop added in new para obj
                     prop_value = cmp_para_obj[prop]
-                    if prop in PARA_PROPERTY_ADD_BREAK_LIST:
-                        diff_obj = ParaPropAdd(cmd_name, base_para_obj["name"], prop, prop_value, True)
+                    if prop in PARA_PROPERTY_ADD_WARN_LIST:
+                        diff_obj = ParaPropAdd(cmd_name, base_para_obj["name"], prop, prop_value,
+                                               False, DiffLevel.WARN)
+                    elif prop in PARA_PROPERTY_ADD_BREAK_LIST:
+                        diff_obj = ParaPropAdd(cmd_name, base_para_obj["name"], prop, prop_value,
+                                               True, DiffLevel.BREAK)
                     else:
-                        diff_obj = ParaPropAdd(cmd_name, base_para_obj["name"], prop, prop_value, False)
+                        diff_obj = ParaPropAdd(cmd_name, base_para_obj["name"], prop, prop_value,
+                                               False, DiffLevel.INFO)
                     self.diff_objs.append(diff_obj)
                     continue
                 # prop exists in both new and old para obj, value needs to be checked
@@ -232,13 +257,24 @@ class MetaChangeDetect:
                 if base_val != cmp_val:
                     if isinstance(base_val, list) and isinstance(cmp_val, list):
                         if set(base_val).issubset(set(cmp_val)):
-                            diff_obj = ParaPropUpdate(cmd_name, base_para_obj["name"], prop, False, base_val, cmp_val)
+                            diff_obj = ParaPropUpdate(cmd_name, base_para_obj["name"], prop, False, DiffLevel.INFO,
+                                                      base_val, cmp_val)
                         else:
-                            diff_obj = ParaPropUpdate(cmd_name, base_para_obj["name"], prop, True, base_val, cmp_val)
+                            if prop in PARA_PROPERTY_UPDATE_WARN_LIST:
+                                diff_obj = ParaPropUpdate(cmd_name, base_para_obj["name"], prop, False, DiffLevel.WARN,
+                                                          base_val, cmp_val)
+                            else:
+                                diff_obj = ParaPropUpdate(cmd_name, base_para_obj["name"], prop, True, DiffLevel.BREAK,
+                                                          base_val, cmp_val)
+                    elif prop in PARA_PROPERTY_UPDATE_WARN_LIST:
+                        diff_obj = ParaPropUpdate(cmd_name, base_para_obj["name"], prop, False, DiffLevel.WARN,
+                                                  base_val, cmp_val)
                     elif prop in PARA_PROPERTY_UPDATE_BREAK_LIST:
-                        diff_obj = ParaPropUpdate(cmd_name, base_para_obj["name"], prop, True, base_val, cmp_val)
+                        diff_obj = ParaPropUpdate(cmd_name, base_para_obj["name"], prop, True, DiffLevel.BREAK,
+                                                  base_val, cmp_val)
                     else:
-                        diff_obj = ParaPropUpdate(cmd_name, base_para_obj["name"], prop, False, base_val, cmp_val)
+                        diff_obj = ParaPropUpdate(cmd_name, base_para_obj["name"], prop, False, DiffLevel.INFO,
+                                                  base_val, cmp_val)
                     self.diff_objs.append(diff_obj)
 
         # check added parameter obj, if obj is required, then is break
@@ -248,9 +284,9 @@ class MetaChangeDetect:
             para_name = cmp_para_obj["name"]
             required = cmp_para_obj.get("required", None)
             if required:
-                diff_obj = ParaAdd(cmd_name, para_name, True)
+                diff_obj = ParaAdd(cmd_name, para_name, True, DiffLevel.BREAK)
             else:
-                diff_obj = ParaAdd(cmd_name, para_name, False)
+                diff_obj = ParaAdd(cmd_name, para_name, False, DiffLevel.INFO)
             self.diff_objs.append(diff_obj)
 
     def check_cmds_parameter_diff(self):

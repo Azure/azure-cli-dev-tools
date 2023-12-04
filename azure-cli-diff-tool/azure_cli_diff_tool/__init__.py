@@ -18,7 +18,7 @@ from .utils import get_blob_config, load_blob_config_file, get_target_version_mo
     extract_module_name_from_meta_file, export_meta_changes_to_csv, export_meta_changes_to_json, \
     export_meta_changes_to_dict
 
-__VERSION__ = '0.0.4'
+__VERSION__ = '0.0.5'
 
 logger = logging.getLogger(__name__)
 

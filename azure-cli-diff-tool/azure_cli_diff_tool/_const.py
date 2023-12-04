@@ -17,22 +17,35 @@ DOWNLOAD_THREADS = 30
 BREAKING_CHANE_RULE_LINK_URL_PREFIX = "https://github.com/Azure/azure-cli/blob/dev/doc/breaking_change_rules/"
 BREAKING_CHANE_RULE_LINK_URL_SUFFIX = ".md"
 
+CMD_REMOVE_SUFFIX_WARN_LIST = ["wait"]
+
 CMD_PROPERTY_REMOVE_BREAK_LIST = []
+CMD_PROPERTY_REMOVE_WARN_LIST = []
+
 CMD_PROPERTY_ADD_BREAK_LIST = ["confirmation"]
+CMD_PROPERTY_ADD_WARN_LIST = []
+
 CMD_PROPERTY_UPDATE_BREAK_LIST = []
+CMD_PROPERTY_UPDATE_WARN_LIST = []
+
 CMD_PROPERTY_IGNORED_LIST = ["is_aaz", "supports_no_wait"]
 
-PARA_PROPERTY_REMOVE_BREAK_LIST = ["options", "id_part", "nargs"]
-PARA_PROPERTY_ADD_BREAK_LIST = ["required", "choices"]
-PARA_PROPERTY_UPDATE_BREAK_LIST = ["default", "aaz_default", "type", "aaz_type"]
-PARA_PROPERTY_UPDATE_WARN_LIST = ["type", "aaz_type"]
+PARA_PROPERTY_REMOVE_BREAK_LIST = ["options"]
+PARA_PROPERTY_REMOVE_WARN_LIST = ["id_part", "nargs"]
+
+PARA_PROPERTY_ADD_BREAK_LIST = ["required"]
+PARA_PROPERTY_ADD_WARN_LIST = ["choices"]
+
+PARA_PROPERTY_UPDATE_BREAK_LIST = ["default", "aaz_default"]
+PARA_PROPERTY_UPDATE_WARN_LIST = ["type", "aaz_type", "choices", "nargs"]
+
 PARA_NAME_IGNORED_LIST = ["force_string"]
 PARA_PROPERTY_IGNORED_LIST = []
 PARA_VALUE_IGNORED_LIST = ["generic_update_set", "generic_update_add", "generic_update_remove",
                            "generic_update_force_string"]
 
-EXPORTED_CSV_META_HEADER = ["module", "cmd_name", "rule_id", "rule_name", "is_break", "rule_link_url",
-                            "rule_message", "suggest_message"]
+EXPORTED_CSV_META_HEADER = ["module", "cmd_name", "rule_id", "rule_name", "is_break", "diff_level",
+                            "rule_link_url", "rule_message", "suggest_message"]
 
 CHANGE_RULE_MESSAGE_MAPPING = {
     "1000": "default Message",
