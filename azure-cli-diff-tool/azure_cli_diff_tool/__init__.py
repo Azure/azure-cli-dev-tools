@@ -135,9 +135,11 @@ def version_diff(base_version, diff_version, only_break=False, version_diff_file
     return export_meta_changes_to_csv(version_diffs, version_diff_file)
 
 
-def version_upgrade(base_meta_file, diff_meta_file, current_version, is_preview, is_experimental, label):
+def version_upgrade(base_meta_file, diff_meta_file, current_version, is_preview, is_experimental,
+                    version_pre_update=False, segment_tag=None):
     from version_upgrade import VersionUpgradeMod
-    version_op = VersionUpgradeMod(current_version, is_preview, is_experimental, base_meta_file, diff_meta_file, label)
+    version_op = VersionUpgradeMod(current_version, is_preview, is_experimental, base_meta_file, diff_meta_file,
+                                   version_pre_update, segment_tag)
     version_op.update_major()
     version_op.update_minor()
     version_op.update_patch()
