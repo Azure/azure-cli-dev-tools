@@ -143,3 +143,5 @@ def version_upgrade(base_meta_file, diff_meta_file, current_version, is_preview,
     version_op.update_major()
     version_op.update_minor()
     version_op.update_patch()
+    version_op.update_pre()
+    version_op.update_pre_number()
