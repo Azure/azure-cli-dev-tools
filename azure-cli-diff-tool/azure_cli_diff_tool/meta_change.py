@@ -23,7 +23,7 @@ class MetaChange:
         self.filter_key = filter_key
 
     def __str__(self):
-        res = [self.rule_message]
+        res = [self.rule_message, "diff_level: " + str(self.diff_level.value)]
         if self.is_break:
             res.append("is_break: {0}".format(self.is_break))
             res.append(self.suggest_message)

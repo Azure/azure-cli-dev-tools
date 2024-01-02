@@ -53,7 +53,7 @@ class MyTestCase(unittest.TestCase):
             "please confirm cmd `monitor private-link-scope scoped-resource show` removed",
             "sub group `monitor private-link-scope private-endpoint-connection cust` removed",
             "cmd `monitor private-link-scope private-link-resource list` update parameter `scope_name`: added property `type=string`",
-            "cmd `monitor private-link-scope private-link-resource list` update parameter `resource_group_name`: removed property `id_part=resource_group`"
+            "cmd `monitor private-link-scope private-link-resource list` update parameter `resource_group_name`: removed property `id_part=resource_group` | diff_level: 2"
         ]
         for mes in target_message:
             found = False
