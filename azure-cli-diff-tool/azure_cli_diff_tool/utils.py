@@ -54,6 +54,13 @@ class ChangeType(int, Enum):
     REMOVE = 3
 
 
+class DiffLevel(int, Enum):
+    DEFAULT = 0
+    INFO = 1
+    WARN = 2
+    BREAK = 3
+
+
 def get_command_tree(command_name):
     """
     input: monitor log-profiles create

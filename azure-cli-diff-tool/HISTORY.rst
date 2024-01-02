@@ -2,6 +2,11 @@
 
 Release History
 ===============
+0.0.5
+++++++
+* Add `DiffLevel` to meta comparison
+* Downgrade change level according to warn list
+
 0.0.4
 ++++++
 * Add meta change parameter update warn list
