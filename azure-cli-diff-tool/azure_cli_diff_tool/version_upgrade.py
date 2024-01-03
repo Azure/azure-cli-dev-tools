@@ -45,8 +45,8 @@ class VersionUpgradeMod:
         self.norm_versions()
         self.base_meta_file = meta_diff_before
         self.diff_meta_file = meta_diff_after
-        self.next_version_pre_tag = next_version_pre_tag
-        self.next_version_segment_tag = next_version_segment_tag
+        self.next_version_pre_tag = next_version_pre_tag and next_version_pre_tag.lower()
+        self.next_version_segment_tag = next_version_segment_tag and next_version_segment_tag.lower()
         self.diffs = []
         self.init_version_diffs()
         self.init_version_pre_tag()
