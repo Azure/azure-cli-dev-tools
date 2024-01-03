@@ -14,6 +14,7 @@ from enum import Enum
 import logging
 from deepdiff import DeepDiff
 from .meta_change_detect import MetaChangeDetect
+from .version_upgrade import VersionUpgradeMod
 from .utils import get_blob_config, load_blob_config_file, get_target_version_modules, get_target_version_module, \
     extract_module_name_from_meta_file, export_meta_changes_to_csv, export_meta_changes_to_json, \
     export_meta_changes_to_dict
@@ -135,13 +136,12 @@ def version_diff(base_version, diff_version, only_break=False, version_diff_file
     return export_meta_changes_to_csv(version_diffs, version_diff_file)
 
 
-def version_upgrade(base_meta_file, diff_meta_file, current_version, is_preview, is_experimental,
-                    version_pre_update=False, segment_tag=None):
-    from version_upgrade import VersionUpgradeMod
-    version_op = VersionUpgradeMod(current_version, is_preview, is_experimental, base_meta_file, diff_meta_file,
-                                   version_pre_update, segment_tag)
-    version_op.update_major()
-    version_op.update_minor()
-    version_op.update_patch()
-    version_op.update_pre()
-    version_op.update_pre_number()
+def version_upgrade(base_meta_file, diff_meta_file, current_version, is_preview=None, is_experimental=None,
+                    next_version_pre_tag=None, next_version_segment_tag=None):
+    with open(base_meta_file, "r") as g:
+        command_tree = json.load(g)
+        module_name = command_tree["module_name"]
+    version_op = VersionUpgradeMod(module_name, current_version, is_preview, is_experimental,
+                                   base_meta_file, diff_meta_file, next_version_pre_tag, next_version_segment_tag)
+    version_op.update_next_version()
+    return version_op.format_outputs()

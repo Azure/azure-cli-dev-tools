@@ -7,7 +7,7 @@
 
 import unittest
 import os
-from azure_cli_diff_tool import meta_diff
+from azure_cli_diff_tool import meta_diff, version_upgrade
 from azure_cli_diff_tool.utils import get_command_tree, extract_cmd_name, extract_cmd_property, extract_para_info, \
     extract_subgroup_name
 
@@ -82,6 +82,64 @@ class MyTestCase(unittest.TestCase):
                            diff_meta_file="./jsons/az_ams_meta_after.json",
                            output_type="text")
         self.assertEqual(result, [], "returned change isn't empty")
+
+    def test_version_upgrade_major(self):
+        # stable version update major
+        version_test = version_upgrade(base_meta_file="./jsons/az_monitor_meta_before.json",
+                                       diff_meta_file="./jsons/az_monitor_meta_after.json",
+                                       current_version="3.11.0")
+        self.assertEqual("4.0.0", version_test.get("version"), "Version cal error")
+        self.assertEqual(True, version_test.get("is_stable"), "Version tag error")
+        self.assertEqual(False, version_test.get("has_preview_tag"), "Version tag error")
+
+    def test_version_upgrade_major_was_preview(self):
+        # preview version update major and add preview suffix
+        version_test = version_upgrade(base_meta_file="./jsons/az_monitor_meta_before.json",
+                                       diff_meta_file="./jsons/az_monitor_meta_after.json",
+                                       current_version="3.11.0", is_preview=True)
+        self.assertEqual("4.0.0b1", version_test.get("version"), "Version cal error")
+        self.assertEqual(False, version_test.get("is_stable"), "Version tag error")
+        self.assertEqual(True, version_test.get("has_preview_tag"), "Version tag error")
+
+    def test_version_upgrade_major_was_exp(self):
+        # preview version update major and add preview suffix
+        version_test = version_upgrade(base_meta_file="./jsons/az_monitor_meta_before.json",
+                                       diff_meta_file="./jsons/az_monitor_meta_after.json",
+                                       current_version="3.11.0", is_experimental=True)
+        self.assertEqual("4.0.0b1", version_test.get("version"), "Version cal error")
+        self.assertEqual(False, version_test.get("is_stable"), "Version tag error")
+        self.assertEqual(True, version_test.get("has_preview_tag"), "Version tag error")
+
+    def test_version_upgrade_major_to_preview(self):
+        # preview version update major and add preview suffix
+        version_test = version_upgrade(base_meta_file="./jsons/az_monitor_meta_before.json",
+                                       diff_meta_file="./jsons/az_monitor_meta_after.json",
+                                       current_version="3.11.0", next_version_pre_tag="preview")
+        self.assertEqual("4.0.0b1", version_test.get("version"), "Version cal error")
+        self.assertEqual(False, version_test.get("is_stable"), "Version tag error")
+        self.assertEqual(False, version_test.get("has_preview_tag"), "Version tag error")
+
+    def test_version_upgrade_minor_tagged(self):
+        # stable version update minor as user tagged
+        version_test = version_upgrade(base_meta_file="./jsons/az_monitor_meta_before.json",
+                                       diff_meta_file="./jsons/az_monitor_meta_after.json",
+                                       current_version="3.11.0", next_version_segment_tag="minor")
+        self.assertEqual("3.12.0", version_test.get("version"), "Version cal error")
+        self.assertEqual(True, version_test.get("is_stable"), "Version tag error")
+
+    def test_version_upgrade_patch_tagged(self):
+        # stable version update patch as user tagged
+        version_test = version_upgrade(base_meta_file="./jsons/az_monitor_meta_before.json",
+                                       diff_meta_file="./jsons/az_monitor_meta_after.json",
+                                       current_version="3.11.0", next_version_segment_tag="patch")
+        self.assertEqual("3.11.1", version_test.get("version"), "Version cal error")
+
+    def test_version_upgrade_patch(self):
+        # stable version update patch as breaking change detects empty
+        version_test = version_upgrade(base_meta_file="./jsons/az_ams_meta_before.json",
+                                       diff_meta_file="./jsons/az_ams_meta_after.json",
+                                       current_version="3.11.0")
+        self.assertEqual("3.11.1", version_test.get("version"), "Version cal error")
 
 
 if __name__ == '__main__':
