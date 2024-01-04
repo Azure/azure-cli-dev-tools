@@ -24,6 +24,20 @@ class ModuleVersion:
         self.pre = parse_version.pre
         self.pre_num = parse_version.pre and parse_version.pre[1]
 
+    def init_stable_version(self):
+        self.major = 1
+        self.minor = 0
+        self.patch = 0
+        self.pre = None
+        self.pre_num = 0
+
+    def init_preview_version(self):
+        self.major = 1
+        self.minor = 0
+        self.patch = 0
+        self.pre = "b"
+        self.pre_num = 1
+
     def __str__(self):
         version_arr = [self.major, ".", self.minor, ".", self.patch]
         if self.pre:
@@ -37,7 +51,10 @@ class VersionUpgradeMod:
     def __init__(self, module_name, current_version, is_preview, is_experimental,
                  meta_diff_before, meta_diff_after, next_version_pre_tag=None, next_version_segment_tag=None):
         self.module_name = module_name
-        self.version = parse(current_version)
+        try:
+            self.version = parse(current_version)
+        except Exception as e:
+            raise ValueError("Invalid version: {0} cause {1}".format(current_version, str(e)))
         self.is_preview = bool(is_preview or is_experimental or (self.version.pre and self.version.pre in ["a", "b"]))
         self.has_preview_tag = is_preview
         self.has_exp_tag = is_experimental
@@ -60,7 +77,10 @@ class VersionUpgradeMod:
         version_pre = self.version.pre
         if version_pre is None:
             self.version_raw += PREVIEW_INIT_SUFFIX
-            self.version = parse(self.version_raw)
+            try:
+                self.version = parse(self.version_raw)
+            except Exception as e:
+                raise ValueError("Invalid version: {0} cause {1}".format(self.version_raw, str(e)))
 
     def init_version_diffs(self):
         from . import meta_diff
@@ -87,6 +107,14 @@ class VersionUpgradeMod:
             self.next_version.pre_num = (self.version.pre and self.version.pre[1]) or 1
         else:
             raise ValueError("Unsupported pre tag: {0}".format(self.next_version_pre_tag))
+
+        if self.version.major < 1:
+            # for version starting with 0.x.x, norm them to first stable/preview version
+            if self.next_version_pre_tag == VERSION_STABLE_TAG:
+                self.next_version.init_stable_version()
+            else:
+                self.next_version.init_preview_version()
+            return
 
         if self.next_version_segment_tag:
             if self.next_version_segment_tag == VERSION_MAJOR_TAG:
@@ -141,8 +169,8 @@ class VersionUpgradeMod:
                 version_parse = parse(item["metadata"]["version"])
             except Exception as e:
                 raise ValueError(str(e))
-            if version_parse.pre is None and item["metadata"].get("azext.isExperimental", False) \
-                    and item["metadata"].get("azext.isPreview", False):
+            if version_parse.pre is None and not item["metadata"].get("azext.isExperimental", False) \
+                    and not item["metadata"].get("azext.isPreview", False):
                 max_stable_major = max(version_parse.major, max_stable_major)
                 has_stable = True
         return has_stable, max_stable_major

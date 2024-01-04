@@ -121,6 +121,15 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(False, version_test.get("is_stable"), "Version tag error")
         self.assertEqual(False, version_test.get("has_preview_tag"), "Version tag error")
 
+    def test_version_upgrade_to_normal_version(self):
+        # preview version update major and add preview suffix
+        version_test = version_upgrade(base_meta_file=os.path.join(TEST_DIR, "jsons", "az_monitor_meta_before.json"),
+                                       diff_meta_file=os.path.join(TEST_DIR, "jsons", "az_monitor_meta_after.json"),
+                                       current_version="0.11.0", is_preview=True)
+        self.assertEqual("1.0.0b1", version_test.get("version"), "Version cal error")
+        self.assertEqual(False, version_test.get("is_stable"), "Version tag error")
+        self.assertEqual(True, version_test.get("has_preview_tag"), "Version tag error")
+
     def test_version_upgrade_minor_tagged(self):
         # stable version update minor as user tagged
         version_test = version_upgrade(base_meta_file=os.path.join(TEST_DIR, "jsons", "az_monitor_meta_before.json"),
