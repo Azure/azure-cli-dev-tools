@@ -2,10 +2,6 @@
 
 Release History
 ===============
-0.0.6
-++++++
-* Add version_upgrade for cli extension modules
-
 0.0.5
 ++++++
 * Add `DiffLevel` to meta comparison

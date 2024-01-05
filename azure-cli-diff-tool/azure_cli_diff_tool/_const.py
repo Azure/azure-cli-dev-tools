@@ -78,3 +78,4 @@ CHANGE_SUGGEST_MESSAGE_MAPPING = {
     "1011": "please confirm sub group `{0}` added",
     "1012": "please confirm sub group `{0}` removed",
 }
+
