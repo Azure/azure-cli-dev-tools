@@ -7,7 +7,6 @@
 
 import unittest
 import os
-from azdev.operations.command_change import export_command_meta, cmp_command_meta
 from azdev.operations.extensions import version_upgrade
 TEST_DIR = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
 

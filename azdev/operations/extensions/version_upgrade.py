@@ -9,10 +9,10 @@
 # https://github.com/Azure/azure-cli/blob/release/doc/extensions/versioning_guidelines.md
 
 from packaging.version import parse
+from azure_cli_diff_tool.utils import DiffLevel
 from azdev.operations.constant import (PREVIEW_INIT_SUFFIX, VERSION_MAJOR_TAG, VERSION_MINOR_TAG,
                                        VERSION_PATCH_TAG, VERSION_STABLE_TAG, VERSION_PREVIEW_TAG, VERSION_PRE_TAG,
                                        CLI_EXTENSION_INDEX_URL)
-from azure_cli_diff_tool.utils import DiffLevel
 
 
 class ModuleVersion:
@@ -46,6 +46,7 @@ class ModuleVersion:
         return "".join([str(item) for item in version_arr])
 
 
+# pylint: disable=too-many-instance-attributes
 class VersionUpgradeMod:
 
     def __init__(self, module_name, current_version, is_preview, is_experimental,
@@ -83,7 +84,7 @@ class VersionUpgradeMod:
                 raise ValueError("Invalid version: {0} cause {1}".format(self.version_raw, str(e)))
 
     def init_version_diffs(self):
-        from . import meta_diff
+        from azure_cli_diff_tool import meta_diff
         self.diffs = meta_diff(self.base_meta_file, self.diff_meta_file, output_type="dict")
 
     def init_version_pre_tag(self):
@@ -93,7 +94,8 @@ class VersionUpgradeMod:
         """
         if self.next_version_pre_tag is not None:
             return
-        elif self.is_preview:
+
+        if self.is_preview:
             self.next_version_pre_tag = VERSION_PREVIEW_TAG
         else:
             self.next_version_pre_tag = VERSION_STABLE_TAG
@@ -198,5 +200,3 @@ class VersionUpgradeMod:
             "has_exp_tag": False
         }
         return result
-
-
