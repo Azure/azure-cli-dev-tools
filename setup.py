@@ -83,6 +83,7 @@ setup(
         'jsbeautifier~=1.14.7',
         'deepdiff~=6.3.0',
         'azure-cli-diff-tool',
+        'packaging',
         'tqdm',
         'wheel==0.30.0'
     ],

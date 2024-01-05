@@ -9,10 +9,10 @@
 # https://github.com/Azure/azure-cli/blob/release/doc/extensions/versioning_guidelines.md
 
 from packaging.version import parse
-from ._const import (PREVIEW_INIT_SUFFIX, VERSION_MAJOR_TAG, VERSION_MINOR_TAG,
-                     VERSION_PATCH_TAG, VERSION_STABLE_TAG, VERSION_PREVIEW_TAG, VERSION_PRE_TAG,
-                     CLI_EXTENSION_INDEX_URL)
-from .utils import DiffLevel
+from azdev.operations.constant import (PREVIEW_INIT_SUFFIX, VERSION_MAJOR_TAG, VERSION_MINOR_TAG,
+                                       VERSION_PATCH_TAG, VERSION_STABLE_TAG, VERSION_PREVIEW_TAG, VERSION_PRE_TAG,
+                                       CLI_EXTENSION_INDEX_URL)
+from azure_cli_diff_tool.utils import DiffLevel
 
 
 class ModuleVersion:

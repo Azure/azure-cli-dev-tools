@@ -220,3 +220,15 @@ RED_PCT = 30
 ORANGE_PCT = 60
 GREEN_PCT = 80
 BLUE_PCT = 100
+
+VERSION_MAJOR_TAG = "major"
+VERSION_MINOR_TAG = "minor"
+VERSION_PATCH_TAG = "patch"
+VERSION_PRE_TAG = "pre"
+
+VERSION_STABLE_TAG = "stable"
+VERSION_PREVIEW_TAG = "preview"
+
+PREVIEW_INIT_SUFFIX = "b1"
+
+CLI_EXTENSION_INDEX_URL = "https://azcliextensionsync.blob.core.windows.net/index1/index.json"
