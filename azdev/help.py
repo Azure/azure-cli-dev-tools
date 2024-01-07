@@ -266,6 +266,9 @@ helps['extension update-index'] = """
     short-summary: Update the extensions index.json from a built WHL file.
 """
 
+helps['extension cal-next-version'] = """
+    short-summary: Calculate valid version for next extension module release.
+"""
 
 helps['extension repo'] = """
     short-summary: Commands to manage extension repositories for development.

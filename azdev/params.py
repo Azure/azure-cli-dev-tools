@@ -165,6 +165,15 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'extension update-index') as c:
         c.positional('extensions', nargs='+', metavar='URL', help='Space-separated list of URLs to extension WHL files.')
 
+    with ArgumentsContext(self, 'extension cal-next-version') as c:
+        c.argument('base_meta_file', required=True, help='command meta json file')
+        c.argument('diff_meta_file', required=True, help='command meta json file to diff')
+        c.argument('current_version', help='current version from metadata')
+        c.argument('is_preview', help='current azext.isPreview from metadata')
+        c.argument('is_experimental', help='current azext.isExperimental from metadata')
+        c.argument('next_version_pre_tag', help='next version is stable or preview, if not provided, use current stable/preview tag')
+        c.argument('next_version_segment_tag', help='used to modify actual major/minor/patch/pre, if provided, increment version as provided')
+
     with ArgumentsContext(self, 'cli create') as c:
         c.positional('mod_name', help='Name of the module to create.')
 

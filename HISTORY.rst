@@ -2,6 +2,9 @@
 
 Release History
 ===============
+0.1.62
+++++++
+* `azdev extension cal-next-version`: Add some examples.
 
 0.1.61
 ++++++

@@ -85,7 +85,9 @@ class VersionUpgradeMod:
 
     def init_version_diffs(self):
         from azure_cli_diff_tool import meta_diff
-        self.diffs = meta_diff(self.base_meta_file, self.diff_meta_file, output_type="dict")
+        meta_diffs = meta_diff(self.base_meta_file, self.diff_meta_file, output_type="dict")
+        if meta_diffs:
+            self.diffs = meta_diffs
 
     def init_version_pre_tag(self):
         """
