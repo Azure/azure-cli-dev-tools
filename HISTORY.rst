@@ -4,7 +4,7 @@ Release History
 ===============
 0.1.62
 ++++++
-* `azdev extension cal-next-version`: Add some examples.
+* `azdev extension cal-next-version`: New command to calculate valid version for next extension module release..
 
 0.1.61
 ++++++
