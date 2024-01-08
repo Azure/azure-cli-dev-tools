@@ -17,6 +17,7 @@ from knack.util import CLIError
 from azdev.utilities import (
     cmd, py_cmd, pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_azdev_config,
     require_azure_cli, heading, subheading, EXTENSION_PREFIX)
+from .version_upgrade import VersionUpgradeMod
 
 logger = get_logger(__name__)
 
@@ -328,3 +329,14 @@ def publish_extensions(extensions, storage_account, storage_account_key, storage
     if not update_index:
         logger.warning('You still need to update the index for your changes!')
         logger.warning('    az extension update-index <URL>')
+
+
+def cal_next_version(base_meta_file, diff_meta_file, current_version, is_preview=None, is_experimental=None,
+                     next_version_pre_tag=None, next_version_segment_tag=None):
+    with open(base_meta_file, "r") as g:
+        command_tree = json.load(g)
+        module_name = command_tree["module_name"]
+    version_op = VersionUpgradeMod(module_name, current_version, is_preview, is_experimental,
+                                   base_meta_file, diff_meta_file, next_version_pre_tag, next_version_segment_tag)
+    version_op.update_next_version()
+    return version_op.format_outputs()

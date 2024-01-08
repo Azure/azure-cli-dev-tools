@@ -1,0 +1,49 @@
+{
+    "module_name": "ams",
+    "name": "az",
+    "commands": {},
+    "sub_groups": {
+        "ams": {
+            "name": "ams",
+            "commands": {},
+            "sub_groups": {
+                "ams asset": {
+                    "name": "ams asset",
+                    "commands": {
+                        "ams asset get-sas-urls": {
+                            "name": "ams asset get-sas-urls",
+                            "is_aaz": false,
+                            "parameters": [{
+                                "name": "resource_group_name",
+                                "options": ["--resource-group", "-g"],
+                                "required": true,
+                                "id_part": "resource_group"
+                            }, {
+                                "name": "account_name",
+                                "options": ["--account-name", "-a"],
+                                "required": true,
+                                "id_part": "name"
+                            }, {
+                                "name": "asset_name",
+                                "options": ["--name", "-n"],
+                                "required": true,
+                                "id_part": "child_name_1"
+                            }, {
+                                "name": "permissions",
+                                "options": ["--permissions"],
+                                "choices": ["Read", "ReadWrite", "ReadWriteDelete"],
+                                "default": "Read"
+                            }, {
+                                "name": "expiry_time",
+                                "options": ["--expiry"],
+                                "type": "custom_type",
+                                "default": "2023-07-10 18:43:29.693229"
+                            }]
+                        }
+                    },
+                    "sub_groups": {}
+                }
+            }
+        }
+    }
+}
