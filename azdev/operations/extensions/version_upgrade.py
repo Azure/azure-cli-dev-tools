@@ -5,7 +5,7 @@
 # -----------------------------------------------------------------------------
 # pylint: disable=line-too-long
 
-# NOTE: The version uodate rules in this doc is complied with the doc below
+# NOTE: The version update rules in this doc comply with the doc below
 # https://github.com/Azure/azure-cli/blob/release/doc/extensions/versioning_guidelines.md
 
 from packaging.version import parse
@@ -92,7 +92,7 @@ class VersionUpgradeMod:
     def init_version_pre_tag(self):
         """
         use next version pre tag if user inputs
-        otherwise, consistant with the preview tag
+        otherwise, consistent with the preview tag
         """
         if self.next_version_pre_tag is not None:
             return
