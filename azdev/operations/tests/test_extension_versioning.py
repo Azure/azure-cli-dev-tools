@@ -79,3 +79,14 @@ class MyTestCase(unittest.TestCase):
                                         diff_meta_file=os.path.join(TEST_DIR, "jsons", "az_ams_meta_after.json"),
                                         current_version="3.11.0")
         self.assertEqual("3.11.1", version_test.get("version"), "Version cal error")
+
+    def test_version_upgrade_preview_break(self):
+        # preview version update while no stable version before or stable version already lower in major
+        version_test = cal_next_version(base_meta_file=os.path.join(TEST_DIR, "jsons",
+                                                                    "az_costmanagement_meta_before.json"),
+                                        diff_meta_file=os.path.join(TEST_DIR, "jsons",
+                                                                    "az_costmanagement_meta_after.json"),
+                                        current_version="1.0.0b3")
+        self.assertEqual("1.0.0b4", version_test.get("version"), "Version cal error")
+        self.assertEqual(False, version_test.get("is_stable"), "Version tag error")
+        self.assertEqual(False, version_test.get("has_preview_tag"), "Version tag error")

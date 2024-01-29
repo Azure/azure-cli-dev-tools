@@ -1,0 +1,139 @@
+{
+    "module_name": "costmanagement",
+    "name": "az",
+    "commands": {},
+    "sub_groups": {
+        "costmanagement": {
+            "name": "costmanagement",
+            "commands": {
+                "costmanagement show-operation-result": {
+                    "name": "costmanagement show-operation-result",
+                    "is_aaz": true,
+                    "supports_no_wait": true,
+                    "parameters": [{
+                        "name": "no_wait",
+                        "options": ["--no-wait"],
+                        "choices": ["0", "1", "f", "false", "n", "no", "t", "true", "y", "yes"],
+                        "nargs": "?",
+                        "aaz_type": "bool",
+                        "type": "bool"
+                    }, {
+                        "name": "operation_id",
+                        "options": ["--operation-id"],
+                        "required": true,
+                        "aaz_type": "string",
+                        "type": "string"
+                    }, {
+                        "name": "scope",
+                        "options": ["--scope"],
+                        "required": true,
+                        "aaz_type": "string",
+                        "type": "string"
+                    }]
+                }
+            },
+            "sub_groups": {
+                "costmanagement export": {
+                    "name": "costmanagement export",
+                    "commands": {
+                        "costmanagement export list": {
+                            "name": "costmanagement export list",
+                            "is_aaz": false,
+                            "parameters": [{
+                                "name": "scope",
+                                "options": ["--scope"],
+                                "required": true
+                            }]
+                        },
+                        "costmanagement export show": {
+                            "name": "costmanagement export show",
+                            "is_aaz": false,
+                            "parameters": [{
+                                "name": "scope",
+                                "options": ["--scope"],
+                                "required": true
+                            }, {
+                                "name": "export_name",
+                                "options": ["--name"],
+                                "required": true
+                            }]
+                        },
+                        "costmanagement export create": {
+                            "name": "costmanagement export create",
+                            "is_aaz": false,
+                            "parameters": [{
+                                "name": "scope",
+                                "options": ["--scope"],
+                                "required": true
+                            }, {
+                                "name": "export_name",
+                                "options": ["--name"],
+                                "required": true
+                            }, {
+                                "name": "delivery_storage_container",
+                                "options": ["--storage-container"],
+                                "required": true
+                            }, {
+                                "name": "delivery_storage_account_id",
+                                "options": ["--storage-account-id"],
+                                "required": true
+                            }, {
+                                "name": "definition_timeframe",
+                                "options": ["--timeframe"],
+                                "required": true,
+                                "choices": ["BillingMonthToDate", "Custom", "MonthToDate", "TheLastBillingMonth", "TheLastMonth", "WeekToDate"]
+                            }, {
+                                "name": "delivery_directory",
+                                "options": ["--storage-directory"]
+                            }, {
+                                "name": "definition_type",
+                                "options": ["--type"],
+                                "choices": ["ActualCost", "AmortizedCost", "Usage"],
+                                "default": "Usage"
+                            }, {
+                                "name": "definition_time_period",
+                                "options": ["--time-period"],
+                                "nargs": "+"
+                            }, {
+                                "name": "definition_dataset_configuration",
+                                "options": ["--dataset-configuration"],
+                                "nargs": "+"
+                            }, {
+                                "name": "schedule_status",
+                                "options": ["--schedule-status"],
+                                "choices": ["Active", "Inactive"],
+                                "default": "Inactive"
+                            }, {
+                                "name": "schedule_recurrence",
+                                "options": ["--recurrence"],
+                                "choices": ["Annually", "Daily", "Monthly", "Weekly"]
+                            }, {
+                                "name": "schedule_recurrence_period",
+                                "options": ["--recurrence-period"],
+                                "nargs": "+"
+                            }]
+                        },
+                        "costmanagement export delete": {
+                            "name": "costmanagement export delete",
+                            "is_aaz": false,
+                            "confirmation": true,
+                            "parameters": [{
+                                "name": "scope",
+                                "options": ["--scope"],
+                                "required": true
+                            }, {
+                                "name": "export_name",
+                                "options": ["--name"],
+                                "required": true
+                            }, {
+                                "name": "yes",
+                                "options": ["--yes", "-y"]
+                            }]
+                        }
+                    },
+                    "sub_groups": {}
+                }
+            }
+        }
+    }
+}

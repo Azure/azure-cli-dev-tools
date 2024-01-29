@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.64
+++++++
+* `azdev extension cal-next-version`: Fix module name when querying extension modules from index.
+
 0.1.63
 ++++++
 * `azdev`: Update required version for `azure-cli-diff-tool`.

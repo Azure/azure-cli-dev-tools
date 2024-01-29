@@ -56,7 +56,7 @@ class VersionUpgradeMod:
             self.version = parse(current_version)
         except Exception as e:
             raise ValueError("Invalid version: {0} cause {1}".format(current_version, str(e)))
-        self.is_preview = bool(is_preview or is_experimental or (self.version.pre and self.version.pre in ["a", "b"]))
+        self.is_preview = bool(is_preview or is_experimental or (self.version.pre and self.version.pre[0] in ["a", "b"]))
         self.has_preview_tag = is_preview
         self.has_exp_tag = is_experimental
         self.version_raw = current_version
@@ -187,9 +187,11 @@ class VersionUpgradeMod:
             if self.module_name not in extension_data["extensions"]:
                 return
             has_stable, max_stable_major = self.find_max_version(
-                extension_data["extensions"][self.base_meta_file["module_name"]])
+                extension_data["extensions"][self.module_name])
             if has_stable:
                 self.last_stable_major = max_stable_major
+            else:
+                self.last_stable_major = 0
         except Exception as e:
             raise ValueError(str(e))
 
