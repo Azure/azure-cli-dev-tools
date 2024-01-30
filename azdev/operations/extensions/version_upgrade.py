@@ -5,7 +5,7 @@
 # -----------------------------------------------------------------------------
 # pylint: disable=line-too-long
 
-# NOTE: The version uodate rules in this doc is complied with the doc below
+# NOTE: The version update rules in this doc comply with the doc below
 # https://github.com/Azure/azure-cli/blob/release/doc/extensions/versioning_guidelines.md
 
 from packaging.version import parse
@@ -56,7 +56,7 @@ class VersionUpgradeMod:
             self.version = parse(current_version)
         except Exception as e:
             raise ValueError("Invalid version: {0} cause {1}".format(current_version, str(e)))
-        self.is_preview = bool(is_preview or is_experimental or (self.version.pre and self.version.pre in ["a", "b"]))
+        self.is_preview = bool(is_preview or is_experimental or (self.version.pre and self.version.pre[0] in ["a", "b"]))
         self.has_preview_tag = is_preview
         self.has_exp_tag = is_experimental
         self.version_raw = current_version
@@ -92,7 +92,7 @@ class VersionUpgradeMod:
     def init_version_pre_tag(self):
         """
         use next version pre tag if user inputs
-        otherwise, consistant with the preview tag
+        otherwise, consistent with the preview tag
         """
         if self.next_version_pre_tag is not None:
             return
@@ -187,9 +187,11 @@ class VersionUpgradeMod:
             if self.module_name not in extension_data["extensions"]:
                 return
             has_stable, max_stable_major = self.find_max_version(
-                extension_data["extensions"][self.base_meta_file["module_name"]])
+                extension_data["extensions"][self.module_name])
             if has_stable:
                 self.last_stable_major = max_stable_major
+            else:
+                self.last_stable_major = 0
         except Exception as e:
             raise ValueError(str(e))
 
