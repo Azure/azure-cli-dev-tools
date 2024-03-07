@@ -50,6 +50,10 @@ def process_arg_options(argument_settings, para):
         else:
             logger.warning("Unsupported option type: %i", opt_type)
     para["options"] = sorted(option_list)
+    if argument_settings.get("deprecate_info", None) and argument_settings["deprecate_info"].expiration:
+        para["deprecation"] = {
+            "expiration": argument_settings["deprecate_info"].expiration
+        }
 
 
 def process_arg_type(argument_settings, para):
@@ -89,13 +93,13 @@ def normalize_para_types(para):
 
 
 def gen_command_meta(command_info, with_help=False, with_example=False):
-    stored_property_when_exist = ["confirmation", "supports_no_wait", "is_preview"]
+    stored_property_when_exist = ["confirmation", "supports_no_wait", "is_preview", "deprecation"]
     command_meta = {
         "name": command_info["name"],
         "is_aaz": command_info["is_aaz"],
     }
     for prop in stored_property_when_exist:
-        if command_info[prop]:
+        if command_info.get(prop, None):
             command_meta[prop] = command_info[prop]
     if with_example:
         try:
