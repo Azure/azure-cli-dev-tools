@@ -11,7 +11,7 @@ from .util import get_command_tree
 
 logger = get_logger(__name__)
 
-STORED_DEPRECATION_KEY = ["expiration", "target", "redirect"]
+STORED_DEPRECATION_KEY = ["expiration", "target", "redirect", "hide"]
 
 
 class DiffExportFormat(Enum):
@@ -63,21 +63,17 @@ def process_arg_options_deprecation(argument_settings, para):
         opt_type = opt.__class__.__name__
         if opt_type != "Deprecated":
             continue
-        if hasattr(opt, "hide") and opt.hide:
-            continue
         opt_deprecation = {}
         for info_key in STORED_DEPRECATION_KEY:
             if hasattr(opt, info_key) and getattr(opt, info_key):
                 opt_deprecation[info_key] = getattr(opt, info_key)
         option_deprecation_list.append(opt_deprecation)
-    if len(option_deprecation_list):
+    if len(option_deprecation_list) == 0:
         para["options_deprecate_info"] = option_deprecation_list
 
 
 def process_arg_deprecation(argument_settings, para):
     if argument_settings.get("deprecate_info", None) is None:
-        return
-    if hasattr(argument_settings["deprecate_info"], "hide") and argument_settings["deprecate_info"].hide:
         return
     for info_key in STORED_DEPRECATION_KEY:
         if hasattr(argument_settings["deprecate_info"], info_key) and \
@@ -182,6 +178,19 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
     return command_meta
 
 
+def process_command_group_deprecation(command_group_obj, command_group_info):
+    if not hasattr(command_group_obj, "group_kwargs"):
+        return
+    group_kwargs = getattr(command_group_obj, "group_kwargs")
+    if not hasattr(group_kwargs, "deprecate_info"):
+        return
+    for info_key in STORED_DEPRECATION_KEY:
+        if hasattr(group_kwargs.deprecation_info, info_key) and getattr(group_kwargs.deprecation_info, info_key):
+            if command_group_info.get("deprecate_info", None) is None:
+                command_group_info["deprecate_info"] = {}
+            command_group_info["deprecate_info"][info_key] = getattr(group_kwargs.deprecation_info, info_key)
+
+
 def get_commands_meta(command_group_table, commands_info, with_help, with_example):
     commands_meta = {}
 
@@ -209,6 +218,7 @@ def get_commands_meta(command_group_table, commands_info, with_help, with_exampl
                         "commands": {},
                         "sub_groups": {}
                     }
+                    process_command_group_deprecation(group_info, command_group_info["sub_groups"][group_name])
                     if with_help:
                         try:
                             command_group_info["sub_groups"][group_name]["desc"] = group_info.help["short-summary"]

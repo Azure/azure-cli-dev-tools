@@ -4,7 +4,7 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-# pylint: disable=no-else-return
+# pylint: disable=no-else-return, too-many-nested-blocks
 
 import time
 
@@ -81,6 +81,8 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
     commands_info = []
 
     for command_name, command in command_loader.command_table.items():
+        if command_name != "acr helm list":
+            continue
         command_info = {
             "name": command_name,
             "source": _get_command_source(command_name, command),
@@ -94,14 +96,11 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
         }
 
         if hasattr(command, "deprecate_info"):
-            if hasattr(command.deprecate_info, "hide") and command.deprecate_info.hide:
-                pass
-            else:
-                for info_key in STORED_DEPRECATION_KEY:
-                    if hasattr(command.deprecate_info, info_key) and getattr(command.deprecate_info, info_key):
-                        if command_info.get("deprecate_info", None) is None:
-                            command_info["deprecate_info"] = {}
-                        command_info["deprecate_info"][info_key] = getattr(command.deprecate_info, info_key)
+            for info_key in STORED_DEPRECATION_KEY:
+                if hasattr(command.deprecate_info, info_key) and getattr(command.deprecate_info, info_key):
+                    if command_info.get("deprecate_info", None) is None:
+                        command_info["deprecate_info"] = {}
+                    command_info["deprecate_info"][info_key] = getattr(command.deprecate_info, info_key)
 
         module_loader = command_loader.cmd_to_loader_map[command_name]
         for loader in module_loader:
