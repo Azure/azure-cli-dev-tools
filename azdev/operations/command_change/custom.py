@@ -11,6 +11,8 @@ from .util import get_command_tree
 
 logger = get_logger(__name__)
 
+STORED_DEPRECATION_KEY = ["expiration", "target", "redirect"]
+
 
 class DiffExportFormat(Enum):
     DICT = "dict"
@@ -50,10 +52,39 @@ def process_arg_options(argument_settings, para):
         else:
             logger.warning("Unsupported option type: %i", opt_type)
     para["options"] = sorted(option_list)
-    if argument_settings.get("deprecate_info", None) and argument_settings["deprecate_info"].expiration:
-        para["deprecation"] = {
-            "expiration": argument_settings["deprecate_info"].expiration
-        }
+
+
+def process_arg_options_deprecation(argument_settings, para):
+    if not argument_settings.get("options_list", None):
+        return
+    raw_options_list = argument_settings["options_list"]
+    option_deprecation_list = []
+    for opt in raw_options_list:
+        opt_type = opt.__class__.__name__
+        if opt_type != "Deprecated":
+            continue
+        if hasattr(opt, "hide") and opt.hide:
+            continue
+        opt_deprecation = {}
+        for info_key in STORED_DEPRECATION_KEY:
+            if hasattr(opt, info_key) and getattr(opt, info_key):
+                opt_deprecation[info_key] = getattr(opt, info_key)
+        option_deprecation_list.append(opt_deprecation)
+    if len(option_deprecation_list):
+        para["options_deprecate_info"] = option_deprecation_list
+
+
+def process_arg_deprecation(argument_settings, para):
+    if argument_settings.get("deprecate_info", None) is None:
+        return
+    if hasattr(argument_settings["deprecate_info"], "hide") and argument_settings["deprecate_info"].hide:
+        return
+    for info_key in STORED_DEPRECATION_KEY:
+        if hasattr(argument_settings["deprecate_info"], info_key) and \
+                getattr(argument_settings["deprecate_info"], info_key):
+            if para.get("deprecate_info", None) is None:
+                para["deprecate_info"] = {}
+            para["deprecate_info"][info_key] = getattr(argument_settings["deprecate_info"], info_key)
 
 
 def process_arg_type(argument_settings, para):
@@ -93,7 +124,7 @@ def normalize_para_types(para):
 
 
 def gen_command_meta(command_info, with_help=False, with_example=False):
-    stored_property_when_exist = ["confirmation", "supports_no_wait", "is_preview", "deprecation"]
+    stored_property_when_exist = ["confirmation", "supports_no_wait", "is_preview", "deprecate_info"]
     command_meta = {
         "name": command_info["name"],
         "is_aaz": command_info["is_aaz"],
@@ -124,7 +155,9 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         para = {
             "name": settings["dest"],
         }
+        process_arg_deprecation(settings, para)
         process_arg_options(settings, para)
+        process_arg_options_deprecation(settings, para)
         process_arg_type(settings, para)
         if settings.get("required", False):
             para["required"] = True
