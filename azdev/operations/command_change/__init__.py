@@ -81,8 +81,6 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
     commands_info = []
 
     for command_name, command in command_loader.command_table.items():
-        if command_name != "acr helm list":
-            continue
         command_info = {
             "name": command_name,
             "source": _get_command_source(command_name, command),

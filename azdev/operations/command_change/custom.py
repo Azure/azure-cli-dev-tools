@@ -68,7 +68,7 @@ def process_arg_options_deprecation(argument_settings, para):
             if hasattr(opt, info_key) and getattr(opt, info_key):
                 opt_deprecation[info_key] = getattr(opt, info_key)
         option_deprecation_list.append(opt_deprecation)
-    if len(option_deprecation_list) == 0:
+    if len(option_deprecation_list) != 0:
         para["options_deprecate_info"] = option_deprecation_list
 
 
