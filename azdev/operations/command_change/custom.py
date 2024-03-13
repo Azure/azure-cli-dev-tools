@@ -182,13 +182,13 @@ def process_command_group_deprecation(command_group_obj, command_group_info):
     if not hasattr(command_group_obj, "group_kwargs"):
         return
     group_kwargs = getattr(command_group_obj, "group_kwargs")
-    if not hasattr(group_kwargs, "deprecate_info"):
+    if group_kwargs.get("deprecate_info", None) is None:
         return
     for info_key in STORED_DEPRECATION_KEY:
-        if hasattr(group_kwargs.deprecation_info, info_key) and getattr(group_kwargs.deprecation_info, info_key):
+        if hasattr(group_kwargs["deprecate_info"], info_key) and getattr(group_kwargs["deprecate_info"], info_key):
             if command_group_info.get("deprecate_info", None) is None:
                 command_group_info["deprecate_info"] = {}
-            command_group_info["deprecate_info"][info_key] = getattr(group_kwargs.deprecation_info, info_key)
+            command_group_info["deprecate_info"][info_key] = getattr(group_kwargs["deprecate_info"], info_key)
 
 
 def get_commands_meta(command_group_table, commands_info, with_help, with_example):
