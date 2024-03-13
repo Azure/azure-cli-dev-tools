@@ -4,14 +4,14 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-# pylint: disable=no-else-return
+# pylint: disable=no-else-return, too-many-nested-blocks
 
 import time
 
 from knack.log import get_logger
 import azure_cli_diff_tool
 from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff
-from .custom import DiffExportFormat, get_commands_meta
+from .custom import DiffExportFormat, get_commands_meta, STORED_DEPRECATION_KEY
 from .util import export_commands_meta
 from ..statistics import _create_invoker_and_load_cmds, _get_command_source, \
     _command_codegen_info  # pylint: disable=protected-access
@@ -92,6 +92,14 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
             "supports_no_wait": command.supports_no_wait,
             "is_preview": command.command_kwargs.get("is_preview", False)
         }
+
+        if hasattr(command, "deprecate_info"):
+            for info_key in STORED_DEPRECATION_KEY:
+                if hasattr(command.deprecate_info, info_key) and getattr(command.deprecate_info, info_key):
+                    if command_info.get("deprecate_info", None) is None:
+                        command_info["deprecate_info"] = {}
+                    command_info["deprecate_info"][info_key] = getattr(command.deprecate_info, info_key)
+
         module_loader = command_loader.cmd_to_loader_map[command_name]
         for loader in module_loader:
             loader.skip_applicability = True

@@ -11,6 +11,8 @@ from .util import get_command_tree
 
 logger = get_logger(__name__)
 
+STORED_DEPRECATION_KEY = ["expiration", "target", "redirect", "hide"]
+
 
 class DiffExportFormat(Enum):
     DICT = "dict"
@@ -52,6 +54,35 @@ def process_arg_options(argument_settings, para):
     para["options"] = sorted(option_list)
 
 
+def process_arg_options_deprecation(argument_settings, para):
+    if not argument_settings.get("options_list", None):
+        return
+    raw_options_list = argument_settings["options_list"]
+    option_deprecation_list = []
+    for opt in raw_options_list:
+        opt_type = opt.__class__.__name__
+        if opt_type != "Deprecated":
+            continue
+        opt_deprecation = {}
+        for info_key in STORED_DEPRECATION_KEY:
+            if hasattr(opt, info_key) and getattr(opt, info_key):
+                opt_deprecation[info_key] = getattr(opt, info_key)
+        option_deprecation_list.append(opt_deprecation)
+    if len(option_deprecation_list) != 0:
+        para["options_deprecate_info"] = option_deprecation_list
+
+
+def process_arg_deprecation(argument_settings, para):
+    if argument_settings.get("deprecate_info", None) is None:
+        return
+    for info_key in STORED_DEPRECATION_KEY:
+        if hasattr(argument_settings["deprecate_info"], info_key) and \
+                getattr(argument_settings["deprecate_info"], info_key):
+            if para.get("deprecate_info", None) is None:
+                para["deprecate_info"] = {}
+            para["deprecate_info"][info_key] = getattr(argument_settings["deprecate_info"], info_key)
+
+
 def process_arg_type(argument_settings, para):
     if not argument_settings.get("type", None):
         return
@@ -89,13 +120,13 @@ def normalize_para_types(para):
 
 
 def gen_command_meta(command_info, with_help=False, with_example=False):
-    stored_property_when_exist = ["confirmation", "supports_no_wait", "is_preview"]
+    stored_property_when_exist = ["confirmation", "supports_no_wait", "is_preview", "deprecate_info"]
     command_meta = {
         "name": command_info["name"],
         "is_aaz": command_info["is_aaz"],
     }
     for prop in stored_property_when_exist:
-        if command_info[prop]:
+        if command_info.get(prop, None):
             command_meta[prop] = command_info[prop]
     if with_example:
         try:
@@ -120,7 +151,9 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         para = {
             "name": settings["dest"],
         }
+        process_arg_deprecation(settings, para)
         process_arg_options(settings, para)
+        process_arg_options_deprecation(settings, para)
         process_arg_type(settings, para)
         if settings.get("required", False):
             para["required"] = True
@@ -143,6 +176,19 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         parameters.append(para)
     command_meta["parameters"] = parameters
     return command_meta
+
+
+def process_command_group_deprecation(command_group_obj, command_group_info):
+    if not hasattr(command_group_obj, "group_kwargs"):
+        return
+    group_kwargs = getattr(command_group_obj, "group_kwargs")
+    if group_kwargs.get("deprecate_info", None) is None:
+        return
+    for info_key in STORED_DEPRECATION_KEY:
+        if hasattr(group_kwargs["deprecate_info"], info_key) and getattr(group_kwargs["deprecate_info"], info_key):
+            if command_group_info.get("deprecate_info", None) is None:
+                command_group_info["deprecate_info"] = {}
+            command_group_info["deprecate_info"][info_key] = getattr(group_kwargs["deprecate_info"], info_key)
 
 
 def get_commands_meta(command_group_table, commands_info, with_help, with_example):
@@ -172,6 +218,7 @@ def get_commands_meta(command_group_table, commands_info, with_help, with_exampl
                         "commands": {},
                         "sub_groups": {}
                     }
+                    process_command_group_deprecation(group_info, command_group_info["sub_groups"][group_name])
                     if with_help:
                         try:
                             command_group_info["sub_groups"][group_name]["desc"] = group_info.help["short-summary"]
