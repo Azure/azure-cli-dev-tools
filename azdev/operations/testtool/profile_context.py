@@ -4,6 +4,7 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+import os
 import traceback
 
 from knack.log import get_logger
@@ -14,6 +15,7 @@ from azdev.utilities import display
 
 
 logger = get_logger(__name__)
+os.environ['AZURE_CORE_COLLECT_TELEMETRY'] = 'False'
 
 
 class ProfileContext:
