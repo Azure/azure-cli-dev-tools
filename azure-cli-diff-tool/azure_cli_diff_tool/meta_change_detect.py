@@ -7,7 +7,8 @@
 import logging
 import os.path
 
-from .utils import get_command_tree, ChangeType, extract_cmd_name, extract_subgroup_name, extract_cmd_property, DiffLevel
+from .utils import get_command_tree, ChangeType, extract_cmd_name, extract_subgroup_name, extract_subgroup_property, \
+    extract_cmd_property, DiffLevel
 from .meta_change import (CmdAdd, CmdRemove, CmdPropAdd, CmdPropRemove, CmdPropUpdate,
                           ParaAdd, ParaRemove, ParaPropAdd, ParaPropRemove, ParaPropUpdate,
                           SubgroupAdd, SubgroupRemove)
@@ -84,12 +85,16 @@ class MetaChangeDetect:
                 has_subgroup, subgroup_name = extract_subgroup_name(dict_key)
                 if not has_subgroup or not subgroup_name:
                     continue
-                if diff_type == ChangeType.REMOVE:
-                    diff_obj = SubgroupRemove(subgroup_name)
+                has_subgroup_key, subgroup_property = extract_subgroup_property(dict_key, subgroup_name)
+                if has_subgroup_key:
+                    continue
                 else:
-                    diff_obj = SubgroupAdd(subgroup_name)
-                self.diff_objs.append(diff_obj)
-                continue
+                    if diff_type == ChangeType.REMOVE:
+                        diff_obj = SubgroupRemove(subgroup_name)
+                    else:
+                        diff_obj = SubgroupAdd(subgroup_name)
+                    self.diff_objs.append(diff_obj)
+                    continue
 
             has_cmd_key, cmd_property = extract_cmd_property(dict_key, cmd_name)
             if has_cmd_key:
@@ -312,6 +317,8 @@ class MetaChangeDetect:
         self.diff_objs = new_diff_objs
 
     def check_deep_diffs(self):
+        for diff_type, diff_key in self.deep_diff.items():
+            print(diff_type, ": ", diff_key)
         self.check_dict_item_remove()
         self.check_dict_item_add()
         self.check_list_item_remove()

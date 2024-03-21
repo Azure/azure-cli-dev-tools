@@ -165,6 +165,14 @@ def extract_subgroup_name(key):
     return True, subgroup_ame_res[-1]
 
 
+def extract_subgroup_property(key, subgroup_name):
+    subgroup_key_pattern = re.compile(subgroup_name + r"\'\]\[\'([a-zA-Z0-9\-\_]+)\'\]")
+    subgroup_key_res = re.findall(subgroup_key_pattern, key)
+    if not subgroup_key_res or len(subgroup_key_res) == 0:
+        return False, None
+    return True, subgroup_key_res[0]
+
+
 def extract_cmd_name(key):
     cmd_name_res = re.findall(CMD_NAME_PATTERN, key)
     if not cmd_name_res or len(cmd_name_res) == 0:
