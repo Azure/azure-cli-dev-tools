@@ -88,16 +88,17 @@ def search_argument_context(row_num, lines):
     cmds = []
     while row_num > 0:
         row_num -= 1
-        # Match `with self.argument_context('') as c:`
-        sub_pattern0 = r'with self.argument_context\(\'(.*?)\'[\),]'
+        # Match `with self.argument_context(['"]['"]) as c:`
+        sub_pattern0 = r'with self.argument_context\([\'\"](.*?)[\'\"][\),]'
         # Match `with self.argument_context(scope) as c:`
         sub_pattern1 = r'with self.argument_context\(scope[\),]'
-        # Match `with self.argument_context(\'{} stop\'.format(scope)) as c:',
-        sub_pattern2 = r'with self.argument_context\(\'(.*)\'.format\(scope\)\)'
+        # Match `with self.argument_context(['"]{} stop['"].format(scope)) as c:',
+        sub_pattern2 = r'with self.argument_context\([\'\"](.*)[\'\"].format\(scope\)\)'
+        # There are many matching patterns, but their proportion is very small. Ignore these commands.
         ref0 = re.findall(sub_pattern0, lines[row_num])
         ref1 = re.findall(sub_pattern1, lines[row_num])
         ref2 = re.findall(sub_pattern2, lines[row_num])
-        # Match `with self.argument_context('') as c:`
+        # Match `with self.argument_context(['"]['"]) as c:`
         if ref0:
             cmds = ref0
             break
@@ -107,7 +108,7 @@ def search_argument_context(row_num, lines):
             cmds = json.loads(
                 re.findall(sub_pattern, lines[row_num - 1])[0].replace('\'', '"'))
             break
-        # Match `with self.argument_context(\'{} stop\'.format(scope)) as c:',
+        # Match `with self.argument_context(['"]{} stop['"].format(scope)) as c:',
         if ref2:
             sub_pattern = r'for scope in (.*):'
             format_strings = json.loads(

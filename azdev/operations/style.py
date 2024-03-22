@@ -192,16 +192,15 @@ def _run_pep8(modules):
 
 
 def _config_file_path(style_type="pylint"):
-    cli_repo_path = get_azdev_config().get("cli", "repo_path")
-
-    ext_repo_path = filter(
-        lambda x: "azure-cli-extension" in x,
-        get_azdev_config().get("ext", "repo_paths").split(),
-    )
+    from configparser import NoSectionError
     try:
-        ext_repo_path = next(ext_repo_path)
-    except StopIteration:
-        ext_repo_path = []
+        cli_repo_path = get_azdev_config().get("cli", "repo_path")
+    except NoSectionError:
+        cli_repo_path = None
+    try:
+        ext_repo_path = get_azdev_config().get("ext", "repo_paths").split(',')[0]
+    except NoSectionError:
+        ext_repo_path = None
 
     if style_type not in ["pylint", "flake8"]:
         raise ValueError("style_tyle value allows only: pylint, flake8.")
