@@ -89,6 +89,7 @@ class MetaChangeDetect:
             else:
                 diff_obj = SubgroupAdd(subgroup_name)
             self.diff_objs.append(diff_obj)
+            return
 
         # deal with deprecate_info expanded key's add/remove/update
         if diff_type == ChangeType.ADD:
