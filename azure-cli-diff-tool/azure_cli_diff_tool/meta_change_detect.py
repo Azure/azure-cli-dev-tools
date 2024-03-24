@@ -89,22 +89,8 @@ class MetaChangeDetect:
             else:
                 diff_obj = SubgroupAdd(subgroup_name)
             self.diff_objs.append(diff_obj)
-        if subgroup_property != "deprecate_info":
-            # property of sub group level is in deprecate_info dict
-            return
-        has_subgroup_deprecate_key, subgroup_deprecate_property = \
-            extract_subgroup_deprecate_property(dict_key, "deprecate_info")
-        if not has_subgroup_deprecate_key:
-            # deal with whole deprecate_info add or remove
-            if diff_type == ChangeType.ADD:
-                diff_obj = SubgroupPropAdd(subgroup_name, "deprecate_info", False, DiffLevel.WARN)
-            else:
-                diff_obj = SubgroupPropRemove(subgroup_name, "deprecate_info", False, DiffLevel.INFO)
-            self.diff_objs.append(diff_obj)
-            return
-        else:
-            subgroup_property = subgroup_deprecate_property
-        # deal with deprecate_info's key's add/remove/update
+
+        # deal with deprecate_info expanded key's add/remove/update
         if diff_type == ChangeType.ADD:
             if subgroup_property in SUBGROUP_PROPERTY_ADD_WARN_LIST:
                 diff_obj = SubgroupPropAdd(subgroup_name, subgroup_property, False, DiffLevel.WARN)
@@ -139,19 +125,6 @@ class MetaChangeDetect:
         if cmd_property == "parameters":
             self.__log_cmd_with_parameter_change(cmd_name)
             return
-        elif cmd_property == "deprecate_info":
-            has_cmd_deprecate_key, cmd_deprecate_property = extract_cmd_deprecate_property(dict_key, "deprecate_info")
-            if not has_cmd_deprecate_key:
-                # deal with whole deprecate_info add or remove
-                if diff_type == ChangeType.ADD:
-                    diff_obj = CmdPropAdd(cmd_name, "deprecate_info", False, DiffLevel.WARN)
-                else:
-                    diff_obj = CmdPropRemove(cmd_name, "deprecate_info", False, DiffLevel.INFO)
-                self.diff_objs.append(diff_obj)
-                return
-            else:
-                # deal with deprecate info keys, use them as normal cmd_property
-                cmd_property = cmd_deprecate_property
 
         if diff_type == ChangeType.ADD:
             if cmd_property in CMD_PROPERTY_ADD_WARN_LIST:
@@ -235,15 +208,6 @@ class MetaChangeDetect:
         if not has_subgroup_prop:
             # subgroup key does not change independently, it must be followed by some cmd property
             return
-        if subgroup_property != "deprecate_info":
-            # for subgroup, only deprecate_info is supported now
-            return
-        has_subgroup_deprecate_prop, subgroup_deprecate_property = \
-            extract_subgroup_deprecate_property(key, "deprecate_info")
-        if not has_subgroup_deprecate_prop:
-            # the whole deprecate_info does not have value change event, it must be with some key inside
-            return
-        subgroup_property = subgroup_deprecate_property
         if subgroup_property in SUBGROUP_PROPERTY_UPDATE_WARN_LIST:
             diff_obj = SubgroupPropUpdate(subgroup_name, subgroup_property, False, DiffLevel.WARN, old_value, new_value)
         elif subgroup_property in SUBGROUP_PROPERTY_UPDATE_BREAK_LIST:
@@ -260,12 +224,6 @@ class MetaChangeDetect:
         if cmd_property == "parameters":
             self.__log_cmd_with_parameter_change(cmd_name)
             return
-        elif cmd_property == "deprecate_info":
-            has_cmd_deprecate_prop, cmd_deprecate_property = extract_cmd_deprecate_property(key, "deprecate_info")
-            if not has_cmd_deprecate_prop:
-                # the whole deprecate_info does not have value change event, it must be with some key inside
-                return
-            cmd_property = cmd_deprecate_property
 
         if cmd_property in CMD_PROPERTY_UPDATE_WARN_LIST:
             diff_obj = CmdPropUpdate(cmd_name, cmd_property, False, DiffLevel.WARN, old_value, new_value)
@@ -277,8 +235,8 @@ class MetaChangeDetect:
 
     def check_value_change(self):
         """
-        ['sub_groups']['acr']['deprecate_info']['redirect']
-        ['commands']['acr helm show']['deprecate_info']['redirect']
+        ['sub_groups']['acr']['deprecate_info_redirect']
+        ['commands']['acr helm show']['deprecate_info_redirect']
         """
         if not self.deep_diff.get("values_changed", None):
             return

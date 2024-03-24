@@ -281,18 +281,14 @@ def expand_deprecate_obj(meta_obj):
         return
     for key, obj in meta_obj.items():
         if type(obj) is dict:
-            print("-------------key: ", key, "dict: ", obj)
             if obj.get("deprecate_info", None):
-                print("-----------------depre:", obj["deprecate_info"])
                 for dekey, devalue in obj["deprecate_info"].items():
                     obj["deprecate_info_" + dekey] = devalue
                 del obj["deprecate_info"]
             expand_deprecate_obj(obj)
         elif type(obj) is list:
-            print("------------list: ", obj)
             for ind, item in enumerate(obj):
                 if type(item) is dict and item.get("deprecate_info", None):
-                    print("-----------------depre:", item["deprecate_info"])
                     for dekey, devalue in item["deprecate_info"].items():
                         obj[ind]["deprecate_info_" + dekey] = devalue
                     del item["deprecate_info"]

@@ -92,11 +92,7 @@
                             }]
                         }
                     },
-                    "sub_groups": {},
-                    "deprecate_info": {
-                        "target": "acr helm",
-                        "redirect": "helm v3"
-                    }
+                    "sub_groups": {}
                 }
             },
             "deprecate_info": {
