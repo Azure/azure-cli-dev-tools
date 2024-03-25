@@ -1,0 +1,128 @@
+{
+    "module_name": "acr",
+    "name": "az",
+    "commands": {},
+    "sub_groups": {
+        "acr": {
+            "name": "acr",
+            "commands": {},
+            "sub_groups": {
+                "acr helm": {
+                    "name": "acr helm",
+                    "commands": {
+                        "acr helm list": {
+                            "name": "acr helm list",
+                            "is_aaz": false,
+                            "deprecate_info": {
+                                "target": "acr helm list",
+                                "redirect": "acr helm list2",
+                                "hide": true
+                            },
+                            "parameters": [{
+                                "name": "registry_name",
+                                "options": ["--name", "-n"],
+                                "required": true
+                            }, {
+                                "name": "repository",
+                                "options": ["--repository"],
+                                "options_deprecate_info": [{
+                                    "target": "--docker-registry-server-password",
+                                    "redirect": "--registry-password"
+                                }],
+                                "default": "repo"
+                            }, {
+                                "name": "resource_group_name",
+                                "deprecate_info": {
+                                    "target": "resource_group_name",
+                                    "hide": true
+                                },
+                                "options": ["--resource-group", "-g"],
+                                "id_part": "resource_group"
+                            }, {
+                                "name": "tenant_suffix",
+                                "options": ["--suffix"],
+                                "deprecate_info": {
+                                    "target": "tenant_suffix",
+                                    "hide": true
+                                }
+                            }, {
+                                "name": "username",
+                                "options": ["--username", "-u"]
+                            }, {
+                                "name": "password",
+                                "options": ["--password", "-p"],
+                                "options_deprecate_info": [{
+                                    "target": "--password",
+                                    "redirect": "--registry-password",
+                                    "hide": true
+                                }, {
+                                    "target": "-p",
+                                    "redirect": "--registry-p",
+                                    "hide": true
+                                }]
+                            }]
+                        },
+                        "acr helm show": {
+                            "name": "acr helm show",
+                            "is_aaz": false,
+                            "deprecate_info": {
+                                "target": "acr helm show",
+                                "redirect": "acr helm show2"
+                            },
+                            "parameters": [{
+                                "name": "registry_name",
+                                "options": ["--name", "-n"],
+                                "required": true
+                            }, {
+                                "name": "chart",
+                                "options": [],
+                                "required": true
+                            }, {
+                                "name": "version",
+                                "options": ["--version"],
+                                "options_deprecate_info": [{
+                                    "target": "--version",
+                                    "redirect": "--version2"
+                                }]
+                            }, {
+                                "name": "repository",
+                                "options": ["--repository"],
+                                "default": "repo",
+                                "options_deprecate_info": [{
+                                    "target": "--repository",
+                                    "redirect": "--repository2"
+                                }]
+                            }, {
+                                "name": "resource_group_name",
+                                "deprecate_info": {
+                                    "target": "resource_group_name",
+                                    "hide": true
+                                },
+                                "options": ["--resource-group", "-g"],
+                                "id_part": "resource_group"
+                            }, {
+                                "name": "tenant_suffix",
+                                "options": ["--suffix"]
+                            }, {
+                                "name": "username",
+                                "options": ["--username", "-u"]
+                            }, {
+                                "name": "password",
+                                "options": ["--password", "-p"]
+                            }]
+                        }
+                    },
+                    "sub_groups": {},
+                    "deprecate_info": {
+                        "target": "acr helm",
+                        "redirect": "helm v3"
+                    }
+                }
+            },
+            "deprecate_info": {
+                "target": "acr",
+                "redirect": "acr2"
+            }
+        }
+    }
+}

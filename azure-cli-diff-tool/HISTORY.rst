@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.0.6
+++++++
+* Add diff support for deprecate_info in subgroup, cmd, parameters and options
+
 0.0.5
 ++++++
 * Add `DiffLevel` to meta comparison

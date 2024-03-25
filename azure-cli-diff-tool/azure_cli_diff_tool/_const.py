@@ -19,25 +19,37 @@ BREAKING_CHANE_RULE_LINK_URL_SUFFIX = ".md"
 
 CMD_REMOVE_SUFFIX_WARN_LIST = ["wait"]
 
+SUBGROUP_PROPERTY_REMOVE_BREAK_LIST = []
+SUBGROUP_PROPERTY_REMOVE_WARN_LIST = ["deprecate_info_redirect"]
+
+SUBGROUP_PROPERTY_ADD_BREAK_LIST = []
+SUBGROUP_PROPERTY_ADD_WARN_LIST = ["deprecate_info_hide", "deprecate_info_expiration"]
+
+SUBGROUP_PROPERTY_UPDATE_BREAK_LIST = []
+SUBGROUP_PROPERTY_UPDATE_WARN_LIST = ["deprecate_info_expiration"]
+
+SUBGROUP_PROPERTY_IGNORED_LIST = []
+
 CMD_PROPERTY_REMOVE_BREAK_LIST = []
-CMD_PROPERTY_REMOVE_WARN_LIST = []
+CMD_PROPERTY_REMOVE_WARN_LIST = ["deprecate_info_redirect"]
 
 CMD_PROPERTY_ADD_BREAK_LIST = ["confirmation"]
-CMD_PROPERTY_ADD_WARN_LIST = []
+CMD_PROPERTY_ADD_WARN_LIST = ["deprecate_info_hide", "deprecate_info_expiration"]
 
 CMD_PROPERTY_UPDATE_BREAK_LIST = []
-CMD_PROPERTY_UPDATE_WARN_LIST = []
+CMD_PROPERTY_UPDATE_WARN_LIST = ["deprecate_info_expiration", "deprecate_info_redirect"]
 
 CMD_PROPERTY_IGNORED_LIST = ["is_aaz", "supports_no_wait"]
 
 PARA_PROPERTY_REMOVE_BREAK_LIST = ["options"]
-PARA_PROPERTY_REMOVE_WARN_LIST = ["id_part", "nargs"]
+PARA_PROPERTY_REMOVE_WARN_LIST = ["id_part", "nargs", "deprecate_info_redirect"]
 
 PARA_PROPERTY_ADD_BREAK_LIST = ["required"]
-PARA_PROPERTY_ADD_WARN_LIST = ["choices"]
+PARA_PROPERTY_ADD_WARN_LIST = ["choices", "deprecate_info_expiration", "deprecate_info_hide", "options_deprecate_info"]
 
 PARA_PROPERTY_UPDATE_BREAK_LIST = ["default", "aaz_default"]
-PARA_PROPERTY_UPDATE_WARN_LIST = ["type", "aaz_type", "choices", "nargs"]
+PARA_PROPERTY_UPDATE_WARN_LIST = ["type", "aaz_type", "choices", "nargs",
+                                  "deprecate_info_expiration", "deprecate_info_redirect", "options_deprecate_info"]
 
 PARA_NAME_IGNORED_LIST = ["force_string"]
 PARA_PROPERTY_IGNORED_LIST = []
@@ -61,6 +73,9 @@ CHANGE_RULE_MESSAGE_MAPPING = {
     "1010": "cmd `{0}` update parameter `{1}`: updated property `{2}` from `{3}` to `{4}`",
     "1011": "sub group `{0}` added",
     "1012": "sub group `{0}` removed",
+    "1013": "sub group `{0}` added property `{1}`",
+    "1014": "sub group `{0}` removed property `{1}`",
+    "1015": "sub group `{0}` updated property `{1}` from `{2}` to `{3}`",
 }
 
 CHANGE_SUGGEST_MESSAGE_MAPPING = {
@@ -77,5 +92,8 @@ CHANGE_SUGGEST_MESSAGE_MAPPING = {
     "1010": "please change property `{0}` from `{1}` to `{2}` for parameter `{3}` of cmd `{4}`",
     "1011": "please confirm sub group `{0}` added",
     "1012": "please confirm sub group `{0}` removed",
+    "1013": "please remove property `{0}` for sub group `{1}`",
+    "1014": "please add back property `{0}` for sub group `{1}`",
+    "1015": "please change property `{0}` from `{1}` to `{2}` for sub group `{3}`",
 }
 

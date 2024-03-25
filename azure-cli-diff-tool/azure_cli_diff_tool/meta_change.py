@@ -6,7 +6,8 @@
 
 from .utils import get_change_rule_template, get_change_suggest_template, DiffLevel
 from ._const import BREAKING_CHANE_RULE_LINK_URL_PREFIX, BREAKING_CHANE_RULE_LINK_URL_SUFFIX, \
-    CMD_PROPERTY_IGNORED_LIST, PARA_NAME_IGNORED_LIST, PARA_PROPERTY_IGNORED_LIST, PARA_VALUE_IGNORED_LIST
+    SUBGROUP_PROPERTY_IGNORED_LIST, CMD_PROPERTY_IGNORED_LIST, PARA_NAME_IGNORED_LIST, \
+    PARA_PROPERTY_IGNORED_LIST, PARA_VALUE_IGNORED_LIST
 
 
 class MetaChange:
@@ -56,6 +57,84 @@ class SubgroupRemove(MetaChange):
         self.suggest_message = get_change_suggest_template(self.rule_id).format(self.subgroup_name) \
             if self.is_break else ""
         super().__init__(self.rule_id, is_break, diff_level, self.rule_message, self.suggest_message)
+
+
+class SubgroupPropAdd(MetaChange):
+    def __init__(self, subgroup_name, subgroup_property, is_break=False, diff_level=DiffLevel.INFO):
+        if not subgroup_name or not subgroup_property:
+            raise Exception("sub group name needed")
+        self.rule_id = "1013"
+        self.is_ignore = False
+        self.subgroup_name = subgroup_name
+        self.subgroup_property = subgroup_property
+        self.is_break = is_break
+        self.diff_level = diff_level
+        self.rule_message = get_change_rule_template(self.rule_id).format(self.subgroup_name, self.subgroup_property)
+        self.suggest_message = get_change_suggest_template(self.rule_id).format(self.subgroup_property, self.subgroup_name) \
+            if self.is_break else ""
+        if subgroup_property in SUBGROUP_PROPERTY_IGNORED_LIST:
+            self.is_ignore = True
+        self.filter_key = [self.rule_id, self.subgroup_name, self.subgroup_property]
+        super().__init__(self.rule_id, is_break, diff_level, self.rule_message, self.suggest_message, self.is_ignore,
+                         self.filter_key)
+
+
+class SubgroupPropRemove(MetaChange):
+    def __init__(self, subgroup_name, subgroup_property, is_break=False, diff_level=DiffLevel.BREAK):
+        if not subgroup_name or not subgroup_property:
+            raise Exception("sub group name needed")
+        self.rule_id = "1014"
+        self.is_ignore = False
+        self.subgroup_name = subgroup_name
+        self.subgroup_property = subgroup_property
+        self.is_break = is_break
+        self.diff_level = diff_level
+        self.rule_message = get_change_rule_template(self.rule_id).format(self.subgroup_name, self.subgroup_property)
+        if self.is_break:
+            self.suggest_message = get_change_suggest_template(self.rule_id).format(self.subgroup_property,
+                                                                                    self.subgroup_name)
+        else:
+            self.suggest_message = ""
+        if subgroup_property in CMD_PROPERTY_IGNORED_LIST:
+            self.is_ignore = True
+        self.filter_key = [self.rule_id, self.subgroup_name, self.subgroup_property]
+        super().__init__(self.rule_id, is_break, diff_level, self.rule_message, self.suggest_message,
+                         self.is_ignore, self.filter_key)
+
+
+class SubgroupPropUpdate(MetaChange):
+
+    def __init__(self, subgroup_name, subgroup_property, is_break=False, diff_level=DiffLevel.INFO,
+                 old_value=None, new_value=None):
+        if not subgroup_name or not subgroup_property:
+            raise Exception("sub group name and sub group prop needed")
+        self.rule_id = "1015"
+        self.is_ignore = False
+        self.subgroup_name = subgroup_name
+        self.is_break = is_break
+        self.diff_level = diff_level
+        self.subgroup_prop_updated = subgroup_property
+        self.old_value = ""
+        self.new_value = ""
+
+        if old_value is not None:
+            self.old_value = old_value
+        if new_value is not None:
+            self.new_value = new_value
+        self.rule_message = get_change_rule_template(self.rule_id).format(self.subgroup_name,
+                                                                          self.subgroup_prop_updated,
+                                                                          self.old_value, self.new_value)
+        if self.is_break:
+            self.suggest_message = get_change_suggest_template(self.rule_id).format(self.subgroup_prop_updated,
+                                                                                    self.new_value, self.old_value,
+                                                                                    self.subgroup_name)
+        else:
+            self.suggest_message = ""
+        if subgroup_property in SUBGROUP_PROPERTY_IGNORED_LIST:
+            self.is_ignore = True
+        self.filter_key = [self.rule_id, self.subgroup_name, self.subgroup_prop_updated]
+        super().__init__(self.rule_id, is_break, diff_level, self.rule_message, self.suggest_message,
+                         self.is_ignore, self.filter_key)
 
 
 class CmdAdd(MetaChange):

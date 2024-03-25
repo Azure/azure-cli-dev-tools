@@ -165,6 +165,22 @@ def extract_subgroup_name(key):
     return True, subgroup_ame_res[-1]
 
 
+def extract_subgroup_property(key, subgroup_name):
+    subgroup_key_pattern = re.compile(subgroup_name + r"\'\]\[\'([a-zA-Z0-9\-\_]+)\'\]")
+    subgroup_key_res = re.findall(subgroup_key_pattern, key)
+    if not subgroup_key_res or len(subgroup_key_res) == 0:
+        return False, None
+    return True, subgroup_key_res[0]
+
+
+def extract_subgroup_deprecate_property(key, deprecate_key):
+    subgroup_deprecate_key_pattern = re.compile(deprecate_key + r"\'\]\[\'([a-zA-Z0-9\-\_]+)\'\]")
+    subgroup_deprecate_key_res = re.findall(subgroup_deprecate_key_pattern, key)
+    if not subgroup_deprecate_key_res or len(subgroup_deprecate_key_res) == 0:
+        return False, None
+    return True, subgroup_deprecate_key_res[0]
+
+
 def extract_cmd_name(key):
     cmd_name_res = re.findall(CMD_NAME_PATTERN, key)
     if not cmd_name_res or len(cmd_name_res) == 0:
@@ -179,6 +195,13 @@ def extract_cmd_property(key, cmd_name):
         return False, None
     return True, cmd_key_res[0]
 
+
+def extract_cmd_deprecate_property(key, deprecate_key):
+    cmd_deprecate_key_pattern = re.compile(deprecate_key + r"\'\]\[\'([a-zA-Z0-9\-\_]+)\'\]")
+    cmd_deprecate_key_res = re.findall(cmd_deprecate_key_pattern, key)
+    if not cmd_deprecate_key_res or len(cmd_deprecate_key_res) == 0:
+        return False, None
+    return True, cmd_deprecate_key_res[0]
 
 def extract_para_info(key):
     parameters_ind = key.find("['parameters']")
@@ -251,3 +274,22 @@ def export_meta_changes_to_dict(module_diffs, version_diff_file):
         writer = csv.writer(f)
         writer.writerows(dict_res)
     return None
+
+
+def expand_deprecate_obj(meta_obj):
+    if type(meta_obj) is not dict:
+        return
+    for key, obj in meta_obj.items():
+        if type(obj) is dict:
+            if obj.get("deprecate_info", None):
+                for dekey, devalue in obj["deprecate_info"].items():
+                    obj["deprecate_info_" + dekey] = devalue
+                del obj["deprecate_info"]
+            expand_deprecate_obj(obj)
+        elif type(obj) is list:
+            for ind, item in enumerate(obj):
+                if type(item) is dict and item.get("deprecate_info", None):
+                    for dekey, devalue in item["deprecate_info"].items():
+                        obj[ind]["deprecate_info_" + dekey] = devalue
+                    del item["deprecate_info"]
+                expand_deprecate_obj(item)

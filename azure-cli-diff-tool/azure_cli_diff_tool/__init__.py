@@ -16,9 +16,9 @@ from deepdiff import DeepDiff
 from .meta_change_detect import MetaChangeDetect
 from .utils import get_blob_config, load_blob_config_file, get_target_version_modules, get_target_version_module, \
     extract_module_name_from_meta_file, export_meta_changes_to_csv, export_meta_changes_to_json, \
-    export_meta_changes_to_dict
+    export_meta_changes_to_dict, expand_deprecate_obj
 
-__VERSION__ = '0.0.5'
+__VERSION__ = '0.0.6'
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,8 @@ def meta_diff(base_meta_file, diff_meta_file, only_break=False, output_type="tex
     if command_tree_after.get("compat_version", None) \
             and check_meta_tool_compatibility(command_tree_after["compat_version"]):
         raise Exception("Please update your azure cli diff tool")
-
+    expand_deprecate_obj(command_tree_before)
+    expand_deprecate_obj(command_tree_after)
     diff = DeepDiff(command_tree_before, command_tree_after)
     if not diff:
         print(f"No meta diffs from {diff_meta_file} to {base_meta_file}")
@@ -116,7 +117,8 @@ def version_diff(base_version, diff_version, only_break=False, version_diff_file
         if command_tree_after.get("compat_version", None) \
                 and check_meta_tool_compatibility(command_tree_after["compat_version"]):
             raise Exception("Please update your azure cli diff tool")
-
+        expand_deprecate_obj(command_tree_before)
+        expand_deprecate_obj(command_tree_after)
         diff = DeepDiff(command_tree_before, command_tree_after)
         if not diff:
             print(f"No meta diffs from version: {diff_version}/{base_meta_file} for module: {module_name}")
