@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.65
+++++++
+* `azdev command-change meta-diff`: Support deprecate_info diff in subgroup, cmd, parameters and options
+
 0.1.64
 ++++++
 * `azdev extension cal-next-version`: Fix module name when querying extension modules from index.
