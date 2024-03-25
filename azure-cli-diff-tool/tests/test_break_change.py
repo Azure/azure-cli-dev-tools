@@ -9,7 +9,7 @@ import unittest
 import os
 from azure_cli_diff_tool import meta_diff
 from azure_cli_diff_tool.utils import get_command_tree, extract_cmd_name, extract_cmd_property, extract_para_info, \
-    extract_subgroup_name, extract_subgroup_deprecate_property, expand_deprecate_obj
+    extract_subgroup_name, extract_subgroup_deprecate_property, expand_deprecate_obj, extract_subgroup_property
 
 
 class MyTestCase(unittest.TestCase):
@@ -52,6 +52,17 @@ class MyTestCase(unittest.TestCase):
         has_subgroup_deprecate_prop, subgroup_deprecate_prop = extract_subgroup_deprecate_property(test_key, "deprecate_info")
         self.assertTrue(has_subgroup_deprecate_prop, "sub group deprecate info prop parse failed from diff dict key")
         self.assertEqual(subgroup_deprecate_prop, "hide", "sub group deprecate prop extract failed")
+
+    def test_diff_dict_key_for_subgroups_prop(self):
+        test_key = "root['sub_groups']['acr']['deprecate_info_hide']"
+        has_cmd, _ = extract_cmd_name(test_key)
+        self.assertFalse(has_cmd, "cmd parse error from diff dict key")
+        has_subgroup, subgroup_name = extract_subgroup_name(test_key)
+        self.assertTrue(has_subgroup, "sub group parse failed from diff dict key")
+        self.assertEqual(subgroup_name, "acr", "sub group name extract failed")
+        has_subgroup_prop, subgroup_prop = extract_subgroup_property(test_key, subgroup_name)
+        self.assertTrue(has_subgroup_prop, "sub group prop parse failed from diff dict key")
+        self.assertEqual(subgroup_prop, "deprecate_info_hide", "sub group prop extract failed")
 
     def test_diff_meta(self):
         if not os.path.exists("./jsons/az_monitor_meta_before.json") \
