@@ -160,9 +160,9 @@ class MetaChangeDetect:
 
     def __iter_list_items(self, list_items, diff_type):
         """
+        ['parameters'][3]
         ['parameters'][0]['options'][1]
         ['parameters'][0]['choices'][0]
-        ['parameters'][3]
         ['parameters'][5]['options_deprecate_info'][1]
         """
         if diff_type not in [ChangeType.REMOVE, ChangeType.ADD]:
