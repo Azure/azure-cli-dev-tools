@@ -129,6 +129,10 @@ def load_arguments(self, _):
                    help='format to print diff and suggest message')
         c.argument('output_file', help='command meta diff json file path to store')
 
+    with ArgumentsContext(self, 'command-change tree-export') as c:
+        c.positional('modules', modules_type)
+        c.argument('output_file', help='command tree json file path to store')
+
     # region cmdcov
     with ArgumentsContext(self, 'cmdcov') as c:
         c.positional('modules', modules_type)

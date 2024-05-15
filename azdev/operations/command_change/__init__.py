@@ -12,7 +12,7 @@ from knack.log import get_logger
 import azure_cli_diff_tool
 from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff
 from .custom import DiffExportFormat, get_commands_meta, STORED_DEPRECATION_KEY
-from .util import export_commands_meta
+from .util import export_commands_meta, dump_command_tree
 from ..statistics import _create_invoker_and_load_cmds, _get_command_source, \
     _command_codegen_info  # pylint: disable=protected-access
 from ..statistics.util import filter_modules
@@ -129,3 +129,70 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
 
 def cmp_command_meta(base_meta_file, diff_meta_file, only_break=False, output_type="text", output_file=None):
     return azure_cli_diff_tool.meta_diff(base_meta_file, diff_meta_file, only_break, output_type, output_file)
+
+
+def export_command_tree(modules, output_file=None):
+    require_azure_cli()
+
+    # allow user to run only on CLI or extensions
+    cli_only = modules == ['CLI']
+    ext_only = modules == ['EXT']
+    if cli_only or ext_only:
+        modules = None
+
+    selected_modules = get_path_table(include_only=modules)
+
+    if cli_only:
+        selected_modules['ext'] = {}
+    if ext_only:
+        selected_modules['core'] = {}
+        selected_modules['mod'] = {}
+
+    if not any(selected_modules.values()):
+        logger.warning('No commands selected to check.')
+
+    selected_mod_names = list(selected_modules['mod'].keys())
+    selected_mod_names += list(selected_modules['ext'].keys())
+    selected_mod_names += list(selected_modules['core'].keys())
+
+    if selected_mod_names:
+        display('Modules selected: {}\n'.format(', '.join(selected_mod_names)))
+
+    heading('Export Command Table Meta')
+    start = time.time()
+    display('Initializing with loading command table...')
+    from azure.cli.core import get_default_cli  # pylint: disable=import-error
+    az_cli = get_default_cli()
+
+    # load commands, args, and help
+    _create_invoker_and_load_cmds(az_cli)
+
+    stop = time.time()
+    logger.info('Commands loaded in %i sec', stop - start)
+    display('Commands loaded in {} sec'.format(stop - start))
+    command_loader = az_cli.invocation.commands_loader
+
+    # trim command table to selected_modules
+    command_loader = filter_modules(command_loader, modules=selected_mod_names)
+
+    if not command_loader.command_table:
+        logger.warning('No commands selected to check.')
+
+    command_tree = {}
+
+    for command_name, command in command_loader.command_table.items():
+        module_loader = command_loader.cmd_to_loader_map[command_name]
+        if not module_loader:
+            continue
+        module_loader = module_loader[0]
+        module_path = module_loader.__class__.__module__
+        module_name = module_path.rsplit('.', maxsplit=1)[-1]
+        parts = command_name.split()
+        subtree = command_tree
+        for part in parts[:-1]:
+            if not subtree.get(part):
+                subtree[part] = {}
+            subtree = subtree[part]
+        subtree[parts[-1]] = module_name
+
+    dump_command_tree(command_tree, output_file)

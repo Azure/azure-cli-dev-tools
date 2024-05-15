@@ -40,6 +40,7 @@ def load_command_table(self, _):
     with CommandGroup(self, 'command-change', operation_group('command_change')) as g:
         g.command('meta-export', 'export_command_meta')
         g.command('meta-diff', 'cmp_command_meta')
+        g.command('tree-export', 'export_command_tree')
 
     with CommandGroup(self, 'cli', operation_group('pypi')) as g:
         g.command('check-versions', 'verify_versions')
