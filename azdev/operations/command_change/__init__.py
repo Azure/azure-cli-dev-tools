@@ -180,7 +180,7 @@ def export_command_tree(modules, output_file=None):
 
     command_tree = {}
 
-    for command_name, command in command_loader.command_table.items():
+    for command_name, _ in command_loader.command_table.items():
         module_loader = command_loader.cmd_to_loader_map[command_name]
         if not module_loader:
             continue
