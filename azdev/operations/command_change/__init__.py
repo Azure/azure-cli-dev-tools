@@ -158,7 +158,7 @@ def export_command_tree(modules, output_file=None):
     if selected_mod_names:
         display('Modules selected: {}\n'.format(', '.join(selected_mod_names)))
 
-    heading('Export Command Table Meta')
+    heading('Export Command Tree')
     start = time.time()
     display('Initializing with loading command table...')
     from azure.cli.core import get_default_cli  # pylint: disable=import-error
@@ -180,19 +180,15 @@ def export_command_tree(modules, output_file=None):
 
     command_tree = {}
 
-    for command_name, _ in command_loader.command_table.items():
-        module_loader = command_loader.cmd_to_loader_map[command_name]
-        if not module_loader:
-            continue
-        module_loader = module_loader[0]
-        module_path = module_loader.__class__.__module__
-        module_name = module_path.rsplit('.', maxsplit=1)[-1]
+    for command_name, command in command_loader.command_table.items():
+        module_source = _get_command_source(command_name, command)['module']
         parts = command_name.split()
+        # The command tree is a tree structure like our azExtCmdTree: https://aka.ms/azExtCmdTree
         subtree = command_tree
         for part in parts[:-1]:
             if not subtree.get(part):
                 subtree[part] = {}
             subtree = subtree[part]
-        subtree[parts[-1]] = module_name
+        subtree[parts[-1]] = module_source
 
     dump_command_tree(command_tree, output_file)
