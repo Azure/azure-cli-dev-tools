@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.68
+++++++
+* `azdev command-change tree-export`: Add new command to support export command tree of CLI modules.
+
 0.1.67
 ++++++
 * `azdev extension cal-next-version`: Justify preview/exp tag operation based on last version's tag and next version's stable/preview tag.
