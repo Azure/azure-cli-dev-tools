@@ -75,6 +75,16 @@ def export_commands_meta(commands_meta, meta_output_path=None):
             f_out.write(jsbeautifier.beautify(json.dumps(module_info), options))
 
 
+def add_to_command_tree(tree, key, value):
+    parts = key.split()
+    subtree = tree
+    for part in parts[:-1]:
+        if not subtree.get(part):
+            subtree[part] = {}
+        subtree = subtree[part]
+    subtree[parts[-1]] = value
+
+
 def dump_command_tree(command_tree, output_file):
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(command_tree, f, indent=4)

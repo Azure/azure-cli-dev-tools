@@ -8,7 +8,7 @@
 import unittest
 import os
 from azdev.operations.command_change import export_command_meta, cmp_command_meta
-from azdev.operations.command_change.util import get_command_tree
+from azdev.operations.command_change.util import get_command_tree, add_to_command_tree
 
 
 class MyTestCase(unittest.TestCase):
@@ -56,6 +56,22 @@ class MyTestCase(unittest.TestCase):
                     ignored = False
                     break
             self.assertTrue(ignored, "ignored message found")
+
+    def test_command_tree(self):
+        tree = {}
+        add_to_command_tree(tree, 'a b c', 'd')
+        add_to_command_tree(tree, 'a b foo', 'bar')
+        add_to_command_tree(tree, 'a foo', 'baz')
+        expected = {
+            'a': {
+                'b': {
+                    'c': 'd',
+                    'foo': 'bar'
+                },
+                'foo': 'baz'
+            }
+        }
+        self.assertDictEqual(tree, expected)
 
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ from knack.log import get_logger
 import azure_cli_diff_tool
 from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff
 from .custom import DiffExportFormat, get_commands_meta, STORED_DEPRECATION_KEY
-from .util import export_commands_meta, dump_command_tree
+from .util import export_commands_meta, dump_command_tree, add_to_command_tree
 from ..statistics import _create_invoker_and_load_cmds, _get_command_source, \
     _command_codegen_info  # pylint: disable=protected-access
 from ..statistics.util import filter_modules
@@ -182,13 +182,7 @@ def export_command_tree(modules, output_file=None):
 
     for command_name, command in command_loader.command_table.items():
         module_source = _get_command_source(command_name, command)['module']
-        parts = command_name.split()
         # The command tree is a tree structure like our azExtCmdTree: https://aka.ms/azExtCmdTree
-        subtree = command_tree
-        for part in parts[:-1]:
-            if not subtree.get(part):
-                subtree[part] = {}
-            subtree = subtree[part]
-        subtree[parts[-1]] = module_source
+        add_to_command_tree(command_tree, command_name, module_source)
 
     dump_command_tree(command_tree, output_file)
