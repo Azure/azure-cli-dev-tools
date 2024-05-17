@@ -197,6 +197,13 @@ helps['command-change meta-diff'] = """
           text: azdev statistics meta-diff --base-meta-file fileA --diff-meta-file fileB --only-break
 """
 
+helps['command-change tree-export'] = """
+    short-summary: Export Command Tree for CLI modules or extensions.
+    examples:
+        - name: Export command tree for CLI modules
+          text: azdev command-change tree-export CLI --output-file command_tree.json
+"""
+
 helps['perf'] = """
     short-summary: Commands to test CLI performance.
 """
