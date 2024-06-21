@@ -58,7 +58,6 @@ class CmdcovManager:
         self.enable_cli_own = enable_cli_own
         self.all_commands = {m: [] for m in self.selected_mod_names}
         self.all_tested_commands = {m: [] for m in self.selected_mod_names}
-        self.all_live_commands = []
         self.all_untested_commands = {}
         self.command_test_coverage = {'Total': [0, 0, 0]}
         self.date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -73,8 +72,6 @@ class CmdcovManager:
         self._get_all_tested_commands_from_regex()
         self._get_all_tested_commands_from_record()
         self._run_command_test_coverage()
-        self._get_all_tested_commands_from_live()
-        self._run_command_test_coverage_enhance()
         html_file = self._render_html()
         if self.enable_cli_own:
             command_test_coverage = {k: v for k, v in self.command_test_coverage.items() if k in CLI_OWN_MODULES}
@@ -191,10 +188,6 @@ class CmdcovManager:
                             cmd = command + ' ' + argument
                             self.all_tested_commands[self.selected_mod_names[idx]].append(cmd)
 
-    def _get_all_tested_commands_from_live(self):
-        with open(os.path.join(self.cmdcov_path, 'tested_command.txt'), 'r') as f:
-            self.all_live_commands = f.readlines()
-
     def _run_command_test_coverage(self):
         """
         all_commands: All commands that need to be test
@@ -247,55 +240,6 @@ class CmdcovManager:
         logger.warning(self.command_test_coverage)
         return self.command_test_coverage
 
-    def _run_command_test_coverage_enhance(self):
-        """
-        all_untest_commands: {[module]:[],}
-        all_tested_commands_from_file: []
-        command_test_coverage: {[module: [test, untested, pct]
-        module: vm
-        percentage: xx.xxx%
-        """
-        import ast
-        total_tested = 0
-        total_untested = 0
-        # pylint: disable=too-many-nested-blocks
-        for module, untested_commands in self.all_untested_commands.items():
-            for cmd_idx, command in enumerate(untested_commands):
-                exist_flag = False
-                prefix = command.rsplit('[', maxsplit=1)[0]
-                opt_list = ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1]) if self.level == 'argument' \
-                    else []
-                for cmd in self.all_live_commands:
-                    if prefix in cmd:
-                        if self.level == 'argument':
-                            for opt in opt_list:
-                                if opt in cmd:
-                                    self.command_test_coverage[module][0] += 1
-                                    untested_commands.pop(cmd_idx)
-                                    exist_flag = True
-                                    if exist_flag:
-                                        break
-                        else:
-                            self.command_test_coverage[module][0] += 1
-                            untested_commands.pop(cmd_idx)
-                            exist_flag = True
-                            if exist_flag:
-                                break
-                    if exist_flag:
-                        break
-            try:
-                self.command_test_coverage[module][1] = len(untested_commands)
-                self.command_test_coverage[module][2] = f'''{self.command_test_coverage[module][0] /
-                                                        (self.command_test_coverage[module][0] +
-                                                         self.command_test_coverage[module][1]):.3%}'''
-            except ZeroDivisionError:
-                self.command_test_coverage[module] = [0, 0, 'N/A']
-            total_tested += self.command_test_coverage[module][0] if self.command_test_coverage[module] else 0
-            total_untested += self.command_test_coverage[module][1] if self.command_test_coverage[module] else 0
-        self.command_test_coverage['Total'][0] = total_tested
-        self.command_test_coverage['Total'][1] = total_untested
-        self.command_test_coverage['Total'][2] = f'{total_tested / (total_tested + total_untested):.3%}'
-        logger.warning(self.command_test_coverage)
 
     def _render_html(self):
         """
