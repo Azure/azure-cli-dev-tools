@@ -240,7 +240,6 @@ class CmdcovManager:
         logger.warning(self.command_test_coverage)
         return self.command_test_coverage
 
-
     def _render_html(self):
         """
         :return: Return a HTML string
