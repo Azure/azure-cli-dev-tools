@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.70
+++++++
+* Fix cmdcov issue(#455): remove tested_command.txt reference.
+
 0.1.69
 ++++++
 * `azdev command-change tree-export`: Add command help message.
