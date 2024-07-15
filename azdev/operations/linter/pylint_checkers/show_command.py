@@ -6,11 +6,9 @@
 import astroid
 
 from pylint.checkers import BaseChecker
-from pylint.interfaces import IAstroidChecker
 
 
 class ShowCommandChecker(BaseChecker):
-    __implements__ = IAstroidChecker
 
     name = 'show-command'
     priority = -1
