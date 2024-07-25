@@ -6,11 +6,11 @@ The ``azure-cli-diff-tool`` is designed to aid azure-cli users in diffing metada
 Setting up your environment
 +++++++++++++++++++++++++++++++++++++++
 
-1. Install Python 3.6+ from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7.
+1. Install Python 3.8+ from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7.
 
 3. Create a new virtual environment for Python in the root of your clone. You can do this by running:
 
-    Python 3.6+ (all platforms):
+    Python 3.8+ (all platforms):
 
     ::
 

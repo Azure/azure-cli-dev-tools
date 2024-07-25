@@ -2,6 +2,10 @@
 
 Release History
 ===============
+Unreleased
+++++++++++
+* Remove EOL Python versions, namely 3.6 and 3.7.
+
 0.1.72
 ++++++
 * Bump `pylint` to 3

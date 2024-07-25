@@ -1,7 +1,6 @@
 env/
 .vs/
 src/aztool.egg-info/
-src/aztool/__pycache__/__init__.cpython-36.pyc
 src/aztool/__pycache__/
 src/azdev.egg-info/*
 *.pyc

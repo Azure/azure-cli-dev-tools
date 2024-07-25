@@ -21,7 +21,7 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
 
 ## Setting up your development environment
 
-1. Install Python 3.6/3.7/3.8 from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7. Currently it's not recommended to use Python 3.9.
+1. Install Python 3.8/3.9/3.10 from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7.
 2. Fork and clone the repository or repositories you wish to develop for.
     - For Azure CLI: https://github.com/Azure/azure-cli
     - For Azure CLI Extensions: https://github.com/Azure/azure-cli-extensions
@@ -45,10 +45,10 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
 
     See [Authenticating with GitHub from Git](https://docs.github.com/github/getting-started-with-github/set-up-git#next-steps-authenticating-with-github-from-git) about caching your GitHub credentials in Git which is needed when you push the code.
 
-    
+
 3. Create a new virtual environment for Python in the root of your clone. You can do this by running:
 
-    Python 3.6+ (all platforms):
+    Python 3.8+ (all platforms):
     ```BatchFile
     python -m venv env
     ```
@@ -84,11 +84,11 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
    ```
    For rpm packages:
    ```Bash
-   sudo yum install gcc python3-devel 
+   sudo yum install gcc python3-devel
    ```
 
    Otherwise you will have `psutil` installation issues (#269) when you setup `azure-cli` later.
-  
+
    Upgrade `pip` on all platforms:
    ```
    python -m pip install -U pip
@@ -102,7 +102,7 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
    ```
    azdev setup
    ```
-  
+
    This will launch the interactive setup process. You can also run with non-interactive options:
    ```
    azdev setup --cli /path/to/azure-cli --repo /path/to/azure-cli-extensions
@@ -127,7 +127,7 @@ azdev extension add <extension-name>
 
 Run `az <command> --help` with your command groups or commands for a quick check on the command interface and help messages.
 
-For instructions on manually writing the commands and tests, see more in 
+For instructions on manually writing the commands and tests, see more in
 - [Authoring Command Modules](https://github.com/Azure/azure-cli/tree/dev/doc/authoring_command_modules)
 - [Authoring Extensions](https://github.com/Azure/azure-cli/blob/dev/doc/extensions/authoring.md)
 - [Authoring Tests](https://github.com/Azure/azure-cli/blob/dev/doc/authoring_tests.md)
