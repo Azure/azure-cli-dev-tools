@@ -31,19 +31,19 @@ function sortStrDesc(a, b)
 }
 function sortTextAS(a, b)
 {
-    if (a==='Not applicable'){
-        a = -1
-    } else if (a===''){
-        a = 100
+    if (a === 'Not applicable' || a === 'N/A') {
+        a = -1;
+    } else if (a === '') {
+        a = 100;
     } else {
-        a = parseFloat(a.substr(0,a.length-1))
+        a = parseFloat(a.substr(0, a.length - 1));
     }
-    if (b==='N/A'){
-        b = -1
-    } else if (b===''){
-        b = 100
+    if (b === 'Not applicable' || b === 'N/A') {
+        b = -1;
+    } else if (b === '') {
+        b = 100;
     } else {
-        b = parseFloat(b.substr(0,b.length-1))
+        b = parseFloat(b.substr(0, b.length - 1));
     }
     if (a < b) {
         return -1;
@@ -51,22 +51,23 @@ function sortTextAS(a, b)
     if (a > b) {
         return 1;
     }
+    return 0; // In case a and b are equal
 }
 function sortTextDesc(a, b)
 {
-    if (a==='N/A'){
-        a = -1
-    } else if (a===''){
-        a = 100
-    }  else {
-        a = parseFloat(a.substr(0,a.length-1))
+    if (a === 'Not applicable' || a === 'N/A') {
+        a = -1;
+    } else if (a === '') {
+        a = 100;
+    } else {
+        a = parseFloat(a.substr(0, a.length - 1));
     }
-    if (b==='N/A'){
-        b = -1
-    } else if (b===''){
-        b = 100
-    }  else {
-        b = parseFloat(b.substr(0,b.length-1))
+    if (b === 'Not applicable' || b === 'N/A') {
+        b = -1;
+    } else if (b === '') {
+        b = 100;
+    } else {
+        b = parseFloat(b.substr(0, b.length - 1));
     }
     if (a < b) {
         return 1;
@@ -74,7 +75,9 @@ function sortTextDesc(a, b)
     if (a > b) {
         return -1;
     }
+    return 0; // In case a and b are equal
 }
+
 
 function SortTable(obj){
     var column=obj.id

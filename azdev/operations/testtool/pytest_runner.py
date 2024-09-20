@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import os
+import sys
 
 from knack.log import get_logger
 
@@ -35,7 +36,7 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark):
             arguments.append('--lf')
         if pytest_args:
             arguments += pytest_args
-        cmd = 'python -m pytest {}'.format(' '.join(arguments))
+        cmd = sys.executable + ' -m pytest {}'.format(' '.join(arguments))
         logger.info('Running: %s', cmd)
         return call(cmd)
 

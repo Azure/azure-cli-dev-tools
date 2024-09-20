@@ -116,12 +116,16 @@ class CmdcovManager:
         print("\033[31m" + "Get all commands".center(self.width, self.fillchar) + "\033[0m")
         time.sleep(0.1)
         for _, y in tqdm(self.loaded_help.items()):
+            module = None
             if hasattr(y, 'command_source') and y.command_source in self.selected_mod_names:
                 module = y.command_source
             elif hasattr(y, 'command_source') and hasattr(y.command_source, 'extension_name'):
-                module = 'azext_' + y.command_source.extension_name.replace('-', '_')
-                if module not in self.selected_mod_names:
-                    module = None
+                ext_name = y.command_source.extension_name
+                full_ext_name = 'azext_' + ext_name.replace('-', '_')
+                if ext_name in self.selected_mod_names:
+                    module = ext_name
+                elif full_ext_name in self.selected_mod_names:
+                    module = full_ext_name
             else:
                 continue
             if (not y.deprecate_info) and module:

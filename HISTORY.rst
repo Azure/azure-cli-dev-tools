@@ -2,6 +2,12 @@
 
 Release History
 ===============
+0.1.80
+++++++
+* `azdev cmdcov`: Support both extension short name and long name
+* `azdev cmdcov`: Fix sorting issues
+* `azdev test`: Fix executable inconsistence in `subprocess` of windows platform
+
 0.1.79
 ++++++
 * Fix profile options
