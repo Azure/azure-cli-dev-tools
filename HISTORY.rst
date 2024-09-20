@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.81
+++++++
+* `azdev scan/mask`: Add `--confidence-level` to support secret pattern levels
+
 0.1.80
 ++++++
 * `azdev cmdcov`: Support both extension short name and long name
