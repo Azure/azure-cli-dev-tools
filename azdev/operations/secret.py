@@ -243,7 +243,8 @@ def _mask_secret_for_string(data, secret, redaction_type=None):
 
 def mask_secrets(file_path=None, directory_path=None, recursive=False,
                  include_pattern=None, exclude_pattern=None, data=None,
-                 save_scan_result=None, scan_result_path=None, custom_pattern=None,
+                 save_scan_result=None, scan_result_path=None,
+                 confidence_level=None, custom_pattern=None,
                  saved_scan_result_path=None, redaction_type='FIXED_VALUE', yes=None):
     scan_results = {}
     if saved_scan_result_path:
@@ -258,7 +259,7 @@ def mask_secrets(file_path=None, directory_path=None, recursive=False,
         scan_response = scan_secrets(file_path=file_path, directory_path=directory_path, recursive=recursive,
                                      include_pattern=include_pattern, exclude_pattern=exclude_pattern, data=data,
                                      save_scan_result=save_scan_result, scan_result_path=scan_result_path,
-                                     custom_pattern=custom_pattern)
+                                     confidence_level=confidence_level, custom_pattern=custom_pattern)
         if save_scan_result and scan_response['scan_result_path']:
             with open(scan_response['scan_result_path'], encoding='utf8') as f:
                 scan_results = json.load(f)
