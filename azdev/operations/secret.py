@@ -75,19 +75,29 @@ def _get_files_from_directory(directory_path, recursive=None, include_pattern=No
     return target_files
 
 
-def _load_built_in_regex_patterns():
-    return load_regex_patterns_from_json_file('PreciselyClassifiedSecurityKeys.json')
+def _load_built_in_regex_patterns(confidence_level=None):
+    if not confidence_level:
+        confidence_level = 'HIGH'
+    patterns = set()
+    if confidence_level in ['HIGH', 'MEDIUM', 'LOW']:
+        patterns.update(load_regex_patterns_from_json_file('HighConfidenceSecurityModels.json'))
+    if confidence_level in ['MEDIUM', 'LOW']:
+        patterns.update(load_regex_patterns_from_json_file('MediumConfidenceSecurityModels.json'))
+    if confidence_level == 'LOW':
+        patterns.update(load_regex_patterns_from_json_file('LowConfidenceSecurityModels.json'))
+    return patterns
 
 
-def _load_regex_patterns(custom_pattern=None):
-    built_in_regex_patterns = _load_built_in_regex_patterns()
+def _load_regex_patterns(confidence_level=None, custom_pattern=None):
+    built_in_regex_patterns = _load_built_in_regex_patterns(confidence_level)
 
     if not custom_pattern:
         return built_in_regex_patterns
 
     try:
         if os.path.isfile(custom_pattern):
-            custom_pattern = json.load(custom_pattern)
+            with open(custom_pattern, 'r', encoding='utf8') as f:
+                custom_pattern = json.load(f)
         else:
             custom_pattern = json.loads(custom_pattern)
     except JSONDecodeError as err:
@@ -115,11 +125,11 @@ def _load_regex_patterns(custom_pattern=None):
     return regex_patterns
 
 
-def _scan_secrets_for_string(data, custom_pattern=None):
+def _scan_secrets_for_string(data, confidence_level=None, custom_pattern=None):
     if not data:
         return None
 
-    regex_patterns = _load_regex_patterns(custom_pattern)
+    regex_patterns = _load_regex_patterns(confidence_level, custom_pattern)
     secret_masker = SecretMasker(regex_patterns)
     detected_secrets = secret_masker.detect_secrets(data)
     secrets = []
@@ -135,7 +145,8 @@ def _scan_secrets_for_string(data, custom_pattern=None):
 
 def scan_secrets(file_path=None, directory_path=None, recursive=False,
                  include_pattern=None, exclude_pattern=None, data=None,
-                 save_scan_result=None, scan_result_path=None, custom_pattern=None):
+                 save_scan_result=None, scan_result_path=None,
+                 confidence_level=None, custom_pattern=None):
     _validate_data_path(file_path=file_path, directory_path=directory_path,
                         include_pattern=include_pattern, exclude_pattern=exclude_pattern, data=data)
     target_files = []
@@ -149,7 +160,7 @@ def scan_secrets(file_path=None, directory_path=None, recursive=False,
         target_files.append(file_path)
 
     if data:
-        secrets = _scan_secrets_for_string(data, custom_pattern)
+        secrets = _scan_secrets_for_string(data, confidence_level, custom_pattern)
         if secrets:
             scan_results['raw_data'] = secrets
     elif target_files:
@@ -159,7 +170,7 @@ def scan_secrets(file_path=None, directory_path=None, recursive=False,
                 data = f.read()
             if not data:
                 continue
-            secrets = _scan_secrets_for_string(data, custom_pattern)
+            secrets = _scan_secrets_for_string(data, confidence_level, custom_pattern)
             logger.debug('%d secrets found for %s', len(secrets), target_file)
             if secrets:
                 scan_results[target_file] = secrets

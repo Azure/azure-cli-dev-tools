@@ -125,6 +125,10 @@ def load_arguments(self, _):
                             'If specified, --save-scan-result will be True anyway. '
                             'If not speficied but set --save-scan-result to True, '
                             'the file will be saved as `scan_result_YYYYmmddHHMMSS.json` in your `.azdev` directory ')
+            c.argument('confidence_level', choices=['HIGH', 'MEDIUM', 'LOW'], default='HIGH',
+                       help='Which confidence level can you accept for built-in scanning patterns. If you choose HIGH, '
+                            'we will only scan with high confidence level patterns. If you choose MEDIUM, '
+                            'we will use patterns of medium confidence level or above, which is medium and high level.')
             c.argument('custom_pattern',
                        help='Additional patterns you want to apply or built-in patterns you want to exclude '
                             'for scanning. Can be json string or path to the json file.')
