@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import os
+import subprocess
 from shutil import copytree, rmtree
 import time
 
@@ -256,6 +257,109 @@ def _interactive_setup():
         raise CLIError('Installation aborted.')
 
 
+def _setup_azure_cli_repo(cli_path):
+    if cli_path and cli_path != 'EDGE':
+        # Store original directory
+        original_dir = os.getcwd()
+        try:
+            # Change to CLI repo root directory
+            os.chdir(cli_path)
+
+            # Change git hooks path
+            _change_git_hooks_path(cli_path)
+
+            # Check existing remotes
+            remotes = subprocess.check_output(['git', 'remote', '-v'], text=True)
+
+            # If upstream already exists, nothing to do
+            if 'upstream' in remotes:
+                return
+
+            # Check origin remote URL
+            origin_url = None
+            for line in remotes.splitlines():
+                if line.startswith('origin') and '(fetch)' in line:
+                    origin_url = line.split()[1]
+                    break
+
+            # Only add upstream if origin is an azure-cli fork
+            if origin_url and origin_url.endswith('/azure-cli.git'):
+                upstream_url = 'https://github.com/Azure/azure-cli.git'
+                subprocess.check_call(['git', 'remote', 'add', 'upstream', upstream_url])
+                display(f"\nAdded upstream remote: {upstream_url}\n")
+                # fetch the upstream/dev branch
+                subprocess.check_call(['git', 'fetch', 'upstream', 'dev'])
+                display(f"\nFetched upstream/dev branch for CLI in {cli_path}")
+        except subprocess.CalledProcessError as e:
+            logger.warning("Failed to add upstream remote: %s", str(e))
+        finally:
+            # Always return to original directory
+            os.chdir(original_dir)
+
+
+def _setup_azure_cli_extension_repo(ext_repo_path):
+    if not ext_repo_path:
+        return
+
+    try:
+        # Handle both single path and list of paths
+        repo_paths = ext_repo_path if isinstance(ext_repo_path, list) else [ext_repo_path]
+
+        # Iterate over all repository paths
+        for repo_path in repo_paths:
+            _setup_single_extension_repo(repo_path)
+
+    except subprocess.CalledProcessError as e:
+        logger.warning("Failed to add upstream remote for extensions: %s", str(e))
+
+
+def _setup_single_extension_repo(repo_path):
+    # Store original directory
+    original_dir = os.getcwd()
+
+    try:
+        # Change to extension repo root directory
+        os.chdir(repo_path)
+
+        # Change git hooks path
+        _change_git_hooks_path(repo_path)
+
+        # Check existing remotes
+        remotes = subprocess.check_output(['git', 'remote', '-v'], text=True)
+
+        # If upstream already exists, return
+        if 'upstream' in remotes:
+            return
+
+        # Check origin remote URL
+        origin_url = None
+        for line in remotes.splitlines():
+            if line.startswith('origin') and '(fetch)' in line:
+                origin_url = line.split()[1]
+                break
+
+        # Only add upstream if origin is an azure-cli-extensions fork
+        if origin_url and origin_url.endswith('/azure-cli-extensions.git'):
+            upstream_url = 'https://github.com/Azure/azure-cli-extensions.git'
+            subprocess.check_call(['git', 'remote', 'add', 'upstream', upstream_url])
+            display(f"\nAdded upstream remote for extensions in {repo_path}: {upstream_url}\n")
+            # fetch the upstream/main branch
+            subprocess.check_call(['git', 'fetch', 'upstream', 'main'])
+            display(f"\nFetched upstream/main branch for extensions in {repo_path}")
+
+    finally:
+        # Always return to original directory
+        os.chdir(original_dir)
+
+
+def _change_git_hooks_path(repo_path):
+    # if .githooks folder exists in the repo folder, change the git config to use the .githooks folder in the repo
+    githooks_path = os.path.join(repo_path, '.githooks')
+    if os.path.exists(githooks_path):
+        subprocess.check_call(['git', 'config', 'core.hooksPath', githooks_path])
+        logger.info("Changed git hooks path to %s", githooks_path)
+
+
 def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
 
     require_virtual_env()
@@ -318,6 +422,13 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
     config = get_azdev_config()
     config.set_value('ext', 'repo_paths', dev_sources if dev_sources else '_NONE_')
     config.set_value('cli', 'repo_path', cli_path if cli_path else '_NONE_')
+
+    # Add upstreams for CLI and extensions repos if they are forks
+    if cli_path:
+        _setup_azure_cli_repo(cli_path)
+
+    if ext_repo_path:
+        _setup_azure_cli_extension_repo(ext_repo_path)
 
     # install packages
     subheading('Installing packages')
