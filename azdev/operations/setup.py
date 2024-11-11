@@ -265,6 +265,7 @@ def _setup_azure_cli_repo(cli_path):
             # Change to CLI repo root directory
             os.chdir(cli_path)
 
+            display(f"\nSetting up Azure CLI repo: {cli_path}\n")
             # Change git hooks path
             _change_git_hooks_path(cli_path)
 
@@ -286,10 +287,10 @@ def _setup_azure_cli_repo(cli_path):
             if origin_url and origin_url.endswith('/azure-cli.git'):
                 upstream_url = 'https://github.com/Azure/azure-cli.git'
                 subprocess.check_call(['git', 'remote', 'add', 'upstream', upstream_url])
-                display(f"\nAdded upstream remote: {upstream_url}\n")
+                display(f"Added upstream remote: {upstream_url}")
                 # fetch the upstream/dev branch
                 subprocess.check_call(['git', 'fetch', 'upstream', 'dev'])
-                display(f"\nFetched upstream/dev branch for CLI in {cli_path}")
+                display(f"Fetched upstream/dev branch for CLI in {cli_path}")
         except subprocess.CalledProcessError as e:
             logger.warning("Failed to add upstream remote: %s", str(e))
         finally:
@@ -321,6 +322,7 @@ def _setup_single_extension_repo(repo_path):
         # Change to extension repo root directory
         os.chdir(repo_path)
 
+        display(f"\nSetting up Azure CLI extension repo: {repo_path}\n")
         # Change git hooks path
         _change_git_hooks_path(repo_path)
 
@@ -342,10 +344,10 @@ def _setup_single_extension_repo(repo_path):
         if origin_url and origin_url.endswith('/azure-cli-extensions.git'):
             upstream_url = 'https://github.com/Azure/azure-cli-extensions.git'
             subprocess.check_call(['git', 'remote', 'add', 'upstream', upstream_url])
-            display(f"\nAdded upstream remote for extensions in {repo_path}: {upstream_url}\n")
+            display(f"Added upstream remote for extensions in {repo_path}: {upstream_url}")
             # fetch the upstream/main branch
             subprocess.check_call(['git', 'fetch', 'upstream', 'main'])
-            display(f"\nFetched upstream/main branch for extensions in {repo_path}")
+            display(f"Fetched upstream/main branch for extensions in {repo_path}")
 
     finally:
         # Always return to original directory
@@ -357,7 +359,7 @@ def _change_git_hooks_path(repo_path):
     githooks_path = os.path.join(repo_path, '.githooks')
     if os.path.exists(githooks_path):
         subprocess.check_call(['git', 'config', 'core.hooksPath', githooks_path])
-        logger.info("Changed git hooks path to %s", githooks_path)
+        display(f"Changed git hooks path to {githooks_path}")
 
 
 def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
