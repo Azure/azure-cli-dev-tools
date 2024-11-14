@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.85
+++++++
+* `azdev setup`: Setup the upstream and enable .githooks for azure-cli and azure-cli-extensions repos
+
 0.1.84
 ++++++
 * `azdev generate-breaking-change-report`: Fix `azdev -h` error caused by global importing `azure.cli.core` in `breaking-change.py` module.
