@@ -6,16 +6,24 @@
 
 import copy
 import re
+import requests
 
 from knack.log import get_logger
 
 from azdev.utilities import get_name_index
+from azdev.operations.constant import ALLOWED_HTML_TAG
 
 
 logger = get_logger(__name__)
 
 
 _LOADER_CLS_RE = re.compile('.*azure/cli/command_modules/(?P<module>[^/]*)/__init__.*')
+
+# add html tag extraction for <abd>, <lun1>, <edge zone>
+# html tag search for <os_des>, <lun1_des> is enabled in cli ci but skipped in doc build cause internal issue
+_HTML_TAG_RE = re.compile(r'<([^\n>]+)>')
+
+_HTTP_LINK_RE = re.compile(r'(?<!`)(https?://[^\s`]+)(?!`)')
 
 
 def filter_modules(command_loader, help_file_entries, modules=None, include_whl_extensions=False):
@@ -112,3 +120,38 @@ class LinterError(Exception):
     Exception thrown by linter for non rule violation reasons
     """
     pass  # pylint: disable=unnecessary-pass
+
+
+# pylint: disable=line-too-long
+def has_illegal_html_tag(help_message, filtered_lines=None):
+    """
+    Detect those content wrapped with <> but illegal html tag.
+    Refer to rule doc: https://review.learn.microsoft.com/en-us/help/platform/validation-ref/disallowed-html-tag?branch=main
+    """
+    html_matches = re.findall(_HTML_TAG_RE, help_message)
+    unbackticked_matches = [match for match in html_matches if not re.search(r'`[^`]*' + re.escape('<' + match + '>') + r'[^`]*`', help_message)]
+    disallowed_html_tags = set(unbackticked_matches) - set(ALLOWED_HTML_TAG)
+    if filtered_lines:
+        disallowed_html_tags = [s for s in disallowed_html_tags if any(('<' + s + '>') in diff_line for diff_line in filtered_lines)]
+    return ['<' + s + '>' for s in disallowed_html_tags]
+
+
+def has_broken_site_links(help_message, filtered_lines=None):
+    """
+    Detect broken link in help message.
+    Refer to rule doc: https://review.learn.microsoft.com/en-us/help/platform/validation-ref/other-site-link-broken?branch=main
+    """
+    urls = re.findall(_HTTP_LINK_RE, help_message)
+    invalid_urls = []
+
+    for url in urls:
+        url = re.sub(r'[.")\'\s]*$', '', url)
+        try:
+            response = requests.get(url, timeout=5)
+            if response.status_code != 200:
+                invalid_urls.append(url)
+        except requests.exceptions.RequestException:
+            invalid_urls.append(url)
+    if filtered_lines:
+        invalid_urls = [s for s in invalid_urls if any(s in diff_line for diff_line in filtered_lines)]
+    return invalid_urls

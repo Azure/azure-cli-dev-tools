@@ -3,6 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # -----------------------------------------------------------------------------
+# pylint: disable=line-too-long
 
 ENCODING = 'utf-8'
 
@@ -78,6 +79,23 @@ EXCLUDE_MODULES = [
     'kusto',
     'util'
 ]
+
+# refer to doc: https://review.learn.microsoft.com/en-us/help/platform/metadata-taxonomies/allowed-html?branch=main
+ALLOWED_HTML_TAG = [
+    "a", "address", "article", "b", "blockquote", "br", "button", "br /",
+    "caption", "center", "cite", "code", "col", "colgroup",
+    "dd", "del", "details", "div", "dl", "dt", "em", "figcaption", "figure", "form",
+    "h1", "h2", "h3", "h4", "head", "hr",
+    "i", "iframe", "image", "img", "input", "ins", "kbd",
+    "label", "li", "nav", "nobr", "ol", "p", "pre", "rgn",
+    "s", "section", "source", "span", "strike", "strong", "sub", "summary", "sup",
+    "table", "tbody", "td", "tfoot", "th", "thead", "tr",
+    "u", "ul", "wbr"
+]
+
+DISALLOWED_HTML_TAG_RULE_LINK = "https://review.learn.microsoft.com/en-us/help/platform/validation-ref/disallowed-html-tag?branch=main"
+
+BROKEN_LINK_RULE_LINK = "https://review.learn.microsoft.com/en-us/help/platform/validation-ref/other-site-link-broken?branch=main"
 
 GLOBAL_EXCLUDE_COMMANDS = ['wait']
 

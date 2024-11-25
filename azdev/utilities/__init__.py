@@ -35,6 +35,7 @@ from .display import (
 from .git_util import (
     diff_branches,
     filter_by_git_diff,
+    diff_branch_file_patch,
     diff_branches_detail
 )
 from .path import (
@@ -94,5 +95,6 @@ __all__ = [
     'require_virtual_env',
     'require_azure_cli',
     'diff_branches_detail',
+    'diff_branch_file_patch',
     'calc_selected_mod_names',
 ]

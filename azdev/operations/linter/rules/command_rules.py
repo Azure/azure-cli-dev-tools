@@ -3,9 +3,12 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # -----------------------------------------------------------------------------
+# pylint: disable=duplicate-code
 
+from azdev.operations.constant import DISALLOWED_HTML_TAG_RULE_LINK
 from ..rule_decorators import CommandRule
 from ..linter import RuleError, LinterSeverity
+from ..util import has_illegal_html_tag, has_broken_site_links
 
 
 @CommandRule(LinterSeverity.HIGH)
@@ -35,3 +38,35 @@ def group_delete_commands_should_confirm(linter, command_name):
         if 'yes' not in linter.get_command_parameters(command_name):
             raise RuleError("If this command deletes a collection, or group of resources. "
                             "Please make sure to ask for confirmation.")
+
+
+@CommandRule(LinterSeverity.MEDIUM)
+def disallowed_html_tag_from_command(linter, command_name):
+    if command_name == '' or not linter.get_loaded_help_entry(command_name):
+        return
+    help_entry = linter.get_loaded_help_entry(command_name)
+    if help_entry.short_summary and (disallowed_tags := has_illegal_html_tag(help_entry.short_summary,
+                                                                             linter.diffed_lines)):
+        raise RuleError("Disallowed html tags {} in short summary. "
+                        "If the content is a placeholder, please remove <> or wrap it with backtick. "
+                        "For more info please refer to: {}".format(disallowed_tags,
+                                                                   DISALLOWED_HTML_TAG_RULE_LINK))
+    if help_entry.long_summary and (disallowed_tags := has_illegal_html_tag(help_entry.long_summary,
+                                                                            linter.diffed_lines)):
+        raise RuleError("Disallowed html tags {} in long summary. "
+                        "If content is a placeholder, please remove <> or wrap it with backtick. "
+                        "For more info please refer to: {}".format(disallowed_tags,
+                                                                   DISALLOWED_HTML_TAG_RULE_LINK))
+
+
+@CommandRule(LinterSeverity.MEDIUM)
+def broken_site_link_from_command(linter, command_name):
+    if command_name == '' or not linter.get_loaded_help_entry(command_name):
+        return
+    help_entry = linter.get_loaded_help_entry(command_name)
+    if help_entry.short_summary and (broken_links := has_broken_site_links(help_entry.short_summary)):
+        raise RuleError("Broken links {} in short summary. "
+                        "If link is an example, please wrap it with backtick. ".format(broken_links))
+    if help_entry.long_summary and (broken_links := has_broken_site_links(help_entry.long_summary)):
+        raise RuleError("Broken links {} in long summary. "
+                        "If link is an example, please wrap it with backtick. ".format(broken_links))

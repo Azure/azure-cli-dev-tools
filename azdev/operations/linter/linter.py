@@ -20,7 +20,7 @@ from azdev.operations.regex import (
     search_argument_context,
     search_command,
     search_command_group)
-from azdev.utilities import diff_branches_detail
+from azdev.utilities import diff_branches_detail, diff_branch_file_patch
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
 from .util import share_element, exclude_commands, LinterError
 
@@ -63,6 +63,8 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         self.git_target = git_target
         self.git_repo = git_repo
         self.exclusions = exclusions
+        self.diffed_lines = set()
+        self._get_diffed_patches()
 
     @property
     def commands(self):
@@ -150,6 +152,17 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
     def get_parameter_settings(self, command_name, parameter_name):
         return self.get_command_metadata(command_name).arguments.get(parameter_name).type.settings
 
+    def get_parameter_help_info(self, command_name, parameter_name):
+        options = self.get_parameter_options(command_name, parameter_name)
+        command_help = self._loaded_help.get(command_name, None)
+
+        if not command_help:
+            return None
+
+        parameter_helps = command_help.parameters
+        param_help = next((param for param in parameter_helps if share_element(options, param.name.split())), None)
+        return param_help
+
     def command_expired(self, command_name):
         deprecate_info = self._command_loader.command_table[command_name].deprecate_info
         if deprecate_info:
@@ -191,6 +204,10 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         help_entry = self._loaded_help.get(entry, None)
         if help_entry:
             return help_entry.short_summary or help_entry.long_summary
+        return help_entry
+
+    def get_loaded_help_entry(self, entry):
+        help_entry = self._loaded_help.get(entry, None)
         return help_entry
 
     def get_command_test_coverage(self):
@@ -353,6 +370,19 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                 'Please add some scenario tests for the new parameter',
                 'Or add the parameter with missing_parameter_test_coverage rule in linter_exclusions.yml'])
         return exec_state, violations
+
+    def _get_diffed_patches(self):
+        if not self.git_source or not self.git_target or not self.git_repo:
+            return
+        diff_patches = diff_branch_file_patch(repo=self.git_repo, target=self.git_target, source=self.git_source)
+        for change in diff_patches:
+            patch = change.diff.decode("utf-8")
+            added_lines = [line for line in patch.splitlines() if line.startswith('+') and not line.startswith('+++')]
+            self.diffed_lines |= set(added_lines)
+            if added_lines:
+                _logger.info("Changes in file '%s':", change.a_path)
+                for line in added_lines:
+                    _logger.info(line)
 
 
 # pylint: disable=too-many-instance-attributes
