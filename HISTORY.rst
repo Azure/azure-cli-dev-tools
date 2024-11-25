@@ -5,6 +5,7 @@ Release History
 0.1.85
 ++++++
 * `azdev setup`: Setup the upstream and enable .githooks for azure-cli and azure-cli-extensions repos
+* `azdev linter`: Add `disallowed_html_tags` and `broken_site_link` detection in linter rule and set them as `Medium` for unblock CI pipeline temporarily
 
 0.1.84
 ++++++
