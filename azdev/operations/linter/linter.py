@@ -268,7 +268,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                             if idx:
                                 idx = int(idx[0]) + offset
                                 break
-                        with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
+                        with open(os.path.join(self.git_repo, diff.a_path), encoding='utf-8') as f:
                             param_lines = f.readlines()
                         cmds = search_argument_context(idx, param_lines)
                         for cmd in cmds:
@@ -292,7 +292,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                             if idx:
                                 idx = int(idx[0]) + offset
                                 break
-                        with open(os.path.join(get_cli_repo_path(), diff.a_path), encoding='utf-8') as f:
+                        with open(os.path.join(self.git_repo, diff.a_path), encoding='utf-8') as f:
                             cmd_lines = f.readlines()
                         cmd = search_command_group(idx, cmd_lines, command)
                         if cmd:
@@ -310,14 +310,14 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         for diff in diff_index:
             filename = diff.a_path.split('/')[-1]
             if re.findall(r'^test_.*\.py$', filename) and \
-                    os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
+                    os.path.exists(os.path.join(self.git_repo, diff.a_path)):
                 with open(os.path.join(self.git_repo, diff.a_path), encoding='utf-8') as f:
                     lines = f.readlines()
                 ref = get_all_tested_commands_from_regex(lines)
                 all_tested_command += ref
             # get tested command by recording file
             if re.findall(r'^test_.*\.yaml$', filename) and \
-                    os.path.exists(os.path.join(get_cli_repo_path(), diff.a_path)):
+                    os.path.exists(os.path.join(self.git_repo, diff.a_path)):
                 with open(os.path.join(self.git_repo, diff.a_path)) as f:
                     records = yaml.load(f, Loader=yaml.Loader) or {}
                     for record in records['interactions']:
