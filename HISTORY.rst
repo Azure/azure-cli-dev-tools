@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.87
+++++++
+* `azdev linter`: Fix repo path failed when `detect_new_command`.
+
 0.1.86
 ++++++
 * `azdev linter`: Add close html tags into whitelist of `disallowed_html_tags`
