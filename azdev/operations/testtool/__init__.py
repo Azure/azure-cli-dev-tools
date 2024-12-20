@@ -45,14 +45,14 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
     path_table = get_path_table()
 
-    test_index = _get_test_index(profile or current_profile(), discover)
-
     if not tests:
         tests = list(path_table['mod'].keys()) + list(path_table['core'].keys()) + list(path_table['ext'].keys())
     if tests == ['CLI']:
         tests = list(path_table['mod'].keys()) + list(path_table['core'].keys())
     elif tests == ['EXT']:
         tests = list(path_table['ext'].keys())
+
+    test_index = _get_test_index(profile or current_profile(), discover, target_tests=set(tests))
 
     # filter out tests whose modules haven't changed
     modified_mods = _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo)
@@ -193,7 +193,7 @@ def _discover_module_tests(mod_name, mod_data):
 
 
 # pylint: disable=too-many-statements, too-many-locals
-def _discover_tests(profile):
+def _discover_tests(profile, target_tests):
     """ Builds an index of tests so that the user can simply supply the name they wish to test instead of the
         full path.
     """
@@ -274,13 +274,16 @@ def _discover_tests(profile):
             mod2 = extract_module_name(test_index[key])
             if mod1 != mod2:
                 # resolve conflicted keys by prefixing with the module name and a dot (.)
-                logger.warning("'%s' exists in both '%s' and '%s'. Resolve using `%s.%s` or `%s.%s`",
-                               key, mod1, mod2, mod1, key, mod2, key)
+                if not target_tests or key in target_tests or mod1 in target_tests or mod2 in target_tests:
+                    logger.warning("'%s' exists in both '%s' and '%s'. Resolve using `%s.%s` or `%s.%s`",
+                                key, mod1, mod2, mod1, key, mod2, key)
                 test_index['{}.{}'.format(mod1, key)] = path
                 test_index['{}.{}'.format(mod2, key)] = test_index[key]
             else:
-                logger.error("'%s' exists twice in the '%s' module. "
-                             "Please rename one or both and re-run --discover.", key, mod1)
+                if  not target_tests or key in target_tests or mod1 in target_tests:
+                    logger.error("'%s' exists twice in the '%s' module. "
+                                "Please rename one or both and re-run --discover. "
+                                "Duplication exists in: \n\t%s\n\t%s", key, mod1, test_index[key], path)
         else:
             test_index[key] = path
 
@@ -310,14 +313,14 @@ def _discover_tests(profile):
     return test_index
 
 
-def _get_test_index(profile, discover):
+def _get_test_index(profile, discover, target_tests):
     config_dir = get_azdev_config_dir()
     test_index_dir = os.path.join(config_dir, 'test_index')
     make_dirs(test_index_dir)
     test_index_path = os.path.join(test_index_dir, '{}.json'.format(profile))
     test_index = {}
     if discover:
-        test_index = _discover_tests(profile)
+        test_index = _discover_tests(profile, target_tests)
         with open(test_index_path, 'w') as f:
             f.write(json.dumps(test_index))
         display('\ntest index updated: {}'.format(test_index_path))
@@ -326,7 +329,7 @@ def _get_test_index(profile, discover):
             test_index = json.loads(''.join(f.readlines()))
         display('\ntest index found: {}'.format(test_index_path))
     else:
-        test_index = _discover_tests(profile)
+        test_index = _discover_tests(profile, target_tests)
         with open(test_index_path, 'w') as f:
             f.write(json.dumps(test_index))
         display('\ntest index created: {}'.format(test_index_path))
