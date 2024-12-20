@@ -57,7 +57,6 @@ def run_tests(tests, xml_path=None, discover=False, in_series=False,
 
     test_index = _get_test_index(profile or current_profile(), discover, target_tests=target_tests)
 
-
     # filter out tests whose modules haven't changed
     modified_mods = _filter_by_git_diff(tests, test_index, git_source, git_target, git_repo)
     if modified_mods:
@@ -281,14 +280,14 @@ def _discover_tests(profile, target_tests):
                 if key in target_tests or mod1 in target_tests or mod2 in target_tests:
                     logger.warning("'%s' exists in both '%s' and '%s'. Resolve using `%s.%s` or `%s.%s`"
                                    "Duplication exists in: \n\t%s\n\t%s\n",
-                                    key, mod1, mod2, mod1, key, mod2, key, path, test_index[key])
+                                   key, mod1, mod2, mod1, key, mod2, key, path, test_index[key])
                 test_index['{}.{}'.format(mod1, key)] = path
                 test_index['{}.{}'.format(mod2, key)] = test_index[key]
             else:
                 if key in target_tests or mod1 in target_tests:
                     logger.error("'%s' exists twice in the '%s' module. "
-                                "Please rename one or both and re-run --discover. "
-                                "Duplication exists in: \n\t%s\n\t%s\n", key, mod1, test_index[key], path)
+                                 "Please rename one or both and re-run --discover. "
+                                 "Duplication exists in: \n\t%s\n\t%s\n", key, mod1, test_index[key], path)
         else:
             test_index[key] = path
 
