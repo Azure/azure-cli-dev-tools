@@ -132,6 +132,10 @@ def load_arguments(self, _):
             c.argument('custom_pattern',
                        help='Additional patterns you want to apply or built-in patterns you want to exclude '
                             'for scanning. Can be json string or path to the json file.')
+            c.argument('continue_on_failure', action='store_true',
+                       help='If not, the operation will terminate quickly on encountering file operation errors. '
+                            'If true, the operation will warning the error for specific file and proceed with other files. '
+                            'If not set the default value is false.')
 
     with ArgumentsContext(self, 'mask') as c:
         c.argument('yes', options_list=['--yes', '-y'], action='store_true', help='Answer "yes" to all prompts.')

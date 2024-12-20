@@ -146,7 +146,8 @@ def _scan_secrets_for_string(data, confidence_level=None, custom_pattern=None):
 def scan_secrets(file_path=None, directory_path=None, recursive=False,
                  include_pattern=None, exclude_pattern=None, data=None,
                  save_scan_result=None, scan_result_path=None,
-                 confidence_level=None, custom_pattern=None):
+                 confidence_level=None, custom_pattern=None,
+                 continue_on_failure=None):
     _validate_data_path(file_path=file_path, directory_path=directory_path,
                         include_pattern=include_pattern, exclude_pattern=exclude_pattern, data=data)
     target_files = []
@@ -165,15 +166,21 @@ def scan_secrets(file_path=None, directory_path=None, recursive=False,
             scan_results['raw_data'] = secrets
     elif target_files:
         for target_file in target_files:
-            logger.debug('start scanning secrets for %s', target_file)
-            with open(target_file, encoding='utf8') as f:
-                data = f.read()
-            if not data:
-                continue
-            secrets = _scan_secrets_for_string(data, confidence_level, custom_pattern)
-            logger.debug('%d secrets found for %s', len(secrets), target_file)
-            if secrets:
-                scan_results[target_file] = secrets
+            try:
+                logger.debug('start scanning secrets for %s', target_file)
+                with open(target_file, encoding='utf8') as f:
+                    data = f.read()
+                if not data:
+                    continue
+                secrets = _scan_secrets_for_string(data, confidence_level, custom_pattern)
+                logger.debug('%d secrets found for %s', len(secrets), target_file)
+                if secrets:
+                    scan_results[target_file] = secrets
+            except Exception as ex:  # pylint: disable=broad-exception-caught
+                if continue_on_failure:
+                    logger.warning("Error handling file %s, exception %s", target_file, str(ex))
+                else:
+                    raise ex
 
     if scan_result_path:
         save_scan_result = True
@@ -244,7 +251,7 @@ def _mask_secret_for_string(data, secret, redaction_type=None):
 def mask_secrets(file_path=None, directory_path=None, recursive=False,
                  include_pattern=None, exclude_pattern=None, data=None,
                  save_scan_result=None, scan_result_path=None,
-                 confidence_level=None, custom_pattern=None,
+                 confidence_level=None, custom_pattern=None, continue_on_failure=None,
                  saved_scan_result_path=None, redaction_type='FIXED_VALUE', yes=None):
     scan_results = {}
     if saved_scan_result_path:
@@ -259,7 +266,8 @@ def mask_secrets(file_path=None, directory_path=None, recursive=False,
         scan_response = scan_secrets(file_path=file_path, directory_path=directory_path, recursive=recursive,
                                      include_pattern=include_pattern, exclude_pattern=exclude_pattern, data=data,
                                      save_scan_result=save_scan_result, scan_result_path=scan_result_path,
-                                     confidence_level=confidence_level, custom_pattern=custom_pattern)
+                                     confidence_level=confidence_level, custom_pattern=custom_pattern,
+                                     continue_on_failure=continue_on_failure)
         if save_scan_result and scan_response['scan_result_path']:
             with open(scan_response['scan_result_path'], encoding='utf8') as f:
                 scan_results = json.load(f)
@@ -291,13 +299,19 @@ def mask_secrets(file_path=None, directory_path=None, recursive=False,
         return mask_result
 
     for scan_file_path, secrets in scan_results.items():
-        with open(scan_file_path, 'r', encoding='utf8') as f:
-            content = f.read()
-        if not content:
-            continue
-        for secret in secrets:
-            content = _mask_secret_for_string(content, secret, redaction_type)
-        with open(scan_file_path, 'w', encoding='utf8') as f:
-            f.write(content)
+        try:
+            with open(scan_file_path, 'r', encoding='utf8') as f:
+                content = f.read()
+            if not content:
+                continue
+            for secret in secrets:
+                content = _mask_secret_for_string(content, secret, redaction_type)
+            with open(scan_file_path, 'w', encoding='utf8') as f:
+                f.write(content)
+        except Exception as ex:  # pylint: disable=broad-exception-caught
+            if continue_on_failure:
+                logger.warning("Error handling file %s, exception %s", scan_file_path, str(ex))
+            else:
+                raise ex
     mask_result['mask'] = True
     return mask_result

@@ -2,7 +2,12 @@
 
 Release History
 ===============
+0.1.89
+++++++
+* `azdev scan/mask`: Add `--continue-on-failure` support
+
 0.1.88
+++++++
 * `azdev cmdcov`: Fix incorrect detection of code changes as new commands
 
 0.1.87
