@@ -7,7 +7,7 @@
 from enum import Enum
 
 from knack.log import get_logger
-from .util import get_command_tree
+from .util import get_command_tree, search_cmd_obj, ChangeType
 
 logger = get_logger(__name__)
 
@@ -241,3 +241,65 @@ def get_commands_meta(command_group_table, commands_info, with_help, with_exampl
                 command_group_info["commands"][command_name] = command_meta
                 break
     return commands_meta
+
+
+def command_example_diff(base_meta=None, diff_meta=None):
+    diff_cmds = []
+    find_command_remove(base_meta, diff_meta, diff_cmds)
+    check_command_add(diff_meta, diff_cmds)
+    add_cmd_example = []
+    for cmd_name, diff_type in diff_cmds:
+        if diff_type == ChangeType.REMOVE:
+            cmd_obj = search_cmd_obj(cmd_name, base_meta)
+            add_cmd_example.append({
+                "cmd": cmd_name,
+                "change_type": diff_type,
+                "param_count": len(cmd_obj["parameters"]) if "parameters" in cmd_obj else 0,
+                "example_count": len(cmd_obj["examples"]) if "examples" in cmd_obj else 0
+            })
+            continue
+        diff_cmd_obj = search_cmd_obj(cmd_name, diff_meta)
+        add_cmd_example.append({
+            "cmd": cmd_name,
+            "change_type": diff_type,
+            "param_count": len(diff_cmd_obj["parameters"]) if "parameters" in diff_cmd_obj else 0,
+            "example_count": len(diff_cmd_obj["examples"]) if "examples" in diff_cmd_obj else 0
+        })
+    return add_cmd_example
+
+
+def find_command_remove(base_meta, diff_meta, diff_cmds):
+    if "sub_groups" in base_meta:
+        for sub_group, group_item in base_meta["sub_groups"].items():
+            find_command_remove(group_item, diff_meta, diff_cmds)
+    if "commands" in base_meta:
+        generate_command_remove(base_meta["commands"], diff_meta, diff_cmds)
+
+
+def generate_command_remove(base_cmd_items, diff_meta, diff_cmds):
+    for cmd_name, cmd_obj in base_cmd_items.items():
+        if cmd_obj.get("checked", None):
+            continue
+        cmd_obj["checked"] = True
+        diff_cmd_obj = search_cmd_obj(cmd_name, diff_meta)
+        if diff_cmd_obj is None:
+            # cmd lost
+            diff_cmds.append((cmd_name, ChangeType.REMOVE))
+            continue
+        diff_cmd_obj["checked"] = True
+
+
+def check_command_add(diff_meta, diff_cmds):
+    if "sub_groups" in diff_meta:
+        for sub_group, group_item in diff_meta["sub_groups"].items():
+            check_command_add(group_item, diff_cmds)
+    if "commands" in diff_meta:
+        generate_command_add(diff_meta["commands"], diff_cmds)
+
+
+def generate_command_add(diff_cmd_items, diff_cmds):
+    for cmd_name, cmd_obj in diff_cmd_items.items():
+        if cmd_obj.get("checked", None):
+            continue
+        diff_cmds.append((cmd_name, ChangeType.ADD))
+        cmd_obj["checked"] = True

@@ -243,7 +243,7 @@ helps['command-change meta-diff'] = """
     short-summary: Diff the command meta between provided meta files.
     examples:
         - name: Diff the command meta change from fileA to fileB
-          text: azdev statistics meta-diff --base-meta-file fileA --diff-meta-file fileB --only-break
+          text: azdev command-change meta-diff --base-meta-file fileA --diff-meta-file fileB --only-break
 """
 
 helps['command-change tree-export'] = """
@@ -251,6 +251,13 @@ helps['command-change tree-export'] = """
     examples:
         - name: Export command tree for CLI modules
           text: azdev command-change tree-export CLI --output-file command_tree.json
+"""
+
+helps['command-change cmd-example-diff'] = """
+    short-summary: Check the command example number between provided meta files.
+    examples:
+        - name: Check the command example number from fileA to fileB
+          text: azdev command-change cmd-example-diff --base-meta-file fileA --diff-meta-file fileB --only-break
 """
 
 helps['perf'] = """

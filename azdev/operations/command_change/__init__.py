@@ -7,12 +7,14 @@
 # pylint: disable=no-else-return, too-many-nested-blocks, too-many-locals, too-many-branches
 
 import time
+import os
+import json
 
 from knack.log import get_logger
 import azure_cli_diff_tool
 from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff, \
     calc_selected_mod_names
-from .custom import DiffExportFormat, get_commands_meta, STORED_DEPRECATION_KEY
+from .custom import DiffExportFormat, get_commands_meta, STORED_DEPRECATION_KEY, command_example_diff
 from .util import export_commands_meta, dump_command_tree, add_to_command_tree
 from ..statistics import _create_invoker_and_load_cmds, _get_command_source, \
     _command_codegen_info  # pylint: disable=protected-access
@@ -178,3 +180,17 @@ def export_command_tree(modules, output_file=None):
         add_to_command_tree(command_tree, command_name, module_source)
 
     dump_command_tree(command_tree, output_file)
+
+
+def meta_command_example_diff(base_meta_file, diff_meta_file):
+    if not os.path.exists(base_meta_file) and not os.path.exists(diff_meta_file):
+        raise Exception("base and/or diff meta file needed")
+    command_tree_before = {}
+    command_tree_after = {}
+    if os.path.exists(base_meta_file):
+        with open(base_meta_file, "r") as g:
+            command_tree_before = json.load(g)
+    if os.path.exists(diff_meta_file):
+        with open(diff_meta_file, "r") as g:
+            command_tree_after = json.load(g)
+    return command_example_diff(command_tree_before, command_tree_after)

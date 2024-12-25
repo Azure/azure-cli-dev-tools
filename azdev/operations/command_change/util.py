@@ -61,6 +61,27 @@ def get_command_tree(command_name):
     return ret
 
 
+def search_cmd_obj(cmd_name, search_meta):
+    command_tree = get_command_tree(cmd_name)
+    meta_search = search_meta
+    while True:
+        if "is_group" not in command_tree:
+            break
+        if command_tree["is_group"]:
+            group_name = command_tree["group_name"]
+            if group_name not in meta_search["sub_groups"]:
+                return None
+            meta_search = meta_search["sub_groups"][group_name]
+            command_tree = command_tree["sub_info"]
+        else:
+            cmd_name = command_tree["cmd_name"]
+            if cmd_name not in meta_search["commands"]:
+                return None
+            meta_search = meta_search["commands"][cmd_name]
+            break
+    return meta_search
+
+
 def export_commands_meta(commands_meta, meta_output_path=None):
     options = jsbeautifier.default_options()
     options.indent_size = 4

@@ -83,7 +83,7 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'linter') as c:
         c.positional('modules', modules_type)
         c.argument('rules', options_list=['--rules', '-r'], nargs='+', help='Space-separated list of rules to run. Omit to run all rules.')
-        c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries', 'command_test_coverage'], help='Space-separated list of rule types to run. Omit to run all.')
+        c.argument('rule_types', options_list=['--rule-types', '-t'], nargs='+', choices=['params', 'commands', 'command_groups', 'help_entries', 'command_test_coverage', 'extra_cli_linter'], help='Space-separated list of rule types to run. Omit to run all.')
         c.argument('ci_exclusions', action='store_true', help='Force application of CI exclusions list when run locally.')
         c.argument('include_whl_extensions',
                    action='store_true',
@@ -98,6 +98,8 @@ def load_arguments(self, _):
                         'For example, specifying "medium" runs linter rules that have "high" or "medium" severity. '
                         'However, specifying "low" runs the linter on every rule, regardless of severity. '
                         'Defaults to "high".')
+        c.argument('base_meta_path', arg_group='Metadata', help='path to store command meta json file from base branch')
+        c.argument('diff_meta_path', arg_group='Metadata', help='path to store command meta json file from diff branch')
     # endregion
 
     # region scan & mask
@@ -177,6 +179,10 @@ def load_arguments(self, _):
     with ArgumentsContext(self, 'command-change tree-export') as c:
         c.positional('modules', modules_type)
         c.argument('output_file', help='command tree json file path to store')
+
+    with ArgumentsContext(self, 'command-change cmd-example-diff') as c:
+        c.argument('base_meta_file', required=True, help='command meta json file')
+        c.argument('diff_meta_file', required=True, help='command meta json file to diff')
 
     # region cmdcov
     with ArgumentsContext(self, 'cmdcov') as c:

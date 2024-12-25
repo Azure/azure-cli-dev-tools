@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for
 # license information.
 # -----------------------------------------------------------------------------
-
+# pylint: disable=line-too-long
 from knack.util import CLIError
 from .linter import RuleError, LinterSeverity
 
@@ -82,6 +82,27 @@ class ParameterRule(BaseRule):
                                        func.__name__)
 
             linter_manager.add_rule('params', func.__name__, wrapper, self.severity)
+        add_to_linter.linter_rule = True
+        return add_to_linter
+
+
+class ExtraCliLinterRule(BaseRule):
+
+    def __call__(self, func):
+        def add_to_linter(linter_manager):
+            def wrapper():
+                linter = linter_manager.linter
+                try:
+                    func(linter)
+                except RuleError as ex:
+                    linter_manager.mark_rule_failure(self.severity)
+                    yield (_create_violation_msg(ex, 'Repo: {}, Src Branch: {}, Target Branch: {}, base meta path: {}, diff meta path: {} \n',
+                           linter.git_repo, linter.git_source, linter.git_target, linter.base_meta_path, linter.diff_meta_path),
+                           (linter.base_meta_path, linter.diff_meta_path),
+                           func.__name__)
+
+            linter_manager.add_rule('extra_cli_linter', func.__name__, wrapper, self.severity)
+
         add_to_linter.linter_rule = True
         return add_to_linter
 

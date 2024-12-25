@@ -1,0 +1,143 @@
+{
+    "module_name": "util",
+    "name": "az",
+    "commands": {
+        "rest": {
+            "name": "rest",
+            "is_aaz": false,
+            "examples": [{
+                "name": "Get Audit log through Microsoft Graph",
+                "text": "az rest --method get --url https://graph.microsoft.com/beta/auditLogs/directoryAudits\n"
+            }, {
+                "name": "Update a Azure Active Directory Graph User's display name",
+                "text": "(Bash or CMD)\naz rest --method patch --url \"https://graph.microsoft.com/v1.0/users/johndoe@azuresdkteam.onmicrosoft.com\" --body \"{\\\"displayName\\\": \\\"johndoe2\\\"}\"\n\n(Bash)\naz rest --method patch --url \"https://graph.microsoft.com/v1.0/users/johndoe@azuresdkteam.onmicrosoft.com\" --body '{\"displayName\": \"johndoe2\"}'\n\n(PowerShell)\naz rest --method patch --url \"https://graph.microsoft.com/v1.0/users/johndoe@azuresdkteam.onmicrosoft.com\" --body '{\\\"displayName\\\": \\\"johndoe2\\\"}'\n"
+            }, {
+                "name": "Get a virtual machine",
+                "text": "az rest --method get --uri /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}?api-version=2019-03-01\n"
+            }, {
+                "name": "Create a public IP address from body.json file",
+                "text": "az rest --method put --url https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}?api-version=2019-09-01 --body @body.json\n"
+            }, {
+                "name": "List the top three resources (Bash)",
+                "text": "az rest --method get --url https://management.azure.com/subscriptions/{subscriptionId}/resources?api-version=2019-07-01 --url-parameters \\$top=3\n"
+            }],
+            "parameters": [{
+                "name": "url",
+                "options": ["--uri", "--url", "-u"],
+                "required": true
+            }, {
+                "name": "method",
+                "options": ["--method", "-m"],
+                "choices": ["delete", "get", "head", "options", "patch", "post", "put"],
+                "default": "get"
+            }, {
+                "name": "headers",
+                "options": ["--headers"],
+                "nargs": "+"
+            }, {
+                "name": "uri_parameters",
+                "options": ["--uri-parameters", "--url-parameters"],
+                "nargs": "+"
+            }, {
+                "name": "body",
+                "options": ["--body", "-b"]
+            }, {
+                "name": "skip_authorization_header",
+                "options": ["--skip-authorization-header"]
+            }, {
+                "name": "resource",
+                "options": ["--resource"]
+            }, {
+                "name": "output_file",
+                "options": ["--output-file"]
+            }]
+        },
+        "version": {
+            "name": "version",
+            "is_aaz": false,
+            "parameters": []
+        },
+        "upgrade": {
+            "name": "upgrade",
+            "is_aaz": false,
+            "is_preview": true,
+            "examples": [{
+                "name": "example1",
+                "text": "az upgrade -x aaa"
+            }, {
+                "name": "example1",
+                "text": "az upgrade -y bbb"
+            }],
+            "parameters": [{
+                "name": "update_all",
+                "options": ["--all"],
+                "choices": ["false", "true"],
+                "nargs": "?",
+                "default": "true"
+            }, {
+                "name": "yes",
+                "options": ["--yes", "-y"]
+            }, {
+                "name": "allow_preview",
+                "options": ["--allow-preview", "--allow-preview-extensions"],
+                "choices": ["false", "true"],
+                "nargs": "?"
+            }]
+        }
+    },
+    "sub_groups": {
+        "demo": {
+            "name": "demo",
+            "commands": {
+                "demo byo-access-token": {
+                    "name": "demo byo-access-token",
+                    "is_aaz": false,
+                    "examples": [{
+                        "name": "List resource groups by bringing your own access token",
+                        "text": "az demo byo-access-token --access-token \"eyJ0eXAiO...\" --subscription-id 00000000-0000-0000-0000-000000000000"
+                    }],
+                    "parameters": [{
+                        "name": "access_token",
+                        "options": ["--access-token"],
+                        "required": true
+                    }, {
+                        "name": "subscription_id",
+                        "options": ["--subscription-id"],
+                        "required": true
+                    }]
+                }
+            },
+            "sub_groups": {
+                "demo secret-store": {
+                    "name": "demo secret-store",
+                    "commands": {
+                        "demo secret-store save": {
+                            "name": "demo secret-store save",
+                            "is_aaz": false,
+                            "examples": [{
+                                "name": "Save data to secret store.",
+                                "text": "az demo secret-store save \"name=Johann Sebastian Bach\" job=musician"
+                            }],
+                            "parameters": [{
+                                "name": "key_value",
+                                "options": [],
+                                "required": true,
+                                "nargs": "+"
+                            }]
+                        },
+                        "demo secret-store load": {
+                            "name": "demo secret-store load",
+                            "is_aaz": false,
+                            "parameters": []
+                        }
+                    },
+                    "sub_groups": {}
+                }
+            },
+            "deprecate_info": {
+                "target": "demo",
+                "hide": true
+            }
+        }
+    }
+}

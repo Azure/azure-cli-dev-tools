@@ -7,7 +7,7 @@
 
 import unittest
 import os
-from azdev.operations.command_change import export_command_meta, cmp_command_meta
+from azdev.operations.command_change import export_command_meta, cmp_command_meta, meta_command_example_diff
 from azdev.operations.command_change.util import get_command_tree, add_to_command_tree
 
 
@@ -72,6 +72,14 @@ class BreakingChangeTestCase(unittest.TestCase):
             }
         }
         self.assertDictEqual(tree, expected)
+
+    def test_diff_cmd_example(self):
+        if not os.path.exists("./jsons/az_util_meta_before.json") or \
+                not os.path.exists("./jsons/az_util_meta_after.json"):
+            raise Exception("Test json missing")
+        result = meta_command_example_diff(base_meta_file="./jsons/az_util_meta_before.json",
+                                           diff_meta_file="./jsons/az_util_meta_after.json")
+        self.assertEqual(len(result), 3)
 
 
 if __name__ == '__main__':

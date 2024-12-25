@@ -10,6 +10,7 @@ import requests
 
 from knack.log import get_logger
 
+from azdev.operations.command_change.util import ChangeType
 from azdev.utilities import get_name_index
 from azdev.operations.constant import ALLOWED_HTML_TAG
 
@@ -155,3 +156,25 @@ def has_broken_site_links(help_message, filtered_lines=None):
     if filtered_lines:
         invalid_urls = [s for s in invalid_urls if any(s in diff_line for diff_line in filtered_lines)]
     return invalid_urls
+
+
+def is_substring_in_target(string_list, target):
+    return any(s in target for s in string_list)
+
+
+# pylint: disable=line-too-long
+def add_cmd_example_justification(cmd_example_count):
+    if "cmd" not in cmd_example_count or "param_count" not in cmd_example_count or\
+            "example_count" not in cmd_example_count:
+        return None
+    if cmd_example_count["change_type"] != ChangeType.ADD:
+        return None
+    cmd_name_arr = cmd_example_count["cmd"].split()
+    if is_substring_in_target(["add", "create", "update"], cmd_name_arr[-1]):
+        cmd_example_count["min_example_count"] = max(2, cmd_example_count["param_count"] / 5)
+    elif is_substring_in_target(["show", "list", "delete"], cmd_name_arr[-1]):
+        cmd_example_count["min_example_count"] = 1
+    else:
+        cmd_example_count["min_example_count"] = 1
+    cmd_example_count["valid"] = True if cmd_example_count["min_example_count"] <= cmd_example_count["example_count"] else False
+    return cmd_example_count

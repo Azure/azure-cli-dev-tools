@@ -22,9 +22,10 @@ from azdev.operations.regex import (
     search_command,
     search_deleted_command,
     search_command_group)
+from azdev.operations.command_change import meta_command_example_diff
 from azdev.utilities import diff_branches_detail, diff_branch_file_patch
 from azdev.utilities.path import get_cli_repo_path, get_ext_repo_paths
-from .util import share_element, exclude_commands, LinterError
+from .util import share_element, exclude_commands, LinterError, add_cmd_example_justification
 
 PACKAGE_NAME = 'azdev.operations.linter'
 _logger = get_logger(__name__)
@@ -49,7 +50,7 @@ class LinterSeverity(Enum):
 
 class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attributes
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, git_source=None, git_target=None,
-                 git_repo=None, exclusions=None):
+                 git_repo=None, exclusions=None, base_meta_path=None, diff_meta_path=None):
         self._all_yaml_help = help_file_entries
         self._loaded_help = loaded_help
         self._command_loader = command_loader
@@ -65,6 +66,8 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
         self.git_target = git_target
         self.git_repo = git_repo
         self.exclusions = exclusions
+        self.base_meta_path = base_meta_path
+        self.diff_meta_path = diff_meta_path
         self.diffed_lines = set()
         self._get_diffed_patches()
 
@@ -387,6 +390,21 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
                 'Or add the parameter with missing_parameter_test_coverage rule in linter_exclusions.yml'])
         return exec_state, violations
 
+    def check_examples_from_added_command(self):
+        if not self.diff_meta_path:
+            return None
+        added_cmd_example_counts = []
+        for root, _, files in os.walk(self.diff_meta_path):
+            for file_name in files:
+                diff_metadata_file = os.path.join(root, file_name)
+                base_metadata_file = os.path.join(self.base_meta_path, file_name)
+                if not os.path.exists(diff_metadata_file):
+                    continue
+                added_cmd_example_counts += meta_command_example_diff(base_metadata_file, diff_metadata_file)
+        added_cmd_example_counts = list(map(add_cmd_example_justification, added_cmd_example_counts))
+        filtered_cmd_example = list(filter(lambda x: not x or not x["valid"], added_cmd_example_counts))
+        return filtered_cmd_example
+
     def _get_diffed_patches(self):
         if not self.git_source or not self.git_target or not self.git_repo:
             return
@@ -403,17 +421,20 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
 
 # pylint: disable=too-many-instance-attributes
 class LinterManager:
-    _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params', 'command_test_coverage'}
+    _RULE_TYPES = {'help_file_entries', 'command_groups', 'commands', 'params', 'command_test_coverage',
+                   'extra_cli_linter'}
 
     def __init__(self, command_loader=None, help_file_entries=None, loaded_help=None, exclusions=None,
                  rule_inclusions=None, use_ci_exclusions=None, min_severity=None, update_global_exclusion=None,
-                 git_source=None, git_target=None, git_repo=None):
+                 git_source=None, git_target=None, git_repo=None, base_meta_path=None, diff_meta_path=None):
         # default to running only rules of the highest severity
         self.min_severity = min_severity or LinterSeverity.get_ordered_members()[-1]
         self._exclusions = exclusions or {}
         self.linter = Linter(command_loader=command_loader, help_file_entries=help_file_entries,
                              loaded_help=loaded_help, git_source=git_source, git_target=git_target, git_repo=git_repo,
-                             exclusions=self._exclusions)
+                             exclusions=self._exclusions,
+                             base_meta_path=base_meta_path,
+                             diff_meta_path=diff_meta_path)
         self._rules = {rule_type: {} for rule_type in LinterManager._RULE_TYPES}  # initialize empty rules
         self._ci_exclusions = {}
         self._rule_inclusions = rule_inclusions
@@ -456,7 +477,7 @@ class LinterManager:
         return self._exit_code
 
     def run(self, run_params=None, run_commands=None, run_command_groups=None,
-            run_help_files_entries=None, run_command_test_coverage=None):
+            run_help_files_entries=None, run_command_test_coverage=None, run_extra_cli_linter=None):
         paths = import_module('{}.rules'.format(PACKAGE_NAME)).__path__
 
         if paths:
@@ -493,6 +514,9 @@ class LinterManager:
 
         if run_command_test_coverage and self._rules.get('command_test_coverage'):
             self._run_rules('command_test_coverage')
+
+        if run_extra_cli_linter and self._rules.get("extra_cli_linter"):
+            self._run_rules("extra_cli_linter")
 
         if not self.exit_code:
             print(os.linesep + 'No violations found for linter rules.')

@@ -29,7 +29,7 @@ CHECKERS_PATH = 'azdev.operations.linter.pylint_checkers'
 # pylint:disable=too-many-locals, too-many-statements, too-many-branches
 def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                git_source=None, git_target=None, git_repo=None, include_whl_extensions=False,
-               min_severity=None, save_global_exclusion=False):
+               min_severity=None, save_global_exclusion=False, base_meta_path=None, diff_meta_path=None):
 
     require_azure_cli()
 
@@ -155,7 +155,10 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
                                    update_global_exclusion=update_global_exclusion,
                                    git_source=git_source,
                                    git_target=git_target,
-                                   git_repo=git_repo)
+                                   git_repo=git_repo,
+                                   base_meta_path=base_meta_path,
+                                   diff_meta_path=diff_meta_path
+                                   )
 
     subheading('Results')
     logger.info('Running linter: %i commands, %i help entries',
@@ -166,6 +169,7 @@ def run_linter(modules=None, rule_types=None, rules=None, ci_exclusions=None,
         run_command_groups=not rule_types or 'command_groups' in rule_types,
         run_help_files_entries=not rule_types or 'help_entries' in rule_types,
         run_command_test_coverage=not rule_types or 'command_test_coverage' in rule_types,
+        run_extra_cli_linter=not rule_types or "extra_cli_linter" in rule_types,
     )
     display(os.linesep + 'Run custom pylint rules.')
     exit_code += pylint_rules(selected_modules)
