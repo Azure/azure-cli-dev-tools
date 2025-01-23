@@ -165,6 +165,8 @@ def load_arguments(self, _):
         c.argument('with_help', action="store_true", help="State whether to include help message")
         c.argument('with_example', action="store_true", help="State whether to include examples")
         c.argument('meta_output_path', help='command meta json file path to store')
+        c.argument('include_whl_extensions', action='store_true',
+                   help="Allow running cmd loader on extensions installed by `az extension add --source xxx.whl`.")
 
     with ArgumentsContext(self, 'command-change meta-diff') as c:
         c.argument('base_meta_file', required=True, help='command meta json file')

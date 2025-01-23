@@ -28,7 +28,7 @@ def diff_export_format_choices():
 
 # pylint: disable=too-many-statements
 def export_command_meta(modules=None, git_source=None, git_target=None, git_repo=None,
-                        with_help=False, with_example=False,
+                        with_help=False, with_example=False, include_whl_extensions=False,
                         meta_output_path=None):
     require_azure_cli()
 
@@ -38,7 +38,7 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
     if cli_only or ext_only:
         modules = None
 
-    selected_modules = get_path_table(include_only=modules)
+    selected_modules = get_path_table(include_only=modules, include_whl_extensions=include_whl_extensions)
 
     if cli_only:
         selected_modules['ext'] = {}
@@ -84,7 +84,8 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
             help_info[help_item.command] = help_item
 
     # trim command table to selected_modules
-    command_loader = filter_modules(command_loader, modules=selected_mod_names)
+    command_loader = filter_modules(command_loader, modules=selected_mod_names,
+                                    include_whl_extensions=include_whl_extensions)
 
     if not command_loader.command_table:
         logger.warning('No commands selected to check.')

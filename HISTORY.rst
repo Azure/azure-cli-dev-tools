@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.94
+++++++
+* `azdev command-change meta-export`: Enable meta exporting for extension installed using `.whl` package by `include_whl_extensions`
+
 0.1.93
 ++++++
 * `azdev linter`: Fix `None` path for added files in `git diff` for `missing_command_example` rule
