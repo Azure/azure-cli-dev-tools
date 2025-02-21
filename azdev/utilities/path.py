@@ -265,7 +265,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     return table
 
 
-def calc_selected_mod_names(modules=None):
+def calc_selected_modules(modules=None):
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
     ext_only = modules == ['EXT']
@@ -279,6 +279,12 @@ def calc_selected_mod_names(modules=None):
     if ext_only:
         selected_modules['core'] = {}
         selected_modules['mod'] = {}
+
+    return selected_modules
+
+
+def calc_selected_mod_names(modules=None):
+    selected_modules = calc_selected_modules(modules)
 
     if not any(selected_modules.values()):
         logger.warning('No commands selected to check.')
