@@ -183,6 +183,8 @@ def disallowed_html_tag_from_parameter(linter, command_name, parameter_name):
                                                                              linter.diffed_lines)):
         raise RuleError("Disallowed html tags {} in short summary. "
                         "If the content is a placeholder, please remove <> or wrap it with backtick. "
+                        "For example: 1) <Name>-res.yaml -> `<Name>-res.yaml`; "
+                        "2) http://<URL>:<PORT> -> `http://<URL>:<PORT>`. "
                         "For more info please refer to: {}".format(disallowed_tags,
                                                                    DISALLOWED_HTML_TAG_RULE_LINK))
 
@@ -190,6 +192,8 @@ def disallowed_html_tag_from_parameter(linter, command_name, parameter_name):
                                                                             linter.diffed_lines)):
         raise RuleError("Disallowed html tags {} in long summary. "
                         "If content is a placeholder, please remove <> or wrap it with backtick. "
+                        "For example: 1) <Name>-res.yaml -> `<Name>-res.yaml`; "
+                        "2) http://<URL>:<PORT> -> `http://<URL>:<PORT>`. "
                         "For more info please refer to: {}".format(disallowed_tags,
                                                                    DISALLOWED_HTML_TAG_RULE_LINK))
 
