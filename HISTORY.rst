@@ -2,6 +2,12 @@
 
 Release History
 ===============
+0.1.95
+++++++
+* `azdev generate-breaking-change-report`: Extracts upcoming breaking changes in extensions, regardless of the target version set
+* `azdev generate-breaking-change-report`: Fix collecting announcement starting with `az`
+
+
 0.1.94
 ++++++
 * `azdev command-change meta-export`: Enable meta exporting for extension installed using `.whl` package by `include_whl_extensions`
