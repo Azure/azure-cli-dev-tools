@@ -13,6 +13,7 @@ from knack.log import get_logger
 
 from azdev.operations.statistics import _create_invoker_and_load_cmds  # pylint: disable=protected-access
 from azdev.utilities import require_azure_cli, display, heading, output, calc_selected_mod_names
+from azdev.utilities.path import calc_selected_modules
 
 # pylint: disable=no-else-return
 
@@ -68,8 +69,9 @@ def _handle_custom_breaking_changes(module, command):
     """
     from azure.cli.core.breaking_change import upcoming_breaking_changes
     yield from _handle_custom_breaking_change(module, command, upcoming_breaking_changes.get(command))
+    yield from _handle_custom_breaking_change(module, command, upcoming_breaking_changes.get(f'az {command}'))
     for key in upcoming_breaking_changes:
-        if key.startswith(command + '.'):
+        if key.startswith(command + '.') or key.startswith(f'az {command}.'):
             yield from _handle_custom_breaking_change(module, command, upcoming_breaking_changes[key])
 
 
@@ -249,9 +251,7 @@ def _handle_core(source):
     display('Core finished loaded in {} sec'.format(stop - start))
 
 
-def _handle_upcoming_breaking_changes(selected_mod_names, source):
-    command_loader = _load_commands()
-
+def _handle_upcoming_breaking_changes(command_loader, selected_mod_names, source):
     if 'core' in selected_mod_names or 'azure-cli-core' in selected_mod_names:
         yield from _handle_core(source)
 
@@ -285,13 +285,13 @@ def _filter_breaking_changes(iterator, max_version=None):
 # pylint: disable=unnecessary-lambda-assignment
 def _group_breaking_change_items(iterator, group_by_version=False):
     if group_by_version:
-        upcoming_breaking_changes = defaultdict(    # module to command
-            lambda: defaultdict(    # command to version
-                lambda: {'group_ref': None, 'items': defaultdict(    # version to list of breaking changes
+        upcoming_breaking_changes = defaultdict(  # module to command
+            lambda: defaultdict(  # command to version
+                lambda: {'group_ref': None, 'items': defaultdict(  # version to list of breaking changes
                     lambda: [])}))
     else:
-        upcoming_breaking_changes = defaultdict(    # module to command
-            lambda: defaultdict(    # command to list of breaking changes
+        upcoming_breaking_changes = defaultdict(  # module to command
+            lambda: defaultdict(  # command to list of breaking changes
                 lambda: {'group_ref': None, 'items': []}))
     for item in iterator:
         version = item.target_version if item.target_version else 'Unspecific'
@@ -313,14 +313,24 @@ def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow',
 
     require_azure_cli()
 
-    selected_mod_names = calc_selected_mod_names(modules)
+    selected_modules = calc_selected_modules(modules)
+    cli_mod_names = list(selected_modules['core'].keys()) + list(selected_modules['mod'].keys())
+    ext_mod_names = list(selected_modules['ext'].keys())
 
-    if selected_mod_names:
-        display('Modules selected: {}\n'.format(', '.join(selected_mod_names)))
+    if cli_mod_names or ext_mod_names:
+        display('Modules selected: {}\n'.format(', '.join(cli_mod_names + ext_mod_names)))
+
+    command_loader = _load_commands()
 
     heading('Collecting Breaking Change Pre-announcement')
-    breaking_changes = _handle_upcoming_breaking_changes(selected_mod_names, source)
-    breaking_changes = _filter_breaking_changes(breaking_changes, target_version)
+    breaking_changes = []
+    if cli_mod_names:
+        cli_breaking_changes = _handle_upcoming_breaking_changes(command_loader, cli_mod_names, source)
+        cli_breaking_changes = _filter_breaking_changes(cli_breaking_changes, target_version)
+        breaking_changes.extend(cli_breaking_changes)
+    if ext_mod_names:
+        ext_breaking_changes = _handle_upcoming_breaking_changes(command_loader, ext_mod_names, 'pre_announce')
+        breaking_changes.extend(ext_breaking_changes)
     breaking_changes = _group_breaking_change_items(breaking_changes, group_by_version)
     if output_format == 'structure':
         return breaking_changes
