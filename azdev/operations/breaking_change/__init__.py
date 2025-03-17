@@ -304,7 +304,7 @@ def _group_breaking_change_items(iterator, group_by_version=False):
 
 
 def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow', source=None, group_by_version=None,
-                                      output_format='structure'):
+                                      output_format='structure', no_head=False, no_tail=False):
     if target_version == 'NextWindow':
         from azure.cli.core.breaking_change import NEXT_BREAKING_CHANGE_RELEASE
         target_version = NEXT_BREAKING_CHANGE_RELEASE
@@ -339,5 +339,9 @@ def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow',
         env = Environment(loader=PackageLoader('azdev', 'operations/breaking_change'),
                           trim_blocks=True)
         template = env.get_template('markdown_template.jinja2')
-        output(template.render({'module_bc': breaking_changes}))
+        output(template.render({
+            'module_bc': breaking_changes,
+            'no_head': no_head,
+            'no_tail': no_tail,
+        }))
     return None
