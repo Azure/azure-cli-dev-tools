@@ -34,8 +34,8 @@ class TestScanAndMaskSecrets(unittest.TestCase):
         self.assertEqual(len(result['scan_results']['raw_data']), 1)
         self.assertEqual(result['scan_results']['raw_data'][0]['secret_name'], 'AdditionalPattern')
 
-        regex_pattern1 = RegexPattern(r'(?<refine>[\w.%#+-]+)(%40|@)([a-z0-9.-]*.[a-z]{2,})', '000', 'EmailAddress')
-        regex_pattern2 = RegexPattern('(?i)(?:^|[?;&])(?:dsas_secret|sig)=(?<refine>[0-9a-z\\/+%]{43,129}(?:=|%3d))', '001', 'LooseSasSecret')
+        regex_pattern1 = RegexPattern(r'(?P<refine>[\w.%#+-]+)(%40|@)([a-z0-9.-]*.[a-z]{2,})', '000', 'EmailAddress')
+        regex_pattern2 = RegexPattern('(?i)(?:^|[?;&])(?:dsas_secret|sig)=(?P<refine>[0-9a-z\\/+%]{43,129}(?:=|%3d))', '001', 'LooseSasSecret')
         with mock.patch("azdev.operations.secret._load_built_in_regex_patterns", return_value=(regex_pattern1, regex_pattern2)):
             test_data2 = "This is a test string with email fooabc@gmail.com and sas sv=2022-11-02&sr=c&sig=a9Y5mpQgKUiiPzHFNdDm53Na6UndTrNMCsRZd6b2oV4%3D"
             result = scan_secrets(data=test_data2)
@@ -86,8 +86,8 @@ class TestScanAndMaskSecrets(unittest.TestCase):
         self.assertEqual(len(result['scan_results'][simple_string_file]), 1)
         self.assertEqual(result['scan_results'][simple_string_file][0]['secret_name'], 'AdditionalPattern')
 
-        regex_pattern1 = RegexPattern(r'(?<refine>[\w.%#+-]+)(%40|@)([a-z0-9.-]*.[a-z]{2,})', '000', 'EmailAddress')
-        regex_pattern2 = RegexPattern('(?i)(?:^|[?;&])(?:dsas_secret|sig)=(?<refine>[0-9a-z\\/+%]{43,129}(?:=|%3d))', '001', 'LooseSasSecret')
+        regex_pattern1 = RegexPattern(r'(?P<refine>[\w.%#+-]+)(%40|@)([a-z0-9.-]*.[a-z]{2,})', '000', 'EmailAddress')
+        regex_pattern2 = RegexPattern('(?i)(?:^|[?;&])(?:dsas_secret|sig)=(?P<refine>[0-9a-z\\/+%]{43,129}(?:=|%3d))', '001', 'LooseSasSecret')
         with mock.patch("azdev.operations.secret._load_built_in_regex_patterns", return_value=(regex_pattern1, regex_pattern2)):
             result = scan_secrets(file_path=info_json_file)
             self.assertTrue(result['secrets_detected'])
@@ -118,7 +118,7 @@ class TestScanAndMaskSecrets(unittest.TestCase):
         custom_pattern = {
             "Include": [
                 {
-                    "Pattern": r"(?<refine>[\w.%#+-]+)(%40|@)([a-z0-9.-]*.[a-z]{2,})",
+                    "Pattern": r"(?P<refine>[\w.%#+-]+)(%40|@)([a-z0-9.-]*.[a-z]{2,})",
                     "Name": "EmailAddress"
                 }
             ]
@@ -153,7 +153,7 @@ class TestScanAndMaskSecrets(unittest.TestCase):
         custom_pattern = {
             "Include": [
                 {
-                    "Pattern": r"(?<refine>[\w.%#+-]+)(%40|@)([a-z0-9.-]*.[a-z]{2,})",
+                    "Pattern": r"(?P<refine>[\w.%#+-]+)(%40|@)([a-z0-9.-]*.[a-z]{2,})",
                     "Name": "EmailAddress"
                 }
             ]

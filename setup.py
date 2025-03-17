@@ -87,7 +87,7 @@ setup(
         'packaging',
         'tqdm',
         'wheel==0.30.0',
-        'microsoft-security-utilities-secret-masker~=1.0.0b2'
+        'microsoft-security-utilities-secret-masker~=1.0.0b4'
     ],
     package_data={
         'azdev.config': ['*.*', 'cli_pylintrc', 'ext_pylintrc'],
