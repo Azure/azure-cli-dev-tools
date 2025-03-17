@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.96
+++++++
+* `azdev generate-breaking-change-report`: Add `--no-head` and `--no-tail` to support trim header and tail in markdown report.
+
 0.1.95
 ++++++
 * `azdev generate-breaking-change-report`: Extracts upcoming breaking changes in extensions, regardless of the target version set
