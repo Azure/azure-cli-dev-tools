@@ -276,3 +276,5 @@ def load_arguments(self, _):
                    help='If specified, breaking changes would be grouped by their target version as well.')
         c.argument('output_format', choices=['structure', 'markdown'], default='structure',
                    help='Output format of the collected breaking changes.')
+        c.argument('no_head', action='store_true', help='Skip head when displaying as markdown.')
+        c.argument('no_tail', action='store_true', help='Skip tail when displaying as markdown.')
