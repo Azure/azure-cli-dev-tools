@@ -143,10 +143,10 @@ def cmp_command_meta(base_meta_file, diff_meta_file, only_break=False, output_ty
     return azure_cli_diff_tool.meta_diff(base_meta_file, diff_meta_file, only_break, output_type, output_file)
 
 
-def export_command_tree(modules, output_file=None):
+def export_command_tree(modules, output_file=None, include_whl_extensions=False):
     require_azure_cli()
 
-    selected_mod_names = calc_selected_mod_names(modules)
+    selected_mod_names = calc_selected_mod_names(modules, include_whl_extensions=include_whl_extensions)
 
     if selected_mod_names:
         display('Modules selected: {}\n'.format(', '.join(selected_mod_names)))

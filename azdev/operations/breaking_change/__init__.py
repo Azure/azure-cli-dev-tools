@@ -304,7 +304,8 @@ def _group_breaking_change_items(iterator, group_by_version=False):
 
 
 def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow', source=None, group_by_version=None,
-                                      output_format='structure', no_head=False, no_tail=False):
+                                      output_format='structure', no_head=False, no_tail=False,
+                                      include_whl_extensions=False):
     if target_version == 'NextWindow':
         from azure.cli.core.breaking_change import NEXT_BREAKING_CHANGE_RELEASE
         target_version = NEXT_BREAKING_CHANGE_RELEASE
@@ -313,7 +314,7 @@ def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow',
 
     require_azure_cli()
 
-    selected_modules = calc_selected_modules(modules)
+    selected_modules = calc_selected_modules(modules, include_whl_extensions=include_whl_extensions)
     cli_mod_names = list(selected_modules['core'].keys()) + list(selected_modules['mod'].keys())
     ext_mod_names = list(selected_modules['ext'].keys())
 

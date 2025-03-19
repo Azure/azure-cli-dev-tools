@@ -265,14 +265,14 @@ def get_path_table(include_only=None, include_whl_extensions=False):
     return table
 
 
-def calc_selected_modules(modules=None):
+def calc_selected_modules(modules=None, include_whl_extensions=False):
     # allow user to run only on CLI or extensions
     cli_only = modules == ['CLI']
     ext_only = modules == ['EXT']
     if cli_only or ext_only:
         modules = None
 
-    selected_modules = get_path_table(include_only=modules)
+    selected_modules = get_path_table(include_only=modules, include_whl_extensions=include_whl_extensions)
 
     if cli_only:
         selected_modules['ext'] = {}
@@ -283,8 +283,8 @@ def calc_selected_modules(modules=None):
     return selected_modules
 
 
-def calc_selected_mod_names(modules=None):
-    selected_modules = calc_selected_modules(modules)
+def calc_selected_mod_names(modules=None, include_whl_extensions=False):
+    selected_modules = calc_selected_modules(modules, include_whl_extensions=include_whl_extensions)
 
     if not any(selected_modules.values()):
         logger.warning('No commands selected to check.')
