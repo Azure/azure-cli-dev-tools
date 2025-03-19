@@ -12,9 +12,9 @@ def display(txt):
     print(txt, file=sys.stderr)
 
 
-def output(txt):
+def output(txt, **kwargs):
     """ Output to stdout """
-    print(txt, file=sys.stdout)
+    print(txt, file=sys.stdout, **kwargs)
 
 
 def heading(txt):

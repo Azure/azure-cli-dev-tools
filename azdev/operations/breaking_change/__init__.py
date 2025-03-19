@@ -224,10 +224,12 @@ def _handle_module(module, loader, source):
     start = time.time()
 
     for command, command_info in loader.command_table.items():
-        yield from _handle_command_breaking_changes(module, command, command_info, source)
+        if command:
+            yield from _handle_command_breaking_changes(module, command, command_info, source)
 
     for command_group_name, command_group in loader.command_group_table.items():
-        yield from _handle_command_group_breaking_changes(module, command_group_name, command_group, source)
+        if command_group_name:
+            yield from _handle_command_group_breaking_changes(module, command_group_name, command_group, source)
 
     stop = time.time()
     logger.info('Module %s finished in %i sec', module, stop - start)
@@ -244,7 +246,8 @@ def _handle_core(source):
         except ImportError:
             pass
 
-        yield from _handle_custom_breaking_changes('core', 'core')
+        yield from _handle_custom_breaking_changes('core', '')
+        yield from _handle_custom_breaking_changes('core', '_core')
 
     stop = time.time()
     logger.info('Core finished in %i sec', stop - start)
@@ -344,5 +347,5 @@ def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow',
             'module_bc': breaking_changes,
             'no_head': no_head,
             'no_tail': no_tail,
-        }))
+        }), end='' if no_tail else '\n')
     return None
