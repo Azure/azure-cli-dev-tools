@@ -8,7 +8,6 @@ import os
 import re
 import sys
 
-from distutils.version import LooseVersion  # pylint:disable=import-error,no-name-in-module,deprecated-module
 from docutils import core, io
 
 from knack.log import get_logger
@@ -247,6 +246,7 @@ def _compare_module_against_pypi(results, root_dir, mod, mod_path):
         results[mod]['status'] = 'OK'
         return results
     # OK if local version is higher than what's on PyPI
+    from distutils.version import LooseVersion  # pylint:disable=import-error,no-name-in-module,deprecated-module
     if LooseVersion(build_version) > LooseVersion(downloaded_version):
         results[mod]['status'] = 'OK'
         return results
