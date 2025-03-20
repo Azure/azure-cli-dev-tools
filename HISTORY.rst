@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.98
+++++++
+* `az verify history`: Mitigate the usage of "distutils" by inline
+
 0.1.97
 ++++++
 * `azdev generate-breaking-change-report`: Add `--include-whl-extensions` to support extensions installed through wheel.
