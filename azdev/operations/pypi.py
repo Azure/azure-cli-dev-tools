@@ -93,7 +93,7 @@ def _check_history_headings(mod_path):
                           "line after the 'Release History' heading.".format(history_path))
 
         first_version_history = all_versions[0]
-        actual_version = cmd('python setup.py --version', cwd=mod_path)
+        actual_version = cmd(sys.executable + ' setup.py --version', cwd=mod_path)
         # command can output warnings as well, so we just want the last line, which should have the version
         actual_version = actual_version.result.splitlines()[-1].strip()
         if first_version_history != actual_version:
@@ -104,7 +104,7 @@ def _check_history_headings(mod_path):
 
 def _check_readme_render(mod_path):
     errors = []
-    result = cmd('python setup.py check -r -s', cwd=mod_path)
+    result = cmd(sys.executable + ' setup.py check -r -s', cwd=mod_path)
     if result.exit_code:
         # this outputs some warnings we don't care about
         error_lines = []

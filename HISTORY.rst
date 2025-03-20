@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.99
+++++++
+* `azdev verify`: Fix executable inconsistence in `subprocess`
+
 0.1.98
 ++++++
 * `az verify history`: Mitigate the usage of "distutils" by inline
