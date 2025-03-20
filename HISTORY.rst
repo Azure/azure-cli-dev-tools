@@ -2,6 +2,13 @@
 
 Release History
 ===============
+0.1.97
+++++++
+* `azdev generate-breaking-change-report`: Add `--include-whl-extensions` to support extensions installed through wheel.
+* `azdev command-change tree-export`: Add `--include-whl-extensions` to support extensions installed through wheel.
+* `azdev generate-breaking-change-report`: Support collecting Breaking Change items from CLI core.
+* `azdev generate-breaking-change-report`: Support trim the last newline in output with `--no-tail`.
+
 0.1.96
 ++++++
 * `azdev generate-breaking-change-report`: Add `--no-head` and `--no-tail` to support trim header and tail in markdown report.
