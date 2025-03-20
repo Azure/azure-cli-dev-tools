@@ -224,10 +224,12 @@ def _handle_module(module, loader, source):
     start = time.time()
 
     for command, command_info in loader.command_table.items():
-        yield from _handle_command_breaking_changes(module, command, command_info, source)
+        if command:
+            yield from _handle_command_breaking_changes(module, command, command_info, source)
 
     for command_group_name, command_group in loader.command_group_table.items():
-        yield from _handle_command_group_breaking_changes(module, command_group_name, command_group, source)
+        if command_group_name:
+            yield from _handle_command_group_breaking_changes(module, command_group_name, command_group, source)
 
     stop = time.time()
     logger.info('Module %s finished in %i sec', module, stop - start)
@@ -244,7 +246,8 @@ def _handle_core(source):
         except ImportError:
             pass
 
-        yield from _handle_custom_breaking_changes('core', 'core')
+        yield from _handle_custom_breaking_changes('core', '')
+        yield from _handle_custom_breaking_changes('core', '_core')
 
     stop = time.time()
     logger.info('Core finished in %i sec', stop - start)
@@ -304,7 +307,8 @@ def _group_breaking_change_items(iterator, group_by_version=False):
 
 
 def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow', source=None, group_by_version=None,
-                                      output_format='structure', no_head=False, no_tail=False):
+                                      output_format='structure', no_head=False, no_tail=False,
+                                      include_whl_extensions=False):
     if target_version == 'NextWindow':
         from azure.cli.core.breaking_change import NEXT_BREAKING_CHANGE_RELEASE
         target_version = NEXT_BREAKING_CHANGE_RELEASE
@@ -313,7 +317,7 @@ def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow',
 
     require_azure_cli()
 
-    selected_modules = calc_selected_modules(modules)
+    selected_modules = calc_selected_modules(modules, include_whl_extensions=include_whl_extensions)
     cli_mod_names = list(selected_modules['core'].keys()) + list(selected_modules['mod'].keys())
     ext_mod_names = list(selected_modules['ext'].keys())
 
@@ -343,5 +347,5 @@ def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow',
             'module_bc': breaking_changes,
             'no_head': no_head,
             'no_tail': no_tail,
-        }))
+        }), end='' if no_tail else '\n')
     return None

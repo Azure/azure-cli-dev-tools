@@ -8,7 +8,7 @@ The breaking changes listed in this article are planned for the next major relea
 ## {{ module }}
 
 {% for command, multi_version_bcs in command_bc.items() -%}
-{% if not (module == 'core' and command == 'core') -%}
+{% if not module == 'core' -%}
 ### `{{ command }}`
 
 {% endif -%}
@@ -18,7 +18,7 @@ The breaking changes listed in this article are planned for the next major relea
 {% endif -%}
 {% if multi_version_bcs['items'] is mapping -%}
 {% for version, bcs in multi_version_bcs['items'] | dictsort -%}
-###{%- if not (module == 'core' and command == 'core') -%}#{%- endif %} Deprecated in {{ version }}
+###{%- if not module == 'core' -%}#{%- endif %} Deprecated in {{ version }}
 
 {% for bc in bcs -%}
 - {{ bc.detail }}

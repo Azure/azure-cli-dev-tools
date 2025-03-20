@@ -178,6 +178,8 @@ def load_arguments(self, _):
 
     with ArgumentsContext(self, 'command-change tree-export') as c:
         c.positional('modules', modules_type)
+        c.argument('include_whl_extensions', action='store_true',
+                   help="Allow running cmd loader on extensions installed by `az extension add --source xxx.whl`.")
         c.argument('output_file', help='command tree json file path to store')
 
     # region cmdcov
@@ -271,10 +273,12 @@ def load_arguments(self, _):
         c.argument('source', choices=['deprecate_info', 'pre_announce'], default='pre_announce',
                    help='The source of pre-announced breaking changes. `deprecate_info` represents all breaking changes '
                         'marked through `deprecation_info`; `pre_announce` represents the breaking changes announced in '
-                        '`breaking_change.py` file.')
+                        '`_breaking_change.py` file.')
         c.argument('group_by_version', action='store_true',
                    help='If specified, breaking changes would be grouped by their target version as well.')
         c.argument('output_format', choices=['structure', 'markdown'], default='structure',
                    help='Output format of the collected breaking changes.')
         c.argument('no_head', action='store_true', help='Skip head when displaying as markdown.')
         c.argument('no_tail', action='store_true', help='Skip tail when displaying as markdown.')
+        c.argument('include_whl_extensions', action='store_true',
+                   help="Allow scanning on extensions installed by `az extension add --source xxx.whl`.")

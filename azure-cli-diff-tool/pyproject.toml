@@ -4,4 +4,6 @@
 # license information.
 # -----------------------------------------------------------------------------
 
-__VERSION__ = '0.1.97'
+[build-system]
+# Minimum requirements for the build system to execute.
+requires = ["setuptools", "wheel"]
