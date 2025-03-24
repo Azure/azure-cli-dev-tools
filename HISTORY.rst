@@ -3,7 +3,7 @@
 Release History
 ===============
 0.1.100
-++++++
++++++++
 * `azdev generated-breaking-change-report`: Support multi-line upcoming breaking change announcement
 
 0.1.99
