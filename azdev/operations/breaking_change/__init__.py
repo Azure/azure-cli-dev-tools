@@ -38,7 +38,7 @@ class BreakingChangeItem:
 
     @property
     def prepended_detail(self):
-        prepended_lines = [f'- {l}' if l else '' for l in self.detail.split('\n')]
+        prepended_lines = [f'- {line}' if line else '' for line in self.detail.split('\n')]
         return '\n'.join(prepended_lines)
 
 
