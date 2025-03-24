@@ -36,6 +36,11 @@ class BreakingChangeItem:
         else:
             self.group_ref = self.command.split()[:-1]
 
+    @property
+    def prepended_detail(self):
+        prepended_lines = [f'- {line}' if line else '' for line in self.detail.split('\n')]
+        return '\n'.join(prepended_lines)
+
 
 def _load_commands():
     start = time.time()
@@ -300,9 +305,9 @@ def _group_breaking_change_items(iterator, group_by_version=False):
         version = item.target_version if item.target_version else 'Unspecific'
         upcoming_breaking_changes[item.module][item.command]['group_ref'] = item.group_ref
         if group_by_version:
-            upcoming_breaking_changes[item.module][item.command]['items'][version].append(item.detail)
+            upcoming_breaking_changes[item.module][item.command]['items'][version].append(item.prepended_detail)
         else:
-            upcoming_breaking_changes[item.module][item.command]['items'].append(item.detail)
+            upcoming_breaking_changes[item.module][item.command]['items'].append(item.prepended_detail)
     return upcoming_breaking_changes
 
 

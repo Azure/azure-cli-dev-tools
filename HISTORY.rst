@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.0
++++++
+* `azdev generated-breaking-change-report`: Support multi-line upcoming breaking change announcement
+
 0.1.99
 ++++++
 * `azdev verify`: Fix executable inconsistence in `subprocess`
