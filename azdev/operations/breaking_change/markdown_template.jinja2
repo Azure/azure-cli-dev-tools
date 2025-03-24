@@ -21,14 +21,14 @@ The breaking changes listed in this article are planned for the next major relea
 ###{%- if not module == 'core' -%}#{%- endif %} Deprecated in {{ version }}
 
 {% for bc in bcs -%}
-- {{ bc.detail }}
+{{ bc }}
 {% endfor %}
 
 {% endfor -%}
 {% else -%}
 
 {% for bc in multi_version_bcs['items'] -%}
-- {{ bc }}
+{{ bc }}
 {% endfor %}
 
 {% endif -%}
