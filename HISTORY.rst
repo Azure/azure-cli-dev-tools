@@ -4,7 +4,7 @@ Release History
 ===============
 0.2.1
 ++++++
-* `azdev extension cal-next-version`: Adjust `manor` or `patch` update for previous preview versioning pattern.
+* `azdev extension cal-next-version`: Adjust `minor` or `patch` update for previous preview versioning pattern.
 
 0.2.0
 +++++
