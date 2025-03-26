@@ -363,7 +363,7 @@ def publish_extensions(extensions, storage_account, storage_account_key, storage
 
 def cal_next_version(base_meta_file, diff_meta_file, current_version, is_preview=None, is_experimental=None,
                      next_version_pre_tag=None, next_version_segment_tag=None):
-    with open(base_meta_file, "r") as g:
+    with open(diff_meta_file, "r") as g:
         command_tree = json.load(g)
         module_name = command_tree["module_name"]
     version_op = VersionUpgradeMod(module_name, current_version, is_preview, is_experimental,

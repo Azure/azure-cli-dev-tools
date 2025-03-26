@@ -60,6 +60,8 @@ class VersionUpgradeMod:
         self.is_preview = bool(is_preview or is_experimental or (self.version.pre and self.version.pre[0] in ["a", "b"]))
         self.has_preview_tag = is_preview
         self.has_exp_tag = is_experimental
+        # x.x.x + (isPreview/isExperimental: True)
+        self.is_preview_deprecate_pattern = bool((is_preview or is_experimental) and not self.version.pre)
         self.version_raw = current_version
         self.norm_versions()
         self.base_meta_file = meta_diff_before
@@ -124,7 +126,12 @@ class VersionUpgradeMod:
             return
 
         if self.next_version_pre_tag == VERSION_STABLE_TAG and self.is_preview:
-            # 2.0.0bN -> stable > 2.0.0
+            # normal case: 2.0.0bN -> stable > 2.0.0
+            if self.is_preview_deprecate_pattern:
+                # old preview tag pattern
+                # 1.0.5 + isPreview: true -> stable -> 1.1.0
+                self.next_version.minor = self.version.minor + 1
+                self.next_version.patch = 0
             return
 
         if self.next_version_segment_tag:
@@ -157,7 +164,13 @@ class VersionUpgradeMod:
         if found_break:
             if self.next_version_pre_tag == VERSION_PREVIEW_TAG and self.is_preview and self.last_stable_major < self.version.major:
                 # refer to rule: https://github.com/Azure/azure-cli/blob/release/doc/extensions/versioning_guidelines.md#notes-1
-                self.next_version.pre_num = self.version.pre[1] + 1
+                if self.is_preview_deprecate_pattern:
+                    # 1.1.0 + isPreview:True -> preview -> 1.1.1b1
+                    # if 1.1.0b2, then version cannot upgrade in core
+                    self.next_version.patch = self.version.micro + 1
+                    self.next_version.pre_num = 1
+                else:
+                    self.next_version.pre_num = self.version.pre[1] + 1
             else:
                 self.next_version.major = self.version.major + 1
                 self.next_version.minor = 0
@@ -166,13 +179,25 @@ class VersionUpgradeMod:
                     self.next_version.pre_num = 1
         elif len(self.diffs) > 0:
             if self.is_preview:
-                self.next_version.pre_num = self.version.pre[1] + 1
+                if self.is_preview_deprecate_pattern:
+                    # 1.1.0 + isPreview:True -> preview -> 1.1.1b1
+                    # if 1.1.0b2, then version cannot upgrade in core
+                    self.next_version.patch = self.version.micro + 1
+                    self.next_version.pre_num = 1
+                else:
+                    self.next_version.pre_num = self.version.pre[1] + 1
             else:
                 self.next_version.minor = self.version.minor + 1
                 self.next_version.patch = 0
         else:
             if self.is_preview:
-                self.next_version.pre_num = self.version.pre[1] + 1
+                if self.is_preview_deprecate_pattern:
+                    # 1.1.0 + isPreview:True -> preview -> 1.1.1b1
+                    # if 1.1.0b2, then version cannot upgrade in core
+                    self.next_version.patch = self.version.micro + 1
+                    self.next_version.pre_num = 1
+                else:
+                    self.next_version.pre_num = self.version.pre[1] + 1
             else:
                 self.next_version.patch = self.version.micro + 1
 
