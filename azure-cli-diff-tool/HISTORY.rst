@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.0
+++++++
+* Use dynamic metadata whitelist
+
 0.0.9
 ++++++
 * Use dynamic metadata whitelist

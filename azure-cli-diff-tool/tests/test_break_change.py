@@ -183,6 +183,24 @@ class CLIDiffToolTestCase(unittest.TestCase):
             print(mes)
             self.assertTrue(found, "target message not found")
 
+    def test_diff_meta_with_different_mod_name(self):
+        if not os.path.exists("./jsons/az_virtual-network-manager_meta_before.json") \
+                or not os.path.exists("./jsons/az_network-manager_meta_after.json"):
+            raise ValueError("Meta file not found, please check testing package")
+        result = meta_diff(base_meta_file="./jsons/az_virtual-network-manager_meta_before.json",
+                           diff_meta_file="./jsons/az_network-manager_meta_after.json",
+                           output_type="text")
+        target_message = [
+            "updated property `name` from `network_manager_scopes` to `module_name`",
+        ]
+        for mes in target_message:
+            found = False
+            for line in result:
+                if line.find(mes) > -1:
+                    found = True
+                    break
+            self.assertTrue(found, "target message not found")
+
 
 if __name__ == '__main__':
     unittest.main()
