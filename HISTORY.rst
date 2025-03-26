@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.1
+++++++
+* `azdev extension cal-next-version`: Adjust `minor` or `patch` update for previous preview versioning pattern.
+
 0.2.0
 +++++
 * `azdev generated-breaking-change-report`: Support multi-line upcoming breaking change announcement

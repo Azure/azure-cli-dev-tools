@@ -146,3 +146,46 @@ class ExtensionVersioningTestCase(unittest.TestCase):
         self.assertEqual("1.0.0b4", version_test.get("version"), "Version cal error")
         self.assertEqual(False, version_test.get("is_stable"), "Version tag error")
         self.assertEqual("add", version_test.get("preview_tag", False), "Version tag error")
+
+    @patch.object(VersionUpgradeMod, 'find_max_version')
+    def test_version_upgrade_pure_preview_pattern_to_preview(self, find_max_version):
+        # preview version update while no stable version before or stable version already lower in major
+        def config_last_stable_version(_):
+            return False, -1
+
+        find_max_version.side_effect = config_last_stable_version
+        version_test = cal_next_version(base_meta_file=os.path.join(TEST_DIR, "jsons",
+                                                                    "az_costmanagement_meta_before.json"),
+                                        diff_meta_file=os.path.join(TEST_DIR, "jsons",
+                                                                    "az_costmanagement_meta_after.json"),
+                                        current_version="1.0.0", is_preview=True)
+        self.assertEqual("1.0.1b1", version_test.get("version"), "Version cal error")
+        self.assertEqual(False, version_test.get("is_stable"), "Version tag error")
+        self.assertEqual(False, version_test.get("preview_tag", False), "Version tag error")
+
+    @patch.object(VersionUpgradeMod, 'find_max_version')
+    def test_version_upgrade_pure_preview_pattern_to_stable(self, find_max_version):
+        # preview version update while no stable version before or stable version already lower in major
+        def config_last_stable_version(_):
+            return False, -1
+
+        find_max_version.side_effect = config_last_stable_version
+        version_test = cal_next_version(base_meta_file=os.path.join(TEST_DIR, "jsons",
+                                                                    "az_costmanagement_meta_before.json"),
+                                        diff_meta_file=os.path.join(TEST_DIR, "jsons",
+                                                                    "az_costmanagement_meta_after.json"),
+                                        current_version="1.0.4", is_preview=True, next_version_pre_tag="stable")
+        self.assertEqual("1.1.0", version_test.get("version"), "Version cal error")
+        self.assertEqual(True, version_test.get("is_stable"), "Version tag error")
+        self.assertEqual("remove", version_test.get("preview_tag", False), "Version tag error")
+
+    def test_version_upgrade_pure_exp_pattern_to_stable(self):
+        version_test = cal_next_version(base_meta_file=os.path.join(TEST_DIR, "jsons",
+                                                                    "az_costmanagement_meta_before.json"),
+                                        diff_meta_file=os.path.join(TEST_DIR, "jsons",
+                                                                    "az_costmanagement_meta_after.json"),
+                                        current_version="1.0.4", is_experimental=True, next_version_pre_tag="stable")
+        self.assertEqual("1.1.0", version_test.get("version"), "Version cal error")
+        self.assertEqual(True, version_test.get("is_stable"), "Version tag error")
+        self.assertEqual(False, version_test.get("preview_tag", False), "Version tag error")
+        self.assertEqual("remove", version_test.get("exp_tag", False), "Version tag error")
