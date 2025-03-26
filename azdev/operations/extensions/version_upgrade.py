@@ -61,7 +61,7 @@ class VersionUpgradeMod:
         self.has_preview_tag = is_preview
         self.has_exp_tag = is_experimental
         # x.x.x + (isPreview/isExperimental: True)
-        # the versioning patter for previous preview pattern is as following:
+        # the versioning update rule for previous deprecated preview pattern is as following:
         # 1) 1.0.4 + isPreview: true -> stable: increase minor num to 1.1.0 + no preview tag
         # 2) 1.0.4 + isPreview: true -> preview: increase patch num to 1.0.5b1 + preview tag
         self.is_preview_deprecate_pattern = bool((is_preview or is_experimental) and not self.version.pre)
