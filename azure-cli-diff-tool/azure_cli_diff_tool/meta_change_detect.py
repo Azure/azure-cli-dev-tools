@@ -45,8 +45,10 @@ class MetaChangeDetect:
             self.deep_diff = deep_diff
         else:
             logger.info("None diffs from cmd meta json")
-        assert base_meta["module_name"] == diff_meta["module_name"]
-        self.module_name = base_meta["module_name"]
+        if base_meta["module_name"] != diff_meta["module_name"]:
+            print(f'Comparing two modules with different name, base mod: {base_meta["module_name"]},'
+                  f' diff mod: {diff_meta["module_name"]}')
+        self.module_name = diff_meta["module_name"]
         self.base_meta = base_meta
         self.diff_meta = diff_meta
         self.diff_objs = []

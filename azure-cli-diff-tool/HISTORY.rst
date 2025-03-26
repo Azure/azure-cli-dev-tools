@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.0
+++++++
+* Enable meta-diff with `module_name` excluded
+
 0.0.9
 ++++++
 * Use dynamic metadata whitelist

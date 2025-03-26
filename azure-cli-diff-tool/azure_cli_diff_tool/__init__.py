@@ -18,7 +18,7 @@ from .utils import get_blob_config, load_blob_config_file, get_target_version_mo
     extract_module_name_from_meta_file, export_meta_changes_to_csv, export_meta_changes_to_json, \
     export_meta_changes_to_dict, expand_deprecate_obj
 
-__VERSION__ = '0.0.9'
+__VERSION__ = '0.1.0'
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ def meta_diff(base_meta_file, diff_meta_file, only_break=False, output_type="tex
         raise Exception("Please update your azure cli diff tool")
     expand_deprecate_obj(command_tree_before)
     expand_deprecate_obj(command_tree_after)
-    diff = DeepDiff(command_tree_before, command_tree_after)
+    diff = DeepDiff(command_tree_before, command_tree_after, exclude_paths=["root['module_name']"])
     if not diff:
         print(f"No meta diffs from {diff_meta_file} to {base_meta_file}")
         return export_meta_changes_to_json(None, output_file)
