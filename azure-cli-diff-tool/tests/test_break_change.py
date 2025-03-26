@@ -10,6 +10,7 @@ import os
 from azure_cli_diff_tool import meta_diff
 from azure_cli_diff_tool.utils import get_command_tree, extract_cmd_name, extract_cmd_property, extract_para_info, \
     extract_subgroup_name, extract_subgroup_deprecate_property, expand_deprecate_obj, extract_subgroup_property
+TEST_DIR = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
 
 
 class CLIDiffToolTestCase(unittest.TestCase):
@@ -65,12 +66,15 @@ class CLIDiffToolTestCase(unittest.TestCase):
         self.assertEqual(subgroup_prop, "deprecate_info_hide", "sub group prop extract failed")
 
     def test_diff_meta(self):
-        if not os.path.exists("./jsons/az_monitor_meta_before.json") \
-                or not os.path.exists("./jsons/az_monitor_meta_after.json"):
-            return
-        result = meta_diff(base_meta_file="./jsons/az_monitor_meta_before.json",
-                           diff_meta_file="./jsons/az_monitor_meta_after.json",
+        base_meta_file = os.path.join(TEST_DIR, "jsons", "az_monitor_meta_before.json")
+        diff_meta_file = os.path.join(TEST_DIR, "jsons", "az_monitor_meta_after.json")
+        if not os.path.exists(base_meta_file) or not os.path.exists(diff_meta_file):
+            raise ValueError("Meta file not found, please check testing package")
+
+        result = meta_diff(base_meta_file=base_meta_file,
+                           diff_meta_file=diff_meta_file,
                            output_type="text")
+
         target_message = [
             "please confirm cmd `monitor private-link-scope scoped-resource show` removed",
             "sub group `monitor private-link-scope private-endpoint-connection cust` removed",
@@ -97,20 +101,22 @@ class CLIDiffToolTestCase(unittest.TestCase):
             self.assertTrue(ignored, "ignored message found")
 
     def test_diff_meta_whitelist(self):
-        if not os.path.exists("./jsons/az_ams_meta_before.json") \
-                or not os.path.exists("./jsons/az_ams_meta_after.json"):
-            return
-        result = meta_diff(base_meta_file="./jsons/az_ams_meta_before.json",
-                           diff_meta_file="./jsons/az_ams_meta_after.json",
+        base_meta_file = os.path.join(TEST_DIR, "jsons", "az_ams_meta_before.json")
+        diff_meta_file = os.path.join(TEST_DIR, "jsons", "az_ams_meta_after.json")
+        if not os.path.exists(base_meta_file) or not os.path.exists(diff_meta_file):
+            raise ValueError("Meta file not found, please check testing package")
+        result = meta_diff(base_meta_file=base_meta_file,
+                           diff_meta_file=diff_meta_file,
                            output_type="text")
         self.assertEqual(result, [], "returned change isn't empty")
 
     def test_dynamic_diff_meta_whitelist(self):
-        if not os.path.exists("./jsons/az_mysql_meta_before.json") \
-                or not os.path.exists("./jsons/az_mysql_meta_after.json"):
-            return
-        result = meta_diff(base_meta_file="./jsons/az_mysql_meta_before.json",
-                           diff_meta_file="./jsons/az_mysql_meta_after.json",
+        base_meta_file = os.path.join(TEST_DIR, "jsons", "az_mysql_meta_before.json")
+        diff_meta_file = os.path.join(TEST_DIR, "jsons", "az_mysql_meta_after.json")
+        if not os.path.exists(base_meta_file) or not os.path.exists(diff_meta_file):
+            raise ValueError("Meta file not found, please check testing package")
+        result = meta_diff(base_meta_file=base_meta_file,
+                           diff_meta_file=diff_meta_file,
                            output_type="text")
         self.assertEqual(result, [], "returned change isn't empty")
 
@@ -158,11 +164,12 @@ class CLIDiffToolTestCase(unittest.TestCase):
         self.assertEqual(example_obj["sub_groups"]["acr"]["commands"]["acr helm list"]["parameters"][0]["deprecate_info_redirect"], "resource_group_name2", "deprecate info expand not working properly")
 
     def test_diff_meta_for_deprecate_info(self):
-        if not os.path.exists("./jsons/az_acr_meta_before.json") or not os.path.exists("./jsons/az_acr_meta_after.json"):
-            return
-        result = meta_diff(base_meta_file="./jsons/az_acr_meta_before.json",
-                           diff_meta_file="./jsons/az_acr_meta_after.json",
-                           output_type="text")
+        base_meta_file = os.path.join(TEST_DIR, "jsons", "az_acr_meta_before.json")
+        diff_meta_file = os.path.join(TEST_DIR, "jsons", "az_acr_meta_after.json")
+        if not os.path.exists(base_meta_file) or not os.path.exists(diff_meta_file):
+            raise ValueError("Meta file not found, please check testing package")
+
+        result = meta_diff(base_meta_file=base_meta_file, diff_meta_file=diff_meta_file, output_type="text")
         target_message = [
             "sub group `acr` added property `deprecate_info_hide` | diff_level: 2",
             "sub group `acr` updated property `deprecate_info_redirect` from `acr2` to `acr3` | diff_level: 1",
@@ -184,12 +191,11 @@ class CLIDiffToolTestCase(unittest.TestCase):
             self.assertTrue(found, "target message not found")
 
     def test_diff_meta_with_different_mod_name(self):
-        if not os.path.exists("./jsons/az_virtual-network-manager_meta_before.json") \
-                or not os.path.exists("./jsons/az_network-manager_meta_after.json"):
+        base_meta_file = os.path.join(TEST_DIR, "jsons", "az_virtual-network-manager_meta_before.json")
+        diff_meta_file = os.path.join(TEST_DIR, "jsons", "az_network-manager_meta_after.json")
+        if not os.path.exists(base_meta_file) or not os.path.exists(diff_meta_file):
             raise ValueError("Meta file not found, please check testing package")
-        result = meta_diff(base_meta_file="./jsons/az_virtual-network-manager_meta_before.json",
-                           diff_meta_file="./jsons/az_network-manager_meta_after.json",
-                           output_type="text")
+        result = meta_diff(base_meta_file=base_meta_file, diff_meta_file=diff_meta_file, output_type="text")
         target_message = [
             "updated property `name` from `network_manager_scopes` to `module_name`",
         ]
