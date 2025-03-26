@@ -179,7 +179,6 @@ class ExtensionVersioningTestCase(unittest.TestCase):
         self.assertEqual(True, version_test.get("is_stable"), "Version tag error")
         self.assertEqual("remove", version_test.get("preview_tag", False), "Version tag error")
 
-
     def test_version_upgrade_pure_exp_pattern_to_stable(self):
         version_test = cal_next_version(base_meta_file=os.path.join(TEST_DIR, "jsons",
                                                                     "az_costmanagement_meta_before.json"),
