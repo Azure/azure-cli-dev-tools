@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.2
+++++++
+* Update dependency `azure-cli-diff-tool` to `0.1.0`.
+
 0.2.1
 ++++++
 * `azdev extension cal-next-version`: Adjust `minor` or `patch` update for previous preview versioning pattern.
