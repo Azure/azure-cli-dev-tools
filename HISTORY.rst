@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.3b1
+++++++
+* extract metadata generation logic and decouple from wheel 0.30.0 
+
 0.2.2
 ++++++
 * Update dependency `azure-cli-diff-tool` to `0.1.0`.
