@@ -296,9 +296,7 @@ def pkginfo_to_dict(path, distribution=None):
 
     # convert entry points to exports
     try:
-        with open(os.path.join(os.path.dirname(path), "entry_points.txt"), "r") as ep_file:
-            ep_map = entry_points()
-            # ep_map = pkg_resources.EntryPoint.parse_map(ep_file.read())
+        ep_map = entry_points()
         exports = OrderedDict()
         # exports = defaultdict()
         for group, items in sorted(ep_map.items()):

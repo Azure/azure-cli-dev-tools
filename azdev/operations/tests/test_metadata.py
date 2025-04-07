@@ -82,6 +82,7 @@ def compare_metadata(wheel_url, expected_metadata):
             import shutil
             shutil.rmtree(temp_dir)
 
+
 def test_specific_wheel():
     """
     Test specific wheel metadata consistency
@@ -174,6 +175,7 @@ def test_specific_wheel():
     }
 
     assert compare_metadata(wheel_url, metadata_from_index), "Metadata comparison failed"
+
 
 if __name__ == "__main__":
     test_specific_wheel()
