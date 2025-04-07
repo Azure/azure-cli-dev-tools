@@ -3,7 +3,7 @@
 Release History
 ===============
 0.2.3b1
-++++++
++++++++
 * extract metadata generation logic and decouple from wheel 0.30.0 
 
 0.2.2
@@ -15,7 +15,7 @@ Release History
 * `azdev extension cal-next-version`: Adjust `minor` or `patch` update for previous preview versioning pattern.
 
 0.2.0
-+++++
+++++++
 * `azdev generated-breaking-change-report`: Support multi-line upcoming breaking change announcement
 
 0.1.99
