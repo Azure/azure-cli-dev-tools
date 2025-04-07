@@ -1,5 +1,11 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for
+# license information.
+# -----------------------------------------------------------------------------
+
 """
-Tools for converting old- to new-style metadata.
+Tools for generate metadata for index.json.
 """
 
 import email.parser
