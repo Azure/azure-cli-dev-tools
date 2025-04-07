@@ -1,3 +1,5 @@
+# pylint: disable=C0325,R1725,W0612,R1704,W0718,R0914,E1101,R0912,R0915,R1705
+
 # -----------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for
