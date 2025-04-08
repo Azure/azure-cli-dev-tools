@@ -100,9 +100,22 @@ jobs:
         # azdev setup
         git clone --quiet https://github.com/Azure/azure-cli.git
         git clone --quiet https://github.com/Azure/azure-cli-extensions.git
-        azdev setup -c ./azure-cli -r ./azure-cli-extensions
 
+        python -m azure.cli || echo "Failed to execute azure.cli directly"
+        pip show azure-cli || echo "Failed to show azure-cli"
+        python -c "import azure.cli; print(azure.cli.__file__)" || echo "Failed to print azure.cli location"
+        python -c "import sys; print('\n'.join(sys.path))" || echo "Failed to print sys.path"
+        az --version || echo "Failed to get az version"
+
+        azdev setup -c ./azure-cli -r ./azure-cli-extensions
         azdev --version
+
+        python -m azure.cli || echo "Failed to execute azure.cli directly"
+        pip show azure-cli || echo "Failed to show azure-cli"
+        python -c "import azure.cli; print(azure.cli.__file__)" || echo "Failed to print azure.cli location"
+        python -c "import sys; print('\n'.join(sys.path))" || echo "Failed to print sys.path"
+        az --version || echo "Failed to get az version"
+
 
         python -m pytest azdev/ --ignore=azdev/mod_templates --junitxml=junit/test-results.xml --cov=azdev --cov-report=xml
     - task: PublishTestResults@2
