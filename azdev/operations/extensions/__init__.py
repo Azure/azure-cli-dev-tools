@@ -45,7 +45,7 @@ def add_extension(extensions):
             raise CLIError('extension(s) not found: {}'.format(' '.join(extensions)))
 
     for path in paths_to_add:
-        result = pip_cmd('install -e {}'.format(path), "Adding extension '{}'...".format(path))
+        result = pip_cmd('install -e {} editable_mode=compat'.format(path), "Adding extension '{}'...".format(path))
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
 
