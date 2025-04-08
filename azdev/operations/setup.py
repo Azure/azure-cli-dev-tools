@@ -49,8 +49,10 @@ def _install_extensions(ext_paths):
 
     # install specified extensions
     for path in ext_paths or []:
-        result = pip_cmd('install -e {} --config-settings editable_mode=compat'.format(path),
-                          "Adding extension '{}'...".format(path))
+        result = pip_cmd(
+            f'install -e {path} --config-settings editable_mode=compat',
+            f"Adding extension '{path}'..."
+        )
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
 
