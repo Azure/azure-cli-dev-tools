@@ -102,6 +102,7 @@ jobs:
         git clone --quiet https://github.com/Azure/azure-cli-extensions.git
 
         pip --version
+        pip show setuptools
         python -m azure.cli || echo "Failed to execute azure.cli directly"
         pip show azure-cli || echo "Failed to show azure-cli"
         python -c "import azure.cli; print(azure.cli.__file__)" || echo "Failed to print azure.cli location"
@@ -112,6 +113,7 @@ jobs:
         azdev --version
 
         pip --version
+        pip show setuptools
         python -m azure.cli || echo "Failed to execute azure.cli directly"
         pip show azure-cli || echo "Failed to show azure-cli"
         python -c "import azure.cli; print(azure.cli.__file__)" || echo "Failed to print azure.cli location"
