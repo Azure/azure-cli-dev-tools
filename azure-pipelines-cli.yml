@@ -103,6 +103,7 @@ jobs:
         azdev setup -c ./azure-cli -r ./azure-cli-extensions
 
         azdev --version
+        az --version
 
         python -m pytest azdev/ --ignore=azdev/mod_templates --junitxml=junit/test-results.xml --cov=azdev --cov-report=xml
     - task: PublishTestResults@2
@@ -280,6 +281,7 @@ jobs:
         set -ev
         . scripts/ci/install.sh
         azdev --version
+        az --version
       displayName: 'Azdev Setup'
     - bash: |
         set -ev
