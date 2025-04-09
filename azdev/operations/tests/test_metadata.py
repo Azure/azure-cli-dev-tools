@@ -90,7 +90,7 @@ def test_wheel():
     wheel_url = [
         "https://azuremlsdktestpypi.blob.core.windows.net/wheels/sdk-cli-v2-public/ml-2.36.1-py3-none-any.whl",
         "https://azurecliext.blob.core.windows.net/release/azure_cli_ml-1.41.0-py3-none-any.whl"
-        ]
+    ]
     metadata_from_index = [
         {
             "azext.minCliCoreVersion": "2.15.0",
@@ -230,7 +230,7 @@ def test_wheel():
             "summary": "Microsoft Azure Command-Line Tools AzureML Command Module",
             "version": "1.41.0"
         }
-        ]
+    ]
 
     for idx, url in enumerate(wheel_url):
         assert compare_metadata(url, metadata_from_index[idx]), "Metadata comparison failed"
