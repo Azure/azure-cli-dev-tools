@@ -46,7 +46,7 @@ def add_extension(extensions):
 
     for path in paths_to_add:
         result = pip_cmd(
-            f'install -e {path} --config-settings editable_mode=compat',
+            f'install -e {path} --config-settings editable_mode=compat --no-build-isolation',
             f"Adding extension '{path}'..."
         )
         if result.error:
