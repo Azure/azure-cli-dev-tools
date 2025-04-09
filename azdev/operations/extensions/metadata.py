@@ -290,7 +290,7 @@ def pkginfo_to_dict(path, distribution=None):
         with zipfile.ZipFile(path, 'r') as zf:
             has_description = any('DESCRIPTION.rst' in name for name in zf.namelist())
             has_license = any('LICENSE.txt' in name for name in zf.namelist())
-            
+
             if has_description or has_license:
                 document_names = metadata['extensions']['python.details'].setdefault('document_names', {})
                 if has_description:

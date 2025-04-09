@@ -67,7 +67,6 @@ def compare_metadata(wheel_url, expected_metadata):
         print(f"Metadata from index.json cleaned: \n{expected_metadata_cleaned}")
         print(f"Metadata from python wheel package: \n{wheel_metadata}")
         diff = DeepDiff(wheel_metadata, expected_metadata_cleaned, ignore_order=True)
-        
 
         if diff:
             print("Metadata mismatch found:")

@@ -297,6 +297,9 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
     _generate_files(env, kwargs, test_files, dest_path)
 
     if is_ext:
-        result = pip_cmd('install -e {} --config-settings editable_mode=compat'.format(new_package_path), "Installing `{}{}`...".format(prefix, name))
+        result = pip_cmd(
+            f'install -e {new_package_path} --config-settings editable_mode=compat',
+            f"Installing `{prefix}{name}`..."
+        )
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
