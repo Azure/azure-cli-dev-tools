@@ -6,8 +6,12 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+import json
 import os
+import re
+import zipfile
 import requests
+
 from deepdiff import DeepDiff
 from azdev.operations.extensions.metadata import pkginfo_to_dict
 
@@ -47,6 +51,63 @@ def clean_metadata(original_metadata):
     return {k: v for k, v in original_metadata.items() if k not in keys_to_remove}
 
 
+# copy from wheel==0.30.0
+WHEEL_INFO_RE = re.compile(
+    r"""^(?P<namever>(?P<name>.+?)(-(?P<ver>\d.+?))?)
+    ((-(?P<build>\d.*?))?-(?P<pyver>.+?)-(?P<abi>.+?)-(?P<plat>.+?)
+    \.whl|\.dist-info)$""",
+    re.VERBOSE).match
+
+
+def _get_extension_modname(ext_dir):
+    # Modification of https://github.com/Azure/azure-cli/blob/dev/src/azure-cli-core/azure/cli/core/extension.py#L153
+    EXTENSIONS_MOD_PREFIX = 'azext_'
+    pos_mods = [n for n in os.listdir(ext_dir)
+                if n.startswith(EXTENSIONS_MOD_PREFIX) and os.path.isdir(os.path.join(ext_dir, n))]
+    if len(pos_mods) != 1:
+        raise AssertionError("Expected 1 module to load starting with "
+                             "'{}': got {}".format(EXTENSIONS_MOD_PREFIX, pos_mods))
+    return pos_mods[0]
+
+
+def _get_azext_metadata(ext_dir):
+    # Modification of https://github.com/Azure/azure-cli/blob/dev/src/azure-cli-core/azure/cli/core/extension.py#L109
+    AZEXT_METADATA_FILENAME = 'azext_metadata.json'
+    azext_metadata = None
+    ext_modname = _get_extension_modname(ext_dir=ext_dir)
+    azext_metadata_filepath = os.path.join(ext_dir, ext_modname, AZEXT_METADATA_FILENAME)
+    if os.path.isfile(azext_metadata_filepath):
+        with open(azext_metadata_filepath) as f:
+            azext_metadata = json.load(f)
+    return azext_metadata
+
+
+def get_ext_metadata(ext_dir, ext_file, ext_name):
+    generated_metadata = pkginfo_to_dict(ext_file)
+    print(f"generated_metadata from python wheel package: \n{generated_metadata}")
+
+    with zipfile.ZipFile(ext_file, 'r') as zip_ref:
+        zip_ref.extractall(ext_dir)
+
+    metadata = {}
+    # dist_info_dirs = [f for f in os.listdir(ext_dir) if f.endswith('.dist-info')]
+
+    azext_metadata = _get_azext_metadata(ext_dir)
+    print(f"azext_metadata from python wheel package: \n{azext_metadata}")
+
+    if not azext_metadata:
+        raise ValueError('azext_metadata.json for Extension "{}" Metadata is missing'.format(ext_name))
+
+    metadata.update(azext_metadata)
+
+    metadata.update(generated_metadata)
+    # for dist_info_dirname in dist_info_dirs:
+    #     parsed_dist_info_dir = WHEEL_INFO_RE(dist_info_dirname)
+    #     if parsed_dist_info_dir and parsed_dist_info_dir.groupdict().get('name') == ext_name.replace('-', '_'):
+    #         metadata.update(generated_metadata)
+    return metadata
+
+
 def compare_metadata(wheel_url, expected_metadata):
     """
     Compare metadata between wheel file and expected metadata
@@ -56,17 +117,16 @@ def compare_metadata(wheel_url, expected_metadata):
     try:
         # Download the wheel
         print(f"Downloading wheel from {wheel_url}")
-        wheel_path = download_wheel(wheel_url, temp_dir)
+        ext_file = download_wheel(wheel_url, temp_dir)
+        ext_name = os.path.basename(wheel_url)
 
         # Get metadata from wheel
-        wheel_metadata = pkginfo_to_dict(wheel_path)
+        wheel_metadata = get_ext_metadata(temp_dir, ext_file, ext_name)
 
         # Compare metadata
-        expected_metadata_cleaned = clean_metadata(expected_metadata)
-        print(f"Metadata from index.json: \n{expected_metadata}")
-        print(f"Metadata from index.json cleaned: \n{expected_metadata_cleaned}")
         print(f"Metadata from python wheel package: \n{wheel_metadata}")
-        diff = DeepDiff(wheel_metadata, expected_metadata_cleaned, ignore_order=True)
+        print(f"Metadata from index.json: \n{expected_metadata}")
+        diff = DeepDiff(wheel_metadata, expected_metadata, ignore_order=True)
 
         if diff:
             print("Metadata mismatch found:")
@@ -89,7 +149,8 @@ def test_wheel():
     """
     wheel_url = [
         "https://azuremlsdktestpypi.blob.core.windows.net/wheels/sdk-cli-v2-public/ml-2.36.1-py3-none-any.whl",
-        "https://azurecliext.blob.core.windows.net/release/azure_cli_ml-1.41.0-py3-none-any.whl"
+        "https://azurecliext.blob.core.windows.net/release/azure_cli_ml-1.41.0-py3-none-any.whl",
+        "https://azurecliprod.blob.core.windows.net/cli-extensions/alias-0.5.2-py2.py3-none-any.whl"
     ]
     metadata_from_index = [
         {
@@ -229,6 +290,54 @@ def test_wheel():
             ],
             "summary": "Microsoft Azure Command-Line Tools AzureML Command Module",
             "version": "1.41.0"
+        },
+        {
+            "azext.isPreview": True,
+            "azext.minCliCoreVersion": "2.0.50.dev0",
+            "classifiers": [
+                "Development Status :: 4 - Beta",
+                "Intended Audience :: Developers",
+                "Intended Audience :: System Administrators",
+                "Programming Language :: Python",
+                "Programming Language :: Python :: 2",
+                "Programming Language :: Python :: 2.7",
+                "Programming Language :: Python :: 3",
+                "Programming Language :: Python :: 3.4",
+                "Programming Language :: Python :: 3.5",
+                "Programming Language :: Python :: 3.6",
+                "License :: OSI Approved :: MIT License"
+            ],
+            "extensions": {
+                "python.details": {
+                    "contacts": [
+                        {
+                            "email": "t-chwong@microsoft.com",
+                            "name": "Ernest Wong",
+                            "role": "author"
+                        }
+                    ],
+                    "document_names": {
+                        "description": "DESCRIPTION.rst"
+                    },
+                    "project_urls": {
+                        "Home": "https://github.com/Azure/azure-cli-extensions"
+                    }
+                }
+            },
+            "extras": [],
+            "generator": "bdist_wheel (0.30.0)",
+            "license": "MIT",
+            "metadata_version": "2.0",
+            "name": "alias",
+            "run_requires": [
+                {
+                    "requires": [
+                        "jinja2 (~=2.10)"
+                    ]
+                }
+            ],
+            "summary": "Support for command aliases",
+            "version": "0.5.2"
         }
     ]
 
