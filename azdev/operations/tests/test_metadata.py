@@ -67,6 +67,7 @@ def compare_metadata(wheel_url, expected_metadata):
         print(f"Metadata from index.json cleaned: \n{expected_metadata_cleaned}")
         print(f"Metadata from python wheel package: \n{wheel_metadata}")
         diff = DeepDiff(wheel_metadata, expected_metadata_cleaned, ignore_order=True)
+        
 
         if diff:
             print("Metadata mismatch found:")
@@ -83,99 +84,158 @@ def compare_metadata(wheel_url, expected_metadata):
             shutil.rmtree(temp_dir)
 
 
-def test_specific_wheel():
+def test_wheel():
     """
     Test specific wheel metadata consistency
     """
-    wheel_url = "https://azuremlsdktestpypi.blob.core.windows.net/wheels/sdk-cli-v2-public/ml-2.36.1-py3-none-any.whl"
-    metadata_from_index = {
-        "azext.minCliCoreVersion": "2.15.0",
-        "classifiers": [
-            "Development Status :: 5 - Production/Stable",
-            "Intended Audience :: Developers",
-            "Intended Audience :: System Administrators",
-            "Environment :: Console",
-            "Programming Language :: Python",
-            "Programming Language :: Python :: 3",
-            "Programming Language :: Python :: 3.7",
-            "Programming Language :: Python :: 3.8",
-            "Programming Language :: Python :: 3.9",
-            "Programming Language :: Python :: 3.10",
-            "License :: OSI Approved :: MIT License"
-        ],
-        "description_content_type": "text/x-rst",
-        "extensions": {
-            "python.details": {
-                "contacts": [
-                    {
-                        "email": "azuremlsdk@microsoft.com",
-                        "name": "Microsoft Corporation",
-                        "role": "author"
+    wheel_url = [
+        "https://azuremlsdktestpypi.blob.core.windows.net/wheels/sdk-cli-v2-public/ml-2.36.1-py3-none-any.whl",
+        "https://azurecliext.blob.core.windows.net/release/azure_cli_ml-1.41.0-py3-none-any.whl"
+        ]
+    metadata_from_index = [
+        {
+            "azext.minCliCoreVersion": "2.15.0",
+            "classifiers": [
+                "Development Status :: 5 - Production/Stable",
+                "Intended Audience :: Developers",
+                "Intended Audience :: System Administrators",
+                "Environment :: Console",
+                "Programming Language :: Python",
+                "Programming Language :: Python :: 3",
+                "Programming Language :: Python :: 3.7",
+                "Programming Language :: Python :: 3.8",
+                "Programming Language :: Python :: 3.9",
+                "Programming Language :: Python :: 3.10",
+                "License :: OSI Approved :: MIT License"
+            ],
+            "description_content_type": "text/x-rst",
+            "extensions": {
+                "python.details": {
+                    "contacts": [
+                        {
+                            "email": "azuremlsdk@microsoft.com",
+                            "name": "Microsoft Corporation",
+                            "role": "author"
+                        }
+                    ],
+                    "document_names": {
+                        "description": "DESCRIPTION.rst"
+                    },
+                    "project_urls": {
+                        "Home": "https://docs.microsoft.com/azure/machine-learning/azure-machine-learning-release-notes-cli-v2?view=azureml-api-2"
                     }
-                ],
-                "document_names": {
-                    "description": "DESCRIPTION.rst"
-                },
-                "project_urls": {
-                    "Home": "https://docs.microsoft.com/azure/machine-learning/azure-machine-learning-release-notes-cli-v2?view=azureml-api-2"
                 }
-            }
+            },
+            "extras": [],
+            "generator": "bdist_wheel (0.30.0)",
+            "license": "MIT",
+            "metadata_version": "2.0",
+            "name": "ml",
+            "run_requires": [
+                {
+                    "requires": [
+                        "azure-common (>=1.1)",
+                        "azure-common>=1.1",
+                        "azure-identity (==1.17.1)",
+                        "azure-identity==1.17.1",
+                        "azure-mgmt-resource (<23.0.0,>=3.0.0)",
+                        "azure-mgmt-resource<23.0.0,>=3.0.0",
+                        "azure-mgmt-resourcegraph (<9.0.0,>=2.0.0)",
+                        "azure-mgmt-resourcegraph<9.0.0,>=2.0.0",
+                        "azure-monitor-opentelemetry",
+                        "azure-monitor-opentelemetry",
+                        "azure-storage-blob (>=12.10.0)",
+                        "azure-storage-blob>=12.10.0",
+                        "azure-storage-file-datalake (>=12.2.0)",
+                        "azure-storage-file-datalake>=12.2.0",
+                        "azure-storage-file-share",
+                        "azure-storage-file-share",
+                        "colorama",
+                        "colorama",
+                        "cryptography",
+                        "cryptography",
+                        "docker",
+                        "docker",
+                        "isodate",
+                        "isodate",
+                        "jsonschema (>=4.0.0)",
+                        "jsonschema>=4.0.0",
+                        "marshmallow (>=3.5)",
+                        "marshmallow>=3.5",
+                        "pydash (>=6.0.0)",
+                        "pydash>=6.0.0",
+                        "pyjwt",
+                        "pyjwt",
+                        "strictyaml",
+                        "strictyaml",
+                        "tqdm",
+                        "tqdm",
+                        "typing-extensions",
+                        "typing-extensions"
+                    ]
+                }
+            ],
+            "summary": "Microsoft Azure Command-Line Tools AzureMachineLearningWorkspaces Extension",
+            "version": "2.36.1"
         },
-        "extras": [],
-        "generator": "bdist_wheel (0.30.0)",
-        "license": "MIT",
-        "metadata_version": "2.0",
-        "name": "ml",
-        "run_requires": [
-            {
-                "requires": [
-                    "azure-common (>=1.1)",
-                    "azure-common>=1.1",
-                    "azure-identity (==1.17.1)",
-                    "azure-identity==1.17.1",
-                    "azure-mgmt-resource (<23.0.0,>=3.0.0)",
-                    "azure-mgmt-resource<23.0.0,>=3.0.0",
-                    "azure-mgmt-resourcegraph (<9.0.0,>=2.0.0)",
-                    "azure-mgmt-resourcegraph<9.0.0,>=2.0.0",
-                    "azure-monitor-opentelemetry",
-                    "azure-monitor-opentelemetry",
-                    "azure-storage-blob (>=12.10.0)",
-                    "azure-storage-blob>=12.10.0",
-                    "azure-storage-file-datalake (>=12.2.0)",
-                    "azure-storage-file-datalake>=12.2.0",
-                    "azure-storage-file-share",
-                    "azure-storage-file-share",
-                    "colorama",
-                    "colorama",
-                    "cryptography",
-                    "cryptography",
-                    "docker",
-                    "docker",
-                    "isodate",
-                    "isodate",
-                    "jsonschema (>=4.0.0)",
-                    "jsonschema>=4.0.0",
-                    "marshmallow (>=3.5)",
-                    "marshmallow>=3.5",
-                    "pydash (>=6.0.0)",
-                    "pydash>=6.0.0",
-                    "pyjwt",
-                    "pyjwt",
-                    "strictyaml",
-                    "strictyaml",
-                    "tqdm",
-                    "tqdm",
-                    "typing-extensions",
-                    "typing-extensions"
-                ]
-            }
-        ],
-        "summary": "Microsoft Azure Command-Line Tools AzureMachineLearningWorkspaces Extension",
-        "version": "2.36.1"
-    }
+        {
+            "azext.minCliCoreVersion": "2.3.1",
+            "classifiers": [
+                "Development Status :: 3 - Alpha",
+                "Intended Audience :: Developers",
+                "Intended Audience :: System Administrators",
+                "Programming Language :: Python :: 3.5",
+                "Programming Language :: Python :: 3.6",
+                "Programming Language :: Python :: 3.7",
+                "Programming Language :: Python :: 3.8",
+                "Programming Language :: Python :: 3.9"
+            ],
+            "description_content_type": "text/x-rst",
+            "extensions": {
+                "python.details": {
+                    "contacts": [
+                        {
+                            "email": "azpycli@microsoft.com",
+                            "name": "Microsoft Corporation",
+                            "role": "author"
+                        }
+                    ],
+                    "document_names": {
+                        "description": "DESCRIPTION.rst",
+                        "license": "LICENSE.txt"
+                    },
+                    "project_urls": {
+                        "Home": "https://docs.microsoft.com/python/api/overview/azure/ml/?view=azure-ml-py"
+                    }
+                }
+            },
+            "extras": [],
+            "generator": "bdist_wheel (0.30.0)",
+            "license": "Proprietary https://aka.ms/azureml-preview-sdk-license ",
+            "metadata_version": "2.0",
+            "name": "azure-cli-ml",
+            "requires_python": ">=3.5,<4",
+            "run_requires": [
+                {
+                    "requires": [
+                        "adal (>=1.2.1)",
+                        "azureml-cli-common (~=1.41)",
+                        "cryptography (<=3.3.2)",
+                        "docker (>=3.7.2)",
+                        "msrest (>=0.6.6)",
+                        "pyyaml (>=5.1.0)",
+                        "requests (>=2.21.0)"
+                    ]
+                }
+            ],
+            "summary": "Microsoft Azure Command-Line Tools AzureML Command Module",
+            "version": "1.41.0"
+        }
+        ]
 
-    assert compare_metadata(wheel_url, metadata_from_index), "Metadata comparison failed"
+    for idx, url in enumerate(wheel_url):
+        assert compare_metadata(url, metadata_from_index[idx]), "Metadata comparison failed"
 
 
 if __name__ == "__main__":
-    test_specific_wheel()
+    test_wheel()

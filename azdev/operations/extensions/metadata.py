@@ -285,14 +285,18 @@ def pkginfo_to_dict(path, distribution=None):
         metadata['extensions']['python.details']['contacts'] = contacts
 
     # handle document_names
-    # check for DESCRIPTION.rst file in the wheel package
+    # check for DESCRIPTION.rst and LICENSE.txt file in the wheel package
     if zipfile.is_zipfile(path):
         with zipfile.ZipFile(path, 'r') as zf:
-            for file_name in zf.namelist():
-                if 'DESCRIPTION.rst' in file_name:
-                    metadata['extensions']['python.details']['document_names'] = {
-                        'description': 'DESCRIPTION.rst'
-                    }
+            has_description = any('DESCRIPTION.rst' in name for name in zf.namelist())
+            has_license = any('LICENSE.txt' in name for name in zf.namelist())
+            
+            if has_description or has_license:
+                document_names = metadata['extensions']['python.details'].setdefault('document_names', {})
+                if has_description:
+                    document_names['description'] = 'DESCRIPTION.rst'
+                if has_license:
+                    document_names['license'] = 'LICENSE.txt'
 
     # convert entry points to exports
     try:
