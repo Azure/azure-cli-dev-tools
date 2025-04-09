@@ -197,7 +197,7 @@ def pkginfo_to_dict(path, distribution=None):
     metadata = OrderedDefaultDict(
         lambda: OrderedDefaultDict(lambda: OrderedDefaultDict(OrderedDict)))
 
-    metadata["generator"] = get_wheel_generator(path)
+    metadata["generator"] = "bdist_wheel (0.30.0)"
     try:
         pkg_info = read_pkg_info(path)
     except Exception:
