@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.3
+++++++
+* `azdev linter`: Fix `list index out of range` in missing_command_test_coverage regex
+
 0.2.2
 ++++++
 * Update dependency `azure-cli-diff-tool` to `0.1.0`.
