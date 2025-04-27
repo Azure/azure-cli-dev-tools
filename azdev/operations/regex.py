@@ -54,7 +54,8 @@ def get_all_tested_commands_from_regex(lines):
         if re_idx is None and re.findall(CMD_PATTERN[3], lines[row_num]):
             re_idx = 3
         if re_idx is not None:
-            command = re.findall(CMD_PATTERN[re_idx], lines[row_num])[0]
+            matches = re.findall(CMD_PATTERN[re_idx], lines[row_num])
+            command = matches[0] if matches else ''
             while row_num < total_lines:
                 if (re_idx in [0, 1] and not re.findall(END_PATTERN, lines[row_num])) or \
                         (re_idx == 2 and (row_num + 1) < total_lines and
@@ -105,14 +106,17 @@ def search_argument_context(row_num, lines):
         # Match `with self.argument_context(scope) as c:`
         if ref1:
             sub_pattern = r'for scope in (.*):'
-            cmds = json.loads(
-                re.findall(sub_pattern, lines[row_num - 1])[0].replace('\'', '"'))
+            matches = re.findall(sub_pattern, lines[row_num - 1])
+            if matches:
+                cmds = json.loads(matches[0].replace('\'', '"'))
             break
         # Match `with self.argument_context(['"]{} stop['"].format(scope)) as c:',
         if ref2:
             sub_pattern = r'for scope in (.*):'
-            format_strings = json.loads(
-                re.findall(sub_pattern, lines[row_num - 1])[0].replace('\'', '"'))
+            format_strings = ''
+            matches = re.findall(sub_pattern, lines[row_num - 1])
+            if matches:
+                format_strings = json.loads(matches[0].replace('\'', '"'))
             for c in ref2:
                 for f in format_strings:
                     cmds.append(c.replace('{}', f))
