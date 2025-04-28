@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.4
+++++++
+* pin setuptools to 0.70.0
+
 0.2.3
 ++++++
 * `azdev linter`: Fix `list index out of range` in missing_command_test_coverage regex
