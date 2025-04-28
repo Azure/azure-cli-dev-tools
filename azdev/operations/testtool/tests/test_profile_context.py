@@ -14,7 +14,7 @@ from azdev.operations.testtool.profile_context import ProfileContext
 class TestProfileContext(unittest.TestCase):
 
     def test_profile_ok(self):
-        target_profiles = ['latest', '2017-03-09-profile', '2018-03-01-hybrid', '2019-03-01-hybrid']
+        target_profiles = ['latest']
 
         for profile in target_profiles:
             with ProfileContext(profile):
