@@ -44,7 +44,10 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10'
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13'
     ],
     keywords='azure',
     python_requires='>=3.6',
@@ -79,15 +82,15 @@ setup(
         'pytest>=5.0.0',
         'pyyaml',
         'requests',
-        'sphinx==1.6.7',
+        'sphinx>=4.0.0',
         'tox',
         'jsbeautifier~=1.14.7',
         'deepdiff~=6.3.0',
         'azure-cli-diff-tool~=0.1.0',
         'packaging',
         'tqdm',
-        'wheel==0.30.0',
-        'setuptools==70.0.0',
+        'wheel>=0.30.0',
+        'setuptools>=70.0.0',
         'microsoft-security-utilities-secret-masker~=1.0.0b4'
     ],
     package_data={

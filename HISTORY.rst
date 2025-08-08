@@ -2,6 +2,15 @@
 
 Release History
 ===============
+0.2.5
+++++++
+* Add support for Python 3.11, 3.12, and 3.13
+* Update dependency versions for better compatibility:
+  - sphinx: updated from ==1.6.7 to >=4.0.0
+  - wheel: updated from ==0.30.0 to >=0.30.0
+  - setuptools: updated from ==70.0.0 to >=70.0.0
+* Add aaz-dev-tools compatibility testing pipeline
+
 0.2.4
 ++++++
 * pin setuptools to 70.0.0
