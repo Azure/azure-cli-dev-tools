@@ -86,13 +86,13 @@ jobs:
       - name: Test aaz-dev-tools compatibility - Unix/Linux/macOS
         if: runner.os != 'Windows'
         run: |
-          ./scripts/tests/test_compatibility_unix.sh "${{ matrix.python }}" "${{ matrix.os }}"
+          ./scripts/test/test_compatibility_unix.sh "${{ matrix.python }}" "${{ matrix.os }}"
         shell: bash
 
       - name: Test aaz-dev-tools compatibility - Windows
         if: runner.os == 'Windows'
         run: |
-          .\scripts\tests\test_compatibility_windows.ps1 -PythonVersion "${{ matrix.python }}" -OSName "${{ matrix.os }}"
+          .\scripts\test\test_compatibility_windows.ps1 -PythonVersion "${{ matrix.python }}" -OSName "${{ matrix.os }}"
         shell: pwsh
 
       - name: Cleanup test environment - Unix/Linux/macOS
