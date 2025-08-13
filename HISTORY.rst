@@ -5,8 +5,7 @@ Release History
 0.2.5
 ++++++
 * Add support for Python 3.11, 3.12, and 3.13
-* Tested compatibility (externally via GitHub Actions https://github.com/RenSilvaAU/compat-test-azdev/actions/workflows/cross-python-build-and-test.yml
-and https://github.com/RenSilvaAU/compat-test-azdev/actions/workflows/same-python-build-and-test.yml)
+* Tested compatibility (externally via External GitHub Actions)
 
 0.2.4
 ++++++
