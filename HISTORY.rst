@@ -2,6 +2,11 @@
 
 Release History
 ===============
+0.2.5
+++++++
+* Add support for Python 3.11, 3.12, and 3.13
+* Tested compatibility (externally via External GitHub Actions)
+
 0.2.4
 ++++++
 * pin setuptools to 70.0.0
