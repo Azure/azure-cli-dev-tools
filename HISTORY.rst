@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.6
+++++++
+* Use storagev2 utilities to fix `az extension publish` (#529)
+
 0.2.5
 ++++++
 * Add support for Python 3.11, 3.12, and 3.13
