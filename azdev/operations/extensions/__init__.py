@@ -330,7 +330,10 @@ def publish_extensions(extensions, storage_account, storage_account_key, storage
         whl_file = os.path.split(whl_path)[-1]
 
         account_url = f"https://{storage_account}.blob.core.windows.net"
-        client = BlobClient(account_url=account_url, container_name=storage_container, credential=storage_account_key, blob_name=whl_file)
+        client = BlobClient(account_url=account_url,
+                            container_name=storage_container,
+                            credential=storage_account_key,
+                            blob_name=whl_file)
         exists = client.exists()
 
         # check if extension already exists unless user opted not to
