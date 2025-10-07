@@ -308,7 +308,7 @@ def build_extensions(extensions, dist_dir='dist'):
 
 def publish_extensions(extensions, storage_account, storage_account_key, storage_container,
                        dist_dir='dist', update_index=False, yes=False):
-    from azure.multiapi.storage.v2018_11_09.blob import BlockBlobService
+    from azure.multiapi.storagev2.blob.v2022_11_02 import BlobClient
 
     heading('Publish Extensions')
 
@@ -329,8 +329,9 @@ def publish_extensions(extensions, storage_account, storage_account_key, storage
     for whl_path in whl_files:
         whl_file = os.path.split(whl_path)[-1]
 
-        client = BlockBlobService(account_name=storage_account, account_key=storage_account_key)
-        exists = client.exists(container_name=storage_container, blob_name=whl_file)
+        account_url = f"https://{storage_account}.blob.core.windows.net"
+        client = BlobClient(account_url=account_url, container_name=storage_container, credential=storage_account_key, blob_name=whl_file)
+        exists = client.exists()
 
         # check if extension already exists unless user opted not to
         if not yes:
@@ -341,12 +342,10 @@ def publish_extensions(extensions, storage_account, storage_account_key, storage
                     logger.warning("Skipping '%s'...", whl_file)
                     continue
         # upload the WHL file
-        client.create_blob_from_path(container_name=storage_container, blob_name=whl_file,
-                                     file_path=os.path.abspath(whl_path))
-        url = client.make_blob_url(container_name=storage_container, blob_name=whl_file)
-
-        logger.info(url)
-        uploaded_urls.append(url)
+        with open(os.path.abspath(whl_path), 'rb') as f:
+            client.upload_blob(data=f)
+            logger.info(client.url)
+            uploaded_urls.append(client.url)
 
     if update_index:
         subheading('Updating Index')
