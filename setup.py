@@ -83,7 +83,7 @@ setup(
         'tox',
         'jsbeautifier~=1.14.7',
         'deepdiff~=8.6.1',
-        'azure-cli-diff-tool~=0.1.0',
+        'azure-cli-diff-tool~=0.1.1',
         'packaging',
         'tqdm',
         'wheel==0.30.0',
