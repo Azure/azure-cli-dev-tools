@@ -82,7 +82,7 @@ setup(
         'sphinx==1.6.7',
         'tox',
         'jsbeautifier~=1.14.7',
-        'deepdiff~=6.3.0',
+        'deepdiff~=8.6.1',
         'azure-cli-diff-tool~=0.1.0',
         'packaging',
         'tqdm',
