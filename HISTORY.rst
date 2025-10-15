@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.6
+++++++
+* Bump `deepdiff` to 8.6.1 and `azure-cli-diff-tool` to 0.1.1
+
 0.2.5
 ++++++
 * Add support for Python 3.11, 3.12, and 3.13
