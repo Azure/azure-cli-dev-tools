@@ -1,0 +1,2 @@
+variables:
+  ubuntu_pool: 'pool-ubuntu-2204'

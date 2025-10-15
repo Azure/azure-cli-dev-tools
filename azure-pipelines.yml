@@ -5,11 +5,15 @@ trigger:
   branches:
     include:
     - '*'
+
+variables:
+- template: ${{ variables.Pipeline.Workspace }}/.azure-pipelines/templates/variables.yml
+
 jobs:
 - job: Tox
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.windows_pool }}
   strategy:
     matrix:
       Python39:
@@ -44,7 +48,7 @@ jobs:
   displayName: 'Extract Metadata'
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.windows_pool }}
   steps:
   - task: Bash@3
     displayName: 'Extract Version'
@@ -64,7 +68,7 @@ jobs:
   dependsOn: ExtractMetadata
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.9'
@@ -88,7 +92,7 @@ jobs:
 
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.12'
