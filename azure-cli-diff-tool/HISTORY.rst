@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.1
+++++++
+* Bump `deepDiff` to 8.6.1
+
 0.1.0
 ++++++
 * Enable meta-diff with `module_name` excluded

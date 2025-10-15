@@ -30,7 +30,7 @@ setup(name="azure-cli-diff-tool",
       author_email='azpycli@microsoft.com',
       packages=find_packages(),
       include_package_data=True,
-      install_requires=["deepdiff==6.3.0", "requests~=2.32.3"],
+      install_requires=["deepdiff~=8.6.1", "requests~=2.32.3"],
       package_data={
         "azure_cli_diff_tool": ["data/*"]
       }
