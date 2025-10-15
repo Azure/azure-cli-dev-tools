@@ -5,12 +5,16 @@ trigger:
   branches:
     include:
     - '*'
+
+variables:
+- template: ${{ variables.Pipeline.Workspace }}/.azure-pipelines/templates/variables.yml
+
 jobs:
 - job: ExtractMetadata
   displayName: 'Extract Metadata'
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   steps:
   - task: Bash@3
     displayName: 'Extract Version'
@@ -30,7 +34,7 @@ jobs:
   dependsOn: ExtractMetadata
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.12'
@@ -54,7 +58,7 @@ jobs:
 
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   steps:
   - task: UsePythonVersion@0
     displayName: 'Use Python 3.12'
@@ -75,7 +79,7 @@ jobs:
 
 - job: Unittest
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   strategy:
     matrix:
       Python39:
@@ -132,7 +136,7 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   strategy:
     matrix:
       Python39:
@@ -164,7 +168,7 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   strategy:
     matrix:
       Python39:
@@ -196,7 +200,7 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   strategy:
     matrix:
       Python39:
@@ -228,7 +232,7 @@ jobs:
   dependsOn: BuildPythonWheel
   condition: succeeded()
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   strategy:
     matrix:
       Python39:
@@ -259,7 +263,7 @@ jobs:
   displayName: "Performance Check on Linux"
   dependsOn: BuildPythonWheel
   pool:
-    name: 'pool-ubuntu-2004'
+    name: ${{ variables.ubuntu_pool }}
   strategy:
     matrix:
       Python39:
