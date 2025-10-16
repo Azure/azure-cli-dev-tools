@@ -8,11 +8,11 @@
 
 """Azure Developer Tools package that can be installed using setuptools"""
 
-from codecs import open
 import os
 import re
-from setuptools import setup, find_packages
+from codecs import open
 
+from setuptools import find_packages, setup
 
 azdev_path = os.path.dirname(os.path.realpath(__file__))
 with open(os.path.join(azdev_path, 'azdev', '__init__.py'), 'r') as version_file:
@@ -77,6 +77,7 @@ setup(
         'pytest-xdist',  # depends on pytest-forked
         'pytest-forked',
         'pytest>=5.0.0',
+        'pytest-asyncio',
         'pyyaml',
         'requests',
         'sphinx==1.6.7',
