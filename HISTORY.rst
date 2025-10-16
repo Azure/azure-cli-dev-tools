@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.7
+++++++
+* Add `pytest-asyncio` to dependencies to fix `azdev test` with async tests.
+
 0.2.6
 ++++++
 * Bump `deepdiff` to 8.6.1 and `azure-cli-diff-tool` to 0.1.1
