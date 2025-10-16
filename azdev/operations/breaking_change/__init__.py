@@ -13,7 +13,7 @@ from knack.log import get_logger
 
 from azdev.operations.statistics import _create_invoker_and_load_cmds  # pylint: disable=protected-access
 from azdev.utilities import require_azure_cli, display, heading, output, calc_selected_mod_names
-from azdev.utilities.path import calc_selected_modules
+from azdev.utilities.path import calc_selected_modules, get_name_index
 
 # pylint: disable=no-else-return
 
@@ -323,6 +323,7 @@ def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow',
     require_azure_cli()
 
     selected_modules = calc_selected_modules(modules, include_whl_extensions=include_whl_extensions)
+    name_index = get_name_index(include_whl_extensions=include_whl_extensions)
     cli_mod_names = list(selected_modules['core'].keys()) + list(selected_modules['mod'].keys())
     ext_mod_names = list(selected_modules['ext'].keys())
 
@@ -338,6 +339,9 @@ def collect_upcoming_breaking_changes(modules=None, target_version='NextWindow',
         cli_breaking_changes = _filter_breaking_changes(cli_breaking_changes, target_version)
         breaking_changes.extend(cli_breaking_changes)
     if ext_mod_names:
+        # The user input extension name could be extension name or module name.
+        # We need to convert the extension name to module name.
+        ext_mod_names = [name_index.get(ext, ext) for ext in ext_mod_names]
         ext_breaking_changes = _handle_upcoming_breaking_changes(command_loader, ext_mod_names, 'pre_announce')
         breaking_changes.extend(ext_breaking_changes)
     breaking_changes = _group_breaking_change_items(breaking_changes, group_by_version)
