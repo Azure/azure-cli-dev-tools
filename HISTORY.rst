@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.8
+++++++
+* Pin pip to 25.2 as pip 25.3 remove support for the legacy setup.py develop editable method in setuptools editable installs; setuptools >= 64 is now required. (#11457)
+
 0.2.7
 ++++++
 * Support resolve extension name in upcoming breaking change collection
