@@ -85,6 +85,7 @@ setup(
         'deepdiff~=6.3.0',
         'azure-cli-diff-tool~=0.0.6',
         'packaging',
+        'setuptools==70.0.0',
         'tqdm',
         'wheel==0.30.0',
         'microsoft-security-utilities-secret-masker~=1.0.0b2'
