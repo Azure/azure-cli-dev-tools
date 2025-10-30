@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.91
+++++++
+* Pin pip to 25.2 as pip 25.3 remove support for the legacy setup.py develop editable method in setuptools editable installs; setuptools >= 64 is now required. (#11457)
+
 0.1.90
 ++++++
 * `azdev cmdcov`: Fix incorrect detection of code changes as new commands
