@@ -436,8 +436,9 @@ def setup(cli_path=None, ext_repo_path=None, ext=None, deps=None):
     subheading('Installing packages')
 
     try:
-        # upgrade to latest pip
-        pip_cmd('install --upgrade pip', 'Upgrading pip...')
+        # Pin pip to 25.2 as pip 25.3 remove support for the legacy setup.py develop editable
+        # method in setuptools editable installs; setuptools >= 64 is now required. (#11457)
+        pip_cmd('install --upgrade pip==25.2', 'Pin pip to 25.2...')
         _install_cli(cli_path, deps=deps)
         _install_extensions(ext_to_install)
     except CommandError as err:
