@@ -99,6 +99,34 @@ helps['verify history'] = """
     short-summary: Verify the README and HISTORY files for each module so they format correctly on PyPI.
 """
 
+helps['latest-index'] = """
+    short-summary: Generate or verify Azure CLI packaged latest index files.
+    long-summary: >
+        Wraps azure-cli's scripts/generate_latest_indices.py for deterministic, CI-friendly
+        generation and verification of commandIndex.latest.json and helpIndex.latest.json.
+"""
+
+helps['latest-index generate'] = """
+    short-summary: Generate commandIndex.latest.json and helpIndex.latest.json in an Azure CLI repo.
+    examples:
+        - name: Generate latest index files using the configured Azure CLI repo.
+          text: azdev latest-index generate
+
+        - name: Generate latest index files for an explicit repo checkout.
+          text: azdev latest-index generate --cli /path/to/azure-cli
+"""
+
+helps['latest-index verify'] = """
+    short-summary: Verify latest index files are up-to-date.
+    long-summary: Returns a non-zero exit code when generated content differs from checked-in files.
+    examples:
+        - name: Verify latest index files in CI.
+          text: azdev latest-index verify
+
+        - name: Verify latest index files for an explicit repo checkout.
+          text: azdev latest-index verify --repo /path/to/azure-cli
+"""
+
 
 helps['style'] = """
     short-summary: Check code style (pylint and PEP8).

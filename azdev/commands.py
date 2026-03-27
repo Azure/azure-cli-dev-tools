@@ -82,6 +82,10 @@ def load_command_table(self, _):
     with CommandGroup(self, 'cli', operation_group('help')) as g:
         g.command('generate-docs', 'generate_cli_ref_docs')
 
+    with CommandGroup(self, 'latest-index', operation_group('latest_index')) as g:
+        g.command('generate', 'generate_latest_index')
+        g.command('verify', 'verify_latest_index')
+
     with CommandGroup(self, 'extension', operation_group('help')) as g:
         g.command('generate-docs', 'generate_extension_ref_docs')
 
