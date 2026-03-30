@@ -46,7 +46,6 @@ def _run_latest_index(mode, cli_path=None, profile='latest', all_profiles=False)
     heading('Latest Index: {}'.format(mode.capitalize()))
     display('Azure CLI repo: {}'.format(repo_path))
 
-    # Run from repo root to match script expectations and preserve deterministic behavior.
     command = '{} {}'.format(_LATEST_INDEX_SCRIPT, mode)
     result = py_cmd(command, is_module=False, cwd=repo_path)
 
@@ -54,8 +53,6 @@ def _run_latest_index(mode, cli_path=None, profile='latest', all_profiles=False)
     if isinstance(output, bytes):
         output = output.decode('utf-8', errors='replace')
     if output:
-        # Replace the upstream script hint with the azdev equivalent so users
-        # don't need to know the underlying script path.
         output = output.replace(
             'python scripts/generate_latest_indices.py generate',
             'azdev latest-index generate'
