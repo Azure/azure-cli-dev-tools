@@ -87,7 +87,7 @@ You can pass an explicit Azure CLI checkout path when needed:
 ``commandIndex.latest.json`` or ``helpIndex.latest.json``.
 
 Common azdev commands
-++++++++++++++++++++
++++++++++++++++++++++++++++++
 
 This README is not an exhaustive command reference. For the complete command surface, use:
 
