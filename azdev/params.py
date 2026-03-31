@@ -282,3 +282,11 @@ def load_arguments(self, _):
         c.argument('no_tail', action='store_true', help='Skip tail when displaying as markdown.')
         c.argument('include_whl_extensions', action='store_true',
                    help="Allow scanning on extensions installed by `az extension add --source xxx.whl`.")
+
+    with ArgumentsContext(self, 'latest-index') as c:
+        c.argument('cli_path', options_list=['--cli', '--repo'],
+                   help='Path to an Azure CLI repo checkout. If omitted, use the path configured by `azdev setup`.')
+        c.argument('profile', choices=['latest'], default='latest',
+                   help='Cloud profile to process. Only `latest` is currently supported.')
+        c.argument('all_profiles', action='store_true',
+                   help='Not supported yet. Reserved for future multi-profile support.')

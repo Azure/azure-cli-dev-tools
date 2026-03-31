@@ -66,6 +66,49 @@ Setting up your development environment
 
     This will launch the interactive setup process. To see non-interactive options run `azdev setup -h`.
 
+Latest packaged indices
++++++++++++++++++++++++
+
+Use azdev wrappers around Azure CLI's latest index generation script:
+
+::
+
+    azdev latest-index generate
+    azdev latest-index verify
+
+You can pass an explicit Azure CLI checkout path when needed:
+
+::
+
+    azdev latest-index generate --cli /path/to/azure-cli
+    azdev latest-index verify --repo /path/to/azure-cli
+
+``azdev latest-index verify`` exits non-zero when generated output differs from checked-in
+``commandIndex.latest.json`` or ``helpIndex.latest.json``.
+
+Common azdev commands
++++++++++++++++++++++++++++++
+
+This README is not an exhaustive command reference. For the complete command surface, use:
+
+::
+
+    azdev --help
+    azdev <group> --help
+
+Frequently used commands include:
+
+::
+
+    azdev setup
+    azdev style <module-or-extension>
+    azdev linter <module-or-extension>
+    azdev test <module-or-extension>
+    azdev extension add <extension-name>
+    azdev extension build <extension-name>
+    azdev latest-index generate
+    azdev latest-index verify
+
 Reporting issues and feedback
 +++++++++++++++++++++++++++++
 

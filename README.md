@@ -148,6 +148,25 @@ For instructions on manually writing the commands and tests, see more in
 
     By default, test is running in `once` mode. If there are no corresponding recording files (in yaml format), it will run live tests and generate recording files. If recording files are found, the tests will be run in `playback` mode against the recording files. You can use `--live` to force a test run in `live` mode and regenerate the recording files.
 
+## Latest packaged indices
+
+Use azdev wrappers around Azure CLI's latest index generation script:
+
+```
+azdev latest-index generate
+azdev latest-index verify
+```
+
+You can pass an explicit Azure CLI checkout path when needed:
+
+```
+azdev latest-index generate --cli /path/to/azure-cli
+azdev latest-index verify --repo /path/to/azure-cli
+```
+
+`azdev latest-index verify` exits non-zero when generated output differs from the checked-in
+`commandIndex.latest.json` or `helpIndex.latest.json`, making it CI-friendly.
+
 ## Submitting a pull request to merge the code
 
 1. After committing your code locally, push it to your forked repository:
