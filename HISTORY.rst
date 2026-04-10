@@ -4,8 +4,7 @@ Release History
 ===============
 0.2.10
 ++++++
-* Add support for Python 3.14 and drop support for Python 3.9
-* Bump pylint constraint to >=4,<5 for Python 3.14 and style compatibility
+* `azdev extension add/remove`: Invalidate CLI command index (`commandIndex.json`) after installing or removing extensions to prevent stale index from causing test failures in CI (#9716).
 
 0.2.9
 +++++
