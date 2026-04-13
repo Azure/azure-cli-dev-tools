@@ -67,7 +67,7 @@ class TestInvalidateCommandIndex(unittest.TestCase):
     @patch('azdev.operations.extensions.find_files', return_value=['/repo/src/my-ext/my_ext.egg-info'])
     @patch('azdev.operations.extensions.get_ext_repo_paths', return_value=['/repo'])
     def test_remove_extension_calls_invalidate(self, _mock_paths, _mock_find, _mock_display,
-                                                mock_pip, mock_invalidate):
+                                                _mock_pip, mock_invalidate):
         """remove_extension should call _invalidate_command_index after removing."""
         with patch('os.listdir', return_value=[]):
             from azdev.operations.extensions import remove_extension
