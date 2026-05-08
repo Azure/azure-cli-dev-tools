@@ -87,7 +87,7 @@ setup(
         'packaging',
         'tqdm',
         'wheel==0.30.0',
-        'setuptools==70.0.0',
+        'setuptools==78.1.1',
         'microsoft-security-utilities-secret-masker~=1.0.0b4'
     ],
     package_data={
