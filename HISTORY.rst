@@ -8,9 +8,11 @@ Release History
 
 0.2.9
 +++++
++++++
 * `azdev latest-index`: Add `generate` and `verify` commands to manage Azure CLI packaged latest indices (`commandIndex.latest.json`, `helpIndex.latest.json`) with CI-friendly verify exit behavior.
 
 0.2.8
+++++
 ++++++
 * Pin pip to 25.2 as pip 25.3 remove support for the legacy setup.py develop editable method in setuptools editable installs; setuptools >= 64 is now required. (#11457)
 
