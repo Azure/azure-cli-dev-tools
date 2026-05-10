@@ -88,6 +88,8 @@ jobs:
         python.version: '3.12'
       Python313:
         python.version: '3.13'
+      Python314:
+        python.version: '3.14'
   steps:
     - task: UsePythonVersion@0
       displayName: 'Use Python $(python.version)'
@@ -147,6 +149,8 @@ jobs:
         python.version: '3.12'
       Python313:
         python.version: '3.13'
+      Python314:
+        python.version: '3.14'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -181,6 +185,8 @@ jobs:
         python.version: '3.12'
       Python313:
         python.version: '3.13'
+      Python314:
+        python.version: '3.14'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -215,6 +221,8 @@ jobs:
         python.version: '3.12'
       Python313:
         python.version: '3.13'
+      Python314:
+        python.version: '3.14'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -249,6 +257,8 @@ jobs:
         python.version: '3.12'
       Python313:
         python.version: '3.13'
+      Python314:
+        python.version: '3.14'
   steps:
   - task: DownloadPipelineArtifact@1
     displayName: 'Download Build'
@@ -282,6 +292,8 @@ jobs:
         python.version: '3.12'
       Python313:
         python.version: '3.13'
+      Python314:
+        python.version: '3.14'
   steps:
     - task: DownloadPipelineArtifact@1
       displayName: 'Download Build'
