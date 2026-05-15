@@ -73,7 +73,7 @@ setup(
         'gitpython',
         'jinja2',
         'knack',
-        'pylint<4',
+        'pylint>=4,<5',
         'pytest-xdist',  # depends on pytest-forked
         'pytest-forked',
         'pytest>=5.0.0',
