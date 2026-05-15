@@ -372,7 +372,7 @@ class Linter:  # pylint: disable=too-many-public-methods, too-many-instance-attr
             if re.findall(r'^test_.*\.yaml$', filename) and \
                     os.path.exists(os.path.join(self.git_repo, diff.a_path)):
                 with open(os.path.join(self.git_repo, diff.a_path)) as f:
-                    records = yaml.load(f, Loader=yaml.Loader) or {}
+records = yaml.safe_load(f, Loader=yaml.Loader) or {}
                     for record in records['interactions']:
                         # parse command ['acr agentpool create']
                         command = record['request']['headers'].get('CommandName', [''])[0]
