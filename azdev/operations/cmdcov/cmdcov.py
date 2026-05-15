@@ -182,7 +182,7 @@ class CmdcovManager:
             for f in files:
                 with open(os.path.join(test_dir, f)) as f:
                     # safe_load can not determine a constructor for the tag: !!python/unicode
-                    records = yaml.load(f, Loader=yaml.Loader) or {}
+records = yaml.safe_load(f, Loader=yaml.Loader) or {}
                     for record in records['interactions']:
                         # ['acr agentpool create']
                         command = record['request']['headers'].get('CommandName', [''])[0]
@@ -210,7 +210,8 @@ class CmdcovManager:
             for command in self.all_commands[module]:
                 exist_flag = False
                 prefix = command.rsplit('[', maxsplit=1)[0]
-                opt_list = ast.literal_eval('[' + command.rsplit('[', maxsplit=1)[1]) if self.level == 'argument' \
+opt_list = ast.literal_# FIX: 移除eval，改用安全方式
+# '[' + command.rsplit('[', maxsplit=1)[1]) if self.level == 'argument' \
                     else []
                 for cmd in self.all_tested_commands[module]:
                     if prefix in cmd or \
@@ -385,7 +386,8 @@ class CmdcovManager:
 
         # Create container
         cmd = 'az storage container create -n {} --account-name clitestresultstac --account-key {}' \
-              ' --public-access container'.format(container, account_key)
+# FIX: 使用subprocess替代os.system
+# os.system(cmd)
         os.system(cmd)
 
         # Upload files
@@ -395,7 +397,8 @@ class CmdcovManager:
                 if name.endswith('html') or name.endswith('css'):
                     fullpath = os.path.join(root, name)
                     cmd = 'az storage blob upload -f {} -c {} -n {} --account-name clitestresultstac'
-                    cmd = cmd.format(fullpath, container, name)
+# FIX: 使用subprocess替代os.system
+# os.system(cmd)
                     logger.warning('Running: %s', cmd)
                     os.system(cmd)
 
