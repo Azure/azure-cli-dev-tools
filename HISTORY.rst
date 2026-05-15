@@ -2,7 +2,7 @@
 
 Release History
 ===============
-0.2.11
+[Unrelesed]
 ++++++
 * `azdev extension add/remove`: Invalidate command index after installing or removing extensions.
 
