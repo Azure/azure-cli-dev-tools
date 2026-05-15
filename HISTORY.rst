@@ -4,7 +4,7 @@ Release History
 ===============
 0.2.11
 ++++++
-* `azdev extension add/remove`: Invalidate CLI command index (`commandIndex.json`) after installing or removing extensions to prevent stale index from causing test failures in CI (#9716).
+* `azdev extension add/remove`: Invalidate command index after installing or removing extensions.
 
 0.2.10
 ++++++
