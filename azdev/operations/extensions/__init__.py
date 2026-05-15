@@ -16,10 +16,35 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     cmd, py_cmd, pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_azdev_config,
-    require_azure_cli, heading, subheading, EXTENSION_PREFIX)
+    get_azure_config_dir, require_azure_cli, heading, subheading, EXTENSION_PREFIX)
 from .version_upgrade import VersionUpgradeMod
 
 logger = get_logger(__name__)
+
+# These are the index files cleared by CommandIndex().invalidate() in azure-cli-core.
+# Refer: azure-cli-core/azure/cli/core/__init__.py
+_COMMAND_INDEX_FILES = (
+    'commandIndex.json',
+    'extensionIndex.json',
+    'helpIndex.json',
+    'extensionHelpIndex.json',
+)
+
+
+def _invalidate_command_index():
+    """Delete the CLI command index files so they are regenerated on next invocation.
+
+    This mirrors the behavior of ``CommandIndex().invalidate()`` in azure-cli-core but
+    works without requiring a fully initialized CLI session.
+    """
+    azure_config_dir = get_azure_config_dir()
+    for filename in _COMMAND_INDEX_FILES:
+        filepath = os.path.join(azure_config_dir, filename)
+        try:
+            os.remove(filepath)
+            logger.debug("Deleted command index file: %s", filepath)
+        except OSError:
+            pass
 
 
 def add_extension(extensions):
@@ -48,6 +73,8 @@ def add_extension(extensions):
         result = pip_cmd('install -e {}'.format(path), "Adding extension '{}'...".format(path))
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
+
+    _invalidate_command_index()
 
 
 def remove_extension(extensions):
@@ -82,6 +109,8 @@ def remove_extension(extensions):
                 path_to_remove = os.path.join(path, d)
                 display("Removing '{}'...".format(path_to_remove))
                 shutil.rmtree(path_to_remove)
+
+    _invalidate_command_index()
 
 
 def _get_installed_dev_extensions(dev_sources):

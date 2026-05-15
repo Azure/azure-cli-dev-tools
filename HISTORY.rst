@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.11
+++++++
+* `azdev extension add/remove`: Invalidate command index after installing or removing extensions.
+
 0.2.10
 ++++++
 * Add support for Python 3.14 and drop support for Python 3.9
