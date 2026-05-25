@@ -12,6 +12,7 @@ import zipfile
 from knack.util import CLIError
 
 from azdev.utilities import EXTENSION_PREFIX
+from azdev.operations.extensions.metadata import pkginfo_to_dict
 
 
 WHEEL_INFO_RE = re.compile(
@@ -45,7 +46,9 @@ def _get_azext_metadata(ext_dir):
 
 def get_ext_metadata(ext_dir, ext_file, ext_name):
     # Modification of https://github.com/Azure/azure-cli/blob/dev/src/azure-cli-core/azure/cli/core/extension.py#L89
-    WHL_METADATA_FILENAME = 'metadata.json'
+    # Read spec-defined wheel metadata via pkginfo so we don't depend on the
+    # legacy wheel-0.30.0 only ``metadata.json`` artifact.
+    generated_metadata = pkginfo_to_dict(ext_file)
     with zipfile.ZipFile(ext_file, 'r') as zip_ref:
         zip_ref.extractall(ext_dir)
     metadata = {}
@@ -56,10 +59,7 @@ def get_ext_metadata(ext_dir, ext_file, ext_name):
     for dist_info_dirname in dist_info_dirs:
         parsed_dist_info_dir = WHEEL_INFO_RE(dist_info_dirname)
         if parsed_dist_info_dir and parsed_dist_info_dir.groupdict().get('name') == ext_name.replace('-', '_'):
-            whl_metadata_filepath = os.path.join(ext_dir, dist_info_dirname, WHL_METADATA_FILENAME)
-            if os.path.isfile(whl_metadata_filepath):
-                with open(whl_metadata_filepath) as f:
-                    metadata.update(json.load(f))
+            metadata.update(generated_metadata)
     return metadata
 
 

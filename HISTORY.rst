@@ -2,8 +2,9 @@
 
 Release History
 ===============
-0.2.11
-++++++
+0.2.11b1
+++++++++
+* Extract extension metadata generation logic and decouple from ``wheel==0.30.0``; read wheel ``METADATA`` via ``pkginfo`` instead of the legacy ``metadata.json`` artifact. Drops the ``wheel==0.30.0`` and ``setuptools==70.0.0`` pins. (#521)
 * `azdev extension add/remove`: Invalidate command index after installing or removing extensions.
 
 0.2.10
