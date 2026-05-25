@@ -31,7 +31,7 @@ _METADATA_SPEC.loader.exec_module(_METADATA_MODULE)
 get_ext_metadata = _UTIL_MODULE.get_ext_metadata
 get_pkg_info_from_pkg_metafile = _UTIL_MODULE.get_pkg_info_from_pkg_metafile
 
-_coerce_run_requires = _METADATA_MODULE._coerce_run_requires
+_coerce_run_requires = getattr(_METADATA_MODULE, "_coerce_run_requires")  # pylint: disable=protected-access
 read_azext_metadata = _METADATA_MODULE.read_azext_metadata
 merge_to_index_metadata = _METADATA_MODULE.merge_to_index_metadata
 
@@ -204,7 +204,9 @@ _GOLDEN_EXCLUDE_PATHS = {
     "root['metadata_version']",                                       # 2.0 vs 2.1/2.4
     "root['extensions']['python.details']['document_names']",         # wheel 0.30.0 only
     "root['test_requires']",                                          # dropped from modern METADATA
-    "root['description_content_type']",                               # METADATA 2.0 wheels lack this field; wheel 0.30.0 wrote it via the side-channel metadata.json
+    # METADATA 2.0 wheels lack description_content_type; wheel 0.30.0
+    # surfaced it via the side-channel metadata.json.
+    "root['description_content_type']",
 }
 
 
@@ -305,7 +307,7 @@ class MetadataGoldenComparisonTestCase(unittest.TestCase):
             wheel_path = os.path.join(temp_dir, os.path.basename(fixture["url"]))
             try:
                 self._download(fixture["url"], wheel_path)
-            except Exception as exc:  # network/blob outage, 404 on old artifact, etc.
+            except Exception as exc:  # pylint: disable=broad-exception-caught  # network/blob outage, 404, etc.
                 self.skipTest("could not download {}: {}".format(fixture["url"], exc))
 
             generated = pkginfo_to_dict(wheel_path)

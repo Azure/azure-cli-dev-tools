@@ -4,34 +4,20 @@
 # --------------------------------------------------------------------------------------------
 
 """
-Prototype: azext_metadata.json + pkginfo.Wheel as the source of truth for
-index.json metadata entries.
+Extension metadata extraction.
 
-Purpose: provide concrete, runnable evidence that azdev PR #521 can replace
-the legacy wheel-0.30.0 `metadata.json` read path inside
-`azdev.operations.extensions.metadata.pkginfo_to_dict` without depending on the
-`wheel` package at runtime.
+Replaces the legacy wheel-0.30.0 ``metadata.json`` read path with a
+``pkginfo``-based reader of the spec-compliant ``METADATA`` file inside each
+extension wheel, merged with the extension's ``azext_metadata.json``.
 
-Inputs:
-  - Path to an extension folder under `src/<name>/`
-  - Optionally, a prebuilt wheel; otherwise the wheel is built with
-    `python -m pip wheel <ext> --no-deps`.
-
-Output:
-  - A candidate `index.json` metadata block dict
-  - A classified diff report against the matching entry in `src/index.json`
+Used by ``azdev.operations.extensions.util.get_ext_metadata`` to build the
+entries stored in ``index.json``.
 """
 
 from __future__ import annotations
 
-import argparse
 import json
 import re
-import shutil
-import subprocess
-import sys
-import tempfile
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -46,6 +32,7 @@ _REQ_SPLIT_RE = re.compile(
     r"(?:\(\s*(?P<paren_spec>[^)]+?)\s*\)|(?P<bare_spec>[<>=!~].*?))?\s*$"
 )
 
+
 def _get_extension_modname(ext_dir: Path) -> str:
     pos = [d.name for d in ext_dir.iterdir() if d.is_dir() and d.name.startswith("azext_")]
     if len(pos) != 1:
@@ -53,6 +40,7 @@ def _get_extension_modname(ext_dir: Path) -> str:
             "Expected exactly one azext_* module in {}, found: {}".format(ext_dir, pos)
         )
     return pos[0]
+
 
 def read_azext_metadata(ext_dir: Path) -> Dict[str, Any]:
     modname = _get_extension_modname(ext_dir)
@@ -201,7 +189,7 @@ def merge_to_index_metadata(pkg: Dict[str, Any], azext: Dict[str, Any]) -> Dict[
         details["project_urls"] = project_urls
     if details:
         metadata["extensions"] = {"python.details": details}
-        
+
     metadata.update(azext)
 
     return {k: v for k, v in metadata.items() if v is not None}
