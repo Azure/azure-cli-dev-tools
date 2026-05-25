@@ -181,24 +181,9 @@ class MetadataModuleTestCase(unittest.TestCase):
         self.assertEqual("demo-ext", result.get("name"))
 
 
-# ---------------------------------------------------------------------------
-# Golden comparison against real wheels (mirrors PR #521 test approach).
-#
-# Downloads small, historically published extension wheels and confirms that
-# our pkginfo-based ``pkginfo_to_dict`` reconstructs the same metadata block
-# that wheel 0.30.0 produced and that azdev historically wrote into
-# ``index.json``. Fields that are structurally unavailable to a pkginfo reader
-# (because they were only ever emitted by wheel 0.30.0 / older setuptools)
-# are excluded from the diff via ``DeepDiff(exclude_paths=...)`` and listed
-# explicitly so the gap is visible in the test source.
-# ---------------------------------------------------------------------------
-
 pkginfo_to_dict = _METADATA_MODULE.pkginfo_to_dict
 
 
-# Fields that wheel 0.30.0 wrote into ``metadata.json`` but that the spec-
-# compliant ``METADATA`` file (the only thing pkginfo can read on a modern
-# wheel) does not expose. Excluded from the golden diff.
 _GOLDEN_EXCLUDE_PATHS = {
     "root['generator']",                                              # bdist_wheel banner
     "root['metadata_version']",                                       # 2.0 vs 2.1/2.4
