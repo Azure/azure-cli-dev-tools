@@ -85,9 +85,12 @@ setup(
         'deepdiff~=8.6.1',
         'azure-cli-diff-tool~=0.1.1',
         'packaging',
+        'pkginfo',
         'tqdm',
-        'wheel==0.30.0',
-        'setuptools==70.0.0',
+        # setuptools >= 78.1.1 to address CVE-2025-47273 (path traversal).
+        # Upper bound < 80 keeps legacy `setup.py develop` invocations working
+        # for extensions that haven't migrated to pyproject.toml yet.
+        'setuptools>=78.1.1,<80',
         'microsoft-security-utilities-secret-masker~=1.0.0b4'
     ],
     package_data={

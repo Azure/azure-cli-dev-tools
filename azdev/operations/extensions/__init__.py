@@ -21,6 +21,8 @@ from .version_upgrade import VersionUpgradeMod
 
 logger = get_logger(__name__)
 
+_PIP_EDITABLE_OPTS = "--config-settings editable_mode=compat"
+
 # These are the index files cleared by CommandIndex().invalidate() in azure-cli-core.
 # Refer: azure-cli-core/azure/cli/core/__init__.py
 _COMMAND_INDEX_FILES = (
@@ -70,7 +72,10 @@ def add_extension(extensions):
             raise CLIError('extension(s) not found: {}'.format(' '.join(extensions)))
 
     for path in paths_to_add:
-        result = pip_cmd('install -e {}'.format(path), "Adding extension '{}'...".format(path))
+        result = pip_cmd(
+            'install -e {} {}'.format(path, _PIP_EDITABLE_OPTS),
+            "Adding extension '{}'...".format(path),
+        )
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
 
