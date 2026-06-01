@@ -15,6 +15,7 @@ from .command import (
     cmd,
     py_cmd,
     pip_cmd,
+    quote_arg,
     CommandError
 )
 from .const import (
@@ -71,6 +72,7 @@ __all__ = [
     'cmd',
     'py_cmd',
     'pip_cmd',
+    'quote_arg',
     'CommandError',
     'test_cmd',
     'get_env_path',

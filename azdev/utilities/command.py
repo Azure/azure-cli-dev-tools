@@ -15,6 +15,26 @@ from knack.util import CommandResultItem
 logger = get_logger(__name__)
 
 
+def quote_arg(arg):
+    """ Quote a single command-line argument so it survives the shell/argv parsing
+    performed by the command runners in this module.
+
+    On Windows, command strings are passed verbatim to ``subprocess`` (and ultimately
+    ``CreateProcess``), so Windows-style quoting via ``subprocess.list2cmdline`` is used.
+    On POSIX, command strings are split with ``shlex.split``, so POSIX-style quoting via
+    ``shlex.quote`` is used. This makes paths containing spaces (e.g. OneDrive folders)
+    safe to interpolate into command strings.
+
+    :param arg: The argument to quote.
+    :returns: (str) the quoted argument.
+    """
+    from azdev.utilities import IS_WINDOWS
+    arg = str(arg)
+    if IS_WINDOWS:
+        return subprocess.list2cmdline([arg])
+    return shlex.quote(arg)
+
+
 class CommandError(Exception):
 
     def __init__(self, output, exit_code, command):

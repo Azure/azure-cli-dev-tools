@@ -16,7 +16,7 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     cmd, py_cmd, pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_azdev_config,
-    get_azure_config_dir, require_azure_cli, heading, subheading, EXTENSION_PREFIX)
+    get_azure_config_dir, require_azure_cli, heading, subheading, quote_arg, EXTENSION_PREFIX)
 from .version_upgrade import VersionUpgradeMod
 
 logger = get_logger(__name__)
@@ -73,7 +73,7 @@ def add_extension(extensions):
 
     for path in paths_to_add:
         result = pip_cmd(
-            'install -e {} {}'.format(path, _PIP_EDITABLE_OPTS),
+            'install -e {} {}'.format(quote_arg(path), _PIP_EDITABLE_OPTS),
             "Adding extension '{}'...".format(path),
         )
         if result.error:

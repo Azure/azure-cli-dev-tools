@@ -17,7 +17,7 @@ from azdev.operations.extensions import (
 from azdev.params import Flag
 from azdev.utilities import (
     display, heading, subheading, pip_cmd, CommandError, find_file,
-    get_azdev_config_dir, get_azdev_config, require_virtual_env, get_azure_config)
+    get_azdev_config_dir, get_azdev_config, require_virtual_env, get_azure_config, quote_arg)
 
 logger = get_logger(__name__)
 
@@ -51,7 +51,8 @@ def _install_extensions(ext_paths):
 
     # install specified extensions
     for path in ext_paths or []:
-        result = pip_cmd('install -e {} {}'.format(path, _PIP_EDITABLE_OPTS), "Adding extension '{}'...".format(path))
+        result = pip_cmd('install -e {} {}'.format(quote_arg(path), _PIP_EDITABLE_OPTS),
+                         "Adding extension '{}'...".format(path))
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
 
@@ -77,13 +78,13 @@ def _install_cli(cli_path, deps=None):
     privates_dir = os.path.join(cli_path, "privates")
     if os.path.isdir(privates_dir) and os.listdir(privates_dir):
         whl_list = " ".join(
-            [os.path.join(privates_dir, f) for f in os.listdir(privates_dir)]
+            [quote_arg(os.path.join(privates_dir, f)) for f in os.listdir(privates_dir)]
         )
         pip_cmd("install {}".format(whl_list), "Installing private whl files...")
 
     # install general requirements
     pip_cmd(
-        "install -r {}".format(os.path.join(cli_path, "requirements.txt")),
+        "install -r {}".format(quote_arg(os.path.join(cli_path, "requirements.txt"))),
         "Installing `requirements.txt`..."
     )
 
@@ -92,38 +93,41 @@ def _install_cli(cli_path, deps=None):
         # Resolve dependencies from setup.py files.
         # command modules have dependency on azure-cli-core so install this first
         pip_cmd(
-            "install -e {} {}".format(os.path.join(cli_src, 'azure-cli-telemetry'), _PIP_EDITABLE_OPTS),
+            "install -e {} {}".format(quote_arg(os.path.join(cli_src, 'azure-cli-telemetry')), _PIP_EDITABLE_OPTS),
             "Installing `azure-cli-telemetry`..."
         )
         pip_cmd(
-            "install -e {} {}".format(os.path.join(cli_src, 'azure-cli-core'), _PIP_EDITABLE_OPTS),
+            "install -e {} {}".format(quote_arg(os.path.join(cli_src, 'azure-cli-core')), _PIP_EDITABLE_OPTS),
             "Installing `azure-cli-core`..."
         )
 
         # azure cli has dependencies on the above packages so install this one last
         pip_cmd(
-            "install -e {} {}".format(os.path.join(cli_src, 'azure-cli'), _PIP_EDITABLE_OPTS),
+            "install -e {} {}".format(quote_arg(os.path.join(cli_src, 'azure-cli')), _PIP_EDITABLE_OPTS),
             "Installing `azure-cli`..."
         )
 
         pip_cmd(
-            "install -e {} {}".format(os.path.join(cli_src, 'azure-cli-testsdk'), _PIP_EDITABLE_OPTS),
+            "install -e {} {}".format(quote_arg(os.path.join(cli_src, 'azure-cli-testsdk')), _PIP_EDITABLE_OPTS),
             "Installing `azure-cli-testsdk`..."
         )
     else:
         # First install packages without dependencies,
         # then resolve dependencies from requirements.*.txt file.
         pip_cmd(
-            "install -e {} --no-deps {}".format(os.path.join(cli_src, 'azure-cli-telemetry'), _PIP_EDITABLE_OPTS),
+            "install -e {} --no-deps {}".format(
+                quote_arg(os.path.join(cli_src, 'azure-cli-telemetry')), _PIP_EDITABLE_OPTS),
             "Installing `azure-cli-telemetry`..."
         )
         pip_cmd(
-            "install -e {} --no-deps {}".format(os.path.join(cli_src, 'azure-cli-core'), _PIP_EDITABLE_OPTS),
+            "install -e {} --no-deps {}".format(
+                quote_arg(os.path.join(cli_src, 'azure-cli-core')), _PIP_EDITABLE_OPTS),
             "Installing `azure-cli-core`..."
         )
 
         pip_cmd(
-            "install -e {} --no-deps {}".format(os.path.join(cli_src, 'azure-cli'), _PIP_EDITABLE_OPTS),
+            "install -e {} --no-deps {}".format(
+                quote_arg(os.path.join(cli_src, 'azure-cli')), _PIP_EDITABLE_OPTS),
             "Installing `azure-cli`..."
         )
 
@@ -131,14 +135,14 @@ def _install_cli(cli_path, deps=None):
         # azure-cli package for running commands.
         # Here we need to install with dependencies for azdev test.
         pip_cmd(
-            "install -e {} {}".format(os.path.join(cli_src, 'azure-cli-testsdk'), _PIP_EDITABLE_OPTS),
+            "install -e {} {}".format(quote_arg(os.path.join(cli_src, 'azure-cli-testsdk')), _PIP_EDITABLE_OPTS),
             "Installing `azure-cli-testsdk`..."
         )
         import platform
         system = platform.system()
         req_file = 'requirements.py3.{}.txt'.format(system)
         pip_cmd(
-            "install -r {}".format(os.path.join(cli_src, 'azure-cli', req_file)),
+            "install -r {}".format(quote_arg(os.path.join(cli_src, 'azure-cli', req_file))),
             "Installing `{}`...".format(req_file)
         )
 
