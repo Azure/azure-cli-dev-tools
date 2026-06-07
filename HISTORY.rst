@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.11b2
+++++++++
+* Quote paths when running editable installs (``pip install -e <path>``) and the pytest runner so that paths containing spaces (e.g. OneDrive folders) no longer break ``azdev extension add``, ``azdev setup``, code generation, and ``azdev test``. (#550, #415)
+
 0.2.11b1
 ++++++++
 * Extract extension metadata generation logic and decouple from ``wheel==0.30.0``; read wheel ``METADATA`` via ``pkginfo`` instead of the legacy ``metadata.json`` artifact. Drops the ``wheel==0.30.0`` and ``setuptools==70.0.0`` pins. (#521)
