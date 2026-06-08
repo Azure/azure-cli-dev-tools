@@ -18,10 +18,11 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark):
 
         logger = get_logger(__name__)
 
+        quoted_log_path = quote_arg(log_path)
         if os.name == 'posix':
-            arguments = ['-x', '-v', '--forked', '-p no:warnings', '--log-level=WARN', '--junit-xml', quote_arg(log_path)]
+            arguments = ['-x', '-v', '--forked', '-p no:warnings', '--log-level=WARN', '--junit-xml', quoted_log_path]
         else:
-            arguments = ['-x', '-v', '-p no:warnings', '--log-level=WARN', '--junit-xml', quote_arg(log_path)]
+            arguments = ['-x', '-v', '-p no:warnings', '--log-level=WARN', '--junit-xml', quoted_log_path]
 
         if no_exit_first:
             arguments.remove('-x')
