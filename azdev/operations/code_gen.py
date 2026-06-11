@@ -14,7 +14,7 @@ from knack.util import CLIError
 
 from azdev.utilities import (
     pip_cmd, display, heading, COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, get_cli_repo_path, get_ext_repo_paths,
-    find_files)
+    find_files, quote_arg)
 
 logger = get_logger(__name__)
 
@@ -300,7 +300,7 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
 
     if is_ext:
         result = pip_cmd(
-            'install -e {} {}'.format(new_package_path, _PIP_EDITABLE_OPTS),
+            'install -e {} {}'.format(quote_arg(new_package_path), _PIP_EDITABLE_OPTS),
             "Installing `{}{}`...".format(prefix, name),
         )
         if result.error:

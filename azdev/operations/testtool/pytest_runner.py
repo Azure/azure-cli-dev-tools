@@ -9,7 +9,7 @@ import sys
 
 from knack.log import get_logger
 
-from azdev.utilities import call
+from azdev.utilities import call, quote_arg
 
 
 def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark):
@@ -18,10 +18,11 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark):
 
         logger = get_logger(__name__)
 
+        quoted_log_path = quote_arg(log_path)
         if os.name == 'posix':
-            arguments = ['-x', '-v', '--forked', '-p no:warnings', '--log-level=WARN', '--junit-xml', log_path]
+            arguments = ['-x', '-v', '--forked', '-p no:warnings', '--log-level=WARN', '--junit-xml', quoted_log_path]
         else:
-            arguments = ['-x', '-v', '-p no:warnings', '--log-level=WARN', '--junit-xml', log_path]
+            arguments = ['-x', '-v', '-p no:warnings', '--log-level=WARN', '--junit-xml', quoted_log_path]
 
         if no_exit_first:
             arguments.remove('-x')
@@ -29,7 +30,7 @@ def get_test_runner(parallel, log_path, last_failed, no_exit_first, mark):
         if mark:
             arguments.append('-m "{}"'.format(mark))
 
-        arguments.extend(test_paths)
+        arguments.extend(quote_arg(test_path) for test_path in test_paths)
         if parallel:
             arguments += ['-n', 'auto']
         if last_failed:
