@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.11b3
+++++++++
+* ``azdev extension update-index``/``publish``: Fix ``ValueError: Not a known wheel archive format`` when reading wheel metadata. The wheel is now downloaded with its ``.whl`` filename so ``pkginfo.Wheel`` can read it, and ``read_pkginfo`` falls back to a temporary ``.whl`` copy for any non-``.whl`` path. (#7740)
+
 0.2.11b2
 ++++++++
 * Quote paths when running editable installs (``pip install -e <path>``) and the pytest runner so that paths containing spaces (e.g. OneDrive folders) no longer break ``azdev extension add``, ``azdev setup``, code generation, and ``azdev test``. (#550, #415)

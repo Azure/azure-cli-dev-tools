@@ -288,7 +288,7 @@ def update_extension_index(extensions):
         ext_dir = tempfile.mkdtemp(dir=extensions_dir)
         whl_cache_dir = tempfile.mkdtemp()
         whl_cache = {}
-        ext_file = get_whl_from_url(ext_path, extension_name, whl_cache_dir, whl_cache)
+        ext_file = get_whl_from_url(ext_path, ext_path.split("/")[-1], whl_cache_dir, whl_cache)
 
         with open(index_path, 'r') as infile:
             curr_index = json.loads(infile.read())
