@@ -21,7 +21,7 @@ from .version_upgrade import VersionUpgradeMod
 
 logger = get_logger(__name__)
 
-_PIP_EDITABLE_OPTS = "--config-settings editable_mode=compat"
+_PIP_EDITABLE_OPTS = "--config-settings editable_mode=compat --no-build-isolation"
 
 # These are the index files cleared by CommandIndex().invalidate() in azure-cli-core.
 # Refer: azure-cli-core/azure/cli/core/__init__.py

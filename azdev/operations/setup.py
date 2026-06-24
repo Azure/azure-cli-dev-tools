@@ -21,7 +21,7 @@ from azdev.utilities import (
 
 logger = get_logger(__name__)
 
-_PIP_EDITABLE_OPTS = "--config-settings editable_mode=compat"
+_PIP_EDITABLE_OPTS = "--config-settings editable_mode=compat --no-build-isolation"
 
 
 def _check_path(path, file_name):

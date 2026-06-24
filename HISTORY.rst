@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.12
+++++++
+* Editable installs (``azdev setup``, ``azdev extension add``, code generation) now pass ``--no-build-isolation`` so wheels build against the environment's pinned ``setuptools`` instead of an isolated PEP 517 build environment. This fixes editable-install failures introduced by the ``setuptools`` pinning.
+
 0.2.11b3
 ++++++++
 * ``azdev extension update-index``/``publish``: Fix ``ValueError: Not a known wheel archive format`` when reading wheel metadata. The wheel is now downloaded with its ``.whl`` filename so ``pkginfo.Wheel`` can read it, and ``read_pkginfo`` falls back to a temporary ``.whl`` copy for any non-``.whl`` path. (#7740)

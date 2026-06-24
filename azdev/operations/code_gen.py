@@ -18,7 +18,7 @@ from azdev.utilities import (
 
 logger = get_logger(__name__)
 
-_PIP_EDITABLE_OPTS = "--config-settings editable_mode=compat"
+_PIP_EDITABLE_OPTS = "--config-settings editable_mode=compat --no-build-isolation"
 
 _MODULE_ROOT_PATH = os.path.join('src', 'azure-cli', 'azure', 'cli', 'command_modules')
 
