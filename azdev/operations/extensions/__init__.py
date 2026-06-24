@@ -21,7 +21,7 @@ from .version_upgrade import VersionUpgradeMod
 
 logger = get_logger(__name__)
 
-_PIP_EDITABLE_OPTS = "--config-settings editable_mode=compat"
+_PIP_EDITABLE_OPTS = "--config-settings editable_mode=compat --no-build-isolation"
 
 # These are the index files cleared by CommandIndex().invalidate() in azure-cli-core.
 # Refer: azure-cli-core/azure/cli/core/__init__.py
@@ -288,7 +288,7 @@ def update_extension_index(extensions):
         ext_dir = tempfile.mkdtemp(dir=extensions_dir)
         whl_cache_dir = tempfile.mkdtemp()
         whl_cache = {}
-        ext_file = get_whl_from_url(ext_path, extension_name, whl_cache_dir, whl_cache)
+        ext_file = get_whl_from_url(ext_path, ext_path.split("/")[-1], whl_cache_dir, whl_cache)
 
         with open(index_path, 'r') as infile:
             curr_index = json.loads(infile.read())

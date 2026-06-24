@@ -66,7 +66,15 @@ def read_pkginfo(wheel_path: Path) -> Dict[str, Any]:
     """Read spec-defined wheel metadata via pkginfo.Wheel."""
     import pkginfo
 
-    whl = pkginfo.Wheel(str(wheel_path))
+    wheel_path = Path(str(wheel_path))
+    target = wheel_path
+    if wheel_path.suffix != ".whl":
+        import shutil
+        import tempfile
+        target = Path(tempfile.mkdtemp()) / (wheel_path.name + ".whl")
+        shutil.copyfile(wheel_path, target)
+
+    whl = pkginfo.Wheel(str(target))
     return {
         "name": whl.name,
         "version": whl.version,
