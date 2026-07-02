@@ -6,15 +6,15 @@ Release History
 ++++++
 * Editable installs (``azdev setup``, ``azdev extension add``, code generation) now pass ``--no-build-isolation`` so wheels build against the environment's pinned ``setuptools`` instead of an isolated PEP 517 build environment. This fixes editable-install failures introduced by the ``setuptools`` pinning.
 
-0.2.11b3
+0.2.12b3
 ++++++++
 * ``azdev extension update-index``/``publish``: Fix ``ValueError: Not a known wheel archive format`` when reading wheel metadata. The wheel is now downloaded with its ``.whl`` filename so ``pkginfo.Wheel`` can read it, and ``read_pkginfo`` falls back to a temporary ``.whl`` copy for any non-``.whl`` path. (#7740)
 
-0.2.11b2
+0.2.12b2
 ++++++++
 * Quote paths when running editable installs (``pip install -e <path>``) and the pytest runner so that paths containing spaces (e.g. OneDrive folders) no longer break ``azdev extension add``, ``azdev setup``, code generation, and ``azdev test``. (#550, #415)
 
-0.2.11b1
+0.2.12b1
 ++++++++
 * Extract extension metadata generation logic and decouple from ``wheel==0.30.0``; read wheel ``METADATA`` via ``pkginfo`` instead of the legacy ``metadata.json`` artifact. Drops the ``wheel==0.30.0`` and ``setuptools==70.0.0`` pins. (#521)
 
