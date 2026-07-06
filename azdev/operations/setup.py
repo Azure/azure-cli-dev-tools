@@ -13,7 +13,7 @@ from knack.log import get_logger
 from knack.util import CLIError
 
 from azdev.operations.extensions import (
-    list_extensions, add_extension_repo, remove_extension)
+    list_extensions, add_extension_repo, remove_extension, _ensure_egg_info)
 from azdev.params import Flag
 from azdev.utilities import (
     display, heading, subheading, pip_cmd, CommandError, find_file,
@@ -55,6 +55,7 @@ def _install_extensions(ext_paths):
                          "Adding extension '{}'...".format(path))
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
+        _ensure_egg_info(path)
 
 
 def _install_cli(cli_path, deps=None):
