@@ -49,6 +49,23 @@ def _invalidate_command_index():
             pass
 
 
+def _ensure_egg_info(path):
+    # editable_mode=compat + --no-build-isolation results in a PEP 660 editable install:
+    # the .dist-info goes to site-packages and no .egg-info is left in the source tree.
+    # azdev finds dev extensions by globbing *.egg-info under the repo, so without it the
+    # extension is invisible even though pip succeeded. Regenerate it with the env's setuptools.
+    if find_files(path, '*.egg-info'):
+        return
+    result = py_cmd(
+        'setup.py egg_info',
+        "Generating metadata for '{}'...".format(path),
+        is_module=False,
+        cwd=path,
+    )
+    if result.error:
+        raise result.error  # pylint: disable=raising-bad-type
+
+
 def add_extension(extensions):
 
     ext_paths = get_ext_repo_paths()
@@ -78,6 +95,7 @@ def add_extension(extensions):
         )
         if result.error:
             raise result.error  # pylint: disable=raising-bad-type
+        _ensure_egg_info(path)
 
     _invalidate_command_index()
 
