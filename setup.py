@@ -91,6 +91,10 @@ setup(
         # Upper bound < 80 keeps legacy `setup.py develop` invocations working
         # for extensions that haven't migrated to pyproject.toml yet.
         'setuptools>=78.1.1,<80',
+        # `azdev extension build` runs `setup.py bdist_wheel`; keep the wheel command available even
+        # when the environment's setuptools predates the bundled bdist_wheel (< 70.1). Modern, unpinned
+        # wheel for building only -- not the `wheel==0.30.0` metadata pin dropped in 0.2.12b1.
+        'wheel',
         'microsoft-security-utilities-secret-masker~=1.0.0b4'
     ],
     package_data={

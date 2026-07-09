@@ -354,6 +354,13 @@ def build_extensions(extensions, dist_dir='dist'):
         command = 'setup.py bdist_wheel -b bdist -d {}'.format(dist_dir)
         result = py_cmd(command, "Building extension '{}'...".format(path), is_module=False)
         if result.error:
+            # py_cmd captures the build output; surface it so the real setup.py failure is visible
+            # instead of only the opaque CalledProcessError.
+            build_output = result.output
+            if isinstance(build_output, (bytes, bytearray)):
+                build_output = build_output.decode('utf-8', 'ignore')
+            if build_output:
+                logger.error(build_output)
             raise result.error  # pylint: disable=raising-bad-type
     os.chdir(original_cwd)
 
