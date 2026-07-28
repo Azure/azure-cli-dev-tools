@@ -301,9 +301,8 @@ def update_extension_index(extensions):
         except IndexError:
             raise CLIError('unable to parse extension name')
 
-        # TODO: Update this!
-        extensions_dir = tempfile.mkdtemp()
-        ext_dir = tempfile.mkdtemp(dir=extensions_dir)
+        # Create temporary directories for extraction and caching
+        ext_dir = tempfile.mkdtemp()
         whl_cache_dir = tempfile.mkdtemp()
         whl_cache = {}
         ext_file = get_whl_from_url(ext_path, ext_path.split("/")[-1], whl_cache_dir, whl_cache)
