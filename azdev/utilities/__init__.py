@@ -52,6 +52,11 @@ from .path import (
     get_name_index,
     calc_selected_mod_names
 )
+from .packaging import (
+    build_package_wheel,
+    find_package_configs,
+    get_package_config,
+)
 from .testing import test_cmd
 from .tools import (
     require_virtual_env,
@@ -99,4 +104,7 @@ __all__ = [
     'diff_branches_detail',
     'diff_branch_file_patch',
     'calc_selected_mod_names',
+    'build_package_wheel',
+    'find_package_configs',
+    'get_package_config',
 ]

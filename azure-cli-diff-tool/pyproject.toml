@@ -5,5 +5,30 @@
 # -----------------------------------------------------------------------------
 
 [build-system]
-# Minimum requirements for the build system to execute.
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=78.1.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "azure-cli-diff-tool"
+description = "A tool for cli metadata management"
+authors = [{ name = "Microsoft Corporation", email = "azpycli@microsoft.com" }]
+license = "MIT"
+dynamic = ["version", "readme"]
+dependencies = [
+    "deepdiff~=8.6.1",
+    "requests~=2.32.3",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "azure_cli_diff_tool.__VERSION__" }
+readme = { file = ["README.rst", "HISTORY.rst"], content-type = "text/x-rst" }
+
+[tool.setuptools]
+include-package-data = true
+
+# Equivalent to the previous `find_packages()` call, which also picked up the
+# top-level `tests` package.
+[tool.setuptools.packages.find]
+
+[tool.setuptools.package-data]
+azure_cli_diff_tool = ["data/*"]

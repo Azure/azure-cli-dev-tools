@@ -2,6 +2,16 @@
 
 Release History
 ===============
+0.2.14b1
+++++++++
+* Migrate azdev and ``azure-cli-diff-tool`` to PEP 621 ``pyproject.toml``. Both ``setup.py`` files are gone; wheel contents are unchanged.
+* Build with ``python -m build`` in CI, and check metadata with ``twine check`` instead of ``setup.py check -r -s``.
+* Drop the ``setuptools<80`` cap. It guarded ``setup.py develop``, which azdev stopped calling in 0.2.12. The ``>=78.1.1`` floor for CVE-2025-47273 stays.
+* Fix ``azdev cli check-versions`` running ``python -m setup.py bdist_wheel``, which could never work.
+* Fix ``azure-cli-diff-tool``'s sdist missing ``HISTORY.rst``, which broke building a wheel from it.
+* Fix ``scripts/ci/extract_version.sh`` producing an empty version.
+* Set ``Description-Content-Type`` and stop reading the long description through ``codecs.open``, which wrote ``\r\r\n`` line endings on Windows.
+
 0.2.13
 ++++++
 * `azdev extension add` / `azdev setup`: regenerate `*.egg-info` after the editable install so development extensions stay discoverable. `--no-build-isolation` (0.2.12) means pip no longer leaves an `*.egg-info` in the source tree, which made `azdev extension add` a silent no-op for discovery. (#554)

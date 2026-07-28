@@ -7,6 +7,7 @@
 import os
 import re
 import sys
+import tempfile
 
 from docutils import core, io
 
@@ -14,16 +15,14 @@ from knack.log import get_logger
 from knack.util import CLIError
 
 from azdev.utilities import (
-    display, heading, subheading, cmd, py_cmd, get_path_table,
-    pip_cmd, COMMAND_MODULE_PREFIX, require_azure_cli, find_files)
+    build_package_wheel, display, heading, subheading, cmd, get_package_config,
+    get_path_table, pip_cmd, COMMAND_MODULE_PREFIX, require_azure_cli)
 
 logger = get_logger(__name__)
 
 
 HISTORY_NAME = 'HISTORY.rst'
 RELEASE_HISTORY_TITLE = 'Release History'
-SETUP_PY_NAME = 'setup.py'
-
 # modules which should not be included in setup.py
 # because they aren't on PyPI
 EXCLUDED_MODULES = ['azure-cli-testsdk']
@@ -59,7 +58,20 @@ def check_history():
     display('OK')
 
 
-def _check_history_headings(mod_path):
+def _get_built_package_metadata(mod_path):
+    from pkginfo import Wheel
+
+    with tempfile.TemporaryDirectory(prefix='azdev-package-metadata-') as output_dir:
+        wheel_path = build_package_wheel(mod_path, output_dir)
+        metadata = Wheel(wheel_path)
+        return {
+            'description': metadata.description,
+            'description_content_type': metadata.description_content_type,
+            'version': metadata.version,
+        }
+
+
+def _check_history_headings(mod_path, actual_version=None):
     history_path = os.path.join(mod_path, HISTORY_NAME)
 
     source_path = None
@@ -93,41 +105,57 @@ def _check_history_headings(mod_path):
                           "line after the 'Release History' heading.".format(history_path))
 
         first_version_history = all_versions[0]
-        actual_version = cmd(sys.executable + ' setup.py --version', cwd=mod_path)
-        # command can output warnings as well, so we just want the last line, which should have the version
-        actual_version = actual_version.result.splitlines()[-1].strip()
+        if actual_version is None:
+            actual_version_result = cmd(sys.executable + ' setup.py --version', cwd=mod_path)
+            # command can output warnings as well, so we just want the last line, which should have the version
+            actual_version = actual_version_result.result.splitlines()[-1].strip()
         if first_version_history != actual_version:
-            errors.append("The topmost version in {} does not match version {} defined in setup.py.".format(
+            errors.append("The topmost version in {} does not match package version {}.".format(
                 history_path, actual_version))
     return errors
 
 
 def _check_readme_render(mod_path):
     errors = []
-    result = cmd(sys.executable + ' setup.py check -r -s', cwd=mod_path)
-    if result.exit_code:
-        # this outputs some warnings we don't care about
-        error_lines = []
-        target_line = 'The following syntax errors were detected'
-        suppress = True
-        logger.debug(result.error.output)
+    package_config = get_package_config(mod_path)
+    if package_config and os.path.basename(package_config) == 'setup.py':
+        result = cmd(sys.executable + ' setup.py check -r -s', cwd=mod_path)
+        if result.exit_code:
+            # this outputs some warnings we don't care about
+            error_lines = []
+            target_line = 'The following syntax errors were detected'
+            suppress = True
+            logger.debug(result.error.output)
 
-        # TODO: Checks for syntax errors but potentially not other things
-        for line in result.error.output.splitlines():
-            line = str(line).strip()
-            if not suppress and line:
-                error_lines.append(line)
-            if target_line in line:
-                suppress = False
-        errors.append(os.linesep.join(error_lines))
-    errors += _check_history_headings(mod_path)
+            # TODO: Checks for syntax errors but potentially not other things
+            for line in result.error.output.splitlines():
+                line = str(line).strip()
+                if not suppress and line:
+                    error_lines.append(line)
+                if target_line in line:
+                    suppress = False
+            errors.append(os.linesep.join(error_lines))
+        errors += _check_history_headings(mod_path)
+        return errors
+
+    metadata = _get_built_package_metadata(mod_path)
+    content_type = (metadata.get('description_content_type') or 'text/x-rst').split(';', 1)[0].strip().lower()
+    if content_type == 'text/x-rst' and metadata.get('description'):
+        _, publication = core.publish_programmatically(
+            source_class=io.StringInput, source=metadata['description'],
+            source_path=None, destination_class=io.NullOutput, destination=None,
+            destination_path=None, reader=None, reader_name='standalone', parser=None,
+            parser_name='restructuredtext', writer=None, writer_name='null', settings=None,
+            settings_spec=None, settings_overrides={}, config_section=None, enable_exit_status=None)
+        if publication.writer.document.reporter.max_level >= 2:
+            errors.append('The package long description contains reStructuredText warnings or errors.')
+    errors += _check_history_headings(mod_path, actual_version=metadata['version'])
     return errors
 # endregion
 
 
 # region verify PyPI versions
 def verify_versions():
-    import tempfile
     import shutil
 
     require_azure_cli()
@@ -174,25 +202,6 @@ def verify_versions():
         display('OK!')
 
 
-def _get_module_versions(results, modules):
-
-    version_pattern = re.compile(r'.*(?P<ver>\d+.\d+.\d+).*')
-
-    for mod, mod_path in modules:
-        if not mod.startswith(COMMAND_MODULE_PREFIX) and mod != 'azure-cli':
-            mod = '{}{}'.format(COMMAND_MODULE_PREFIX, mod)
-
-        setup_path = find_files(mod_path, 'setup.py')
-        with open(setup_path[0], 'r') as f:
-            local_version = 'Unknown'
-            for line in f.readlines():
-                if line.strip().startswith('VERSION'):
-                    local_version = version_pattern.match(line).group('ver')
-                    break
-            results[mod]['local_version'] = local_version
-    return results
-
-
 # pylint: disable=too-many-statements
 def _compare_module_against_pypi(results, root_dir, mod, mod_path):
     import zipfile
@@ -230,10 +239,7 @@ def _compare_module_against_pypi(results, root_dir, mod, mod_path):
     # build from source and extract the version
     setup_path = os.path.normpath(mod_path.strip())
     os.chdir(setup_path)
-    py_cmd('setup.py bdist_wheel -d {}'.format(build_dir))
-    if len(os.listdir(build_dir)) != 1:
-        raise CLIError('Unexpectedly found multiple build files found in {}.'.format(build_dir))
-    build_path = os.path.join(build_dir, os.listdir(build_dir)[0])
+    build_path = build_package_wheel(setup_path, build_dir)
     build_version = version_pattern.match(build_path).group(1)
 
     results[mod].update({

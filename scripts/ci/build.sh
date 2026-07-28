@@ -8,6 +8,5 @@ set -ev
 cd "${BUILD_SOURCESDIRECTORY}"
 
 echo "Build azdev"
-pip install -U pip setuptools wheel
-python setup.py bdist_wheel -d "${BUILD_STAGINGDIRECTORY}"
-python setup.py sdist -d "${BUILD_STAGINGDIRECTORY}"
+pip install -U pip build
+python -m build --outdir "${BUILD_STAGINGDIRECTORY}"

@@ -71,7 +71,6 @@
     </Compile>
     <Compile Include="azdev\__init__.py" />
     <Compile Include="azdev\__main__.py" />
-    <Compile Include="setup.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="azdev\operations\" />
