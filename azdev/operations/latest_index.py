@@ -17,10 +17,7 @@ _LATEST_INDEX_SCRIPT = os.path.join('scripts', 'generate_latest_indices.py')
 
 
 def _resolve_cli_repo_path(cli_path):
-    if cli_path:
-        resolved = os.path.abspath(os.path.expanduser(cli_path))
-    else:
-        resolved = get_cli_repo_path()
+    resolved = os.path.abspath(os.path.expanduser(cli_path)) if cli_path else get_cli_repo_path()
 
     if not resolved or resolved == '_NONE_':
         raise CLIError('Azure CLI repo path is not configured. Specify `--cli` or run `azdev setup`.')

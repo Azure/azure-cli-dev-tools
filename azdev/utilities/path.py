@@ -10,6 +10,7 @@ from glob import glob
 from knack.util import CLIError
 
 from .const import COMMAND_MODULE_PREFIX, EXTENSION_PREFIX, ENV_VAR_VIRTUAL_ENV
+from .packaging import find_package_configs
 
 logger = logging.getLogger(__name__)
 
@@ -134,7 +135,7 @@ def get_name_index(invert=False, include_whl_extensions=False):
         )
     )
     modules_paths = glob(paths)
-    core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
+    core_paths = find_package_configs(os.path.join(cli_repo_path, 'src'))
     ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
     whl_ext_paths = []
     if include_whl_extensions:
@@ -209,7 +210,7 @@ def get_path_table(include_only=None, include_whl_extensions=False):
         )
     )
     modules_paths = glob(paths)
-    core_paths = glob(os.path.normcase(os.path.join(cli_repo_path, 'src', '*', 'setup.py')))
+    core_paths = find_package_configs(os.path.join(cli_repo_path, 'src'))
     ext_paths = [x for x in find_files(ext_repo_paths, '*.*-info') if 'site-packages' not in x]
     whl_ext_paths = [x for x in find_files(EXTENSIONS_DIR, '*.*-info') if 'site-packages' not in x]
 

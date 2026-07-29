@@ -9,6 +9,5 @@ cd "${BUILD_SOURCESDIRECTORY}"
 cd ./azure-cli-diff-tool
 
 echo "Build azure cli diff tool"
-pip install -U pip setuptools wheel
-python setup.py bdist_wheel -d "${BUILD_STAGINGDIRECTORY}"
-python setup.py sdist -d "${BUILD_STAGINGDIRECTORY}"
+pip install -U pip build
+python -m build --outdir "${BUILD_STAGINGDIRECTORY}"

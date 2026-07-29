@@ -30,7 +30,6 @@ def _ensure_dir(path):
 
 
 def _generate_files(env, generation_kwargs, file_list, dest_path):
-
     # allow sending a single item
     if not isinstance(file_list, list):
         file_list = [file_list]

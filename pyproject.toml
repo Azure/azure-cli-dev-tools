@@ -5,5 +5,107 @@
 # -----------------------------------------------------------------------------
 
 [build-system]
-# Minimum requirements for the build system to execute.
-requires = ["setuptools", "wheel"]
+# setuptools >= 78.1.1 addresses CVE-2025-47273 and provides PEP 639 license
+# expression support used below.
+requires = ["setuptools>=78.1.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "azdev"
+description = "Microsoft Azure CLI Developer Tools"
+authors = [{ name = "Microsoft Corporation", email = "azpycli@microsoft.com" }]
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["azure"]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+# `version` is the single source of truth in azdev/__init__.py; `readme` is the
+# concatenation of README.rst and HISTORY.rst, neither of which PEP 621 can
+# express statically.
+dynamic = ["version", "readme"]
+dependencies = [
+    "azure-multiapi-storage",
+    "build",
+    "docutils",
+    "flake8",
+    "gitpython",
+    "jinja2",
+    "knack",
+    "pylint>=4,<5",
+    "pytest-xdist",     # depends on pytest-forked
+    "pytest-forked",
+    "pytest>=5.0.0",
+    "pyyaml",
+    "requests",
+    "sphinx==1.6.7",
+    "tox",
+    "jsbeautifier~=1.14.7",
+    "deepdiff~=8.6.1",
+    "azure-cli-diff-tool~=0.1.1",
+    "packaging",
+    "pkginfo",
+    "tomli; python_version < '3.11'",
+    "tqdm",
+    # setuptools >= 78.1.1 to address CVE-2025-47273 (path traversal).
+    # No upper bound: azdev does not call the `setup.py develop` / `easy_install`
+    # commands deprecated in setuptools 80. Editable installs go through
+    # `pip install -e --config-settings editable_mode=compat --no-build-isolation`
+    # (0.2.12), and the remaining `setup.py` invocations against *target* repos
+    # (bdist_wheel, egg_info, sdist) are verified against current setuptools.
+    "setuptools>=78.1.1",
+    # `azdev extension build` runs `setup.py bdist_wheel` against extension repos that
+    # have not migrated to pyproject.toml; keep the wheel command available even when
+    # the target environment's setuptools predates the bundled bdist_wheel (< 70.1).
+    "wheel",
+    "microsoft-security-utilities-secret-masker~=1.0.0b4",
+]
+
+[project.urls]
+Homepage = "https://github.com/Azure/azure-cli-dev-tools"
+
+[project.scripts]
+azdev = "azdev.__main__:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "azdev.__VERSION__" }
+readme = { file = ["README.rst", "HISTORY.rst"], content-type = "text/x-rst" }
+
+[tool.setuptools]
+include-package-data = true
+packages = [
+    "azdev",
+    "azdev.config",
+    "azdev.operations",
+    "azdev.mod_templates",
+    "azdev.operations.help",
+    "azdev.operations.help.refdoc",
+    "azdev.operations.linter",
+    "azdev.operations.linter.rules",
+    "azdev.operations.linter.pylint_checkers",
+    "azdev.operations.testtool",
+    "azdev.operations.extensions",
+    "azdev.operations.statistics",
+    "azdev.operations.command_change",
+    "azdev.operations.breaking_change",
+    "azdev.operations.cmdcov",
+    "azdev.utilities",
+]
+
+[tool.setuptools.package-data]
+"azdev.config" = ["*.*", "cli_pylintrc", "ext_pylintrc"]
+"azdev.mod_templates" = ["*.*"]
+"azdev.operations.linter.rules" = ["ci_exclusions.yml"]
+"azdev.operations.linter" = ["data/*"]
+"azdev.operations.cmdcov" = ["*.*"]
+"azdev.operations.breaking_change" = ["*.*"]
