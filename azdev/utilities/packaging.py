@@ -83,12 +83,68 @@ def find_package_configs(root_paths):
     return configs
 
 
+def find_package_configs_recursive(root_paths):
+    """Find packaging configuration files anywhere beneath the given roots.
+
+    Extension repos do not follow the flat ``src/*`` layout that
+    :func:`find_package_configs` assumes: ``azdev extension repo add`` registers
+    the repo root and the packages sit one or more levels below it. This mirrors
+    the recursive ``find_files(paths, 'setup.py')`` lookup that the extension
+    commands used before pyproject.toml packages existed.
+
+    A package whose configuration cannot be read is skipped rather than aborting
+    discovery, so an in-progress migration in one extension does not hide every
+    other extension in the repo.
+    """
+    if isinstance(root_paths, str):
+        root_paths = [root_paths]
+
+    configs = []
+    for root_path in root_paths:
+        if not os.path.isdir(root_path):
+            continue
+        for dir_path, _, _ in os.walk(root_path):
+            try:
+                package_config = get_package_config(dir_path)
+            except CLIError as ex:
+                logger.warning("Skipping '%s' during package discovery: %s", dir_path, ex)
+                continue
+            if package_config:
+                configs.append(package_config)
+    return configs
+
+
+def generate_egg_info(package_dir, message=False):
+    """Write an ``*.egg-info`` directory into a package's source tree.
+
+    ``azure-cli-core`` discovers dev extensions by globbing ``*.egg-info`` under
+    the configured ``extension.dev_sources`` (see ``DevExtension.get_all``), and
+    a PEP 660 editable install leaves nothing behind in the source tree.
+
+    The legacy ``setup.py egg_info`` invocation is unavailable for pyproject-only
+    packages, but setuptools applies ``[project]`` metadata to a bare ``setup()``
+    call made from the package directory, so the same command is reachable
+    without a ``setup.py`` on disk.
+    """
+    package_config = get_package_config(package_dir)
+    if package_config and os.path.basename(package_config) == SETUP_PY:
+        command = 'setup.py egg_info'
+    else:
+        command = '-c {} egg_info'.format(quote_arg('from setuptools import setup; setup()'))
+    return py_cmd(command, message, is_module=False, cwd=package_dir)
+
+
 def build_package_wheel(package_dir, output_dir):
     """Build one wheel and return its path, preserving the legacy build path.
 
     Existing ``setup.py`` packages continue to use their current setuptools
     command. Pyproject-only packages use the public PEP 517 interface exposed by
     ``build``. Callers consume the resulting wheel identically in both cases.
+
+    ``--no-isolation`` keeps parity with the legacy ``setup.py bdist_wheel``
+    path, which always built against the current environment. Some extensions
+    import their own ``azext_*`` package (and therefore ``azure.cli.core``) at
+    build time, which an isolated build environment cannot satisfy.
     """
     package_config = get_package_config(package_dir)
     if not package_config:
@@ -104,10 +160,18 @@ def build_package_wheel(package_dir, output_dir):
         )
     else:
         result = py_cmd(
-            'build --wheel --outdir {} {}'.format(quote_arg(output_dir), quote_arg(package_dir)),
+            'build --wheel --no-isolation --outdir {} {}'.format(
+                quote_arg(output_dir), quote_arg(package_dir)),
             cwd=package_dir,
         )
     if result.error:
+        # py_cmd captures the build output on CommandResultItem.result; surface it so the
+        # real failure is visible instead of only the opaque CalledProcessError.
+        build_output = result.result
+        if isinstance(build_output, (bytes, bytearray)):
+            build_output = build_output.decode('utf-8', 'ignore')
+        if build_output:
+            logger.error(build_output)
         raise result.error  # pylint: disable=raising-bad-type
 
     built_wheels = [

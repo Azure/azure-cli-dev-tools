@@ -49,9 +49,11 @@ class TestInvalidateCommandIndex(unittest.TestCase):
 
     @patch('azdev.operations.extensions._invalidate_command_index')
     @patch('azdev.operations.extensions.pip_cmd')
-    @patch('azdev.operations.extensions.find_files', return_value=['/repo/src/my-ext/setup.py'])
+    @patch('azdev.operations.extensions.find_files', return_value=['/repo/src/my-ext/my_ext.egg-info'])
+    @patch('azdev.operations.extensions.find_package_configs_recursive',
+           return_value=['/repo/src/my-ext/setup.py'])
     @patch('azdev.operations.extensions.get_ext_repo_paths', return_value=['/repo'])
-    def test_add_extension_calls_invalidate(self, _mock_paths, _mock_find, mock_pip, mock_invalidate):
+    def test_add_extension_calls_invalidate(self, _mock_paths, _mock_configs, _mock_find, mock_pip, mock_invalidate):
         """add_extension should call _invalidate_command_index after installing."""
         from unittest.mock import MagicMock
         mock_pip.return_value = MagicMock(error=None)

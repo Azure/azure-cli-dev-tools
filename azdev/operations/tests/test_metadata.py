@@ -178,6 +178,53 @@ class MetadataModuleTestCase(unittest.TestCase):
         self.assertEqual("azext-summary", result.get("summary"))
         self.assertEqual(True, result.get("azext.isPreview"))
         self.assertEqual([{"requires": ["oras (==0.1.30)", "oras==0.1.30"]}], result.get("run_requires"))
+
+    def test_merge_to_index_metadata_maps_pyproject_homepage_to_home(self):
+        """A pyproject package has no Home-page; its `[project.urls] Homepage`
+        must still land under the `Home` label the index has always used."""
+        pkg = {
+            "name": "demo-ext",
+            "version": "0.1.0",
+            "home_page": None,
+            "project_urls": [
+                "Homepage, https://example.com",
+                "Docs, https://example.com/docs",
+            ],
+        }
+
+        result = merge_to_index_metadata(pkg, {})
+
+        project_urls = result["extensions"]["python.details"]["project_urls"]
+        self.assertEqual("https://example.com", project_urls["Home"])
+        self.assertEqual("https://example.com/docs", project_urls["Docs"])
+        self.assertNotIn("Homepage", project_urls)
+
+    def test_merge_to_index_metadata_setup_py_home_page_still_wins(self):
+        """A setup.py package keeps using Home-page, and it takes precedence."""
+        pkg = {
+            "name": "demo-ext",
+            "version": "0.1.0",
+            "home_page": "https://from-home-page.example.com",
+            "project_urls": ["Homepage, https://from-project-url.example.com"],
+        }
+
+        result = merge_to_index_metadata(pkg, {})
+
+        project_urls = result["extensions"]["python.details"]["project_urls"]
+        self.assertEqual("https://from-home-page.example.com", project_urls["Home"])
+
+    def test_merge_to_index_metadata_falls_back_to_license_expression(self):
+        """PEP 639 wheels carry License-Expression instead of License."""
+        pkg = {
+            "name": "demo-ext",
+            "version": "0.1.0",
+            "license": None,
+            "license_expression": "MIT",
+        }
+
+        result = merge_to_index_metadata(pkg, {})
+
+        self.assertEqual("MIT", result.get("license"))
         self.assertEqual("demo-ext", result.get("name"))
 
 

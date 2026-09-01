@@ -17,8 +17,10 @@ class TestProfileContext(unittest.TestCase):
         target_profiles = ['latest']
 
         for profile in target_profiles:
+            # The assertion is that entering the context does not raise; there is
+            # nothing else to check.
             with ProfileContext(profile):
-                self.assertEqual(1, 1)
+                pass
 
     def test_unsupported_profile(self):
         unknown_profile = 'unknown-profile'

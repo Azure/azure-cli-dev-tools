@@ -268,8 +268,7 @@ def _create_package(prefix, repo_path, is_ext, name='test', display_name=None, d
         root_files = [
             'HISTORY.rst',
             'README.rst',
-            'setup.cfg',
-            'setup.py'
+            'pyproject.toml'
         ]
         _generate_files(env, kwargs, root_files, dest_path)
 
