@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=70.1.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{{ pkg_name }}"
+# TODO: Confirm this is the right version number you want and it matches your
+# HISTORY.rst entry.
+version = "0.1.0"
+description = "Microsoft Azure Command-Line Tools {{ display_name }} {{ 'Extension' if is_ext else 'Command Module' }}"
+# TODO: Update author and email, if applicable
+authors = [{ name = "Microsoft Corporation", email = "azpycli@microsoft.com" }]
+license = { text = "MIT" }
+# The full list of classifiers is available at
+# https://pypi.python.org/pypi?%3Aaction=list_classifiers
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+]
+# TODO: Add any additional SDK dependencies here
+dependencies = {% if dependencies %}[
+    {{ dependencies|join(',\n    '|safe) }}
+]{% else %}[]{% endif %}
+# `readme` is the concatenation of README.rst and HISTORY.rst, which PEP 621
+# cannot express statically.
+dynamic = ["readme"]
+
+[project.urls]
+# TODO: change to your extension source code repo if the code will not be put in azure-cli-extensions repo
+Homepage = "https://github.com/Azure/{% if is_ext %}azure-cli-extensions/tree/main/src/{{ pkg_name }}{% else %}azure-cli{% endif %}"
+
+[tool.setuptools.dynamic]
+readme = { file = ["README.rst", "HISTORY.rst"], content-type = "text/x-rst" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests*"]
+{% if is_ext %}
+[tool.setuptools.package-data]
+{{ ext_long_name }} = ["azext_metadata.json"]
+{% endif %}

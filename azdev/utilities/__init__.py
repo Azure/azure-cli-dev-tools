@@ -55,6 +55,8 @@ from .path import (
 from .packaging import (
     build_package_wheel,
     find_package_configs,
+    find_package_configs_recursive,
+    generate_egg_info,
     get_package_config,
 )
 from .testing import test_cmd
@@ -106,5 +108,7 @@ __all__ = [
     'calc_selected_mod_names',
     'build_package_wheel',
     'find_package_configs',
+    'find_package_configs_recursive',
+    'generate_egg_info',
     'get_package_config',
 ]

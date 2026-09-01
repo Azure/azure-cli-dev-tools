@@ -43,9 +43,12 @@ class TestEditableInstallUsesQuotedPath(unittest.TestCase):
     @patch('azdev.operations.extensions._invalidate_command_index')
     @patch('azdev.operations.extensions.pip_cmd')
     @patch('azdev.operations.extensions.find_files',
+           return_value=['/repo/Azure Powershell/src/my-ext/my_ext.egg-info'])
+    @patch('azdev.operations.extensions.find_package_configs_recursive',
            return_value=['/repo/Azure Powershell/src/my-ext/setup.py'])
     @patch('azdev.operations.extensions.get_ext_repo_paths', return_value=['/repo'])
-    def test_add_extension_quotes_whitespace_path(self, _mock_paths, _mock_find, mock_pip, _mock_invalidate):
+    def test_add_extension_quotes_whitespace_path(self, _mock_paths, _mock_configs, _mock_find, mock_pip,
+                                                  _mock_invalidate):
         mock_pip.return_value = MagicMock(error=None)
 
         from azdev.operations.extensions import add_extension

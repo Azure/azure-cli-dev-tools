@@ -82,6 +82,7 @@ def read_pkginfo(wheel_path: Path) -> Dict[str, Any]:
         "description": whl.description,
         "description_content_type": whl.description_content_type,
         "license": whl.license,
+        "license_expression": getattr(whl, "license_expression", None),
         "classifiers": list(whl.classifiers or []),
         "requires_dist": list(whl.requires_dist or []),
         "requires_python": whl.requires_python,
@@ -149,13 +150,27 @@ def _coerce_run_requires(requires_dist: List[str]) -> List[Dict[str, Any]]:
 
 
 def _coerce_project_urls(project_urls: List[str], home_page: Optional[str]) -> Dict[str, str]:
+    """Build the `project_urls` block, normalizing the home page label.
+
+    A `setup.py` package declares `url=`, which lands in the `Home-page` METADATA
+    field and has always been stored in `index.json` under the `Home` label.
+    PEP 621 has no `url` equivalent: a pyproject package declares
+    `[project.urls] Homepage`, which lands in `Project-URL` instead. Both are
+    mapped to `Home` so an extension's index entry keeps its shape when it
+    migrates.
+    """
     out: Dict[str, str] = {}
     if home_page:
         out["Home"] = home_page
     for entry in project_urls or []:
-        if "," in entry:
-            label, url = entry.split(",", 1)
-            out[label.strip()] = url.strip()
+        if "," not in entry:
+            continue
+        label, url = entry.split(",", 1)
+        label, url = label.strip(), url.strip()
+        if label.lower() in ("home", "homepage", "home-page"):
+            out.setdefault("Home", url)
+            continue
+        out[label] = url
     return out
 
 
@@ -180,7 +195,9 @@ def merge_to_index_metadata(pkg: Dict[str, Any], azext: Dict[str, Any]) -> Dict[
     metadata["name"] = pkg.get("name")
     metadata["version"] = pkg.get("version")
     metadata["summary"] = pkg.get("summary")
-    metadata["license"] = pkg.get("license")
+    # PEP 639 wheels carry the license as `License-Expression` rather than
+    # `License`, so accept either and keep a single `license` key in the index.
+    metadata["license"] = pkg.get("license") or pkg.get("license_expression")
     metadata["metadata_version"] = pkg.get("metadata_version")
     metadata["classifiers"] = pkg.get("classifiers") or []
     metadata["extras"] = []

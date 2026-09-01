@@ -15,8 +15,9 @@ from knack.prompting import prompt_y_n
 from knack.util import CLIError
 
 from azdev.utilities import (
-    cmd, py_cmd, pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_azdev_config,
-    get_azure_config_dir, require_azure_cli, heading, subheading, quote_arg, EXTENSION_PREFIX)
+    cmd, pip_cmd, display, get_ext_repo_paths, find_files, get_azure_config, get_azdev_config,
+    get_azure_config_dir, require_azure_cli, heading, subheading, quote_arg, EXTENSION_PREFIX,
+    build_package_wheel, find_package_configs_recursive, generate_egg_info)
 from .version_upgrade import VersionUpgradeMod
 
 logger = get_logger(__name__)
@@ -56,12 +57,7 @@ def _ensure_egg_info(path):
     # extension is invisible even though pip succeeded. Regenerate it with the env's setuptools.
     if find_files(path, '*.egg-info'):
         return
-    result = py_cmd(
-        'setup.py egg_info',
-        "Generating metadata for '{}'...".format(path),
-        is_module=False,
-        cwd=path,
-    )
+    result = generate_egg_info(path, "Generating metadata for '{}'...".format(path))
     if result.error:
         raise result.error  # pylint: disable=raising-bad-type
 
@@ -71,7 +67,7 @@ def add_extension(extensions):
     ext_paths = get_ext_repo_paths()
     if not ext_paths or ext_paths == ['_NONE_']:
         raise CLIError('Extension repo path is empty. Please try `azdev extension repo add` to add an extension repo')
-    all_extensions = find_files(ext_paths, 'setup.py')
+    all_extensions = find_package_configs_recursive(ext_paths)
 
     if extensions == ['*']:
         paths_to_add = [os.path.dirname(path) for path in all_extensions
@@ -168,7 +164,7 @@ def list_extensions():
     installed_names = [x['name'] for x in installed]
     results = []
 
-    for ext_path in find_files(dev_sources, 'setup.py'):
+    for ext_path in find_package_configs_recursive(dev_sources):
         # skip non-extension packages that may be in the extension folder (for example, from a virtual environment)
         try:
             glob_pattern = os.path.join(os.path.split(ext_path)[0], '{}*'.format(EXTENSION_PREFIX))
@@ -333,7 +329,7 @@ def build_extensions(extensions, dist_dir='dist'):
     ext_paths = get_ext_repo_paths()
     if not ext_paths or ext_paths == ['_NONE_']:
         raise CLIError('Extension repo path is empty. Please try `azdev extension repo add` to add an extension repo')
-    all_extensions = find_files(ext_paths, 'setup.py')
+    all_extensions = find_package_configs_recursive(ext_paths)
 
     paths_to_build = []
     for path in all_extensions:
@@ -346,22 +342,10 @@ def build_extensions(extensions, dist_dir='dist'):
     if extensions:
         raise CLIError('extension(s) not found: {}'.format(' '.join(extensions)))
 
-    original_cwd = os.getcwd()
-    dist_dir = os.path.join(original_cwd, dist_dir)
+    dist_dir = os.path.join(os.getcwd(), dist_dir)
     for path in paths_to_build:
-        os.chdir(path)
-        command = 'setup.py bdist_wheel -b bdist -d {}'.format(dist_dir)
-        result = py_cmd(command, "Building extension '{}'...".format(path), is_module=False)
-        if result.error:
-            # py_cmd captures the build output; surface it so the real setup.py failure is visible
-            # instead of only the opaque CalledProcessError.
-            build_output = result.output
-            if isinstance(build_output, (bytes, bytearray)):
-                build_output = build_output.decode('utf-8', 'ignore')
-            if build_output:
-                logger.error(build_output)
-            raise result.error  # pylint: disable=raising-bad-type
-    os.chdir(original_cwd)
+        display("Building extension '{}'...".format(path))
+        build_package_wheel(path, dist_dir)
 
 
 def publish_extensions(extensions, storage_account, storage_account_key, storage_container,

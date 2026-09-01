@@ -2,15 +2,21 @@
 
 Release History
 ===============
-0.2.14b1
-++++++++
-* Migrate azdev and ``azure-cli-diff-tool`` to PEP 621 ``pyproject.toml``. Both ``setup.py`` files are gone; wheel contents are unchanged.
-* Build with ``python -m build`` in CI, and check metadata with ``twine check`` instead of ``setup.py check -r -s``.
-* Drop the ``setuptools<80`` cap. It guarded ``setup.py develop``, which azdev stopped calling in 0.2.12. The ``>=78.1.1`` floor for CVE-2025-47273 stays.
-* Fix ``azdev cli check-versions`` running ``python -m setup.py bdist_wheel``, which could never work.
-* Fix ``azure-cli-diff-tool``'s sdist missing ``HISTORY.rst``, which broke building a wheel from it.
-* Fix ``scripts/ci/extract_version.sh`` producing an empty version.
-* Set ``Description-Content-Type`` and stop reading the long description through ``codecs.open``, which wrote ``\r\r\n`` line endings on Windows.
+0.2.14
+++++++
+* `azdev extension add`/`list`/`build`: discover extensions by packaging configuration instead of globbing for `setup.py`, so extensions that have migrated to `pyproject.toml` are found. Previously a migrated extension was reported as `extension(s) not found`.
+* `azdev extension build`: build through the PEP 517 frontend for `pyproject.toml` extensions, keeping `setup.py bdist_wheel` for the rest. `--no-isolation` preserves the previous behaviour for extensions whose build imports their own `azext_*` package.
+* `azdev extension add`/`azdev setup`: generate `*.egg-info` without `setup.py`, so `az` can still discover a migrated extension as a development extension. `azure-cli-core` finds dev extensions by globbing `*.egg-info`.
+* `azdev extension create`: scaffold `pyproject.toml` instead of `setup.py` and `setup.cfg`.
+* `azdev extension update-index`: keep the home page under the `Home` label for `pyproject.toml` extensions, which declare `[project.urls] Homepage` rather than `url=`, so `index.json` entries do not change shape on migration. Also accept `License-Expression` in place of `License`.
+* `azdev extension build`: fix the build-failure handler reading `CommandResultItem.output`, which does not exist. A failed build raised `AttributeError` instead of showing the build log.
+* Migrate azdev and `azure-cli-diff-tool` to PEP 621 `pyproject.toml`. Both `setup.py` files are gone; wheel contents are unchanged.
+* Build with `python -m build` in CI, and check metadata with `twine check` instead of `setup.py check -r -s`.
+* Drop the `setuptools<80` cap. It guarded `setup.py develop`, which azdev stopped calling in 0.2.12. The `>=78.1.1` floor for CVE-2025-47273 stays.
+* Fix `azdev cli check-versions` running `python -m setup.py bdist_wheel`, which could never work.
+* Fix `azure-cli-diff-tool`'s sdist missing `HISTORY.rst`, which broke building a wheel from it.
+* Fix `scripts/ci/extract_version.sh` producing an empty version.
+* Set `Description-Content-Type` and stop reading the long description through `codecs.open`, which wrote `\r\r\n` line endings on Windows.
 
 0.2.13
 ++++++
