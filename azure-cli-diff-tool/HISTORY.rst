@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.2
+++++++
+* Allow Requests 2.x updates without restricting installations to the 2.32 patch line.
+
 0.1.1
 ++++++
 * Bump `deepDiff` to 8.6.1

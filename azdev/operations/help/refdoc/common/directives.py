@@ -10,10 +10,10 @@ from unittest.mock import patch
 from docutils import nodes
 from docutils.statemachine import ViewList
 from docutils.parsers.rst import directives
+from docutils.parsers.rst import Directive
 
 from sphinx import addnodes
 from sphinx.directives import ObjectDescription
-from sphinx.util.compat import Directive
 from sphinx.util.nodes import nested_parse_with_titles
 from sphinx.util.docfields import Field
 

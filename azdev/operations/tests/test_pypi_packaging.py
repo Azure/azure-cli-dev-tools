@@ -4,6 +4,7 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+from importlib import import_module
 import os
 import unittest
 from unittest.mock import patch
@@ -45,6 +46,14 @@ class TestPackageHistoryValidation(unittest.TestCase):
         self.assertEqual([], _check_readme_render(package_dir))
 
         check_history_mock.assert_called_once_with(package_dir, actual_version='2.3.4')
+
+
+class TestPublishingDependency(unittest.TestCase):
+    def test_declared_dependency_provides_publishing_api(self):
+        # Do not mock this import: the resolved package must supply the API used
+        # by publish_extensions, even when installed from a built azdev wheel.
+        module = import_module('azure.multiapi.storage.v2018_11_09.blob')
+        self.assertTrue(callable(module.BlockBlobService))
 
 
 if __name__ == '__main__':
