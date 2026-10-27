@@ -4,9 +4,6 @@ Release History
 ===============
 0.2.14
 ++++++
-* Declare `azure-multiapi-storage<1.5` because publishing still requires the Track 1 API removed in 1.5.0.
-* Require `azure-cli-diff-tool>=0.1.2,<0.2` to allow current Requests 2.x releases.
-* Make style configuration tests independent of platform paths and pre-existing checkout files.
 * `azdev extension add`/`list`/`build`: discover extensions by packaging configuration instead of globbing for `setup.py`, so extensions that have migrated to `pyproject.toml` are found. Previously a migrated extension was reported as `extension(s) not found`.
 * `azdev extension build`: build through the PEP 517 frontend for `pyproject.toml` extensions, keeping `setup.py bdist_wheel` for the rest. `--no-isolation` preserves the previous behaviour for extensions whose build imports their own `azext_*` package.
 * `azdev extension add`/`azdev setup`: generate `*.egg-info` without `setup.py`, so `az` can still discover a migrated extension as a development extension. `azure-cli-core` finds dev extensions by globbing `*.egg-info`.
@@ -20,9 +17,6 @@ Release History
 * Fix `azure-cli-diff-tool`'s sdist missing `HISTORY.rst`, which broke building a wheel from it.
 * Fix `scripts/ci/extract_version.sh` producing an empty version.
 * Set `Description-Content-Type` and stop reading the long description through `codecs.open`, which wrote `\r\r\n` line endings on Windows.
-* `azdev cli generate-docs`/`azdev extension generate-docs`: support Sphinx>=7 and replace the removed directive import.
-* Set an explicit English language for reference documentation.
-* Include reference documentation generators, directives and RST sources in built distributions.
 
 0.2.13
 ++++++

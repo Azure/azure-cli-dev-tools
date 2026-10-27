@@ -35,8 +35,7 @@ classifiers = [
 # express statically.
 dynamic = ["version", "readme"]
 dependencies = [
-    # Publishing uses the Track 1 BlockBlobService API, removed in 1.5.0.
-    "azure-multiapi-storage<1.5",
+    "azure-multiapi-storage",
     "build",
     "docutils",
     "flake8",
@@ -49,19 +48,21 @@ dependencies = [
     "pytest>=5.0.0",
     "pyyaml",
     "requests",
-    "sphinx>=7",
+    "sphinx==1.6.7",
     "tox",
     "jsbeautifier~=1.14.7",
     "deepdiff~=8.6.1",
-    "azure-cli-diff-tool~=0.1.2",
+    "azure-cli-diff-tool~=0.1.1",
     "packaging",
     "pkginfo",
     "tomli; python_version < '3.11'",
     "tqdm",
     # setuptools >= 78.1.1 to address CVE-2025-47273 (path traversal).
-    # No upper bound: azdev does not call the [setup.py develop] / [easy_install]
+    # No upper bound: azdev does not call the `setup.py develop` / `easy_install`
     # commands deprecated in setuptools 80. Editable installs go through
-    # [pip install -e --config-settings editable_mode=compat --no-build-isolation]
+    # `pip install -e --config-settings editable_mode=compat --no-build-isolation`
+    # (0.2.12), and the remaining `setup.py` invocations against *target* repos
+    # (bdist_wheel, egg_info, sdist) are verified against current setuptools.
     "setuptools>=78.1.1",
     # `azdev extension build` runs `setup.py bdist_wheel` against extension repos that
     # have not migrated to pyproject.toml; keep the wheel command available even when
@@ -89,9 +90,6 @@ packages = [
     "azdev.mod_templates",
     "azdev.operations.help",
     "azdev.operations.help.refdoc",
-    "azdev.operations.help.refdoc.cli_docs",
-    "azdev.operations.help.refdoc.common",
-    "azdev.operations.help.refdoc.extension_docs",
     "azdev.operations.linter",
     "azdev.operations.linter.rules",
     "azdev.operations.linter.pylint_checkers",
@@ -107,8 +105,6 @@ packages = [
 [tool.setuptools.package-data]
 "azdev.config" = ["*.*", "cli_pylintrc", "ext_pylintrc"]
 "azdev.mod_templates" = ["*.*"]
-"azdev.operations.help.refdoc.cli_docs" = ["*.rst"]
-"azdev.operations.help.refdoc.extension_docs" = ["*.rst"]
 "azdev.operations.linter.rules" = ["ci_exclusions.yml"]
 "azdev.operations.linter" = ["data/*"]
 "azdev.operations.cmdcov" = ["*.*"]
