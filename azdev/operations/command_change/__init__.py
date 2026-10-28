@@ -10,8 +10,9 @@ import time
 
 from knack.log import get_logger
 import azure_cli_diff_tool
-from azdev.utilities import display, require_azure_cli, heading, get_path_table, filter_by_git_diff, \
+from azdev.utilities import display, require_azure_cli, heading, filter_by_git_diff, \
     calc_selected_mod_names
+from azdev.utilities.path import calc_selected_modules
 from .custom import DiffExportFormat, get_commands_meta, STORED_DEPRECATION_KEY
 from .util import export_commands_meta, dump_command_tree, add_to_command_tree
 from ..statistics import _create_invoker_and_load_cmds, _get_command_source, \
@@ -32,19 +33,7 @@ def export_command_meta(modules=None, git_source=None, git_target=None, git_repo
                         meta_output_path=None):
     require_azure_cli()
 
-    # allow user to run only on CLI or extensions
-    cli_only = modules == ['CLI']
-    ext_only = modules == ['EXT']
-    if cli_only or ext_only:
-        modules = None
-
-    selected_modules = get_path_table(include_only=modules, include_whl_extensions=include_whl_extensions)
-
-    if cli_only:
-        selected_modules['ext'] = {}
-    if ext_only:
-        selected_modules['core'] = {}
-        selected_modules['mod'] = {}
+    selected_modules = calc_selected_modules(modules, include_whl_extensions=include_whl_extensions)
 
     # filter down to only modules that have changed based on git diff
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)

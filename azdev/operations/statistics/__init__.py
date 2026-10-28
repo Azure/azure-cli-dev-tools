@@ -15,7 +15,8 @@ from pathlib import Path
 
 from knack.log import get_logger
 from azdev.utilities import (
-    heading, display, get_path_table, require_azure_cli, filter_by_git_diff)
+    heading, display, require_azure_cli, filter_by_git_diff)
+from azdev.utilities.path import calc_selected_modules
 
 from .util import filter_modules
 
@@ -30,19 +31,7 @@ def list_command_table(modules=None, git_source=None, git_target=None, git_repo=
 
     heading('List Command Table')
 
-    # allow user to run only on CLI or extensions
-    cli_only = modules == ['CLI']
-    ext_only = modules == ['EXT']
-    if cli_only or ext_only:
-        modules = None
-
-    selected_modules = get_path_table(include_only=modules, include_whl_extensions=include_whl_extensions)
-
-    if cli_only:
-        selected_modules['ext'] = {}
-    if ext_only:
-        selected_modules['mod'] = {}
-        selected_modules['core'] = {}
+    selected_modules = calc_selected_modules(modules, include_whl_extensions=include_whl_extensions)
 
     # filter down to only modules that have changed based on git diff
     selected_modules = filter_by_git_diff(selected_modules, git_source, git_target, git_repo)
