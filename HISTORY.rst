@@ -18,6 +18,7 @@ Release History
 * Fix `scripts/ci/extract_version.sh` producing an empty version.
 * Set `Description-Content-Type` and stop reading the long description through `codecs.open`, which wrote `\r\r\n` line endings on Windows.
 * `azdev command-change meta-export`: record `action` for parameters that take no value (`store_true`, `store_false`, `store_const` or `count`), including preview, experimental and deprecated arguments, whose action knack wraps in a subclass. Readers of the metadata can now tell a flag such as `--enable-fips` from an option that takes a value. Other parameters get no `action` key, and `meta-diff` doesn't compare it.
+* `azdev test`: cap `pytest` below 9.2. On Linux and macOS `azdev test` runs pytest with `--forked`, and pytest-forked 1.7.5 can't serialise pytest 9.2 reports, so every test failed with "EXITED with status 3". The cap stays until pytest-forked supports pytest 9.2 (pytest-dev/pytest-forked#113).
 
 0.2.13
 ++++++
