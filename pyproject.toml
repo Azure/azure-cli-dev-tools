@@ -45,7 +45,7 @@ dependencies = [
     "pylint>=4,<5",
     "pytest-xdist",     # depends on pytest-forked
     "pytest-forked",
-    "pytest>=5.0.0",
+    "pytest>=5.0.0,<9.2",  # azdev test uses --forked; pytest-forked 1.7.5 can't serialise pytest 9.2 reports (pytest-dev/pytest-forked#113)
     "pyyaml",
     "requests",
     "sphinx==1.6.7",
