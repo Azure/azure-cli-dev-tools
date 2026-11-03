@@ -115,13 +115,14 @@ def process_arg_action(argument_settings, para):
     if isinstance(action, str):
         if action in FLAG_ACTIONS:
             para["action"] = action
-        return
-    if not isinstance(action, type):
-        return
-    for action_class, action_name in FLAG_ACTION_CLASSES:
-        if issubclass(action, action_class):
-            para["action"] = action_name
-            return
+    elif isinstance(action, type):
+        for action_class, action_name in FLAG_ACTION_CLASSES:
+            if issubclass(action, action_class):
+                para["action"] = action_name
+                break
+    # a custom action that takes no value, such as the one for --acquire-policy-token
+    if "action" not in para and argument_settings.get("nargs", None) == 0:
+        para["action"] = "store_true"
 
 
 def normalize_para_types(para):

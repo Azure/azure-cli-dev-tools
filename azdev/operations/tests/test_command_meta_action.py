@@ -23,6 +23,20 @@ class _OptionalValueAction(argparse.Action):  # pylint: disable=too-few-public-m
         setattr(namespace, self.dest, values)
 
 
+class _NoValueAction(argparse.Action):  # pylint: disable=too-few-public-methods
+    """Registered with nargs=0, like core's action for --acquire-policy-token."""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, True)
+
+
+class _ValueAction(argparse.Action):  # pylint: disable=too-few-public-methods
+    """Takes a value, like core's action for --change-reference."""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values)
+
+
 def _params(arguments):
     command_info = {
         "name": "test cmd",
@@ -78,6 +92,30 @@ class CommandMetaActionTestCase(unittest.TestCase):
         self.assertEqual(params["deprecated_option_flag"].get("action"), "store_false")
         self.assertEqual(params["preview_const"].get("action"), "store_const")
         self.assertEqual(params["deprecated_count"].get("action"), "count")
+
+    def test_custom_actions_that_take_no_value(self):
+        def register(c):
+            c.argument("acquire_policy_token", options_list=["--acquire-policy-token"],
+                       action=_NoValueAction, nargs=0)
+            c.argument("change_reference", options_list=["--change-reference"], action=_ValueAction)
+            c.argument("preview_no_value", action=_NoValueAction, nargs=0, is_preview=True)
+            c.argument("deprecated_no_value", action=_NoValueAction, nargs=0, deprecate_info=c.deprecate(hide=False))
+            # nargs=0 doesn't replace a flag action that's already recorded
+            c.argument("store_false_nargs_0", action="store_false", nargs=0)
+
+        arguments = self._register(register)
+        settings = {argument.type.settings["dest"]: argument.type.settings for argument in arguments}
+        for name in ("preview_no_value", "deprecated_no_value"):
+            action = settings[name]["action"]
+            self.assertTrue(action is not _NoValueAction and issubclass(action, _NoValueAction), name)
+        params = _params(arguments)
+        self.assertEqual(params["acquire_policy_token"].get("action"), "store_true")
+        self.assertNotIn("action", params["change_reference"])
+        self.assertEqual(params["preview_no_value"].get("action"), "store_true")
+        self.assertEqual(params["deprecated_no_value"].get("action"), "store_true")
+        self.assertEqual(params["store_false_nargs_0"].get("action"), "store_false")
+        for para in params.values():
+            self.assertNotIn("nargs", para)
 
     def test_options_that_take_a_value_have_no_action(self):
         def register(c):
