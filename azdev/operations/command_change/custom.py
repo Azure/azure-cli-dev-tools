@@ -4,6 +4,7 @@
 # license information.
 # -----------------------------------------------------------------------------
 
+import argparse
 from enum import Enum
 
 from knack.log import get_logger
@@ -12,6 +13,17 @@ from .util import get_command_tree
 logger = get_logger(__name__)
 
 STORED_DEPRECATION_KEY = ["expiration", "target", "redirect", "hide"]
+
+# actions that take no value, so a reader of the metadata can tell a flag from an option that needs one
+FLAG_ACTIONS = ["store_true", "store_false", "store_const", "count"]
+# knack wraps the action in a subclass for preview, experimental and deprecated arguments,
+# so match classes by base class, checking subclasses before their bases
+FLAG_ACTION_CLASSES = [
+    (argparse._StoreTrueAction, "store_true"),  # pylint: disable=protected-access
+    (argparse._StoreFalseAction, "store_false"),  # pylint: disable=protected-access
+    (argparse._StoreConstAction, "store_const"),  # pylint: disable=protected-access
+    (argparse._CountAction, "count"),  # pylint: disable=protected-access
+]
 
 
 class DiffExportFormat(Enum):
@@ -98,6 +110,21 @@ def process_arg_type(argument_settings, para):
     para["type"] = raw_type if raw_type in ["str", "int", "float", "bool", "file_type"] else "custom_type"
 
 
+def process_arg_action(argument_settings, para):
+    action = argument_settings.get("action", None)
+    if isinstance(action, str):
+        if action in FLAG_ACTIONS:
+            para["action"] = action
+    elif isinstance(action, type):
+        for action_class, action_name in FLAG_ACTION_CLASSES:
+            if issubclass(action, action_class):
+                para["action"] = action_name
+                break
+    # a custom action that takes no value, such as the one for --acquire-policy-token
+    if "action" not in para and argument_settings.get("nargs", None) == 0:
+        para["action"] = "store_true"
+
+
 def normalize_para_types(para):
     type_string_opts = ["string", "str", "aazstrarg",
                         "aazresourcelocationarg", "aazresourcegroupnamearg", "aazresourceidarg",
@@ -159,6 +186,7 @@ def gen_command_meta(command_info, with_help=False, with_example=False):
         process_arg_options(settings, para)
         process_arg_options_deprecation(settings, para)
         process_arg_type(settings, para)
+        process_arg_action(settings, para)
         if settings.get("required", False):
             para["required"] = True
         if settings.get("choices", None):
