@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 import logging
+import re
 import requests
 import os.path
 
@@ -316,6 +317,56 @@ class MetaChangeDetect:
                                       base_val, cmp_val)
         self.diff_objs.append(diff_obj)
 
+    def __check_aaz_sub_args_diff(self, cmd_name, base_para_obj, cmp_para_obj):
+        """Apply the parameter rules to the fields of object, list and dict arguments:
+        a removed field, a new required field, a field that became required or lost an option is a break."""
+        base_sub_args = base_para_obj.get("aaz_sub_args")
+        cmp_sub_args = cmp_para_obj.get("aaz_sub_args")
+        if base_sub_args is None or cmp_sub_args is None:
+            # metadata exported before sub arguments were recorded, nothing to compare
+            return
+        para_name = base_para_obj["name"]
+        for path, base_sub in base_sub_args.items():
+            cmp_sub = cmp_sub_args.get(path)
+            if cmp_sub is None:
+                parent = self.__aaz_sub_arg_parent(path)
+                if parent in base_sub_args and parent not in cmp_sub_args:
+                    continue
+                self.diff_objs.append(ParaPropRemove(cmd_name, para_name, "aaz_sub_args", path,
+                                                     True, DiffLevel.BREAK))
+                continue
+            if cmp_sub.get("required") and not base_sub.get("required"):
+                self.diff_objs.append(ParaPropUpdate(cmd_name, para_name, f"aaz_sub_args.{path}.required",
+                                                     True, DiffLevel.BREAK, False, True))
+            if not set(base_sub.get("options", [])).issubset(cmp_sub.get("options", [])):
+                self.diff_objs.append(ParaPropUpdate(cmd_name, para_name, f"aaz_sub_args.{path}.options",
+                                                     True, DiffLevel.BREAK, base_sub.get("options"),
+                                                     cmp_sub.get("options")))
+            for prop in ["aaz_type", "choices"]:
+                if base_sub.get(prop) != cmp_sub.get(prop):
+                    is_narrowed = prop == "aaz_type" or not set(base_sub.get(prop) or []).issubset(
+                        cmp_sub.get(prop) or [])
+                    level = DiffLevel.WARN if is_narrowed else DiffLevel.INFO
+                    self.diff_objs.append(ParaPropUpdate(cmd_name, para_name, f"aaz_sub_args.{path}.{prop}",
+                                                         False, level, base_sub.get(prop), cmp_sub.get(prop)))
+        for path, cmp_sub in cmp_sub_args.items():
+            if path not in base_sub_args:
+                # a new required field breaks scripts only when they could already set its parent
+                parent = self.__aaz_sub_arg_parent(path)
+                is_break = bool(cmp_sub.get("required")) and (parent is None or parent in base_sub_args)
+                self.diff_objs.append(ParaPropAdd(cmd_name, para_name, "aaz_sub_args", path, is_break,
+                                                  DiffLevel.BREAK if is_break else DiffLevel.INFO))
+
+    @staticmethod
+    def __aaz_sub_arg_parent(path):
+        if path.endswith(("[]", "{}")):
+            parent = path[:-2]
+        elif "." in path:
+            parent = re.sub(r"\{[^}]+\}$", "", path.rsplit(".", 1)[0])
+        else:
+            return None
+        return parent or None
+
     def check_cmd_parameter_diff(self, cmd_name, base_parameters, cmp_parameters):
         """check cmd parameter diff"""
         for base_para_obj in base_parameters:
@@ -364,7 +415,7 @@ class MetaChangeDetect:
                 cmp_val = cmp_para_obj[prop]
                 self.__process_parameter_value_update(cmd_name, prop, base_para_obj, base_val, cmp_val)
                 continue
-
+            self.__check_aaz_sub_args_diff(cmd_name, base_para_obj, cmp_para_obj)
         # check added parameter obj, if obj is required, then is break
         for cmp_para_obj in cmp_parameters:
             if "checked" in cmp_para_obj and cmp_para_obj["checked"]:

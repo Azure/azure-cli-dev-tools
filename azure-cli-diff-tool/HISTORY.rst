@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.1.3
+++++++
+* `meta-diff`: compare `aaz_sub_args`. A removed field, a field that becomes required or loses an option, and a new required field under an existing parent are breaking changes. Enum value and type changes are warnings. Metadata without `aaz_sub_args` is not compared.
+
 0.1.2
 ++++++
 * Allow Requests 2.x updates without restricting installations to the 2.32 patch line.
