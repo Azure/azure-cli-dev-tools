@@ -35,7 +35,8 @@ classifiers = [
 # express statically.
 dynamic = ["version", "readme"]
 dependencies = [
-    "azure-multiapi-storage",
+    # Publishing uses the Track 1 BlockBlobService API, removed in 1.5.0.
+    "azure-multiapi-storage<1.5",
     "build",
     "docutils",
     "flake8",
@@ -48,7 +49,8 @@ dependencies = [
     "pytest>=5.0.0,<9.2",  # azdev test uses --forked; pytest-forked 1.7.5 can't serialise pytest 9.2 reports (pytest-dev/pytest-forked#113)
     "pyyaml",
     "requests",
-    "sphinx==1.6.7",
+    # Sphinx 1.6 requires pkg_resources, which modern setuptools no longer ships.
+    "sphinx>=7",
     "tox",
     "jsbeautifier~=1.14.7",
     "deepdiff~=8.6.1",
@@ -90,6 +92,9 @@ packages = [
     "azdev.mod_templates",
     "azdev.operations.help",
     "azdev.operations.help.refdoc",
+    "azdev.operations.help.refdoc.cli_docs",
+    "azdev.operations.help.refdoc.common",
+    "azdev.operations.help.refdoc.extension_docs",
     "azdev.operations.linter",
     "azdev.operations.linter.rules",
     "azdev.operations.linter.pylint_checkers",
@@ -105,6 +110,8 @@ packages = [
 [tool.setuptools.package-data]
 "azdev.config" = ["*.*", "cli_pylintrc", "ext_pylintrc"]
 "azdev.mod_templates" = ["*.*"]
+"azdev.operations.help.refdoc.cli_docs" = ["*.rst"]
+"azdev.operations.help.refdoc.extension_docs" = ["*.rst"]
 "azdev.operations.linter.rules" = ["ci_exclusions.yml"]
 "azdev.operations.linter" = ["data/*"]
 "azdev.operations.cmdcov" = ["*.*"]
