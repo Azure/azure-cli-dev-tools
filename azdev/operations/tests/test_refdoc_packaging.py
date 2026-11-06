@@ -53,6 +53,11 @@ class TestRefdocPackaging(unittest.TestCase):
                 self.assertNotIn('1.6.7', dependencies['sphinx'])
                 self.assertIn('7.0.0', dependencies['sphinx'])
                 self.assertIn('9.0.0', dependencies['sphinx'])
+                self.assertNotIn('78.1.0', dependencies['setuptools'])
+                self.assertIn('78.1.1', dependencies['setuptools'])
+                self.assertIn('79.0.1', dependencies['setuptools'])
+                self.assertNotIn('80.0.0', dependencies['setuptools'])
+                self.assertNotIn('84.2.1', dependencies['setuptools'])
                 archive.extractall(installed)
 
             # Import the actual wheel payload, not the source checkout. The

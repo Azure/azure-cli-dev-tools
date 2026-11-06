@@ -6,6 +6,8 @@
 
 from importlib import import_module
 import os
+import subprocess
+import sys
 import unittest
 from unittest.mock import patch
 
@@ -54,6 +56,19 @@ class TestPublishingDependency(unittest.TestCase):
         # used by publish_extensions. This test performs no storage requests.
         module = import_module('azure.multiapi.storage.v2018_11_09.blob')
         self.assertTrue(callable(module.BlockBlobService))
+
+
+class TestDownstreamPackagingDependency(unittest.TestCase):
+    def test_declared_dependency_provides_legacy_version_parser(self):
+        # Downstream release scripts still import pkg_resources. Exercise the
+        # resolved dependency in a fresh process, without mocking that import.
+        probe = """
+from pkg_resources import parse_version
+assert parse_version('1.0.0b1') < parse_version('1.0.0')
+assert parse_version('1.0.0') < parse_version('1.0.1')
+assert parse_version('1.0') == parse_version('1.0.0')
+"""
+        subprocess.run([sys.executable, '-I', '-c', probe], check=True)
 
 
 if __name__ == '__main__':

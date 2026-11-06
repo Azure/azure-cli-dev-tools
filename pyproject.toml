@@ -60,12 +60,11 @@ dependencies = [
     "tomli; python_version < '3.11'",
     "tqdm",
     # setuptools >= 78.1.1 to address CVE-2025-47273 (path traversal).
-    # No upper bound: azdev does not call the `setup.py develop` / `easy_install`
-    # commands deprecated in setuptools 80. Editable installs go through
-    # `pip install -e --config-settings editable_mode=compat --no-build-isolation`
-    # (0.2.12), and the remaining `setup.py` invocations against *target* repos
-    # (bdist_wheel, egg_info, sdist) are verified against current setuptools.
-    "setuptools>=78.1.1",
+    # Temporarily restore the pre-0.2.14 runtime range for downstream release
+    # scripts (including find_extension_upgraded.py) that import pkg_resources.
+    # Remove the cap once those consumers migrate to packaging.version.
+    # The isolated build backend remains uncapped.
+    "setuptools>=78.1.1,<80",
     # `azdev extension build` runs `setup.py bdist_wheel` against extension repos that
     # have not migrated to pyproject.toml; keep the wheel command available even when
     # the target environment's setuptools predates the bundled bdist_wheel (< 70.1).
