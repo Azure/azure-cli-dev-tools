@@ -2,6 +2,13 @@
 
 Release History
 ===============
+0.2.15
+++++++
+* `azdev cli generate-docs` / `azdev extension generate-docs`: replace `sphinx==1.6.7` with `sphinx>=7`, use the supported docutils `Directive` API, and set an explicit documentation language. This removes the documentation generator's dependency on `pkg_resources`. (#562)
+* Include the reference-documentation subpackages and RST files in azdev wheels and source distributions. Installed packages previously lacked the modules and source files required for documentation generation. (#562)
+* `azdev extension publish`: constrain `azure-multiapi-storage<1.5` to retain the Track 1 `BlockBlobService` API used for publishing. (#562)
+* Temporarily restore the runtime requirement `setuptools>=78.1.1,<80` for downstream release scripts that still import `pkg_resources`. Keep the security floor and the uncapped isolated build requirement. Remove the runtime cap once those consumers migrate to `packaging.version`. (#562)
+
 0.2.14
 ++++++
 * `azdev extension add`/`list`/`build`: discover extensions by packaging configuration instead of globbing for `setup.py`, so extensions that have migrated to `pyproject.toml` are found. Previously a migrated extension was reported as `extension(s) not found`.
