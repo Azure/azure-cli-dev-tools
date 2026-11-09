@@ -2,6 +2,11 @@
 
 Release History
 ===============
+0.2.15
+++++++
+* `azdev command-change meta-export`: record the fields of object, list and dict AAZ arguments under `aaz_sub_args`, keyed by path such as `key.uri`, `rules[]` or `tags{}`. Each field records its `aaz_type`, shorthand `options`, `required` and enum `choices`. Previously only the top level argument was recorded, so removing a nested field such as `serviceLevelEncryptionKey` from `--encryption-with-cmk` produced identical metadata and the breaking change went unreported.
+* Require `azure-cli-diff-tool` 0.1.3, which compares these fields.
+
 0.2.14
 ++++++
 * `azdev extension add`/`list`/`build`: discover extensions by packaging configuration instead of globbing for `setup.py`, so extensions that have migrated to `pyproject.toml` are found. Previously a migrated extension was reported as `extension(s) not found`.
