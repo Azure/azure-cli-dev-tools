@@ -2,6 +2,10 @@
 
 Release History
 ===============
+0.2.16
+++++++
+* `azdev command-change meta-export`: record the fields of object, list and dict AAZ arguments under `aaz_sub_args`, keyed by path such as `key.uri`, `rules[]` or `tags{}`. Each field records its `aaz_type`, shorthand `options`, `required` and enum `choices`. Previously only the top level argument was recorded, so removing a nested field such as `serviceLevelEncryptionKey` from `--encryption-with-cmk` produced identical metadata and the breaking change went unreported.
+
 0.2.15
 ++++++
 * `azdev cli generate-docs` / `azdev extension generate-docs`: replace `sphinx==1.6.7` with `sphinx>=7`, use the supported docutils `Directive` API, and set an explicit documentation language. This removes the documentation generator's dependency on `pkg_resources`. (#562)

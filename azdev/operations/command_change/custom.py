@@ -44,6 +44,40 @@ def process_aaz_argument(az_arguments_schema, argument_settings, para):
             para["aaz_default"] = aaz_type._default  # pylint: disable=protected-access
         if para["aaz_type"] in ["AAZArgEnum"] and aaz_type.get("enum", None) and aaz_type.enum.get("items", None):
             para["aaz_choices"] = aaz_type.enum["items"]
+        if hasattr(aaz_type, "_fields") or hasattr(aaz_type, "_element"):
+            para["aaz_sub_args"] = {}
+            process_aaz_sub_args(aaz_type, "", para["aaz_sub_args"], set())
+
+
+def process_aaz_sub_args(aaz_arg, prefix, sub_args, visited):
+    """Flatten the fields of an object, list or dict argument into `sub_args`, keyed by path.
+
+    Shorthand syntax lets users set these fields, so removing one or making it required breaks scripts
+    even though the top level argument does not change.
+    """
+    from azure.cli.core.aaz._arg import AAZBaseArg, AAZListArg  # pylint: disable=import-error
+    if id(aaz_arg) in visited:
+        return
+    visited = visited | {id(aaz_arg)}
+    children = [(f"{prefix}.{name}" if prefix else name, field)
+                for name, field in getattr(aaz_arg, "_fields", {}).items()]
+    for value, schema in getattr(aaz_arg, "_discriminators", {}).items():
+        children += [(f"{prefix}{{{value}}}.{name}", field) for name, field in schema._fields.items()]  # pylint: disable=protected-access
+    element = getattr(aaz_arg, "_element", None)
+    if element is not None:
+        children.append((prefix + ("[]" if isinstance(aaz_arg, AAZListArg) else "{}"), element))
+    for path, child in children:
+        if not isinstance(child, AAZBaseArg):
+            continue
+        sub_arg = {"aaz_type": child.__class__.__name__}
+        if child._options:  # pylint: disable=protected-access
+            sub_arg["options"] = sorted(child._options)  # pylint: disable=protected-access
+        if child._required:  # pylint: disable=protected-access
+            sub_arg["required"] = True
+        if getattr(child, "enum", None) and child.enum.items:
+            sub_arg["choices"] = sorted(child.enum.items)
+        sub_args[path] = sub_arg
+        process_aaz_sub_args(child, path, sub_args, visited)
 
 
 def process_arg_options(argument_settings, para):
