@@ -27,6 +27,8 @@ The `azdev` tool is designed to aid new and experienced developers in contributi
     - For Azure CLI Extensions: https://github.com/Azure/azure-cli-extensions
     - Any other repository that you might have access to that contains CLI extensions.
 
+    You only need to clone `azure-cli` if you plan to develop CLI modules, or if your extension depends on `azure-cli` changes that are not merged yet. Extensions run on top of the `azure-cli` package, so if you only work on extensions you can skip that clone: run `azdev setup --repo /path/to/your-extensions-repo` without `--cli` and it installs the released `azure-cli` from PyPI for them to run against. Use `--cli EDGE` instead to install the latest developer edge build.
+
     After forking `azure-cli`, follow the below commands to set up:
     ```Shell
     # Clone your forked repository
