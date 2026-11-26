@@ -5,6 +5,7 @@ Release History
 0.2.16
 ++++++
 * `azdev command-change meta-export`: record the fields of object, list and dict AAZ arguments under `aaz_sub_args`, keyed by path such as `key.uri`, `rules[]` or `tags{}`. Each field records its `aaz_type`, shorthand `options`, `required` and enum `choices`. Previously only the top level argument was recorded, so removing a nested field such as `serviceLevelEncryptionKey` from `--encryption-with-cmk` produced identical metadata and the breaking change went unreported.
+* README: explain that the `azure-cli` clone is only needed for CLI module development or unmerged `azure-cli` changes, and that extension-only work can run `azdev setup --repo <extensions-repo>` without `--cli`. (#564)
 
 0.2.15
 ++++++
